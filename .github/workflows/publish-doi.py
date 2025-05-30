@@ -49,6 +49,13 @@ def get_license(container_name, gh_token):
         print(f"Failed to get recipe or parse license: {e}")
         return ""
 
+def stream_download(url, chunk_size=1024*1024):
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()
+        for chunk in r.iter_content(chunk_size=chunk_size):
+            if chunk:
+                yield chunk
+
 def upload_container(container_url, container_name, token, license):
     """
     Upload simg to Zenodo and return the DOI URL.
@@ -80,20 +87,19 @@ def upload_container(container_url, container_name, token, license):
     if license:
         data['metadata']['license'] = license
         print("Updating metadata", data)
-        r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
-                        params=params, data=json.dumps(data),
-                        headers=headers)
-    else:
-        r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
-                params=params, data=json.dumps(data),
-                headers=headers)
-    with requests.get(container_url, stream=True) as response:
-        response.raise_for_status()  # Ensure the request was successful
-        r = requests.put(
-            f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
-            data=response.content,  # Stream the file directly
+    r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+            params=params, data=json.dumps(data),
+            headers=headers)
+    print("Update metadata", r.json())
+    # Stream upload to Zenodo bucket
+    upload_url = f"{bucket_url}/{os.path.basename(container_url)}"
+    with requests.Session() as session:
+        with session.put(
+            upload_url,
+            data=stream_download(container_url),
             params=params,
-        )
+        ) as upload_response:
+            upload_response.raise_for_status()
     
 
     # Publish the deposition
