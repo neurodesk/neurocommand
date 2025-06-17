@@ -2,7 +2,7 @@
     "afni": {
         "apps": {
             "afni 21.2.00": {
-                "version": "20210714", 
+                "version": "20210714",
                 "exec": ""
             },
             "sumaGUI-afni 21.2.00": {
@@ -10,47 +10,49 @@
                 "exec": "suma"
             },
             "afni 22.3.07": {
-                    "version": "20221206",
-                    "exec": ""
+                "version": "20221206",
+                "exec": ""
             },
             "sumaGUI-afni 22.3.07": {
-                    "version": "20221206",
-                    "exec": "suma"
+                "version": "20221206",
+                "exec": "suma"
             },
             "afni 23.0.07": {
-                    "version": "20230302",
-                    "exec": ""
+                "version": "20230302",
+                "exec": ""
             },
             "sumaGUI-afni 23.0.07": {
-                    "version": "20230302",
-                    "exec": "suma"
+                "version": "20230302",
+                "exec": "suma"
             },
             "afni 23.3.02": {
-                    "version": "20231024",
-                    "exec": ""
+                "version": "20231024",
+                "exec": ""
             },
             "sumaGUI-afni 23.3.02": {
-                    "version": "20231024",
-                    "exec": "suma"
+                "version": "20231024",
+                "exec": "suma"
             },
             "afni 24.1.02": {
-                    "version": "20240409",
-                    "exec": ""
+                "version": "20240409",
+                "exec": ""
             },
             "sumaGUI-afni 24.1.02": {
-                    "version": "20240409",
-                    "exec": "suma"
+                "version": "20240409",
+                "exec": "suma"
             },
             "afni 24.3.00": {
-                    "version": "20241003",
-                    "exec": ""
+                "version": "20241003",
+                "exec": ""
             },
             "sumaGUI-afni 24.3.00": {
-                    "version": "20241003",
-                    "exec": "suma"
+                "version": "20241003",
+                "exec": "suma"
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "aidamri": {
         "apps": {
@@ -59,7 +61,9 @@
                 "exec": ""
             }
         },
-        "categories": ["rodent imaging"]
+        "categories": [
+            "rodent imaging"
+        ]
     },
     "ants": {
         "apps": {
@@ -88,7 +92,22 @@
                 "exec": ""
             }
         },
-        "categories": ["image registration", "structural imaging", "image segmentation"]
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "ashs": {
+        "apps": {
+            "ashs 2.0.0": {
+                "version": "20210105",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "hippocampus"
+        ]
     },
     "aslprep": {
         "apps": {
@@ -121,16 +140,10 @@
                 "exec": ""
             }
         },
-        "categories": ["quantitative imaging", "workflows"]
-    },
-    "ashs": {
-        "apps": {
-            "ashs 2.0.0": {
-                "version": "20210105",
-                "exec": ""
-            }
-        },
-        "categories": ["hippocampus"]
+        "categories": [
+            "quantitative imaging",
+            "workflows"
+        ]
     },
     "bart": {
         "apps": {
@@ -143,7 +156,86 @@
                 "exec": ""
             }
         },
-        "categories": ["image reconstruction"]
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "bidsappaa": {
+        "apps": {
+            "bidsappaa 0.2.0": {
+                "version": "20230613",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
+    },
+    "bidsappbaracus": {
+        "apps": {
+            "bidsappbaracus 1.1.4": {
+                "version": "20230612",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
+    },
+    "bidsappbrainsuite": {
+        "apps": {
+            "bidsappbrainsuite 21a": {
+                "version": "20230618",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
+    },
+    "bidsapphcppipelines": {
+        "apps": {
+            "bidsapphcppipelines 4.3.0": {
+                "version": "20230524",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
+    },
+    "bidsappmrtrix3connectome": {
+        "apps": {
+            "bidsappmrtrix3connectome 0.5.3": {
+                "version": "20230615",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
+    },
+    "bidsapppymvpa": {
+        "apps": {
+            "bidsapppymvpa 2.0.2": {
+                "version": "20230629",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
+    },
+    "bidsappspm": {
+        "apps": {
+            "bidsappspm 0.0.20": {
+                "version": "20230629",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps"
+        ]
     },
     "bidscoin": {
         "apps": {
@@ -184,70 +276,9 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
-    },
-    "bidsappaa": {
-        "apps": {
-            "bidsappaa 0.2.0": {
-                "version": "20230613",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
-    },
-    "bidsappbaracus": {
-        "apps": {
-            "bidsappbaracus 1.1.4": {
-                "version": "20230612",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
-    },
-     "bidsappbrainsuite": {
-        "apps": {
-            "bidsappbrainsuite 21a": {
-                "version": "20230618",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
-    },
-    "bidsapphcppipelines": {
-        "apps": {
-            "bidsapphcppipelines 4.3.0": {
-                "version": "20230524",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
-    },
-    "bidsappmrtrix3connectome": {
-        "apps": {
-            "bidsappmrtrix3connectome 0.5.3": {
-                "version": "20230615",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
-    },
-    "bidsappspm": {
-        "apps": {
-            "bidsappspm 0.0.20": {
-                "version": "20230629",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
-    },
-      "bidsapppymvpa": {
-        "apps": {
-            "bidsapppymvpa 2.0.2": {
-                "version": "20230629",
-                "exec": ""
-            }
-        },
-        "categories": ["bids apps"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "bidstools": {
         "apps": {
@@ -268,7 +299,9 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "brainlifecli": {
         "apps": {
@@ -277,49 +310,66 @@
                 "exec": ""
             }
         },
-        "categories": ["workflows"]
+        "categories": [
+            "workflows"
+        ]
     },
     "brainnetviewer": {
         "apps": {
             "brainnetviewer 1.7.20191031": {
                 "version": "20240904",
                 "exec": ""
-            },            
+            },
             "brainnetviewerGUI-brainnetviewer 1.7.20191031": {
                 "version": "20240904",
                 "exec": "brainnetviewer"
             }
         },
-        "categories": ["functional imaging", "visualization"]
+        "categories": [
+            "functional imaging",
+            "visualization"
+        ]
     },
     "brainstorm": {
         "apps": {
             "brainstorm 3.211130": {
                 "version": "20211207",
                 "exec": ""
-            },            
+            },
             "brainstormGUI-brainstorm 3.211130": {
                 "version": "20211207",
                 "exec": "brainstorm3.command /opt/MCR/v98/"
             }
         },
-        "categories": ["electrophysiology"]
+        "categories": [
+            "electrophysiology"
+        ]
     },
-     "brkraw": {
+    "brkraw": {
         "apps": {
             "brkraw 0.3.11": {
                 "version": "20240320",
                 "exec": ""
-            },            
+            },
             "brkrawGUI-brkraw 0.3.11": {
                 "version": "20240320",
                 "exec": "brkraw gui"
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "cat12": {
         "apps": {
+            "cat12GUI-cat12 12.9": {
+                "version": "20250307",
+                "exec": "bash run_spm12.sh /opt/mcr/v93/"
+            },
+            "cat12 12.9": {
+                "version": "20250307",
+                "exec": ""
+            },
             "cat12GUI-cat12 r1933": {
                 "version": "20220128",
                 "exec": "bash run_spm12.sh /opt/mcr/v93/"
@@ -335,17 +385,13 @@
             "cat12 r2166": {
                 "version": "20230601",
                 "exec": ""
-            },
-            "cat12GUI-cat12 12.9": {
-                "version": "20250307",
-                "exec": "bash run_spm12.sh /opt/mcr/v93/"
-            },
-            "cat12 12.9": {
-                "version": "20250307",
-                "exec": ""
             }
         },
-        "categories": ["image segmentation", "image registration", "structural imaging"]
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
     },
     "clearswi": {
         "apps": {
@@ -354,7 +400,9 @@
                 "exec": ""
             }
         },
-        "categories": ["phase processing"]
+        "categories": [
+            "phase processing"
+        ]
     },
     "code": {
         "apps": {
@@ -367,7 +415,9 @@
                 "exec": ""
             }
         },
-        "categories": ["programming"]
+        "categories": [
+            "programming"
+        ]
     },
     "conn": {
         "apps": {
@@ -378,7 +428,7 @@
             "conn 20b": {
                 "version": "20210109",
                 "exec": ""
-            },   
+            },
             "connGUI-conn 22a": {
                 "version": "20231115",
                 "exec": "conn"
@@ -388,7 +438,9 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "connectomeworkbench": {
         "apps": {
@@ -401,7 +453,10 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging", "data organisation"]
+        "categories": [
+            "data organisation",
+            "functional imaging"
+        ]
     },
     "convert3d": {
         "apps": {
@@ -410,10 +465,38 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "dcm2bids": {
+        "apps": {
+            "dcm2bids 3.2.0": {
+                "version": "20250402",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "dcm2niix": {
+        "apps": {
+            "dcm2niix v1.0.20240202": {
+                "version": "20241125",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
     },
     "deepretinotopy": {
         "apps": {
+            "deepretinotopy 1.0.10": {
+                "version": "20250409",
+                "exec": ""
+            },
             "deepretinotopy 1.0.5": {
                 "version": "20240609",
                 "exec": ""
@@ -421,31 +504,12 @@
             "deepretinotopy 1.0.8": {
                 "version": "20250207",
                 "exec": ""
-            },
-            "deepretinotopy 1.0.10": {
-                "version": "20250409",
-                "exec": ""
             }
         },
-        "categories": ["machine learning", "functional imaging"]
-    },
-     "dcm2bids": {
-        "apps": {
-            "dcm2bids 3.2.0": {
-                "version": "20250402",
-                "exec": ""
-            }
-        },
-        "categories": ["data organisation"]
-     },
-     "dcm2niix": {
-        "apps": {
-            "dcm2niix v1.0.20240202": {
-                "version": "20241125",
-                "exec": ""
-            }
-        },
-        "categories": ["data organisation"]
+        "categories": [
+            "functional imaging",
+            "machine learning"
+        ]
     },
     "dicomtools": {
         "apps": {
@@ -454,7 +518,9 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "diffusiontoolkit": {
         "apps": {
@@ -463,49 +529,55 @@
                 "exec": ""
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "dsistudio": {
         "apps": {
             "dsistudio 2020.10": {
                 "version": "20210109",
                 "exec": ""
-            },            
+            },
             "dsistudioGUI-dsistudio 2020.10": {
                 "version": "20210109",
-                "exec": "dsi_studio"
-            },
-            "dsistudio chen.2024.04.19": {
-                "version": "20240426",
-                "exec": ""
-            },            
-            "dsistudioGUI-dsistudio chen.2024.04.19": {
-                "version": "20240426",
                 "exec": "dsi_studio"
             },
             "dsistudio 2024.06.12": {
                 "version": "20241010",
                 "exec": ""
-            },            
+            },
             "dsistudioGUI-dsistudio 2024.06.12": {
                 "version": "20241010",
                 "exec": "dsi_studio"
+            },
+            "dsistudio chen.2024.04.19": {
+                "version": "20240426",
+                "exec": ""
+            },
+            "dsistudioGUI-dsistudio chen.2024.04.19": {
+                "version": "20240426",
+                "exec": "dsi_studio"
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "eeglab": {
         "apps": {
             "eeglab 2020.0": {
                 "version": "20211026",
                 "exec": ""
-            },            
+            },
             "eeglabGUI-eeglab 2020.0": {
                 "version": "20211026",
                 "exec": "EEGLAB"
             }
         },
-        "categories": ["electrophysiology"]
+        "categories": [
+            "electrophysiology"
+        ]
     },
     "elastix": {
         "apps": {
@@ -514,16 +586,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image registration"]
-    },
-    "fatsegnet": {
-        "apps": {
-            "fatsegnet 1.0.gpu": {
-                "version": "20201212",
-                "exec": ""
-            }
-        },
-        "categories": ["body"]
+        "categories": [
+            "image registration"
+        ]
     },
     "fastcsr": {
         "apps": {
@@ -532,7 +597,20 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "fatsegnet": {
+        "apps": {
+            "fatsegnet 1.0.gpu": {
+                "version": "20201212",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "body"
+        ]
     },
     "fieldtrip": {
         "apps": {
@@ -545,7 +623,9 @@
                 "exec": ""
             }
         },
-        "categories": ["electrophysiology"]
+        "categories": [
+            "electrophysiology"
+        ]
     },
     "fmriprep": {
         "apps": {
@@ -578,7 +658,10 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging", "workflows"]
+        "categories": [
+            "functional imaging",
+            "workflows"
+        ]
     },
     "freesurfer": {
         "apps": {
@@ -619,7 +702,10 @@
                 "exec": "freeview"
             }
         },
-        "categories": ["image segmentation", "structural imaging"]
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
     },
     "fsl": {
         "apps": {
@@ -639,7 +725,7 @@
                 "version": "20210105",
                 "exec": "fsleyes"
             },
-            "fsl 6.0.5.1": {  
+            "fsl 6.0.5.1": {
                 "version": "20221016",
                 "exec": ""
             },
@@ -647,7 +733,7 @@
                 "version": "20221016",
                 "exec": "fsleyes"
             },
-            "fsl 6.0.6.4": {  
+            "fsl 6.0.6.4": {
                 "version": "20230618",
                 "exec": ""
             },
@@ -655,7 +741,7 @@
                 "version": "20230618",
                 "exec": "fsleyes"
             },
-            "fsl 6.0.7.1": {  
+            "fsl 6.0.7.1": {
                 "version": "20230809",
                 "exec": ""
             },
@@ -663,23 +749,7 @@
                 "version": "20230809",
                 "exec": "fsleyes"
             },
-            "fsl 6.0.7.4": {  
-                "version": "20231005",
-                "exec": ""
-            },
-            "fsleyesGUI-fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": "fsleyes"
-            },
-            "fsl 6.0.7.8": {  
-                "version": "20240913",
-                "exec": ""
-            },
-            "fsleyesGUI-fsl 6.0.7.8": {
-                "version": "20240913",
-                "exec": "fsleyes"
-            },
-            "fsl 6.0.7.14": {  
+            "fsl 6.0.7.14": {
                 "version": "20241018",
                 "exec": ""
             },
@@ -687,16 +757,38 @@
                 "version": "20241018",
                 "exec": "fsleyes"
             },
-            "fsl 6.0.7.16": {  
-                "version": "20250131",
+            "fsl 6.0.7.16": {
+                "version": "20250617",
                 "exec": ""
             },
             "fsleyesGUI-fsl 6.0.7.16": {
-                "version": "20250131",
+                "version": "20250617",
+                "exec": "fsleyes"
+            },
+            "fsl 6.0.7.4": {
+                "version": "20231005",
+                "exec": ""
+            },
+            "fsleyesGUI-fsl 6.0.7.4": {
+                "version": "20231005",
+                "exec": "fsleyes"
+            },
+            "fsl 6.0.7.8": {
+                "version": "20240913",
+                "exec": ""
+            },
+            "fsleyesGUI-fsl 6.0.7.8": {
+                "version": "20240913",
                 "exec": "fsleyes"
             }
         },
-        "categories": ["functional imaging", "structural imaging", "diffusion imaging", "image segmentation", "image registration"]
+        "categories": [
+            "diffusion imaging",
+            "functional imaging",
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
     },
     "gimp": {
         "apps": {
@@ -709,7 +801,9 @@
                 "exec": ""
             }
         },
-        "categories": ["visualization"]
+        "categories": [
+            "visualization"
+        ]
     },
     "glmsingle": {
         "apps": {
@@ -718,7 +812,9 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "globus": {
         "apps": {
@@ -731,7 +827,9 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "hdbet": {
         "apps": {
@@ -740,7 +838,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "heudiconv": {
         "apps": {
@@ -749,16 +849,9 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
-    },
-    "hnncore": {
-        "apps": {
-            "hnncore 0.3": {
-                "version": "20231112",
-                "exec": ""
-            }
-        },
-        "categories": ["electrophysiology"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "hmri": {
         "apps": {
@@ -779,7 +872,21 @@
                 "exec": ""
             }
         },
-        "categories": ["quantitative imaging", "structural imaging"]
+        "categories": [
+            "quantitative imaging",
+            "structural imaging"
+        ]
+    },
+    "hnncore": {
+        "apps": {
+            "hnncore 0.3": {
+                "version": "20231112",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ]
     },
     "ilastik": {
         "apps": {
@@ -792,7 +899,9 @@
                 "exec": "run_ilastik.sh"
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "itksnap": {
         "apps": {
@@ -821,10 +930,25 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation","visualization"]
+        "categories": [
+            "image segmentation",
+            "visualization"
+        ]
     },
     "julia": {
         "apps": {
+            "julia 1.10.1": {
+                "version": "20240321",
+                "exec": ""
+            },
+            "vscodeGUI-julia 1.10.1": {
+                "version": "20240321",
+                "exec": "code"
+            },
+            "REPLGUI-julia 1.10.1": {
+                "version": "20240321",
+                "exec": "julia"
+            },
             "julia 1.4.1": {
                 "version": "20210105",
                 "exec": ""
@@ -840,21 +964,11 @@
             "REPLGUI-julia 1.9.4": {
                 "version": "20240405",
                 "exec": "julia"
-            },
-            "julia 1.10.1": {
-                "version": "20240321",
-                "exec": ""
-            },
-            "vscodeGUI-julia 1.10.1": {
-                "version": "20240321",
-                "exec": "code"
-            },
-            "REPLGUI-julia 1.10.1": {
-                "version": "20240321",
-                "exec": "julia"
             }
         },
-        "categories": ["programming"]
+        "categories": [
+            "programming"
+        ]
     },
     "lashis": {
         "apps": {
@@ -867,16 +981,20 @@
                 "exec": ""
             }
         },
-        "categories": ["hippocampus"]
+        "categories": [
+            "hippocampus"
+        ]
     },
-    "laynii": { 
+    "laynii": {
         "apps": {
             "laynii 2.2.1": {
                 "version": "20220701",
                 "exec": ""
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "lcmodel": {
         "apps": {
@@ -885,7 +1003,9 @@
                 "exec": ""
             }
         },
-        "categories": ["spectroscopy"]
+        "categories": [
+            "spectroscopy"
+        ]
     },
     "matlab": {
         "apps": {
@@ -922,7 +1042,10 @@
                 "exec": "matlab"
             }
         },
-        "categories": ["programming", "visualization"]
+        "categories": [
+            "programming",
+            "visualization"
+        ]
     },
     "mfcsc": {
         "apps": {
@@ -935,7 +1058,10 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging", "diffusion imaging"]
+        "categories": [
+            "diffusion imaging",
+            "functional imaging"
+        ]
     },
     "mgltools": {
         "apps": {
@@ -956,29 +1082,23 @@
                 "exec": "adt"
             }
         },
-        "categories": ["molecular biology"]
+        "categories": [
+            "molecular biology"
+        ]
     },
-     "micapipe": {
+    "micapipe": {
         "apps": {
             "micapipe v0.2.3": {
                 "version": "20241030",
                 "exec": ""
             }
         },
-        "categories": ["structural imaging", "diffusion imaging", "functional imaging", "workflows"]
-    },
-     "mitkdiffusion": {
-        "apps": {
-            "mitkdiffusion 1.2.0": {
-                "version": "20230720",
-                "exec": ""
-            },
-            "mitkdiffusionGUI-mitkdiffusion 1.2.0": {
-                "version": "20230720",
-                "exec": "MitkDiffusion.sh"
-            }
-        },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging",
+            "functional imaging",
+            "structural imaging",
+            "workflows"
+        ]
     },
     "minc": {
         "apps": {
@@ -999,7 +1119,26 @@
                 "exec": "register"
             }
         },
-        "categories": ["image segmentation", "image registration", "structural imaging"]
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "mitkdiffusion": {
+        "apps": {
+            "mitkdiffusion 1.2.0": {
+                "version": "20230720",
+                "exec": ""
+            },
+            "mitkdiffusionGUI-mitkdiffusion 1.2.0": {
+                "version": "20230720",
+                "exec": "MitkDiffusion.sh"
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "mne": {
         "apps": {
@@ -1027,14 +1166,6 @@
                 "version": "20220607",
                 "exec": "code"
             },
-            "mne 1.1.1": {
-                "version": "20220912",
-                "exec": ""
-            },
-            "code-mne 1.1.1": {
-                "version": "20220912",
-                "exec": "code"
-            },
             "mneextended 1.1.0": {
                 "version": "20220819",
                 "exec": ""
@@ -1042,9 +1173,19 @@
             "codemneextended-mneextended 1.1.0": {
                 "version": "20220819",
                 "exec": "code"
+            },
+            "mne 1.1.1": {
+                "version": "20220912",
+                "exec": ""
+            },
+            "code-mne 1.1.1": {
+                "version": "20220912",
+                "exec": "code"
             }
         },
-        "categories": ["electrophysiology"]
+        "categories": [
+            "electrophysiology"
+        ]
     },
     "mricrogl": {
         "apps": {
@@ -1057,7 +1198,9 @@
                 "exec": "MRIcroGL"
             }
         },
-        "categories": ["visualization"]
+        "categories": [
+            "visualization"
+        ]
     },
     "mricron": {
         "apps": {
@@ -1070,7 +1213,9 @@
                 "exec": "MRIcron"
             }
         },
-        "categories": ["visualization"]
+        "categories": [
+            "visualization"
+        ]
     },
     "mriqc": {
         "apps": {
@@ -1087,7 +1232,12 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation", "functional imaging", "quality control", "workflows"]
+        "categories": [
+            "data organisation",
+            "functional imaging",
+            "quality control",
+            "workflows"
+        ]
     },
     "mritools": {
         "apps": {
@@ -1096,10 +1246,12 @@
                 "exec": ""
             }
         },
-        "categories": ["phase processing"]
+        "categories": [
+            "phase processing"
+        ]
     },
-    "mrsiproc":{
-        "apps":{
+    "mrsiproc": {
+        "apps": {
             "mrsiproc 0.0.1": {
                 "version": "20230503",
                 "exec": ""
@@ -1109,7 +1261,9 @@
                 "exec": ""
             }
         },
-        "categories": ["spectroscopy"]
+        "categories": [
+            "spectroscopy"
+        ]
     },
     "mrtrix3": {
         "apps": {
@@ -1150,7 +1304,9 @@
                 "exec": ""
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "mrtrix3tissue": {
         "apps": {
@@ -1159,7 +1315,9 @@
                 "exec": ""
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "neurodock": {
         "apps": {
@@ -1168,7 +1326,9 @@
                 "exec": ""
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "niftyreg": {
         "apps": {
@@ -1177,7 +1337,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image registration"]
+        "categories": [
+            "image registration"
+        ]
     },
     "nighres": {
         "apps": {
@@ -1190,16 +1352,9 @@
                 "exec": ""
             }
         },
-        "categories": ["structural imaging"]
-    },
-    "niistat": {
-        "apps": {
-            "niistat 1.0.20191216": {
-                "version": "20220111",
-                "exec": ""
-            }
-        },
-        "categories": ["functional imaging"]
+        "categories": [
+            "structural imaging"
+        ]
     },
     "niimath": {
         "apps": {
@@ -1208,7 +1363,20 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "niistat": {
+        "apps": {
+            "niistat 1.0.20191216": {
+                "version": "20220111",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
     },
     "nipype": {
         "apps": {
@@ -1221,7 +1389,9 @@
                 "exec": ""
             }
         },
-        "categories": ["workflows"]
+        "categories": [
+            "workflows"
+        ]
     },
     "oshyx": {
         "apps": {
@@ -1230,7 +1400,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "palm": {
         "apps": {
@@ -1239,7 +1411,9 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "palmettobug": {
         "apps": {
@@ -1252,7 +1426,9 @@
                 "exec": "palmettobug"
             }
         },
-        "categories": ["molecular biology"]
+        "categories": [
+            "molecular biology"
+        ]
     },
     "physio": {
         "apps": {
@@ -1265,7 +1441,9 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "pydeface": {
         "apps": {
@@ -1274,7 +1452,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "qmrlab": {
         "apps": {
@@ -1283,16 +1463,9 @@
                 "exec": ""
             }
         },
-        "categories": ["quantitative imaging"]
-    },
-    "quickshear": {
-        "apps": {
-            "quickshear 1.1.0": {
-                "version": "20240606",
-                "exec": ""
-            }
-        },
-        "categories": ["data organisation"]
+        "categories": [
+            "quantitative imaging"
+        ]
     },
     "qsiprep": {
         "apps": {
@@ -1305,7 +1478,9 @@
                 "exec": ""
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "qsirecon": {
         "apps": {
@@ -1314,7 +1489,9 @@
                 "exec": ""
             }
         },
-            "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "qsmxt": {
         "apps": {
@@ -1339,7 +1516,23 @@
                 "exec": ""
             }
         },
-        "categories": ["phase processing", "quantitative imaging", "structural imaging", "workflows"]
+        "categories": [
+            "phase processing",
+            "quantitative imaging",
+            "structural imaging",
+            "workflows"
+        ]
+    },
+    "quickshear": {
+        "apps": {
+            "quickshear 1.1.0": {
+                "version": "20240606",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
     },
     "rabies": {
         "apps": {
@@ -1348,7 +1541,9 @@
                 "exec": ""
             }
         },
-        "categories": ["rodent imaging"]
+        "categories": [
+            "rodent imaging"
+        ]
     },
     "relion": {
         "apps": {
@@ -1357,7 +1552,9 @@
                 "exec": ""
             }
         },
-        "categories": ["cryo EM"]
+        "categories": [
+            "cryo EM"
+        ]
     },
     "romeo": {
         "apps": {
@@ -1369,8 +1566,10 @@
                 "version": "20220224",
                 "exec": ""
             }
-        }, 
-        "categories": ["phase processing"]
+        },
+        "categories": [
+            "phase processing"
+        ]
     },
     "root": {
         "apps": {
@@ -1379,7 +1578,9 @@
                 "exec": ""
             }
         },
-        "categories": ["programming"]
+        "categories": [
+            "programming"
+        ]
     },
     "rstudio": {
         "apps": {
@@ -1416,7 +1617,9 @@
                 "exec": "rstudio"
             }
         },
-        "categories": ["statistics"]
+        "categories": [
+            "statistics"
+        ]
     },
     "samsrfx": {
         "apps": {
@@ -1429,7 +1632,9 @@
                 "exec": "samsrfx"
             }
         },
-        "categories": ["functional imaging"]
+        "categories": [
+            "functional imaging"
+        ]
     },
     "sigviewer": {
         "apps": {
@@ -1442,9 +1647,11 @@
                 "exec": "sigviewer"
             }
         },
-        "categories": ["electrophysiology"]
+        "categories": [
+            "electrophysiology"
+        ]
     },
-    "slicer": {  
+    "slicer": {
         "apps": {
             "slicer 4.11.20200930": {
                 "version": "20201108",
@@ -1463,7 +1670,12 @@
                 "exec": "Slicer"
             }
         },
-        "categories": ["image segmentation", "image registration", "structural imaging", "visualization"]
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging",
+            "visualization"
+        ]
     },
     "slicersalt": {
         "apps": {
@@ -1476,7 +1688,9 @@
                 "exec": "SlicerSALTApp-real"
             }
         },
-        "categories": ["shape analysis"]
+        "categories": [
+            "shape analysis"
+        ]
     },
     "sovabids": {
         "apps": {
@@ -1485,7 +1699,9 @@
                 "exec": ""
             }
         },
-        "categories": ["data organisation"]
+        "categories": [
+            "data organisation"
+        ]
     },
     "spinalcordtoolbox": {
         "apps": {
@@ -1514,7 +1730,9 @@
                 "exec": ""
             }
         },
-        "categories": ["spine"]
+        "categories": [
+            "spine"
+        ]
     },
     "spm12": {
         "apps": {
@@ -1527,7 +1745,12 @@
                 "exec": ""
             }
         },
-        "categories": ["functional imaging", "image segmentation", "image registration", "structural imaging"]
+        "categories": [
+            "functional imaging",
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
     },
     "surfice": {
         "apps": {
@@ -1540,7 +1763,9 @@
                 "exec": "surfice"
             }
         },
-        "categories": ["visualization"]
+        "categories": [
+            "visualization"
+        ]
     },
     "synthstrip": {
         "apps": {
@@ -1549,7 +1774,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "tgvqsm": {
         "apps": {
@@ -1558,7 +1785,10 @@
                 "exec": ""
             }
         },
-        "categories": ["quantitative imaging", "phase processing"]
+        "categories": [
+            "phase processing",
+            "quantitative imaging"
+        ]
     },
     "topaz": {
         "apps": {
@@ -1567,7 +1797,9 @@
                 "exec": ""
             }
         },
-        "categories": ["cryo EM"]
+        "categories": [
+            "cryo EM"
+        ]
     },
     "trackvis": {
         "apps": {
@@ -1576,7 +1808,9 @@
                 "exec": ""
             }
         },
-        "categories": ["diffusion imaging"]
+        "categories": [
+            "diffusion imaging"
+        ]
     },
     "vesselapp": {
         "apps": {
@@ -1585,7 +1819,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "vesselboost": {
         "apps": {
@@ -1602,7 +1838,9 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     },
     "vesselvio": {
         "apps": {
@@ -1615,7 +1853,9 @@
                 "exec": "vesselvio"
             }
         },
-        "categories": ["visualization"]
+        "categories": [
+            "visualization"
+        ]
     },
     "vina": {
         "apps": {
@@ -1624,7 +1864,9 @@
                 "exec": ""
             }
         },
-        "categories": ["molecular biology"]
+        "categories": [
+            "molecular biology"
+        ]
     },
     "vmtk": {
         "apps": {
@@ -1633,6 +1875,8 @@
                 "exec": ""
             }
         },
-        "categories": ["image segmentation"]
+        "categories": [
+            "image segmentation"
+        ]
     }
 }
