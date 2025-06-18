@@ -758,11 +758,11 @@
                 "exec": "fsleyes"
             },
             "fsl 6.0.7.16": {
-                "version": "20250617",
+                "version": "20250131",
                 "exec": ""
             },
             "fsleyesGUI-fsl 6.0.7.16": {
-                "version": "20250617",
+                "version": "20250131",
                 "exec": "fsleyes"
             },
             "fsl 6.0.7.4": {
@@ -1359,7 +1359,7 @@
     "niimath": {
         "apps": {
             "niimath 1.0.0": {
-                "version": "20240902",
+                "version": "20250617",
                 "exec": ""
             }
         },
@@ -1811,15 +1811,6 @@
         "categories": [
             "diffusion imaging"
         ]
-    },
-    "tractseg": {
-        "apps": {
-            "tractseg 2.9": {
-                "version": "20250613",
-                "exec": ""
-            }
-        },
-        "categories": ["diffusion imaging"]
     },
     "vesselapp": {
         "apps": {
