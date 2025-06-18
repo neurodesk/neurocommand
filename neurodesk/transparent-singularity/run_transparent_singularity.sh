@@ -151,7 +151,7 @@ else
 
    if [[ -v url_cdn ]]; then
       # echo "check if aria2 is installed ..."
-      qq=`which  aria2c`
+      qq=$(which  aria2c)
       if [[  ${#qq} -lt 1 ]]; then
           echo "aria2 is not installed. Defaulting to curl."
          
@@ -187,8 +187,21 @@ else
               
           container_pull="curl -X GET ${url}${container} -O"
        else 
-          container_pull="aria2c ${url_cdn}${container} ${url_nectar}${container}"
-       fi # end of aria2c check
+         #check if both url_cdn and url_nectar are set
+         if [[ -v url_nectar ]] && [[ -v url_cdn ]]; then
+            echo "Using aria2c to download from both CDN and Nectar."
+            container_pull="aria2c -x 16 -s 16 ${url_cdn}${container} ${url_nectar}${container}"
+         else
+            echo "Using aria2c to download from CDN or Nectar."
+            # if only one URL is set, use that one
+            if [[ -v url_nectar ]]; then
+               container_pull="aria2c -x 16 -s 16 ${url_nectar}${container}"
+            fi
+            if [[ -v url_cdn ]]; then
+               container_pull="aria2c -x 16 -s 16 ${url_cdn}${container}"
+            fi
+         fi # end of check if both urls are set
+      fi # end of check if aria2 is installed
    else # end of check if files exist in object storage
       # fallback to docker
       echo "$container does not exist in any cache - loading from docker!"
