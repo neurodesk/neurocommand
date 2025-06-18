@@ -1812,6 +1812,17 @@
             "diffusion imaging"
         ]
     },
+    "tractseg": {
+        "apps": {
+            "tractseg 2.9": {
+                "version": "20250618",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
     "vesselapp": {
         "apps": {
             "vesselapp 0.3.1": {
