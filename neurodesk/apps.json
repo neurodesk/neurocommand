@@ -1359,12 +1359,13 @@
     "niimath": {
         "apps": {
             "niimath 1.0.0": {
-                "version": "20240902",
+                "version": "1.0.0",
+                "build_date": "20250617",
                 "exec": ""
             }
         },
         "categories": [
-            "data organisation"
+            "other"
         ]
     },
     "niistat": {
@@ -1810,6 +1811,17 @@
         },
         "categories": [
             "diffusion imaging"
+        ]
+    },
+    "tractseg": {
+        "apps": {
+            "tractseg 2.9": {
+                "version": "20250618",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "other"
         ]
     },
     "vesselapp": {
