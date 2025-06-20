@@ -46,48 +46,54 @@
             "application": "ants_2.3.1_20211204",
             "categories": [
                 "image registration",
-                "structural imaging",
-                "image segmentation"
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
             "application": "ants_2.3.5_20211212",
             "categories": [
                 "image registration",
-                "structural imaging",
-                "image segmentation"
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
             "application": "ants_2.5.1_20240429",
             "categories": [
                 "image registration",
-                "structural imaging",
-                "image segmentation"
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
             "application": "ants_2.5.3_20240925",
             "categories": [
                 "image registration",
-                "structural imaging",
-                "image segmentation"
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
             "application": "ants_2.5.4_20250423",
             "categories": [
                 "image registration",
-                "structural imaging",
-                "image segmentation"
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
             "application": "ants_2.6.0_20250424",
             "categories": [
                 "image registration",
-                "structural imaging",
-                "image segmentation"
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "ashs_2.0.0_20210105",
+            "categories": [
+                "hippocampus"
             ]
         },
         {
@@ -140,12 +146,6 @@
             ]
         },
         {
-            "application": "ashs_2.0.0_20210105",
-            "categories": [
-                "hippocampus"
-            ]
-        },
-        {
             "application": "bart_0.7.00_20210302",
             "categories": [
                 "image reconstruction"
@@ -155,6 +155,48 @@
             "application": "bart_0.9.00_20240723",
             "categories": [
                 "image reconstruction"
+            ]
+        },
+        {
+            "application": "bidsappaa_0.2.0_20230613",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsappbaracus_1.1.4_20230612",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsappbrainsuite_21a_20230618",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsapphcppipelines_4.3.0_20230524",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsappmrtrix3connectome_0.5.3_20230615",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsapppymvpa_2.0.2_20230629",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsappspm_0.0.20_20230629",
+            "categories": [
+                "bids apps"
             ]
         },
         {
@@ -212,48 +254,6 @@
             ]
         },
         {
-            "application": "bidsappaa_0.2.0_20230613",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
-            "application": "bidsappbaracus_1.1.4_20230612",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
-            "application": "bidsappbrainsuite_21a_20230618",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
-            "application": "bidsapphcppipelines_4.3.0_20230524",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
-            "application": "bidsappmrtrix3connectome_0.5.3_20230615",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
-            "application": "bidsappspm_0.0.20_20230629",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
-            "application": "bidsapppymvpa_2.0.2_20230629",
-            "categories": [
-                "bids apps"
-            ]
-        },
-        {
             "application": "bidstools_1.0.1_20230905",
             "categories": [
                 "data organisation"
@@ -303,26 +303,26 @@
             ]
         },
         {
+            "application": "cat12_12.9_20250307",
+            "categories": [
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "cat12_r1933_20220128",
             "categories": [
-                "image segmentation",
                 "image registration",
+                "image segmentation",
                 "structural imaging"
             ]
         },
         {
             "application": "cat12_r2166_20230601",
             "categories": [
-                "image segmentation",
                 "image registration",
-                "structural imaging"
-            ]
-        },
-        {
-            "application": "cat12_12.9_20250307",
-            "categories": [
                 "image segmentation",
-                "image registration",
                 "structural imaging"
             ]
         },
@@ -353,42 +353,21 @@
         {
             "application": "connectomeworkbench_1.4.2_20201119",
             "categories": [
-                "functional imaging",
-                "data organisation"
+                "data organisation",
+                "functional imaging"
             ]
         },
         {
             "application": "connectomeworkbench_1.5.0_20220919",
             "categories": [
-                "functional imaging",
-                "data organisation"
+                "data organisation",
+                "functional imaging"
             ]
         },
         {
             "application": "convert3d_1.0.0_20210104",
             "categories": [
                 "data organisation"
-            ]
-        },
-        {
-            "application": "deepretinotopy_1.0.5_20240609",
-            "categories": [
-                "machine learning",
-                "functional imaging"
-            ]
-        },
-        {
-            "application": "deepretinotopy_1.0.8_20250207",
-            "categories": [
-                "machine learning",
-                "functional imaging"
-            ]
-        },
-        {
-            "application": "deepretinotopy_1.0.10_20250409",
-            "categories": [
-                "machine learning",
-                "functional imaging"
             ]
         },
         {
@@ -401,6 +380,27 @@
             "application": "dcm2niix_v1.0.20240202_20241125",
             "categories": [
                 "data organisation"
+            ]
+        },
+        {
+            "application": "deepretinotopy_1.0.10_20250409",
+            "categories": [
+                "functional imaging",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "deepretinotopy_1.0.5_20240609",
+            "categories": [
+                "functional imaging",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "deepretinotopy_1.0.8_20250207",
+            "categories": [
+                "functional imaging",
+                "machine learning"
             ]
         },
         {
@@ -422,13 +422,13 @@
             ]
         },
         {
-            "application": "dsistudio_chen.2024.04.19_20240426",
+            "application": "dsistudio_2024.06.12_20241010",
             "categories": [
                 "diffusion imaging"
             ]
         },
         {
-            "application": "dsistudio_2024.06.12_20241010",
+            "application": "dsistudio_chen.2024.04.19_20240426",
             "categories": [
                 "diffusion imaging"
             ]
@@ -446,15 +446,15 @@
             ]
         },
         {
-            "application": "fatsegnet_1.0.gpu_20201212",
-            "categories": [
-                "body"
-            ]
-        },
-        {
             "application": "fastcsr_1.0_20231213",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "fatsegnet_1.0.gpu_20201212",
+            "categories": [
+                "body"
             ]
         },
         {
@@ -556,91 +556,91 @@
         {
             "application": "fsl_6.0.3_20200905",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
+                "functional imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
+                "structural imaging"
             ]
         },
         {
             "application": "fsl_6.0.4_20210105",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
+                "functional imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
+                "structural imaging"
             ]
         },
         {
             "application": "fsl_6.0.5.1_20221016",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
+                "functional imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
+                "structural imaging"
             ]
         },
         {
             "application": "fsl_6.0.6.4_20230618",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
+                "functional imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
+                "structural imaging"
             ]
         },
         {
             "application": "fsl_6.0.7.1_20230809",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
-                "image segmentation",
-                "image registration"
-            ]
-        },
-        {
-            "application": "fsl_6.0.7.4_20231005",
-            "categories": [
                 "functional imaging",
-                "structural imaging",
-                "diffusion imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
-            ]
-        },
-        {
-            "application": "fsl_6.0.7.8_20240913",
-            "categories": [
-                "functional imaging",
-                "structural imaging",
-                "diffusion imaging",
-                "image segmentation",
-                "image registration"
+                "structural imaging"
             ]
         },
         {
             "application": "fsl_6.0.7.14_20241018",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
+                "functional imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
+                "structural imaging"
             ]
         },
         {
             "application": "fsl_6.0.7.16_20250131",
             "categories": [
-                "functional imaging",
-                "structural imaging",
                 "diffusion imaging",
+                "functional imaging",
+                "image registration",
                 "image segmentation",
-                "image registration"
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "fsl_6.0.7.4_20231005",
+            "categories": [
+                "diffusion imaging",
+                "functional imaging",
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "fsl_6.0.7.8_20240913",
+            "categories": [
+                "diffusion imaging",
+                "functional imaging",
+                "image registration",
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
@@ -674,12 +674,6 @@
             ]
         },
         {
-            "application": "hnncore_0.3_20231112",
-            "categories": [
-                "electrophysiology"
-            ]
-        },
-        {
             "application": "hmri_0.6.0_20230901",
             "categories": [
                 "quantitative imaging",
@@ -691,6 +685,12 @@
             "categories": [
                 "quantitative imaging",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "hnncore_0.3_20231112",
+            "categories": [
+                "electrophysiology"
             ]
         },
         {
@@ -721,6 +721,12 @@
             ]
         },
         {
+            "application": "julia_1.10.1_20240321",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
             "application": "julia_1.4.1_20210105",
             "categories": [
                 "programming"
@@ -728,12 +734,6 @@
         },
         {
             "application": "julia_1.9.4_20240405",
-            "categories": [
-                "programming"
-            ]
-        },
-        {
-            "application": "julia_1.10.1_20240321",
             "categories": [
                 "programming"
             ]
@@ -793,15 +793,15 @@
         {
             "application": "mfcsc_1.0_20230306",
             "categories": [
-                "functional imaging",
-                "diffusion imaging"
+                "diffusion imaging",
+                "functional imaging"
             ]
         },
         {
             "application": "mfcsc_1.1_20230321",
             "categories": [
-                "functional imaging",
-                "diffusion imaging"
+                "diffusion imaging",
+                "functional imaging"
             ]
         },
         {
@@ -813,32 +813,32 @@
         {
             "application": "micapipe_v0.2.3_20241030",
             "categories": [
-                "structural imaging",
                 "diffusion imaging",
                 "functional imaging",
+                "structural imaging",
                 "workflows"
-            ]
-        },
-        {
-            "application": "mitkdiffusion_1.2.0_20230720",
-            "categories": [
-                "diffusion imaging"
             ]
         },
         {
             "application": "minc_1.9.17_20210105",
             "categories": [
-                "image segmentation",
                 "image registration",
+                "image segmentation",
                 "structural imaging"
             ]
         },
         {
             "application": "minc_1.9.18_20230208",
             "categories": [
-                "image segmentation",
                 "image registration",
+                "image segmentation",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "mitkdiffusion_1.2.0_20230720",
+            "categories": [
+                "diffusion imaging"
             ]
         },
         {
@@ -860,13 +860,13 @@
             ]
         },
         {
-            "application": "mne_1.1.1_20220912",
+            "application": "mneextended_1.1.0_20220819",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mneextended_1.1.0_20220819",
+            "application": "mne_1.1.1_20220912",
             "categories": [
                 "electrophysiology"
             ]
@@ -989,15 +989,15 @@
             ]
         },
         {
-            "application": "niistat_1.0.20191216_20220111",
+            "application": "niimath_1.0.0_20250617",
             "categories": [
-                "functional imaging"
+                "data organisation"
             ]
         },
         {
-            "application": "niimath_1.0.0_20240902",
+            "application": "niistat_1.0.20191216_20220111",
             "categories": [
-                "data organisation"
+                "functional imaging"
             ]
         },
         {
@@ -1040,12 +1040,6 @@
             "application": "qmrlab_2.4.2_20240828",
             "categories": [
                 "quantitative imaging"
-            ]
-        },
-        {
-            "application": "quickshear_1.1.0_20240606",
-            "categories": [
-                "data organisation"
             ]
         },
         {
@@ -1109,6 +1103,12 @@
                 "quantitative imaging",
                 "structural imaging",
                 "workflows"
+            ]
+        },
+        {
+            "application": "quickshear_1.1.0_20240606",
+            "categories": [
+                "data organisation"
             ]
         },
         {
@@ -1180,8 +1180,8 @@
         {
             "application": "slicer_4.11.20200930_20201108",
             "categories": [
-                "image segmentation",
                 "image registration",
+                "image segmentation",
                 "structural imaging",
                 "visualization"
             ]
@@ -1189,8 +1189,8 @@
         {
             "application": "slicer_5.0.3_20221025",
             "categories": [
-                "image segmentation",
                 "image registration",
+                "image segmentation",
                 "structural imaging",
                 "visualization"
             ]
@@ -1247,8 +1247,8 @@
             "application": "spm12_r7771_20230609",
             "categories": [
                 "functional imaging",
-                "image segmentation",
                 "image registration",
+                "image segmentation",
                 "structural imaging"
             ]
         },
@@ -1267,8 +1267,8 @@
         {
             "application": "tgvqsm_1.0.0_20210629",
             "categories": [
-                "quantitative imaging",
-                "phase processing"
+                "phase processing",
+                "quantitative imaging"
             ]
         },
         {
@@ -1279,6 +1279,12 @@
         },
         {
             "application": "trackvis_0.6.1_20220303",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "tractseg_2.9_20250618",
             "categories": [
                 "diffusion imaging"
             ]
