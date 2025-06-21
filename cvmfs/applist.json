@@ -202,54 +202,70 @@
         {
             "application": "bidscoin_3.7.0_20220329",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.2.0_20231017",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.2.1_20231030",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.3.0_20240221",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.3.2_20240329",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.3.3_20240716",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.4.0_20241003",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.5.0_20250205",
             "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
         {
             "application": "bidscoin_4.6.1_20250328",
             "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidscoin_4.6.2_20250621",
+            "categories": [
+                "bids apps",
                 "data organisation"
             ]
         },
