@@ -678,6 +678,13 @@
             ]
         },
         {
+            "application": "halfpipe_1.2.3_20250623",
+            "categories": [
+                "functional imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "hdbet_1.0.0_20210318",
             "categories": [
                 "image segmentation"
@@ -1006,6 +1013,12 @@
         },
         {
             "application": "niimath_1.0.0_20250617",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "niimath_1.0.20250529_20250623",
             "categories": [
                 "data organisation"
             ]
