@@ -836,6 +836,18 @@
             "data organisation"
         ]
     },
+    "halfpipe": {
+        "apps": {
+            "halfpipe 1.2.3": {
+                "version": "20250623",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "workflows"
+        ]
+    },
     "hdbet": {
         "apps": {
             "hdbet 1.0.0": {
@@ -1365,6 +1377,10 @@
         "apps": {
             "niimath 1.0.0": {
                 "version": "20250617",
+                "exec": ""
+            },
+            "niimath 1.0.20250529": {
+                "version": "20250623",
                 "exec": ""
             }
         },
