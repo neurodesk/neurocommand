@@ -20,7 +20,7 @@ echo "[debug] logfile:"
 cat log.txt
 echo "[debug] logfile is at: $PWD"
 
-export IMAGE_HOME="/home/runner"
+export IMAGE_HOME="/storage/tmp"
 
 mapfile -t arr < log.txt
 for LINE in "${arr[@]}";
@@ -36,16 +36,25 @@ do
 
     if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg"; then
         echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg exists in nectar cloud"
-        echo "[DEBUG] refresh timestamp to show it's still in use"
-        rclone touch nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
+        # echo "[DEBUG] refresh timestamp to show it's still in use"
+        # rclone touch nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
+        # THIS IS NOW DONE IN CONSOLIDATE NEUROCONTAINERS WORKFLOW
     else
         # if image is not in standard nectar cloud then check if the image is in the temporary cache:
         if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg"; then
             # download simg file from cache:
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg exists in temporary cache on nectar cloud"
-            curl --output "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg" "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg"
-            echo "[DEBUG] Deleting file after download or when older than 30days from cache ..."
-            rclone delete nectar:/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg
+
+            # check if the image is already in the cache:
+            if [ -f $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg ]; then
+                echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg already exists in cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
+            else
+                echo "[WARNING] ${IMAGENAME_BUILDDATE}.simg does not exist in cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
+                echo "[WARNING] Downloading now ... this shouldn't be necessary so something is wrong"
+                curl --output "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg" "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg"
+            fi
+
+            echo "[DEBUG] Deleting temporary builds older than 30days from object storage ..."
             rclone delete --min-age 30d nectar:/neurodesk/temporary-builds-new
         else
             # image was not released previously and is not in cache - rebuild from docker:
@@ -78,10 +87,11 @@ do
 
         echo "[DEBUG] Attempting upload to Nectar Cloud ..."
 
-        rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
+        # rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
+        rclone move nectar:/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
 
         if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg"; then
-            echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg was freshly build and exists now :)"
+            echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg was freshly released :)"
             echo "[DEBUG] PROCEEDING TO NEXT LINE"
             echo "[DEBUG] Cleaning up ..."
             rm -rf /home/runner/.singularity/docker
@@ -94,16 +104,10 @@ do
 done < log.txt
 
 # sync the nectar containers to aws-neurocontainers
-echo "[Debug] cleanup & syncing nectar containers to aws-neurocontainers"
-rclone delete --min-age 30d nectar:/neurodesk/
+# echo "[Debug] cleanup & syncing nectar containers to aws-neurocontainers"
+# rclone delete --min-age 30d nectar:/neurodesk/
+# THIS IS NOW DONE IN CONSOLIDATE NEUROCONTAINERS WORKFLOW
 
-# Disable sync for now - need to do this with aws cli or find a way of using these credentials in rsync
-# check if aws cli is installed
-if ! command -v aws &> /dev/null
-then
-    echo "[DEBUG] Installing AWS CLI"
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install && rm -rf aws awscliv2.zip
-fi
 rclone sync nectar:/neurodesk/ aws-neurocontainers-new:/neurocontainers/ --checksum --progress
 
 # echo "[Debug] list bucket with aws cli?"

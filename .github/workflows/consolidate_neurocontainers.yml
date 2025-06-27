@@ -1,0 +1,35 @@
+name: Consolidate neurocontainers
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # every day at midnight UTC
+
+jobs:
+  upload_containers_simg:
+    runs-on: ubuntu-24.04
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+    - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+      with:
+        python-version: 3.8
+    - name: Configure AWS Credentials 1
+      id: creds
+      uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722
+      with:
+        aws-region: us-east-2
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        output-credentials: true
+    - name : Consolidate containers
+      env:
+        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
+      run: |
+        rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true
+        /bin/bash .github/workflows/consolidate_containers.sh
