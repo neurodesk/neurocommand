@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * *' # every day at midnight UTC
 
 jobs:
-  upload_containers_simg:
+  consolidate_containers_simg:
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
