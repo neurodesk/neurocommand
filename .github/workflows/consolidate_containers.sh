@@ -5,13 +5,7 @@ set -e
 python3 neurodesk/write_log.py
 pip3 install requests
 
-# check if rclone is installed and otherwise install it
-if ! command -v rclone &> /dev/null; then
-    echo "[DEBUG] Installing rclone"
-    curl https://rclone.org/install.sh | sudo bash
-else
-    echo "[DEBUG] rclone is already installed"
-fi
+
 
 # remove empty lines
 sed -i '/^$/d' log.txt

@@ -31,5 +31,9 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
         AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
       run: |
+        if ! command -v rclone &> /dev/null; then
+            echo "[DEBUG] Installing rclone"
+            curl https://rclone.org/install.sh | sudo bash
+        fi
         rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true
         /bin/bash .github/workflows/consolidate_containers.sh
