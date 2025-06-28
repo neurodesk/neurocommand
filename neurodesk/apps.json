@@ -160,6 +160,18 @@
             "image reconstruction"
         ]
     },
+    "batchheudiconv": {
+        "apps": {
+            "batchheudiconv 1.0.0": {
+                "version": "20250628",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation",
+            "workflows"
+        ]
+    },
     "bidsappaa": {
         "apps": {
             "bidsappaa 0.2.0": {
@@ -1449,6 +1461,17 @@
         },
         "categories": [
             "molecular biology"
+        ]
+    },
+    "pcntoolkit": {
+        "apps": {
+            "pcntoolkit 0.35": {
+                "version": "20250628",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "statistics"
         ]
     },
     "physio": {
