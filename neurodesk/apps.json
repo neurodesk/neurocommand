@@ -1451,6 +1451,17 @@
             "molecular biology"
         ]
     },
+    "pcntoolkit": {
+        "apps": {
+            "pcntoolkit 0.35": {
+                "version": "20250628",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "statistics"
+        ]
+    },
     "physio": {
         "apps": {
             "physioGUI-physio r2021a": {
