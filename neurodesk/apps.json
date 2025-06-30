@@ -65,6 +65,17 @@
             "rodent imaging"
         ]
     },
+    "amico": {
+        "apps": {
+            "amico 2.1.0": {
+                "version": "20250628",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
     "ants": {
         "apps": {
             "ants 2.3.1": {
