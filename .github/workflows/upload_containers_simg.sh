@@ -79,12 +79,14 @@ do
         # rclone touch nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
         # THIS IS NOW DONE IN CONSOLIDATE NEUROCONTAINERS WORKFLOW
     else
+        echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg does not exist in released files in nectar cloud"
+        echo "[DEBUG] check if it exists in temporary builds: "
         # if image is not in standard nectar cloud then check if the image is in the temporary cache:
         if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg"; then
             # download simg file from cache:
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg exists in temporary cache on nectar cloud"
 
-            # check if the image is already in the cache:
+            # check if the image is already in the local builder cache:
             if [ -f $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg ]; then
                 echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg already exists in cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
             else
@@ -94,32 +96,42 @@ do
             fi
 
         else
-            # image was not released previously and is not in cache - rebuild from docker:
-            # check if there is enough free disk space on the runner:
-            FREE=`df -k --output=avail "$PWD" | tail -n1`   # df -k not df -h
-            echo "[DEBUG] This runner has ${FREE} free disk space"
-            if [[ $FREE -lt 20485760 ]]; then               # 20G = 10*1024*1024k
-                echo "[DEBUG] This runner has not enough free disk space .. cleaning up!"
-                bash .github/workflows/free-up-space.sh
-                FREE=`df -k --output=avail "$PWD" | tail -n1`   # df -k not df -h
-                echo "[DEBUG] This runner has ${FREE} free disk space after cleanup"
-            fi
+            echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg does not exist in any cloud cache on nectar cloud"
 
-            if [ -n "$singularity_setup_done" ]; then
-                echo "Setup already done. Skipping."
+            # check if the image is already in the local builder cache:
+            echo "[DEBUG] Checking if ${IMAGENAME_BUILDDATE}.simg exists in local cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
+            if [ -f $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg ]; then
+                echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg already exists in cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
             else
-                #install apptainer
-                sudo apt update > /dev/null 2>&1
-                sudo apt install -y software-properties-common > /dev/null 2>&1
-                sudo add-apt-repository -y ppa:apptainer/ppa > /dev/null 2>&1
-                sudo apt update > /dev/null 2>&1
-                sudo apt install -y apptainer apptainer-suid > /dev/null 2>&1
+                echo "[WARNING] ${IMAGENAME_BUILDDATE}.simg does not exist in local cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
+                echo "[DEBUG] Rebuilding from docker"
+                # image was not released previously and is not in cache - rebuild from docker:
+                # check if there is enough free disk space on the runner:
+                FREE=`df -k --output=avail "$PWD" | tail -n1`   # df -k not df -h
+                echo "[DEBUG] This runner has ${FREE} free disk space"
+                if [[ $FREE -lt 20485760 ]]; then               # 20G = 10*1024*1024k
+                    echo "[DEBUG] This runner has not enough free disk space .. cleaning up!"
+                    bash .github/workflows/free-up-space.sh
+                    FREE=`df -k --output=avail "$PWD" | tail -n1`   # df -k not df -h
+                    echo "[DEBUG] This runner has ${FREE} free disk space after cleanup"
+                fi
 
-                export singularity_setup_done="true"
+                if [ -n "$singularity_setup_done" ]; then
+                    echo "Setup already done. Skipping."
+                else
+                    #install apptainer
+                    sudo apt update > /dev/null 2>&1
+                    sudo apt install -y software-properties-common > /dev/null 2>&1
+                    sudo add-apt-repository -y ppa:apptainer/ppa > /dev/null 2>&1
+                    sudo apt update > /dev/null 2>&1
+                    sudo apt install -y apptainer apptainer-suid > /dev/null 2>&1
+
+                    export singularity_setup_done="true"
+                fi
+
+                echo "[DEBUG] singularity building docker://vnmd/$IMAGENAME:$BUILDDATE"
+                singularity build "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"  docker://vnmd/$IMAGENAME:$BUILDDATE
             fi
-
-            echo "[DEBUG] singularity building docker://vnmd/$IMAGENAME:$BUILDDATE"
-            singularity build "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"  docker://vnmd/$IMAGENAME:$BUILDDATE
         fi
 
         echo "[DEBUG] Attempting upload to Nectar Cloud ..."
