@@ -833,6 +833,17 @@
             "visualization"
         ]
     },
+    "gingerale": {
+        "apps": {
+            "gingerale 3.0.2": {
+                "version": "20250701",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "other"
+        ]
+    },
     "glmsingle": {
         "apps": {
             "glmsingle 1.2": {
