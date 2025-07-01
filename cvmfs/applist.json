@@ -43,6 +43,12 @@
             ]
         },
         {
+            "application": "amico_2.1.0_20250628",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "ants_2.3.1_20211204",
             "categories": [
                 "image registration",
@@ -155,6 +161,13 @@
             "application": "bart_0.9.00_20240723",
             "categories": [
                 "image reconstruction"
+            ]
+        },
+        {
+            "application": "batchheudiconv_1.0.0_20250628",
+            "categories": [
+                "data organisation",
+                "workflows"
             ]
         },
         {
@@ -1051,6 +1064,12 @@
             "application": "palmettobug_0.0.3_20250424",
             "categories": [
                 "molecular biology"
+            ]
+        },
+        {
+            "application": "pcntoolkit_0.35_20250628",
+            "categories": [
+                "statistics"
             ]
         },
         {
