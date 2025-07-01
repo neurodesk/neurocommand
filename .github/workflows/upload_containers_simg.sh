@@ -134,10 +134,12 @@ do
             fi
         fi
 
-        echo "[DEBUG] Attempting upload to Nectar Cloud ..."
 
+        echo "[DEBUG] Attempting move from temporary builds to release ..."
         rclone move nectar:/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
-        rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg aws-neurocontainers-new:/neurocontainers/
+        
+        echo "[DEBUG] Attempting upload to AWS object storage ..."
+        rclone copy $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg aws-neurocontainers-new:/neurocontainers/
 
 
 
@@ -150,7 +152,7 @@ do
         else
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg does not exist yet. Something is WRONG"
             echo "[DEBUG] Trying again using rclone copy instead of move"
-            rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
+            rclone copy $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
             
             if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"; then
                 echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg is now released :)"
@@ -167,7 +169,8 @@ done < log.txt
 # rclone delete --min-age 30d nectar:/neurodesk/
 # THIS IS NOW DONE IN CONSOLIDATE NEUROCONTAINERS WORKFLOW
 
-rclone sync nectar:/neurodesk/ aws-neurocontainers-new:/neurocontainers/ --checksum --progress
+echo "[Debug] Syncing nectar containers to aws-neurocontainers"
+rclone sync nectar:/neurodesk/ aws-neurocontainers-new:/neurocontainers/ --checksum
 
 # echo "[Debug] list bucket with aws cli?"
 # aws s3 ls s3://neurocontainers/
