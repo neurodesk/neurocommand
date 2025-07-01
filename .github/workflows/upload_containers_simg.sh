@@ -34,43 +34,43 @@ do
     echo "[DEBUG] IMAGENAME: $IMAGENAME"
     echo "[DEBUG] BUILDDATE: $BUILDDATE"
 
-    # Check if container exists on Docker Hub
-    echo "[DEBUG] Checking if ${IMAGENAME}:${BUILDDATE} exists on Docker Hub..."
-    if curl --silent -f -L https://hub.docker.com/v2/repositories/vnmd/${IMAGENAME}/tags/${BUILDDATE} > /dev/null; then
-        echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on Docker Hub"
-    else
-        echo "[WARNING] Container ${IMAGENAME}:${BUILDDATE} does not exist on Docker Hub"
-        # Sync from github container registery:
-        if curl --silent -f -L https://ghcr.io/v2/neurodesk/${IMAGENAME}/manifests/${BUILDDATE} > /dev/null; then
-            echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry"
-            echo "[DEBUG] Syncing from GitHub Container Registry to Docker Hub ..."
-            docker pull ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
-            docker tag ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE} vnmd/${IMAGENAME}:${BUILDDATE}
-            docker push vnmd/${IMAGENAME}:${BUILDDATE}
-        else
-            echo "[ERROR] Container ${IMAGENAME}:${BUILDDATE} does not exist on Docker Hub or GitHub Container Registry"
-            exit 2
-        fi
-    fi
+    # # Check if container exists on Docker Hub
+    # echo "[DEBUG] Checking if ${IMAGENAME}:${BUILDDATE} exists on Docker Hub..."
+    # if curl --silent -f -L https://hub.docker.com/v2/repositories/vnmd/${IMAGENAME}/tags/${BUILDDATE} > /dev/null; then
+    #     echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on Docker Hub"
+    # else
+    #     echo "[WARNING] Container ${IMAGENAME}:${BUILDDATE} does not exist on Docker Hub"
+    #     # Sync from github container registery:
+    #     if curl --silent -f -L https://ghcr.io/v2/neurodesk/${IMAGENAME}/manifests/${BUILDDATE} > /dev/null; then
+    #         echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry"
+    #         echo "[DEBUG] Syncing from GitHub Container Registry to Docker Hub ..."
+    #         docker pull ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
+    #         docker tag ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE} vnmd/${IMAGENAME}:${BUILDDATE}
+    #         docker push vnmd/${IMAGENAME}:${BUILDDATE}
+    #     else
+    #         echo "[ERROR] Container ${IMAGENAME}:${BUILDDATE} does not exist on Docker Hub or GitHub Container Registry"
+    #         exit 2
+    #     fi
+    # fi
 
-    # Check if container exists on Github Container Registry
-    echo "[DEBUG] Checking if ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry..."
-    if curl --silent -f -L https://ghcr.io/v2/neurodesk/${IMAGENAME}/manifests/${BUILDDATE} > /dev/null; then
-        echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry"
-    else
-        echo "[WARNING] Container ${IMAGENAME}:${BUILDDATE} does not exist on GitHub Container Registry"
-        # Sync from Docker Hub:
-        if curl --silent -f -L https://hub.docker.com/v2/repositories/vnmd/${IMAGENAME}/tags/${BUILDDATE} > /dev/null; then
-            echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on Docker Hub"
-            echo "[DEBUG] Syncing from Docker Hub to GitHub Container Registry ..."
-            docker pull vnmd/${IMAGENAME}:${BUILDDATE}
-            docker tag vnmd/${IMAGENAME}:${BUILDDATE} ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
-            docker push ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
-        else
-            echo "[ERROR] Container ${IMAGENAME}:${BUILDDATE} does not exist on GitHub Container Registry or Docker Hub"
-            exit 2
-        fi
-    fi
+    # # Check if container exists on Github Container Registry
+    # echo "[DEBUG] Checking if ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry..."
+    # if curl --silent -f -L https://ghcr.io/v2/neurodesk/${IMAGENAME}/manifests/${BUILDDATE} > /dev/null; then
+    #     echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry"
+    # else
+    #     echo "[WARNING] Container ${IMAGENAME}:${BUILDDATE} does not exist on GitHub Container Registry"
+    #     # Sync from Docker Hub:
+    #     if curl --silent -f -L https://hub.docker.com/v2/repositories/vnmd/${IMAGENAME}/tags/${BUILDDATE} > /dev/null; then
+    #         echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on Docker Hub"
+    #         echo "[DEBUG] Syncing from Docker Hub to GitHub Container Registry ..."
+    #         docker pull vnmd/${IMAGENAME}:${BUILDDATE}
+    #         docker tag vnmd/${IMAGENAME}:${BUILDDATE} ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
+    #         docker push ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
+    #     else
+    #         echo "[ERROR] Container ${IMAGENAME}:${BUILDDATE} does not exist on GitHub Container Registry or Docker Hub"
+    #         exit 2
+    #     fi
+    # fi
 
 
     if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg"; then
