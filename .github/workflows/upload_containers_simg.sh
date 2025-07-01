@@ -34,6 +34,45 @@ do
     echo "[DEBUG] IMAGENAME: $IMAGENAME"
     echo "[DEBUG] BUILDDATE: $BUILDDATE"
 
+    # Check if container exists on Docker Hub
+    echo "[DEBUG] Checking if ${IMAGENAME}:${BUILDDATE} exists on Docker Hub..."
+    if curl --silent -f -L https://hub.docker.com/v2/repositories/vnmd/${IMAGENAME}/tags/${BUILDDATE} > /dev/null; then
+        echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on Docker Hub"
+    else
+        echo "[WARNING] Container ${IMAGENAME}:${BUILDDATE} does not exist on Docker Hub"
+        # Sync from github container registery:
+        if curl --silent -f -L https://ghcr.io/v2/neurodesk/${IMAGENAME}/manifests/${BUILDDATE} > /dev/null; then
+            echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry"
+            echo "[DEBUG] Syncing from GitHub Container Registry to Docker Hub ..."
+            docker pull ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
+            docker tag ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE} vnmd/${IMAGENAME}:${BUILDDATE}
+            docker push vnmd/${IMAGENAME}:${BUILDDATE}
+        else
+            echo "[ERROR] Container ${IMAGENAME}:${BUILDDATE} does not exist on Docker Hub or GitHub Container Registry"
+            exit 2
+        fi
+    fi
+
+    # Check if container exists on Github Container Registry
+    echo "[DEBUG] Checking if ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry..."
+    if curl --silent -f -L https://ghcr.io/v2/neurodesk/${IMAGENAME}/manifests/${BUILDDATE} > /dev/null; then
+        echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on GitHub Container Registry"
+    else
+        echo "[WARNING] Container ${IMAGENAME}:${BUILDDATE} does not exist on GitHub Container Registry"
+        # Sync from Docker Hub:
+        if curl --silent -f -L https://hub.docker.com/v2/repositories/vnmd/${IMAGENAME}/tags/${BUILDDATE} > /dev/null; then
+            echo "[DEBUG] Container ${IMAGENAME}:${BUILDDATE} exists on Docker Hub"
+            echo "[DEBUG] Syncing from Docker Hub to GitHub Container Registry ..."
+            docker pull vnmd/${IMAGENAME}:${BUILDDATE}
+            docker tag vnmd/${IMAGENAME}:${BUILDDATE} ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
+            docker push ghcr.io/neurodesk/${IMAGENAME}:${BUILDDATE}
+        else
+            echo "[ERROR] Container ${IMAGENAME}:${BUILDDATE} does not exist on GitHub Container Registry or Docker Hub"
+            exit 2
+        fi
+    fi
+
+
     if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg"; then
         echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg exists in nectar cloud"
         # echo "[DEBUG] refresh timestamp to show it's still in use"
@@ -54,8 +93,6 @@ do
                 curl --output "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg" "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg"
             fi
 
-            echo "[DEBUG] Deleting temporary builds older than 30days from object storage ..."
-            rclone delete --min-age 30d nectar:/neurodesk/temporary-builds-new
         else
             # image was not released previously and is not in cache - rebuild from docker:
             # check if there is enough free disk space on the runner:
@@ -87,10 +124,12 @@ do
 
         echo "[DEBUG] Attempting upload to Nectar Cloud ..."
 
-        # rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
         rclone move nectar:/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
+        rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg aws-neurocontainers-new:/neurocontainers/
 
-        if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg"; then
+
+
+        if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"; then
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg was freshly released :)"
             echo "[DEBUG] PROCEEDING TO NEXT LINE"
             echo "[DEBUG] Cleaning up ..."
@@ -98,7 +137,15 @@ do
             rm -rf $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg
         else
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg does not exist yet. Something is WRONG"
-            exit 2
+            echo "[DEBUG] Trying again using rclone copy instead of move"
+            rclone copy --progress $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
+            
+            if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"; then
+                echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg is now released :)"
+                rm -rf $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg
+            else 
+                echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg is still not released. Something is WRONG"
+            fi
         fi
     fi 
 done < log.txt

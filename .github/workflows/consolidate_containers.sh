@@ -42,4 +42,9 @@ done < log.txt
 
 echo "[Debug] cleanup & syncing nectar containers to aws-neurocontainers"
 rclone sync nectar:/neurodesk/ aws-neurocontainers-new:/neurocontainers/ --checksum --progress
+
+echo "[DEBUG] Deleting builds unused longer than 30days from object storage ..."
 rclone delete --min-age 30d nectar:/neurodesk/
+
+echo "[DEBUG] Deleting temporary builds older than 30days from object storage ..."
+rclone delete --min-age 30d nectar:/neurodesk/temporary-builds-new
