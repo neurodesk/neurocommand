@@ -679,6 +679,12 @@
             ]
         },
         {
+            "application": "gingerale_3.0.2_20250701",
+            "categories": [
+                "other"
+            ]
+        },
+        {
             "application": "glmsingle_1.2_20240520",
             "categories": [
                 "functional imaging"

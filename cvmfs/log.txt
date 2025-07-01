@@ -96,6 +96,7 @@ fsl_6.0.7.16_20250131 categories:diffusion imaging,functional imaging,image regi
 fsl_6.0.7.4_20231005 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.8_20240913 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 gimp_2.10.18_20210104 categories:visualization,
+gingerale_3.0.2_20250701 categories:other,
 glmsingle_1.2_20240520 categories:functional imaging,
 globus_3.2.2_20230620 categories:data organisation,
 halfpipe_1.2.3_20250623 categories:functional imaging,workflows,
