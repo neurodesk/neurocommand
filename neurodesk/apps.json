@@ -818,6 +818,17 @@
             "structural imaging"
         ]
     },
+    "gigaconnectome": {
+        "apps": {
+            "gigaconnectome 0.6.0": {
+                "version": "20250630",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "other"
+        ]
+    },
     "gimp": {
         "apps": {
             "gimpGUI-gimp 2.10.18": {
@@ -1881,7 +1892,7 @@
     "tractseg": {
         "apps": {
             "tractseg 2.9": {
-                "version": "20250618",
+                "version": "20250702",
                 "exec": ""
             }
         },
