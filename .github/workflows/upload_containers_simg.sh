@@ -135,9 +135,9 @@ do
         fi
 
 
-        echo "[DEBUG] Attempting move from temporary builds to release ..."
-        rclone move nectar:/neurodesk/temporary-builds-new/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/${IMAGENAME_BUILDDATE}.simg
-        
+        echo "[DEBUG] Attempting copy to release folder on nectar object storage ..."
+        rclone copy $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
+
         echo "[DEBUG] Attempting upload to AWS object storage ..."
         rclone copy $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg aws-neurocontainers-new:/neurocontainers/
 
