@@ -673,6 +673,12 @@
             ]
         },
         {
+            "application": "gigaconnectome_0.6.0_20250630",
+            "categories": [
+                "other"
+            ]
+        },
+        {
             "application": "gimp_2.10.18_20210104",
             "categories": [
                 "visualization"
@@ -1338,7 +1344,7 @@
             ]
         },
         {
-            "application": "tractseg_2.9_20250618",
+            "application": "tractseg_2.9_20250702",
             "categories": [
                 "diffusion imaging"
             ]
