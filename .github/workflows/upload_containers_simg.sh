@@ -169,8 +169,8 @@ done < log.txt
 # rclone delete --min-age 30d nectar:/neurodesk/
 # THIS IS NOW DONE IN CONSOLIDATE NEUROCONTAINERS WORKFLOW
 
-echo "[Debug] Syncing nectar containers to aws-neurocontainers"
-rclone sync nectar:/neurodesk/ aws-neurocontainers-new:/neurocontainers/ --checksum
+# echo "[Debug] Syncing nectar containers to aws-neurocontainers"
+# rclone sync nectar:/neurodesk/ aws-neurocontainers-new:/neurocontainers/ --checksum
 
 # echo "[Debug] list bucket with aws cli?"
 # aws s3 ls s3://neurocontainers/
