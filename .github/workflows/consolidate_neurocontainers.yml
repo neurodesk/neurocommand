@@ -25,6 +25,7 @@ jobs:
         aws-region: us-east-2
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
         output-credentials: true
+        role-duration-seconds: 28800 # 8 hours
     - name : Consolidate containers
       env:
         AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
