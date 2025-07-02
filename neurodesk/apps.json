@@ -1881,7 +1881,7 @@
     "tractseg": {
         "apps": {
             "tractseg 2.9": {
-                "version": "20250618",
+                "version": "20250702",
                 "exec": ""
             }
         },
