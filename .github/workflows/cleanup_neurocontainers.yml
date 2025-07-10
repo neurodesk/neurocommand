@@ -1,4 +1,4 @@
-name: Consolidate neurocontainers
+name: Cleanup unused neurocontainers
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     - cron: '0 0 * * *' # every day at midnight UTC
 
 jobs:
-  consolidate_containers_simg:
+  cleanup_containers_simg:
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
@@ -18,7 +18,7 @@ jobs:
     - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
       with:
         python-version: 3.8
-    - name: Configure AWS Credentials 1
+    - name: Configure AWS Credentials
       id: creds
       uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722
       with:
@@ -26,7 +26,7 @@ jobs:
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
         output-credentials: true
         role-duration-seconds: 28800 # 8 hours
-    - name : Consolidate containers
+    - name : clean up containers
       env:
         AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
@@ -48,4 +48,4 @@ jobs:
         rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true
         rclone config create nectar swift env_auth true
 
-        /bin/bash .github/workflows/consolidate_containers.sh
+        /bin/bash .github/workflows/cleanup_containers.sh
