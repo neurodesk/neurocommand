@@ -688,6 +688,10 @@
             "fmriprep 24.1.1": {
                 "version": "20250214",
                 "exec": ""
+            },
+            "fmriprep 25.1.3": {
+                "version": "20250715",
+                "exec": ""
             }
         },
         "categories": [
