@@ -48,6 +48,14 @@
             "sumaGUI-afni 24.3.00": {
                 "version": "20241003",
                 "exec": "suma"
+            },
+            "afni 25.2.03": {
+                "version": "20250717",
+                "exec": ""
+            },
+            "sumaGUI-afni 25.2.03": {
+                "version": "20250717",
+                "exec": "suma"
             }
         },
         "categories": [
