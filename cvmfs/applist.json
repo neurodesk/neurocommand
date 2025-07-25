@@ -1039,6 +1039,13 @@
             ]
         },
         {
+            "application": "nftsim_1.0.2_20250725",
+            "categories": [
+                "hippocampus",
+                "programming"
+            ]
+        },
+        {
             "application": "niftyreg_1.4.0_20220317",
             "categories": [
                 "image registration"
