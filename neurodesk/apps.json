@@ -1408,6 +1408,18 @@
             "diffusion imaging"
         ]
     },
+    "nftsim": {
+        "apps": {
+            "nftsim 1.0.2": {
+                "version": "20250725",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "hippocampus",
+            "programming"
+        ]
+    },
     "niftyreg": {
         "apps": {
             "niftyreg 1.4.0": {
