@@ -186,6 +186,15 @@
 			</Include>
 		</Menu>
 		<Menu>
+			<Name>Arterial Spin Labeling</Name>
+			<Directory>neurodesk/arterial-spin-labeling.directory</Directory>
+			<Include>
+				<And>
+					<Category>arterial-spin-labeling</Category>
+				</And>
+			</Include>
+		</Menu>
+		<Menu>
 			<Name>Molecular Biology</Name>
 			<Directory>neurodesk/molecular-biology.directory</Directory>
 			<Include>
