@@ -1085,6 +1085,18 @@
             "spectroscopy"
         ]
     },
+    "lesymap": {
+        "apps": {
+            "lesymap 0.0.0.9222": {
+                "version": "20250730",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "statistics",
+            "workflows"
+        ]
+    },
     "matlab": {
         "apps": {
             "matlab 2022a": {
