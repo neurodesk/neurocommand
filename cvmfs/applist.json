@@ -831,6 +831,13 @@
             ]
         },
         {
+            "application": "lesymap_0.0.0.9222_20250730",
+            "categories": [
+                "statistics",
+                "workflows"
+            ]
+        },
+        {
             "application": "matlab_2022a_20231207",
             "categories": [
                 "programming",
