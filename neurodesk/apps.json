@@ -1660,6 +1660,10 @@
             "qupath 0.6.0": {
                 "version": "20250805",
                 "exec": ""
+            },
+            "qupathGUI-qupath 0.6.0": {
+                "version": "20250805",
+                "exec": "QuPath"
             }
         },
         "categories": [
