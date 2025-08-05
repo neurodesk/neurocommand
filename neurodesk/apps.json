@@ -1655,6 +1655,19 @@
             "data organisation"
         ]
     },
+    "qupath": {
+        "apps": {
+            "qupath 0.6.0": {
+                "version": "20250805",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
     "rabies": {
         "apps": {
             "rabies 0.3.5": {
