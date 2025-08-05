@@ -867,12 +867,12 @@
     "gingerale": {
         "apps": {
             "gingerale 3.0.2": {
-                "version": "20250701",
+                "version": "20250804",
                 "exec": ""
             }
         },
         "categories": [
-            "other"
+            "statistics"
         ]
     },
     "glmsingle": {
