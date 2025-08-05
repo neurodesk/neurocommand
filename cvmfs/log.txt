@@ -177,6 +177,7 @@ qsmxt_6.4.4_20240802 categories:phase processing,quantitative imaging,structural
 qsmxt_7.3.3_20250311 categories:phase processing,quantitative imaging,structural imaging,workflows,
 qsmxt_8.0.7_20250529 categories:phase processing,quantitative imaging,structural imaging,workflows,
 quickshear_1.1.0_20240606 categories:data organisation,
+qupath_0.6.0_20250805 categories:data organisation,image segmentation,structural imaging,
 rabies_0.3.5_20220111 categories:rodent imaging,
 relion_4.0.1.sm61_20240528 categories:cryo EM,
 romeo_3.2.4_20211015 categories:phase processing,
