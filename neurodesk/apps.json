@@ -1010,6 +1010,14 @@
             "itksnap 4.0.2": {
                 "version": "20240117",
                 "exec": ""
+            },
+            "itksnap 4.2.2": {
+                "version": "20250805",
+                "exec": ""
+            },
+            "itksnapGUI-itksnap 4.2.2": {
+                "version": "20250805",
+                "exec": "itksnap"
             }
         },
         "categories": [
