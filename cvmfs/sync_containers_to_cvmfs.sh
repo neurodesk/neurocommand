@@ -10,7 +10,7 @@
 
 
 LOCKFILE=~/ISRUNNING.lock
-if [[ -s $LOCKFILE ]]; then
+if [[ -f $LOCKFILE ]]; then
     echo "there is currently a process running already."
     exit 2
 else
