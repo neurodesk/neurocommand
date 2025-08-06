@@ -1401,6 +1401,14 @@
                 "version": "20240320",
                 "exec": "mrview"
             },
+            "mrtrix3 3.0.7": {
+                "version": "20250805",
+                "exec": ""
+            },
+            "mrviewGUI-mrtrix3 3.0.7": {
+                "version": "20250805",
+                "exec": "mrview"
+            },
             "mrtrix3src latest": {
                 "version": "latest",
                 "exec": ""
