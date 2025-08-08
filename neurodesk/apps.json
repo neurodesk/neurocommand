@@ -316,6 +316,17 @@
             "data organisation"
         ]
     },
+    "bidsme": {
+        "apps": {
+            "bidsme 1.9.3": {
+                "version": "20250808",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
     "bidstools": {
         "apps": {
             "bidstools 1.0.1": {
