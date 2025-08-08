@@ -1541,6 +1541,18 @@
             "image segmentation"
         ]
     },
+    "ospreybids": {
+        "apps": {
+            "ospreybids 4.2.1": {
+                "version": "20250808",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "bids apps",
+            "spectroscopy"
+        ]
+    },
     "palm": {
         "apps": {
             "palm alpha119": {
