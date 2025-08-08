@@ -1127,6 +1127,13 @@
             ]
         },
         {
+            "application": "ospreybids_4.2.1_20250808",
+            "categories": [
+                "bids apps",
+                "spectroscopy"
+            ]
+        },
+        {
             "application": "palm_alpha119_20211220",
             "categories": [
                 "functional imaging"
