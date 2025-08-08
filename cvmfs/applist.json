@@ -289,6 +289,12 @@
             ]
         },
         {
+            "application": "bidsme_1.9.3_20250808",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidstools_1.0.1_20230905",
             "categories": [
                 "data organisation"
