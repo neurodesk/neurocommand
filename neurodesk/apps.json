@@ -319,7 +319,7 @@
     "bidsme": {
         "apps": {
             "bidsme 1.9.3": {
-                "version": "20250808",
+                "version": "20250812",
                 "exec": ""
             }
         },
