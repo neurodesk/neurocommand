@@ -552,6 +552,10 @@
                 "version": "20250804",
                 "exec": ""
             },
+            "deepretinotopy 1.0.14": {
+                "version": "20250813",
+                "exec": ""
+            },
             "deepretinotopy 1.0.5": {
                 "version": "20240609",
                 "exec": ""
@@ -758,6 +762,14 @@
             },
             "freeviewGUI-freesurfer 8.0.0": {
                 "version": "20250210",
+                "exec": "freeview"
+            },
+            "freesurfer 8.1.0": {
+                "version": "20250812",
+                "exec": ""
+            },
+            "freeviewGUI-freesurfer 8.1.0": {
+                "version": "20250812",
                 "exec": "freeview"
             }
         },
@@ -1673,6 +1685,10 @@
             },
             "qsmxt 8.0.7": {
                 "version": "20250529",
+                "exec": ""
+            },
+            "qsmxt 8.1.0": {
+                "version": "20250812",
                 "exec": ""
             }
         },
