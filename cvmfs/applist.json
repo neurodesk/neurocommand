@@ -445,6 +445,13 @@
             ]
         },
         {
+            "application": "deepretinotopy_1.0.14_20250813",
+            "categories": [
+                "functional imaging",
+                "machine learning"
+            ]
+        },
+        {
             "application": "deepretinotopy_1.0.5_20240609",
             "categories": [
                 "functional imaging",
@@ -610,6 +617,13 @@
         },
         {
             "application": "freesurfer_8.0.0_20250210",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "freesurfer_8.1.0_20250812",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -1225,6 +1239,15 @@
         },
         {
             "application": "qsmxt_8.0.7_20250529",
+            "categories": [
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "qsmxt_8.1.0_20250812",
             "categories": [
                 "phase processing",
                 "quantitative imaging",
