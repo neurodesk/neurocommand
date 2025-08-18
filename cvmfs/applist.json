@@ -872,6 +872,12 @@
             ]
         },
         {
+            "application": "linda_0.5.1_20250814",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "matlab_2022a_20231207",
             "categories": [
                 "programming",
