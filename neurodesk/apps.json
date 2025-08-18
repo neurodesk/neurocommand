@@ -1132,6 +1132,17 @@
             "workflows"
         ]
     },
+    "linda": {
+        "apps": {
+            "linda 0.5.1": {
+                "version": "20250814",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "matlab": {
         "apps": {
             "matlab 2022a": {
