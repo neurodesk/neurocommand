@@ -1467,6 +1467,18 @@
             "diffusion imaging"
         ]
     },
+    "networkcorrespondancetoolkit": {
+        "apps": {
+            "networkcorrespondancetoolkit 0.3.3": {
+                "version": "20250826",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation",
+            "image registration"
+        ]
+    },
     "neurodock": {
         "apps": {
             "neurodock 1.0.0": {
