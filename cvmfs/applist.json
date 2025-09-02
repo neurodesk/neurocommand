@@ -1093,6 +1093,13 @@
             ]
         },
         {
+            "application": "networkcorrespondancetoolkit_0.3.3_20250826",
+            "categories": [
+                "data organisation",
+                "image registration"
+            ]
+        },
+        {
             "application": "neurodock_1.0.0_20241122",
             "categories": [
                 "diffusion imaging"
@@ -1151,6 +1158,12 @@
             "application": "oshyx_0.4_20220620",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "osprey_2.9.0_20250901",
+            "categories": [
+                "spectroscopy"
             ]
         },
         {
