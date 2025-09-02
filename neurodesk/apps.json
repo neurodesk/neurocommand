@@ -560,6 +560,11 @@
                 "version": "20250820",
                 "exec": ""
             },
+            "deepretinotopy 1.0.16": {
+                "version": "20250902",
+                "exec": "",
+                "apptainer_args": []
+            },
             "deepretinotopy 1.0.5": {
                 "version": "20240609",
                 "exec": ""
