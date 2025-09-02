@@ -1467,6 +1467,18 @@
             "diffusion imaging"
         ]
     },
+    "networkcorrespondancetoolkit": {
+        "apps": {
+            "networkcorrespondancetoolkit 0.3.3": {
+                "version": "20250826",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation",
+            "image registration"
+        ]
+    },
     "neurodock": {
         "apps": {
             "neurodock 1.0.0": {
@@ -1566,6 +1578,21 @@
         },
         "categories": [
             "image segmentation"
+        ]
+    },
+    "osprey": {
+        "apps": {
+            "osprey 2.9.0": {
+                "version": "20250901",
+                "exec": ""
+            },
+            "ospreyGUI-osprey 2.9.0": {
+                "version": "20250901",
+                "exec": "ospreyGUI"
+            }
+        },
+        "categories": [
+            "spectroscopy"
         ]
     },
     "ospreybids": {
