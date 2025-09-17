@@ -96,7 +96,7 @@ class NeurodeskApp:
         category: Text = "",
         exec: Text = "",
         terminal: bool = True,
-        apptainer_args: Optional[List] = None,
+        apptainer_args: Optional[List[str]] = None,
         ):
         """Add an application to the menu.
 
