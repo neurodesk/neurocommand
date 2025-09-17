@@ -11,7 +11,7 @@ from xml.dom import minidom
 import shutil
 import logging
 import distutils.dir_util
-
+from typing import Optional, List
 
 def write_directory_file(name, file_dir, icon_dir):
     logging.info(f"Adding submenu for '{name}'")
