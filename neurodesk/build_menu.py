@@ -121,7 +121,7 @@ class NeurodeskApp:
         self.category = category
         self.exec = exec #TODO change exec to safer variable name
         self.terminal = terminal
-        self.apptainer_args = apptainer_args if apptainer_args is not None else []
+        self.apptainer_args = apptainer_args or []
 
     def app_names(self):
         self.basename = f"{self.name.lower().replace(' ', '-').replace('.', '_')}"
