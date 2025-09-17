@@ -95,7 +95,8 @@ class NeurodeskApp:
         version: Text = "",
         category: Text = "",
         exec: Text = "",
-        terminal: bool = True
+        terminal: bool = True,
+        apptainer_args = None,
         ):
         """Add an application to the menu.
 
@@ -120,6 +121,7 @@ class NeurodeskApp:
         self.category = category
         self.exec = exec #TODO change exec to safer variable name
         self.terminal = terminal
+        self.apptainer_args = apptainer_args or []
 
     def app_names(self):
         self.basename = f"{self.name.lower().replace(' ', '-').replace('.', '_')}"
