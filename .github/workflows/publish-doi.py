@@ -3,6 +3,7 @@ import json
 import argparse
 import os
 import yaml
+from tqdm import tqdm
 
 def get_license(container_name, gh_token):
     """
@@ -49,13 +50,29 @@ def get_license(container_name, gh_token):
         print(f"Failed to get recipe or parse license: {e}")
         return ""
 
-def stream_download(url, chunk_size=1024*1024):
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        for chunk in r.iter_content(chunk_size=chunk_size):
-            if chunk:
-                yield chunk
+CHUNK_SIZE = 1024 * 1024 * 100  # 100MB
 
+class RemoteStream:
+    def __init__(self, url, total_size, pbar):
+        self.resp = requests.get(url, stream=True)
+        self.resp.raise_for_status()
+        self.iterator = self.resp.iter_content(chunk_size=CHUNK_SIZE)
+        self.total_size = total_size
+        self.pbar = pbar
+        self.bytes_read = 0
+
+    def read(self, size=None):
+        try:
+            chunk = next(self.iterator)
+            self.bytes_read += len(chunk)
+            self.pbar.update(len(chunk))
+            return chunk
+        except StopIteration:
+            return b""  # end of stream
+
+    def __len__(self):
+        return self.total_size
+    
 def upload_container(container_url, container_name, token, license):
     """
     Upload simg to Zenodo and return the DOI URL.
@@ -63,6 +80,12 @@ def upload_container(container_url, container_name, token, license):
     headers = {"Content-Type": "application/json"}
     params = {'access_token': token}
 
+    # Get file size if possible
+    total_size = None
+    head = requests.head(container_url)
+    total_size = int(head.headers.get("Content-Length", 0))
+
+    print(f"Uploading {container_name} of size {total_size} to Zenodo...")
     # Create a new deposition
     r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
                     params=params,
@@ -71,36 +94,41 @@ def upload_container(container_url, container_name, token, license):
     deposition_id = r.json()['id']
     bucket_url = r.json()["links"]["bucket"]
 
-    print("licenses", license)
+    # Upload the simg container to bucket in the created deposition
+    # The target URL is a combination of the bucket link with the desired filename
+    # seperated by a slash.
+    # print("Uploading container to Zenodo...", container_url)
+    with tqdm(total=total_size, unit="B", unit_scale=True, desc=os.path.basename(container_url)) as pbar:
+        remote_file = RemoteStream(container_url, total_size, pbar)
+        r = requests.put(
+            f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
+            data=remote_file,  # Stream the file directly
+            params=params,
+        )
+        r.raise_for_status()  # Ensure the upload was successful
+    # print("Upload", r.json())
+
     # Update the metadata
     data = {
         'metadata': {
             'title': container_name,
             'upload_type': 'software',
             'description': container_name,
-            'creators': [{
-                'name': 'Neurodesk',
-                'affiliation': 'University of Queensland'
-            }]
+            'license': license,
+            'creators': [{'name': 'Neurodesk',
+                        'affiliation': 'University of Queensland'}]
         }
     }
     if license:
         data['metadata']['license'] = license
         print("Updating metadata", data)
-    r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
-            params=params, data=json.dumps(data),
-            headers=headers)
-    print("Update metadata", r.json())
-    # Stream upload to Zenodo bucket
-    upload_url = f"{bucket_url}/{os.path.basename(container_url)}"
-    with requests.Session() as session:
-        with session.put(
-            upload_url,
-            data=stream_download(container_url),
-            params=params,
-        ) as upload_response:
-            upload_response.raise_for_status()
-    
+        r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+                        params=params, data=json.dumps(data),
+                        headers=headers)
+    else:
+        r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+                params=params, data=json.dumps(data),
+                headers=headers)
 
     # Publish the deposition
     r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions/%s/actions/publish' % deposition_id,
