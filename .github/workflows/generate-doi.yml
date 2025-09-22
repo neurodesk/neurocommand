@@ -29,7 +29,6 @@ jobs:
     publish-doi:
       needs: get-updated-apps
       runs-on: ubuntu-22.04
-      timeout-minutes: 1200
       if: ${{ needs.get-updated-apps.outputs.app_batches != '[]' }}
       strategy:
           fail-fast: false
