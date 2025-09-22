@@ -87,58 +87,78 @@ def upload_container(container_url, container_name, token, license):
 
     print(f"Uploading {container_name} of size {total_size} to Zenodo...")
     # Create a new deposition
-    r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
-                    params=params,
-                    json={},
-                    headers=headers)
-    deposition_id = r.json()['id']
-    bucket_url = r.json()["links"]["bucket"]
-
+    try:
+        r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
+                        params=params,
+                        json={},
+                        headers=headers)
+        deposition_id = r.json()['id']
+        bucket_url = r.json()["links"]["bucket"]
+    except Exception as e:
+        print(f"Failed to create deposition: {e}")
+        return None
+    
     # Upload the simg container to bucket in the created deposition
     # The target URL is a combination of the bucket link with the desired filename
     # seperated by a slash.
     # print("Uploading container to Zenodo...", container_url)
-    with tqdm(total=total_size, unit="B", unit_scale=True, desc=os.path.basename(container_url)) as pbar:
-        remote_file = RemoteStream(container_url, total_size, pbar)
-        r = requests.put(
-            f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
-            data=remote_file,  # Stream the file directly
-            params=params,
-        )
-        r.raise_for_status()  # Ensure the upload was successful
+    try:
+        with tqdm(total=total_size, unit="B", unit_scale=True, desc=os.path.basename(container_url)) as pbar:
+            remote_file = RemoteStream(container_url, total_size, pbar)
+            r = requests.put(
+                f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
+                data=remote_file,  # Stream the file directly
+                params=params,
+            )
+            r.raise_for_status()  # Ensure the upload was successful
+    except Exception as e:
+        print(f"Failed to upload container: {e}")
+        return None
     # print("Upload", r.json())
 
     # Update the metadata
-    data = {
-        'metadata': {
-            'title': container_name,
-            'upload_type': 'software',
-            'description': container_name,
-            'license': license,
-            'creators': [{'name': 'Neurodesk',
-                        'affiliation': 'University of Queensland'}]
+    try:
+        data = {
+            'metadata': {
+                'title': container_name,
+                'upload_type': 'software',
+                'description': container_name,
+                'license': license,
+                'creators': [{'name': 'Neurodesk',
+                            'affiliation': 'University of Queensland'}]
+            }
         }
-    }
-    if license:
-        data['metadata']['license'] = license
-        print("Updating metadata", data)
-        r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
-                        params=params, data=json.dumps(data),
-                        headers=headers)
-    else:
-        r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
-                params=params, data=json.dumps(data),
-                headers=headers)
+        if license:
+            data['metadata']['license'] = license
+            print("Updating metadata", data)
+            r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+                            params=params, data=json.dumps(data),
+                            headers=headers)
+        else:
+            r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+                    params=params, data=json.dumps(data),
+                    headers=headers)
+    except Exception as e:
+        print(f"Failed to update metadata: {e}")
+        return None
 
     # Publish the deposition
-    r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions/%s/actions/publish' % deposition_id,
-                      params=params )
-    print("Publish", r.json())
+    try:
+        r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions/%s/actions/publish' % deposition_id,
+                          params=params)
+        print("Publish", r.json())
+    except Exception as e:
+        print(f"Failed to publish deposition: {e}")
+        return None
 
     # Get the DOI from the deposition
-    r = requests.get('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
-            params=params,
-            headers=headers)
+    try:
+        r = requests.get('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+                params=params,
+                headers=headers)
+    except Exception as e:
+        print(f"Failed to get DOI from deposition: {e}")
+        return None
     doi_url = r.json()["doi_url"]
     return doi_url
 
