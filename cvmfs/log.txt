@@ -103,6 +103,7 @@ fsl_6.0.6.4_20230618 categories:diffusion imaging,functional imaging,image regis
 fsl_6.0.7.1_20230809 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.14_20241018 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.16_20250131 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
+fsl_6.0.7.18_20250922 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.4_20231005 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.8_20240913 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 gigaconnectome_0.6.0_20250630 categories:other,

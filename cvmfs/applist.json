@@ -721,6 +721,16 @@
             ]
         },
         {
+            "application": "fsl_6.0.7.18_20250922",
+            "categories": [
+                "diffusion imaging",
+                "functional imaging",
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "fsl_6.0.7.4_20231005",
             "categories": [
                 "diffusion imaging",
