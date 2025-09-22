@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-wget https://github.com/apptainer/apptainer/releases/download/v1.1.5/apptainer_1.1.5_amd64.deb
-sudo apt-get install -y ./apptainer_1.1.5_amd64.deb
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y ppa:apptainer/ppa
+sudo apt update
+sudo apt install -y apptainer-suid
 
 sudo apt-get remove aria2
 

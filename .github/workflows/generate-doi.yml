@@ -1,4 +1,6 @@
 name: generate-doi
+permissions:
+  contents: read
 
 on:
     schedule:

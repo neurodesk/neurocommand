@@ -1,4 +1,5 @@
 name: on-opening-issue
+permissions: {}
 
 on:
   issues:

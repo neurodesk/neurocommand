@@ -2,13 +2,14 @@
 import configparser
 import json
 from pathlib import Path
-from typing import Text
+from typing import Text, List, Optional
 
 def add_app(
     name: Text,
     version: Text,
     category: Text,
     exec: Text = "",
+    apptainer_args: Optional[List[str]] = None,
     terminal: bool = True,
 ) -> None:
     """Add an application to the menu.

@@ -11,7 +11,7 @@ from xml.dom import minidom
 import shutil
 import logging
 import distutils.dir_util
-
+from typing import Optional, List
 
 def write_directory_file(name, file_dir, icon_dir):
     logging.info(f"Adding submenu for '{name}'")
@@ -95,7 +95,8 @@ class NeurodeskApp:
         version: Text = "",
         category: Text = "",
         exec: Text = "",
-        terminal: bool = True
+        terminal: bool = True,
+        apptainer_args: Optional[List[str]] = None,
         ):
         """Add an application to the menu.
 
@@ -120,6 +121,7 @@ class NeurodeskApp:
         self.category = category
         self.exec = exec #TODO change exec to safer variable name
         self.terminal = terminal
+        self.apptainer_args = apptainer_args or []
 
     def app_names(self):
         self.basename = f"{self.name.lower().replace(' ', '-').replace('.', '_')}"

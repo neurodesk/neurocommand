@@ -8,44 +8,44 @@ on:
 
 jobs:
   test_singularity_aria2:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Test singularity and aria2 before pushing to neurocommand
       run: /bin/bash .github/workflows/test_singularity_aria2.sh
   test_singularity_curl:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Test singularity and curl before pushing to neurocommand
       run: /bin/bash .github/workflows/test_singularity_curl.sh
   test_singularity_cvmfs:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Test singularity and cvmfs before pushing to neurocommand
       run: /bin/bash .github/workflows/test_singularity_cvmfs.sh
   test_apptainer_curl:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Test apptainer and curl before pushing to neurocommand
       run: /bin/bash .github/workflows/test_apptainer_curl.sh
   test_apptainer_cvmfs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Test apptainer and cvmfs before pushing to neurocommand
       run: /bin/bash .github/workflows/test_apptainer_cvmfs.sh
   test_apptainer_aria2:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: Test apptainer and curl before pushing to neurocommand
       run: /bin/bash .github/workflows/test_apptainer_aria2.sh
   push_to_neurocommand:
     needs: [test_singularity_aria2,test_singularity_curl,test_singularity_cvmfs,test_apptainer_aria2,test_apptainer_curl,test_apptainer_cvmfs]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
