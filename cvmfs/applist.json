@@ -1335,6 +1335,12 @@
             ]
         },
         {
+            "application": "rabies_0.5.3_20250922",
+            "categories": [
+                "rodent imaging"
+            ]
+        },
+        {
             "application": "relion_4.0.1.sm61_20240528",
             "categories": [
                 "cryo EM"
