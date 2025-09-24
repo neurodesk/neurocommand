@@ -134,7 +134,6 @@ def upload_container(container_url, container_name, token, license):
                 'title': container_name,
                 'upload_type': 'software',
                 'description': container_name,
-                'license': license,
                 'creators': [{'name': 'Neurodesk',
                             'affiliation': 'University of Queensland'}]
             }
