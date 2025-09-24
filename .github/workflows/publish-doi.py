@@ -19,6 +19,14 @@ def get_license(container_name, gh_token):
     recipe_name = container_name.split("_")[0]
     url = f" https://api.github.com/repos/Neurodesk/neurocontainers/contents/recipes/{recipe_name}/build.yaml"
     try:
+        if 'matlab' in container_name.lower():
+            print("MATLAB container, skipping license check")
+            return {
+                'id': "other-closed",
+                'title': "MATLAB",
+                'url': "https://www.mathworks.com/products/matlab.html"
+            }
+        
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         download_url = response.json().get("download_url")
@@ -36,7 +44,7 @@ def get_license(container_name, gh_token):
             return ""
         # Return the first license found in the copyright field
         license_info = copyrights[0]
-        license = license_info.get('license') or license_info.get('name')
+        license = license_info.get('license')
         license_url = license_info.get('url')
         if license:
             return {
@@ -45,7 +53,11 @@ def get_license(container_name, gh_token):
                 'url': license_url
             }
         else:
-            return ""
+            return {
+                'id': "other-open",
+                'title': license_info.get('name') or "Custom",
+                'url': license_url
+            }
     except Exception as e:
         print(f"Failed to get recipe or parse license: {e}")
         return ""
@@ -95,8 +107,7 @@ def upload_container(container_url, container_name, token, license):
         deposition_id = r.json()['id']
         bucket_url = r.json()["links"]["bucket"]
     except Exception as e:
-        print(f"Failed to create deposition: {e}")
-        return None
+        raise Exception(f"Failed to create deposition: {e}")
     
     # Upload the simg container to bucket in the created deposition
     # The target URL is a combination of the bucket link with the desired filename
@@ -112,8 +123,8 @@ def upload_container(container_url, container_name, token, license):
             )
             r.raise_for_status()  # Ensure the upload was successful
     except Exception as e:
-        print(f"Failed to upload container: {e}")
-        return None
+        raise Exception(f"Failed to upload container: {e}")
+
     # print("Upload", r.json())
 
     # Update the metadata
@@ -139,8 +150,7 @@ def upload_container(container_url, container_name, token, license):
                     params=params, data=json.dumps(data),
                     headers=headers)
     except Exception as e:
-        print(f"Failed to update metadata: {e}")
-        return None
+        raise Exception(f"Failed to update metadata: {e}")
 
     # Publish the deposition
     try:
@@ -148,8 +158,7 @@ def upload_container(container_url, container_name, token, license):
                           params=params)
         print("Publish", r.json())
     except Exception as e:
-        print(f"Failed to publish deposition: {e}")
-        return None
+        raise Exception(f"Failed to publish deposition: {e}")
 
     # Get the DOI from the deposition
     try:
@@ -157,8 +166,7 @@ def upload_container(container_url, container_name, token, license):
                 params=params,
                 headers=headers)
     except Exception as e:
-        print(f"Failed to get DOI from deposition: {e}")
-        return None
+        raise Exception(f"Failed to get DOI from deposition: {e}")
     doi_url = r.json()["doi_url"]
     return doi_url
 
