@@ -1798,6 +1798,11 @@
             "rabies 0.3.5": {
                 "version": "20220111",
                 "exec": ""
+            },
+            "rabies 0.5.3": {
+                "version": "20250922",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
