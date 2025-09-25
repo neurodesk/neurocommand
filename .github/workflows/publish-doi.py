@@ -71,7 +71,7 @@ def get_license(container_name, gh_token):
                 'title': "Custom"
             }
 
-CHUNK_SIZE = 1024 * 1024 * 100  # 100MB
+CHUNK_SIZE = 1024 * 1024 * 10  # 100MB
 
 class RemoteStream:
     def __init__(self, url, total_size, pbar):
@@ -171,7 +171,7 @@ def upload_container(container_url, container_name, token, license):
                     f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
                     data=remote_file,  # Stream the file directly
                     params=params,
-                    timeout=(60, 300),  # (connect_timeout, read_timeout) in seconds
+                    timeout=(30, 300),  # (connect_timeout, read_timeout) in seconds
                     stream=True
                 )
                 r.raise_for_status()  # Ensure the upload was successful
