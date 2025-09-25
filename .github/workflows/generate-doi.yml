@@ -59,8 +59,12 @@ jobs:
                   # curl --output "$IMAGE_HOME/${app}.simg" "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg"
                   echo "Upload container ${app}.simg to Zenodo"
                   # echo $(find $IMAGE_HOME/${app}.simg)
-                  export DOI_URL=$(python3 .github/workflows/publish-doi.py --container_filepath="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg" --container_name=${app} --zenodo_token=${{ secrets.ZENODO_TOKEN }} --gh_token=${{ secrets.GITHUB_TOKEN }})
-                  echo "DOI_URL: $DOI_URL"
+                  if DOI_URL=$(python3 .github/workflows/publish-doi.py --container_filepath="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg" --container_name=${app} --zenodo_token=${{ secrets.ZENODO_TOKEN }} --gh_token=${{ secrets.GITHUB_TOKEN }}); then
+                    echo "DOI_URL: $DOI_URL"
+                  else
+                    echo "Failed to publish ${app} to Zenodo"
+                    exit 1
+                  fi
                 else
                   echo "Container https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg not found. Skipping..."
                 fi

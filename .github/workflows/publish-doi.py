@@ -2,8 +2,14 @@ import requests
 import json
 import argparse
 import os
+import sys
 import yaml
+import time
 from tqdm import tqdm
+from urllib3.exceptions import ProtocolError
+from requests.exceptions import ChunkedEncodingError, ConnectionError
+
+ZENODO_API_URL = "https://sandbox.zenodo.org/api/deposit/depositions"
 
 def get_license(container_name, gh_token):
     """
@@ -59,21 +65,36 @@ def get_license(container_name, gh_token):
                 'url': license_url
             }
     except Exception as e:
-        print(f"Failed to get recipe or parse license: {e}")
-        return ""
+        print(f"WARNING: Failed to get recipe or parse license: {e}")
+        return {
+                'id': "other-at",
+                'title': "Custom"
+            }
 
 CHUNK_SIZE = 1024 * 1024 * 100  # 100MB
 
 class RemoteStream:
     def __init__(self, url, total_size, pbar):
-        self.resp = requests.get(url, stream=True)
-        self.resp.raise_for_status()
-        self.iterator = self.resp.iter_content(chunk_size=CHUNK_SIZE)
+        self.url = url
         self.total_size = total_size
         self.pbar = pbar
         self.bytes_read = 0
+        self.resp = None
+        self.iterator = None
+
+    def _initialize_stream(self):
+        """Initialize or reinitialize the stream"""
+        if self.resp:
+            self.resp.close()  # Close any existing connection
+        self.resp = requests.get(self.url, stream=True, timeout=(30, 300))
+        self.resp.raise_for_status()
+        self.iterator = self.resp.iter_content(chunk_size=CHUNK_SIZE)
 
     def read(self, size=None):
+        # Lazy initialization - only create connection when first read is attempted
+        if self.iterator is None:
+            self._initialize_stream()
+            
         try:
             chunk = next(self.iterator)
             self.bytes_read += len(chunk)
@@ -81,10 +102,22 @@ class RemoteStream:
             return chunk
         except StopIteration:
             return b""  # end of stream
-
+        except Exception as e:
+            # Close the current response to free resources
+            if hasattr(self, 'resp') and self.resp:
+                self.resp.close()
+            raise e
+        
     def __len__(self):
         return self.total_size
     
+    def close(self):
+        """Clean up resources"""
+        if hasattr(self, 'resp') and self.resp:
+            self.resp.close()
+            self.resp = None
+            self.iterator = None
+
 def upload_container(container_url, container_name, token, license):
     """
     Upload simg to Zenodo and return the DOI URL.
@@ -100,30 +133,74 @@ def upload_container(container_url, container_name, token, license):
     print(f"Uploading {container_name} of size {total_size} to Zenodo...")
     # Create a new deposition
     try:
-        r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
+        r = requests.post(f'{ZENODO_API_URL}',
                         params=params,
                         json={},
                         headers=headers)
         deposition_id = r.json()['id']
         bucket_url = r.json()["links"]["bucket"]
     except Exception as e:
-        raise Exception(f"Failed to create deposition: {e}")
+        r = requests.delete(f'{ZENODO_API_URL}/{deposition_id}',
+                    headers={'Authorization': f'Bearer {token}'})
+        raise Exception(f"Failed to create deposition: {e}. Cleanup response: {r.status_code} {r.text}")
     
     # Upload the simg container to bucket in the created deposition
     # The target URL is a combination of the bucket link with the desired filename
     # seperated by a slash.
     # print("Uploading container to Zenodo...", container_url)
-    try:
-        with tqdm(total=total_size, unit="B", unit_scale=True, desc=os.path.basename(container_url)) as pbar:
-            remote_file = RemoteStream(container_url, total_size, pbar)
-            r = requests.put(
-                f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
-                data=remote_file,  # Stream the file directly
-                params=params,
-            )
-            r.raise_for_status()  # Ensure the upload was successful
-    except Exception as e:
-        raise Exception(f"Failed to upload container: {e}")
+    max_retries = 3
+    retry_delay = 60  # seconds
+    
+    for attempt in range(max_retries):
+        remote_file = None
+        session = None
+        try:
+            print(f"Upload attempt {attempt + 1}/{max_retries}")
+            with tqdm(total=total_size, unit="B", unit_scale=True, desc=os.path.basename(container_url)) as pbar:
+                remote_file = RemoteStream(container_url, total_size, pbar)
+                
+                # Configure requests session with longer timeouts and connection pooling
+                session = requests.Session()
+                session.mount('https://', requests.adapters.HTTPAdapter(
+                    max_retries=0,  # We handle retries manually
+                    pool_connections=1,
+                    pool_maxsize=1
+                ))
+                
+                r = session.put(
+                    f"{bucket_url}/{os.path.basename(container_url)}", # bucket is a flat structure, can't include subfolders in it
+                    data=remote_file,  # Stream the file directly
+                    params=params,
+                    timeout=(60, 300),  # (connect_timeout, read_timeout) in seconds
+                    stream=True
+                )
+                r.raise_for_status()  # Ensure the upload was successful
+                
+                # If we get here, upload was successful
+                print(f"Upload successful on attempt {attempt + 1}")
+                break
+                
+        except (ProtocolError, ChunkedEncodingError, ConnectionError, requests.exceptions.Timeout) as e:
+            print(f"Network error on attempt {attempt + 1}: {e}")
+            if attempt < max_retries - 1:
+                print(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                r = requests.delete(f'{ZENODO_API_URL}/{deposition_id}',
+                    headers={'Authorization': f'Bearer {token}'})
+                raise Exception(f"Failed to upload container after {max_retries} attempts. Last error: {e}")
+        except Exception as e:
+            # For non-network errors, don't retry
+            r = requests.delete(f'{ZENODO_API_URL}/{deposition_id}',
+                headers={'Authorization': f'Bearer {token}'})
+            raise Exception(f"Failed to upload container (non-network error): {e}")
+        finally:
+            # Clean up resources
+            if remote_file:
+                remote_file.close()
+            if session:
+                session.close()
 
     # print("Upload", r.json())
 
@@ -141,27 +218,31 @@ def upload_container(container_url, container_name, token, license):
         if license:
             data['metadata']['license'] = license
             print("Updating metadata", data)
-            r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+            r = requests.put(f'{ZENODO_API_URL}/{deposition_id}',
                             params=params, data=json.dumps(data),
                             headers=headers)
         else:
-            r = requests.put('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+            r = requests.put(f'{ZENODO_API_URL}/{deposition_id}',
                     params=params, data=json.dumps(data),
                     headers=headers)
     except Exception as e:
+        r = requests.delete(f'{ZENODO_API_URL}/{deposition_id}',
+            headers={'Authorization': f'Bearer {token}'})
         raise Exception(f"Failed to update metadata: {e}")
 
     # Publish the deposition
     try:
-        r = requests.post('https://sandbox.zenodo.org/api/deposit/depositions/%s/actions/publish' % deposition_id,
+        r = requests.post(f'{ZENODO_API_URL}/{deposition_id}/actions/publish',
                           params=params)
         print("Publish", r.json())
     except Exception as e:
+        r = requests.delete(f'{ZENODO_API_URL}/{deposition_id}',
+            headers={'Authorization': f'Bearer {token}'})
         raise Exception(f"Failed to publish deposition: {e}")
 
     # Get the DOI from the deposition
     try:
-        r = requests.get('https://sandbox.zenodo.org/api/deposit/depositions/%s' % deposition_id,
+        r = requests.get(f'{ZENODO_API_URL}/{deposition_id}',
                 params=params,
                 headers=headers)
     except Exception as e:
@@ -180,6 +261,10 @@ if __name__ == '__main__':
     parser.add_argument("--gh_token", type=str, required=True, help="GitHub token to access the recipe")
     args = parser.parse_args()
 
-    license = get_license(args.container_name, args.gh_token)
-    doi_url = upload_container(args.container_filepath, args.container_name, args.zenodo_token, license)
-    print(doi_url)
+    try:
+        license = get_license(args.container_name, args.gh_token)
+        doi_url = upload_container(args.container_filepath, args.container_name, args.zenodo_token, license)
+        print(doi_url)
+    except Exception as e:
+        print(f"ERROR: Script failed with exception: {e}", file=sys.stderr)
+        sys.exit(1)
