@@ -66,7 +66,7 @@ def find_missing_zenodo_dois(gh_packages, zenodo_dois):
 
     unpublished_apps = [item for item in gh_packages if item not in zenodo_dois]
 
-    # split into batches of 4, 16, or 64 depending on the total number of unpublished apps to avoid timeout as it runs on github actions runner instead of self-hosted runner
+    # split into batches of 4, 8, or total_file//64 depending on the total number of unpublished apps to avoid timeout as it runs on github actions runner instead of self-hosted runner
     batch_size = len(unpublished_apps) // 64 if len(unpublished_apps) >= 256 else 8 if len(unpublished_apps) >= 128 else 4
     batches = [{"apps": unpublished_apps[i:i + batch_size]} for i in range(0, len(unpublished_apps), batch_size)]
     return batches

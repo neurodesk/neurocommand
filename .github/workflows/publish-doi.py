@@ -71,7 +71,7 @@ def get_license(container_name, gh_token):
                 'title': "Custom"
             }
 
-CHUNK_SIZE = 1024 * 1024 * 10  # 100MB
+CHUNK_SIZE = 1024 * 1024 * 10  # 10MB
 
 class RemoteStream:
     def __init__(self, url, total_size, pbar):
