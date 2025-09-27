@@ -2016,6 +2016,21 @@
             "structural imaging"
         ]
     },
+    "spmpython": {
+        "apps": {
+            "spmpython 25.1.2.post1": {
+                "version": "20250905",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
     "surfice": {
         "apps": {
             "surfice 1.0.20210730": {
@@ -2152,6 +2167,17 @@
         },
         "categories": [
             "image segmentation"
+        ]
+    },
+    "xnat": {
+        "apps": {
+            "xnat 1.9.2.1": {
+                "version": "20250805",
+                "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation"
         ]
     }
 }
