@@ -1476,6 +1476,15 @@
             ]
         },
         {
+            "application": "spmpython_25.1.2.post1_20250905",
+            "categories": [
+                "functional imaging",
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "surfice_1.0.20210730_20211218",
             "categories": [
                 "visualization"
@@ -1552,6 +1561,12 @@
             "application": "vmtk_1.5.0_20241004",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "xnat_1.9.2.1_20250805",
+            "categories": [
+                "data organisation"
             ]
         }
     ]
