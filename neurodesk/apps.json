@@ -1460,12 +1460,12 @@
                 "exec": "mrview"
             },
             "mrtrix3 3.0.7": {
-                "version": "20250928",
+                "version": "20250929",
                 "exec": "",
                 "apptainer_args": []
             },
             "mrviewGUI-mrtrix3 3.0.7": {
-                "version": "20250928",
+                "version": "20250929",
                 "exec": "mrview",
                 "apptainer_args": []
             },
