@@ -721,7 +721,7 @@
             ]
         },
         {
-            "application": "fsl_6.0.7.18_20250922",
+            "application": "fsl_6.0.7.18_20250928",
             "categories": [
                 "diffusion imaging",
                 "functional imaging",
@@ -1099,7 +1099,7 @@
             ]
         },
         {
-            "application": "mrtrix3_3.0.7_20250805",
+            "application": "mrtrix3_3.0.7_20250928",
             "categories": [
                 "diffusion imaging"
             ]
