@@ -851,12 +851,12 @@
                 "exec": "fsleyes"
             },
             "fsl 6.0.7.18": {
-                "version": "20250922",
+                "version": "20250928",
                 "exec": "",
                 "apptainer_args": []
             },
             "fsleyesGUI-fsl 6.0.7.18": {
-                "version": "20250922",
+                "version": "20250928",
                 "exec": "fsleyes",
                 "apptainer_args": []
             },
