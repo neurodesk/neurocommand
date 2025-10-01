@@ -22,39 +22,40 @@ def fetch_zenodo_dois(zenodo_token):
     """
     Fetch the list of DOIs from Zenodo
     """
+    all_depositions = []
+    page_size = 100
     page = 1
-    params = {
-        "access_token": zenodo_token,
-        "status": "published",
-        "page": 1,
-        "size": 100,
-    }
     url = "https://sandbox.zenodo.org/api/deposit/depositions"
-    response = requests.get(url, params=params)
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch DOIs: {response.status_code} {response.text}")
-    dois = response.json()
 
-    while 'next' in response.links:
-        page += 1
+    while True:
+        # print(f"Fetching page {page} of packages from Zenodo")
         params = {
             "access_token": zenodo_token,
             "status": "published",
             "page": page,
-            "size": 100,
+            "size": page_size,
         }
         # print(f"Fetching next page of packages from Github", response.links['next']['url'], params, page)
         response=requests.get(url, params=params)
-
         if response.status_code != 200:
             raise Exception(f"Failed to fetch DOIs: {response.status_code} {response.text}")
         # print(f"Fetched {len(response.json())} packages from Github", response.json())
-        dois.extend(response.json())
+        depositions = response.json()
+        
+        if not depositions or len(depositions) < page_size:
+            all_depositions.extend(depositions)
+            break
 
-    doi_list = []
-    for doi in dois:
-        doi_list.append(doi['title'])
-    return doi_list
+        if len(depositions) == page_size:
+            page += 1
+            all_depositions.extend(depositions)
+        else:
+            break
+
+    published_apps = []
+    for deposition in all_depositions:
+        published_apps.append(deposition['title'])
+    return published_apps
 
 def find_missing_zenodo_dois(gh_packages, zenodo_dois):
     """
