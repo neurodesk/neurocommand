@@ -28,7 +28,7 @@ def fetch_zenodo_dois(zenodo_token):
     url = "https://sandbox.zenodo.org/api/deposit/depositions"
 
     while True:
-        print(f"Fetching page {page} of packages from Zenodo")
+        # print(f"Fetching page {page} of packages from Zenodo")
         params = {
             "access_token": zenodo_token,
             "status": "published",
