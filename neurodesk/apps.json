@@ -1802,7 +1802,7 @@
                 "exec": ""
             },
             "rabies 0.5.3": {
-                "version": "20250922",
+                "version": "20251014",
                 "exec": "",
                 "apptainer_args": []
             }
