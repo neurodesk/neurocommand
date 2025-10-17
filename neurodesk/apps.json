@@ -1559,6 +1559,11 @@
             "niimath 1.0.20250529": {
                 "version": "20250623",
                 "exec": ""
+            },
+            "niimath 1.0.20250804": {
+                "version": "20251016",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
