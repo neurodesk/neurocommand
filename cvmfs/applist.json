@@ -103,6 +103,12 @@
             ]
         },
         {
+            "application": "apptainer_1.4.4_20251030",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
             "application": "ashs_2.0.0_20210105",
             "categories": [
                 "hippocampus"
@@ -1162,6 +1168,12 @@
         },
         {
             "application": "niimath_1.0.20250529_20250623",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "niimath_1.0.20250804_20251016",
             "categories": [
                 "data organisation"
             ]
