@@ -117,6 +117,18 @@
             "structural imaging"
         ]
     },
+    "apptainer": {
+        "apps": {
+            "apptainer 1.4.4": {
+                "version": "20251030",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming"
+        ]
+    },
     "ashs": {
         "apps": {
             "ashs 2.0.0": {
@@ -1559,6 +1571,11 @@
             "niimath 1.0.20250529": {
                 "version": "20250623",
                 "exec": ""
+            },
+            "niimath 1.0.20250804": {
+                "version": "20251016",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
