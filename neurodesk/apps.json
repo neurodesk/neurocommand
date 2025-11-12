@@ -686,6 +686,18 @@
             "image segmentation"
         ]
     },
+    "fastsurfer": {
+        "apps": {
+            "fastsurfer 2.4.2": {
+                "version": "20251022",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
     "fatsegnet": {
         "apps": {
             "fatsegnet 1.0.gpu": {
