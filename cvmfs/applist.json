@@ -1494,6 +1494,13 @@
             ]
         },
         {
+            "application": "spm25_25.01.02_20251120",
+            "categories": [
+                "functional imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "spmpython_25.1.2.post1_20250905",
             "categories": [
                 "functional imaging",
