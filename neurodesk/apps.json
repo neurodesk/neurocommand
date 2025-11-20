@@ -2047,6 +2047,19 @@
             "structural imaging"
         ]
     },
+    "spm25": {
+        "apps": {
+            "spm25 25.01.02": {
+                "version": "20251120",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "structural imaging"
+        ]
+    },
     "spmpython": {
         "apps": {
             "spmpython 25.1.2.post1": {
