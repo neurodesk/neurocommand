@@ -909,6 +909,18 @@
             "structural imaging"
         ]
     },
+    "fsqc": {
+        "apps": {
+            "fsqc 2.1.4": {
+                "version": "20251126",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "quality control"
+        ]
+    },
     "gigaconnectome": {
         "apps": {
             "gigaconnectome 0.6.0": {
