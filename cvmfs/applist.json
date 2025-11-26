@@ -763,6 +763,12 @@
             ]
         },
         {
+            "application": "fsqc_2.1.4_20251126",
+            "categories": [
+                "quality control"
+            ]
+        },
+        {
             "application": "gigaconnectome_0.6.0_20250630",
             "categories": [
                 "other"

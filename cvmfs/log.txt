@@ -108,6 +108,7 @@ fsl_6.0.7.16_20250131 categories:diffusion imaging,functional imaging,image regi
 fsl_6.0.7.18_20250928 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.4_20231005 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.8_20240913 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
+fsqc_2.1.4_20251126 categories:quality control,
 gigaconnectome_0.6.0_20250630 categories:other,
 gimp_2.10.18_20210104 categories:visualization,
 gingerale_3.0.2_20250804 categories:statistics,
