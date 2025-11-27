@@ -1799,6 +1799,11 @@
             "qsmxt 8.1.1": {
                 "version": "20250822",
                 "exec": ""
+            },
+            "qsmxt 8.1.3": {
+                "version": "20251127",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
