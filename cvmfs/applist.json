@@ -1339,6 +1339,15 @@
             ]
         },
         {
+            "application": "qsmxt_8.1.3_20251127",
+            "categories": [
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "quickshear_1.1.0_20240606",
             "categories": [
                 "data organisation"

@@ -195,6 +195,7 @@ qsmxt_7.3.3_20250311 categories:phase processing,quantitative imaging,structural
 qsmxt_8.0.7_20250529 categories:phase processing,quantitative imaging,structural imaging,workflows,
 qsmxt_8.1.0_20250812 categories:phase processing,quantitative imaging,structural imaging,workflows,
 qsmxt_8.1.1_20250822 categories:phase processing,quantitative imaging,structural imaging,workflows,
+qsmxt_8.1.3_20251127 categories:phase processing,quantitative imaging,structural imaging,workflows,
 quickshear_1.1.0_20240606 categories:data organisation,
 qupath_0.6.0_20250805 categories:data organisation,image segmentation,structural imaging,
 rabies_0.3.5_20220111 categories:rodent imaging,
