@@ -689,13 +689,13 @@
     "fastsurfer": {
         "apps": {
             "fastsurfer 2.4.2": {
-                "version": "20251022",
+                "version": "20251201",
                 "exec": "",
                 "apptainer_args": []
             }
         },
         "categories": [
-            "image segmentation"
+            "structural imaging"
         ]
     },
     "fatsegnet": {
