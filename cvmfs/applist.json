@@ -541,9 +541,9 @@
             ]
         },
         {
-            "application": "fastsurfer_2.4.2_20251022",
+            "application": "fastsurfer_2.4.2_20251202",
             "categories": [
-                "image segmentation"
+                "structural imaging"
             ]
         },
         {
@@ -1348,6 +1348,15 @@
             ]
         },
         {
+            "application": "qsmxt_8.2.0_20251205",
+            "categories": [
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "quickshear_1.1.0_20240606",
             "categories": [
                 "data organisation"
@@ -1509,7 +1518,7 @@
             ]
         },
         {
-            "application": "spm25_25.01.02_20251120",
+            "application": "spm25_25.01.02_20251210",
             "categories": [
                 "functional imaging",
                 "structural imaging"
