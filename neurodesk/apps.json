@@ -689,13 +689,13 @@
     "fastsurfer": {
         "apps": {
             "fastsurfer 2.4.2": {
-                "version": "20251022",
+                "version": "20251201",
                 "exec": "",
                 "apptainer_args": []
             }
         },
         "categories": [
-            "image segmentation"
+            "structural imaging"
         ]
     },
     "fatsegnet": {
@@ -1804,6 +1804,11 @@
                 "version": "20251127",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "qsmxt 8.2.0": {
+                "version": "20251205",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2067,7 +2072,7 @@
     "spm25": {
         "apps": {
             "spm25 25.01.02": {
-                "version": "20251120",
+                "version": "20251210",
                 "exec": "",
                 "apptainer_args": []
             }
