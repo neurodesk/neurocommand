@@ -1509,6 +1509,12 @@
             ]
         },
         {
+            "application": "spinalcordtoolbox_7.2_20251211",
+            "categories": [
+                "spine"
+            ]
+        },
+        {
             "application": "spm12_r7771_20230609",
             "categories": [
                 "functional imaging",
