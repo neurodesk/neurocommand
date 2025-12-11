@@ -2045,6 +2045,11 @@
             "spinalcordtoolbox 6.4": {
                 "version": "20240925",
                 "exec": ""
+            },
+            "spinalcordtoolbox 7.2": {
+                "version": "20251211",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
