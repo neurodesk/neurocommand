@@ -418,6 +418,12 @@
             ]
         },
         {
+            "application": "convert3d_1.1.0_20251212",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "dcm2bids_3.2.0_20250402",
             "categories": [
                 "data organisation"
@@ -866,6 +872,13 @@
         },
         {
             "application": "itksnap_4.2.2_20250805",
+            "categories": [
+                "image segmentation",
+                "visualization"
+            ]
+        },
+        {
+            "application": "itksnap_4.4.0_20251212",
             "categories": [
                 "image segmentation",
                 "visualization"
