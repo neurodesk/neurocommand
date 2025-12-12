@@ -522,6 +522,11 @@
             "convert3d 1.0.0": {
                 "version": "20210104",
                 "exec": ""
+            },
+            "convert3d 1.1.0": {
+                "version": "20251212",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
