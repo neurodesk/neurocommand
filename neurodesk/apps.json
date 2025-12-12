@@ -1106,6 +1106,16 @@
             "itksnapGUI-itksnap 4.2.2": {
                 "version": "20250805",
                 "exec": "itksnap"
+            },
+            "itksnap 4.4.0": {
+                "version": "20251212",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "itksnapGUI-itksnap 4.4.0": {
+                "version": "20251212",
+                "exec": "itksnap",
+                "apptainer_args": []
             }
         },
         "categories": [
