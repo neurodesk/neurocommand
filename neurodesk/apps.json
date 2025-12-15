@@ -685,6 +685,19 @@
             "image registration"
         ]
     },
+    "ezbids": {
+        "apps": {
+            "ezbids 1.1.0": {
+                "version": "20251212",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "data organisation"
+        ]
+    },
     "fastcsr": {
         "apps": {
             "fastcsr 1.0": {
@@ -1827,6 +1840,11 @@
             },
             "qsmxt 8.2.0": {
                 "version": "20251205",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qsmxt 8.2.1": {
+                "version": "20251215",
                 "exec": "",
                 "apptainer_args": []
             }
