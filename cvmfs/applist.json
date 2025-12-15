@@ -548,6 +548,13 @@
             ]
         },
         {
+            "application": "ezbids_1.1.0_20251212",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
             "application": "fastcsr_1.0_20231213",
             "categories": [
                 "image segmentation"
@@ -1369,6 +1376,15 @@
         },
         {
             "application": "qsmxt_8.2.0_20251205",
+            "categories": [
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "qsmxt_8.2.1_20251215",
             "categories": [
                 "phase processing",
                 "quantitative imaging",
