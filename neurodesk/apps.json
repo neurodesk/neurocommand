@@ -2155,6 +2155,18 @@
             "visualization"
         ]
     },
+    "syncro": {
+        "apps": {
+            "syncro 0.1.1": {
+                "version": "20251216",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "synthstrip": {
         "apps": {
             "synthstrip 7.4.1": {
