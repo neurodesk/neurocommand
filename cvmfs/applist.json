@@ -1582,6 +1582,12 @@
             ]
         },
         {
+            "application": "syncro_0.1.1_20251216",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "synthstrip_7.4.1_20240913",
             "categories": [
                 "image segmentation"
