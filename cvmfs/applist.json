@@ -325,6 +325,12 @@
             ]
         },
         {
+            "application": "brainager_2.1.0_20251220",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "brainlifecli_1.7.0_20241003",
             "categories": [
                 "workflows"
