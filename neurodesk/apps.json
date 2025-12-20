@@ -362,6 +362,19 @@
             "data organisation"
         ]
     },
+    "brainager": {
+        "apps": {
+            "brainager 1.0.0": {
+                "version": "20251220",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
     "brainlifecli": {
         "apps": {
             "brainlifecli 1.7.0": {
@@ -712,7 +725,7 @@
     "fastsurfer": {
         "apps": {
             "fastsurfer 2.4.2": {
-                "version": "20251202",
+                "version": "20251219",
                 "exec": "",
                 "apptainer_args": []
             }
