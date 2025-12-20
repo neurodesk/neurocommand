@@ -362,6 +362,18 @@
             "data organisation"
         ]
     },
+    "brainager": {
+        "apps": {
+            "brainager 2.1.0": {
+                "version": "20251220",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "brainlifecli": {
         "apps": {
             "brainlifecli 1.7.0": {
