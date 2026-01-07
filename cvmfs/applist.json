@@ -1163,6 +1163,12 @@
             ]
         },
         {
+            "application": "mrtrix3_3.0.8_20260107",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "mrtrix3src_latest_latest",
             "categories": [
                 "diffusion imaging"
