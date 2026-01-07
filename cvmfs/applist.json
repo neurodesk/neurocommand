@@ -567,7 +567,7 @@
             ]
         },
         {
-            "application": "fastsurfer_2.4.2_20251219",
+            "application": "fastsurfer_2.4.2_20260107",
             "categories": [
                 "structural imaging"
             ]
@@ -641,6 +641,13 @@
         },
         {
             "application": "fmriprep_25.1.3_20250715",
+            "categories": [
+                "functional imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "fmriprep_25.2.3_20260107",
             "categories": [
                 "functional imaging",
                 "workflows"
