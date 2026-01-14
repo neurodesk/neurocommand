@@ -47,7 +47,7 @@ sudo mount -t cvmfs neurodesk.ardc.edu.au /cvmfs/neurodesk.ardc.edu.au
 cvmfs_config chksetup
 ls /cvmfs/neurodesk.ardc.edu.au/
 cvmfs_config stat -v neurodesk.ardc.edu.au
-cvmfs_talk -i neurodesk.ardc.edu.au host info
+sudo cvmfs_talk -i neurodesk.ardc.edu.au host info
 
 sudo bash -c "cat > /usr/share/module.sh" << 'EOF'
 # system-wide profile.modules                                          #
@@ -69,3 +69,7 @@ EOF
 source /usr/share/module.sh
 
 module use /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/*
+
+ml fsl
+
+bet
