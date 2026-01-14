@@ -40,7 +40,7 @@ do
     else
         echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg does not exist in released files in nectar cloud"
         echo "[DEBUG] check if it exists in AWS: "
-        if curl --output /dev/null --silent --head --fail "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"; then
+        if curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/${IMAGENAME_BUILDDATE}.simg"; then
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg exists AWS"
 
             # check if the image is already in the local builder cache:
@@ -49,7 +49,7 @@ do
             else
                 echo "[WARNING] ${IMAGENAME_BUILDDATE}.simg does not exist in cache at $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg"
                 echo "[WARNING] Downloading now ... this shouldn't be necessary so something is wrong"
-                curl --output "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg" "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"
+                curl --output "$IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg" "https://neurocontainers.s3.us-east-2.amazonaws.com/${IMAGENAME_BUILDDATE}.simg"
             fi
 
         else
@@ -91,7 +91,7 @@ do
             fi
         fi
 
-        if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"; then
+        if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/${IMAGENAME_BUILDDATE}.simg"; then
             echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg was freshly released :)"
             echo "[DEBUG] PROCEEDING TO NEXT LINE"
             echo "[DEBUG] Cleaning up ..."
@@ -103,7 +103,7 @@ do
             rclone copy $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg nectar:/neurodesk/
             rclone copy $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg aws-neurocontainers-new:/neurocontainers/
             
-            if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.neurodesk.org/${IMAGENAME_BUILDDATE}.simg"; then
+            if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg" && curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/${IMAGENAME_BUILDDATE}.simg"; then
                 echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg is now released :)"
                 rm -rf $IMAGE_HOME/${IMAGENAME_BUILDDATE}.simg
             else 

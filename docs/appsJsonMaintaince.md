@@ -220,7 +220,7 @@ bash /neurocommand/local/fetch_and_run.sh {imagename_test} {builddate}
 
 **Direct Singularity Testing**:
 ```bash
-curl -X GET https://neurocontainers.neurodesk.org/temporary-builds-new/{imagename}_{builddate}.simg -O
+curl -X GET https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/{imagename}_{builddate}.simg -O
 singularity shell --overlay /tmp/apptainer_overlay {imagename}_{builddate}.simg
 ```
 
@@ -394,7 +394,7 @@ The automated issue will contain:
 bash /neurocommand/local/fetch_and_run.sh mytool 1.0.0 20240617
 
 # Direct Singularity testing  
-curl -X GET https://neurocontainers.neurodesk.org/temporary-builds-new/mytool_1.0.0_20240617.simg -O
+curl -X GET https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/mytool_1.0.0_20240617.simg -O
 singularity shell --overlay /tmp/apptainer_overlay mytool_1.0.0_20240617.simg
 ```
 
