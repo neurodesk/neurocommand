@@ -1,38 +1,27 @@
 #!/bin/bash
+mkdir -p ~/.cloudshell
+touch ~/.cloudshell/no-apt-get-warning
 
 # install CVMFS packages for ubuntu:
 sudo apt-get install lsb-release
 wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
 
 echo "[DEBUG]: adding cfms repo"
-sudo dpkg -i cvmfs-release-latest_all.deb >> /dev/null
+sudo dpkg -i cvmfs-release-latest_all.deb
 echo "[DEBUG]: apt-get update"
-sudo apt-get update --allow-unauthenticated >> /dev/null
+sudo apt-get update --allow-unauthenticated
 echo "[DEBUG]: apt-get install cvmfs"
-sudo apt-get install cvmfs tree --allow-unauthenticated >> /dev/null
+sudo apt-get install cvmfs tree --allow-unauthenticated
 
 # install apptainer for ubuntu:
 sudo apt update
 sudo apt install -y software-properties-common
 sudo add-apt-repository -y ppa:apptainer/ppa
 sudo apt update
-sudo apt install -y apptainer-suid
-
-sudo apptainer config fakeroot --add root
-
-echo 'unshare -r apptainer "$@"' > /usr/bin/singularity_test
-chmod +x /usr/bin/singularity_test
-mv /usr/bin/singularity /usr/bin/singularity_backup
-mv /usr/bin/singularity_test /usr/bin/singularity
-
-#install datalad and lmod
-sudo apt install -y datalad lmod
-
-#install pip packages
-pip install jupyterlmod==4.0.3 pandas nilearn matplotlib nipype osfclient ipyniivue==2.0.0
+sudo apt install -y apptainer-suid lmod
 
 #setup cvmfs
-mkdir -p /etc/cvmfs/keys/ardc.edu.au/
+sudo mkdir -p /etc/cvmfs/keys/ardc.edu.au/
 echo "-----BEGIN PUBLIC KEY-----" | sudo tee /etc/cvmfs/keys/ardc.edu.au/neurodesk.ardc.edu.au.pub
 echo "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwUPEmxDp217SAtZxaBep" | sudo tee -a /etc/cvmfs/keys/ardc.edu.au/neurodesk.ardc.edu.au.pub
 echo "Bi2TQcLoh5AJ//HSIz68ypjOGFjwExGlHb95Frhu1SpcH5OASbV+jJ60oEBLi3sD" | sudo tee -a /etc/cvmfs/keys/ardc.edu.au/neurodesk.ardc.edu.au.pub
@@ -59,3 +48,24 @@ cvmfs_config chksetup
 ls /cvmfs/neurodesk.ardc.edu.au/
 cvmfs_config stat -v neurodesk.ardc.edu.au
 cvmfs_talk -i neurodesk.ardc.edu.au host info
+
+sudo bash -c "cat > /usr/share/module.sh" << 'EOF'
+# system-wide profile.modules                                          #
+# Initialize modules for all sh-derivative shells                      #
+#----------------------------------------------------------------------#
+trap "" 1 2 3
+
+case "$0" in
+    -bash|bash|*/bash) . /usr/share/lmod/8.6.19/init/bash ;;
+       -ksh|ksh|*/ksh) . /usr/share/lmod/8.6.19/init/ksh ;;
+       -zsh|zsh|*/zsh) . /usr/share/lmod/8.6.19/init/zsh ;;
+          -sh|sh|*/sh) . /usr/share/lmod/8.6.19/init/sh ;;
+                    *) . /usr/share/lmod/8.6.19/init/sh ;;  # default for scripts
+esac
+
+trap - 1 2 3
+EOF
+
+source /usr/share/module.sh
+
+module use /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/*
