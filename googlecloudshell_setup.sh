@@ -3,7 +3,7 @@ mkdir -p ~/.cloudshell
 touch ~/.cloudshell/no-apt-get-warning
 
 # install CVMFS packages for ubuntu:
-sudo apt-get install lsb-release
+sudo apt-get install -y lsb-release
 wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
 
 echo "[DEBUG]: adding cfms repo"
@@ -11,7 +11,7 @@ sudo dpkg -i cvmfs-release-latest_all.deb
 echo "[DEBUG]: apt-get update"
 sudo apt-get update --allow-unauthenticated
 echo "[DEBUG]: apt-get install cvmfs"
-sudo apt-get install cvmfs tree --allow-unauthenticated
+sudo apt-get install -y cvmfs tree --allow-unauthenticated
 
 # install apptainer for ubuntu:
 sudo apt update
