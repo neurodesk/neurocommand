@@ -554,7 +554,7 @@
             ]
         },
         {
-            "application": "ezbids_1.1.0_20251212",
+            "application": "ezbids_1.1.0_20260120",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -905,7 +905,7 @@
             ]
         },
         {
-            "application": "itksnap_4.4.0_20251212",
+            "application": "itksnap_4.4.0_20260117",
             "categories": [
                 "image segmentation",
                 "visualization"
