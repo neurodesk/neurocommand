@@ -700,7 +700,7 @@
     "ezbids": {
         "apps": {
             "ezbids 1.1.0": {
-                "version": "20251212",
+                "version": "20260120",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1143,12 +1143,12 @@
                 "exec": "itksnap"
             },
             "itksnap 4.4.0": {
-                "version": "20251212",
+                "version": "20260117",
                 "exec": "",
                 "apptainer_args": []
             },
             "itksnapGUI-itksnap 4.4.0": {
-                "version": "20251212",
+                "version": "20260117",
                 "exec": "itksnap",
                 "apptainer_args": []
             }
