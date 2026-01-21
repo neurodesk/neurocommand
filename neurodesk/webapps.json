@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "webapps": {
+    "ezbids": {
+      "title": "ezBIDS",
+      "startup_command": "ezbids start",
+      "start_page": "/ezbids/",
+      "startup_timeout": 300,
+      "description": "Web-based DICOM to BIDS conversion tool",
+      "ports": {
+        "main": 3000
+      },
+      "additional_proxies": [
+        {
+          "name": "api/ezbids",
+          "port": 8082
+        }
+      ],
+      "module": "ezbids",
+      "version": "1.1.0"
+    }
+  }
+}
