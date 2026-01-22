@@ -1,18 +1,25 @@
 {
   "version": "1.0",
   "webapps": {
+    "dicompare": {
+      "title": "dicompare",
+      "startup_command": "dicompare start",
+      "startup_timeout": 60,
+      "description": "MRI protocol validation tool - validate DICOMs against community protocols",
+      "port": 3001,
+      "module": "dicompare",
+      "version": "0.1.2"
+    },
     "ezbids": {
       "title": "ezBIDS",
       "startup_command": "ezbids start",
       "start_page": "/ezbids/",
       "startup_timeout": 300,
       "description": "Web-based DICOM to BIDS conversion tool",
-      "ports": {
-        "main": 3000
-      },
+      "port": 3000,
       "additional_proxies": [
         {
-          "name": "api/ezbids",
+          "path": "ezbids/api",
           "port": 8082
         }
       ],
