@@ -19,12 +19,10 @@
       "start_page": "/ezbids/",
       "startup_timeout": 300,
       "description": "Web-based DICOM to BIDS conversion tool",
-      "ports": {
-        "main": 3000
-      },
+      "port": 3000,
       "additional_proxies": [
         {
-          "name": "ezbids/api",
+          "path": "ezbids/api",
           "port": 8082
         }
       ],
