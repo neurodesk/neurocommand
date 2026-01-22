@@ -4,9 +4,12 @@
     "dicompare": {
       "title": "dicompare",
       "startup_command": "dicompare start",
+      "start_page": "/",
       "startup_timeout": 60,
       "description": "MRI protocol validation tool - validate DICOMs against community protocols",
-      "port": 3001,
+      "ports": {
+        "main": 3001
+      },
       "module": "dicompare",
       "version": "0.1.2"
     },
