@@ -618,6 +618,19 @@
             "machine learning"
         ]
     },
+    "dicompare": {
+        "apps": {
+            "dicompare 0.1.2": {
+                "version": "20260122",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "quality control"
+        ]
+    },
     "dicomtools": {
         "apps": {
             "dicomtools 1.0.0": {
@@ -700,7 +713,7 @@
     "ezbids": {
         "apps": {
             "ezbids 1.1.0": {
-                "version": "20260121",
+                "version": "20260122",
                 "exec": "",
                 "apptainer_args": []
             }
