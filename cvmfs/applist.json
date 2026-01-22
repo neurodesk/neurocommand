@@ -512,6 +512,13 @@
             ]
         },
         {
+            "application": "dicompare_0.1.2_20260122",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
             "application": "dicomtools_1.0.0_20250204",
             "categories": [
                 "data organisation"
@@ -554,7 +561,7 @@
             ]
         },
         {
-            "application": "ezbids_1.1.0_20260121",
+            "application": "ezbids_1.1.0_20260122",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -567,7 +574,7 @@
             ]
         },
         {
-            "application": "fastsurfer_2.4.2_20260107",
+            "application": "fastsurfer_2.4.2_20260115",
             "categories": [
                 "structural imaging"
             ]
