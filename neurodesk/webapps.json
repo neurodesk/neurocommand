@@ -25,6 +25,15 @@
       ],
       "module": "ezbids",
       "version": "1.1.0"
+    },
+    "rstudio": {
+      "title": "RStudio Server",
+      "startup_command": "rstudio-server-start",
+      "startup_timeout": 120,
+      "description": "RStudio IDE for R - web-based version",
+      "port": 8787,
+      "module": "rstudio",
+      "version": "2023.12.1"
     }
   }
 }
