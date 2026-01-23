@@ -63,6 +63,12 @@ jobs:
           git remote add subtree https://stebo85:${{secrets.AUTOCOMMIT_FOR_NEUROCOMMAND}}@github.com/NeuroDesk/transparent-singularity.git
           git remote add upstream https://stebo85:${{secrets.AUTOCOMMIT_FOR_NEUROCOMMAND}}@github.com/NeuroDesk/neurocommand.git
       - name: Pull transparent-singularity into subtree
-        run:  git subtree pull --prefix neurodesk/transparent-singularity subtree master --squash
+        run: |
+          git subtree pull --prefix neurodesk/transparent-singularity subtree master --squash || (
+            echo "Conflict detected; accepting incoming changes..."
+            git diff --name-only --diff-filter=U | xargs -r git checkout --theirs
+            git add neurodesk/transparent-singularity
+            git commit --no-edit
+          )
       - name: Push to neurodesk
         run:  git push upstream main
