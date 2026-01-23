@@ -1633,6 +1633,20 @@
             "programming"
         ]
     },
+    "nibabies": {
+        "apps": {
+            "nibabies 24.0.0": {
+                "version": "20260122",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "structural imaging",
+            "workflows"
+        ]
+    },
     "niftyreg": {
         "apps": {
             "niftyreg 1.4.0": {
