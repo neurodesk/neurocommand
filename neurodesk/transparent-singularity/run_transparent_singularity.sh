@@ -137,25 +137,25 @@ else
       url_nectar="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/"
    fi
 
-   echo "Testing temporary CDN Object storage next: "
+   echo "Testing temporary AWS S3 Object storage next: "
    if curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/$container"; then      
       echo "$container exists in the temporary builds cache"
-      url_cdn="https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/"
+      url_awss3="https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/"
    fi
 
    echo "Testing standard Object storage next: "
    if curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/$container"; then
       echo "$container exists in the standard object storage"
-      url_cdn="https://neurocontainers.s3.us-east-2.amazonaws.com/"
+      url_awss3="https://neurocontainers.s3.us-east-2.amazonaws.com/"
    fi
 
-   if [[ -v url_cdn ]] || [[ -v url_nectar ]]; then
+   if [[ -v url_awss3 ]] || [[ -v url_nectar ]]; then
       # echo "check if aria2 is installed ..."
-      qq=$(which  aria2c)
+      qq=`which  aria2c`
       if [[  ${#qq} -lt 1 ]]; then
           echo "aria2 is not installed. Defaulting to curl."
          
-          urls=($url_cdn $url_nectar)
+          urls=($url_awss3 $url_nectar)
           declare -a speeds   
               
           echo "testing which server is fastest."
@@ -173,7 +173,7 @@ else
           for speed in "${speeds[@]}";      
           do 
              #echo comparing $speed with $avg_speed
-             #echo currently fastest server is: $url
+             #echo currenlty fastest server is: $url
              #echo count: $count
              if (( $(echo "$speed < $avg_speed" |bc -l) )); then
                 #echo found a new min: $speed
@@ -187,21 +187,8 @@ else
               
           container_pull="curl -X GET ${url}${container} -O"
        else 
-         #check if both url_cdn and url_nectar are set
-         if [[ -v url_nectar ]] && [[ -v url_cdn ]]; then
-            echo "Using aria2c to download from both CDN and Nectar."
-            container_pull="aria2c -x 16 -s 16 ${url_cdn}${container} ${url_nectar}${container}"
-         else
-            echo "Using aria2c to download from CDN or Nectar."
-            # if only one URL is set, use that one
-            if [[ -v url_nectar ]]; then
-               container_pull="aria2c -x 16 -s 16 ${url_nectar}${container}"
-            fi
-            if [[ -v url_cdn ]]; then
-               container_pull="aria2c -x 16 -s 16 ${url_cdn}${container}"
-            fi
-         fi # end of check if both urls are set
-      fi # end of check if aria2 is installed
+          container_pull="aria2c ${url_awss3}${container} ${url_nectar}${container}"
+       fi # end of aria2c check
    else # end of check if files exist in object storage
       # fallback to docker
       echo "$container does not exist in any cache - loading from docker!"
