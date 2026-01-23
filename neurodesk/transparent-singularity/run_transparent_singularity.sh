@@ -173,7 +173,7 @@ else
           for speed in "${speeds[@]}";      
           do 
              #echo comparing $speed with $avg_speed
-             #echo currenlty fastest server is: $url
+             #echo currently fastest server is: $url
              #echo count: $count
              if (( $(echo "$speed < $avg_speed" |bc -l) )); then
                 #echo found a new min: $speed
