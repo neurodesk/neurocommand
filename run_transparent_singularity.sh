@@ -149,7 +149,7 @@ else
       url_cdn="https://d15yxasja65rk8.cloudfront.net/"
    fi
 
-   if [[ -v url_cdn ]]; then
+   if [[ -v url_cdn ]] || [[ -v url_nectar ]]; then
       # echo "check if aria2 is installed ..."
       qq=`which  aria2c`
       if [[  ${#qq} -lt 1 ]]; then
