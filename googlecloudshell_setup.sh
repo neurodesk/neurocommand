@@ -4,7 +4,7 @@ touch ~/.cloudshell/no-apt-get-warning
 
 # install CVMFS packages for ubuntu:
 sudo apt-get install -y lsb-release
-wget https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
+wget https://cvmrepo.web.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb
 
 echo "[DEBUG]: adding cfms repo"
 sudo dpkg -i cvmfs-release-latest_all.deb
