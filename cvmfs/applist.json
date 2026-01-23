@@ -1208,6 +1208,14 @@
             ]
         },
         {
+            "application": "nibabies_24.0.0_20260122",
+            "categories": [
+                "functional imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "niftyreg_1.4.0_20220317",
             "categories": [
                 "image registration"
