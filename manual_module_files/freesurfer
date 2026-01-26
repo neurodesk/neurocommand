@@ -1,4 +1,4 @@
--- Append custom license paths so that a license can be stored outside the container
+-- Append custom paths
 local additional_bind_paths = "/tmp:/scratch"
 
 if os.getenv("SINGULARITY_BINDPATH") then
