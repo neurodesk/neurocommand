@@ -187,7 +187,14 @@ else
               
           container_pull="curl -X GET ${url}${container} -O"
        else 
-          container_pull="aria2c ${url_awss3}${container} ${url_nectar}${container}"
+          aria_args=""
+          if [[ -v url_awss3 ]]; then
+             aria_args="${aria_args} ${url_awss3}${container}"
+          fi
+          if [[ -v url_nectar ]]; then
+             aria_args="${aria_args} ${url_nectar}${container}"
+          fi
+          container_pull="aria2c $aria_args"
        fi # end of aria2c check
    else # end of check if files exist in object storage
       # fallback to docker
