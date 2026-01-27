@@ -621,7 +621,7 @@
     "dicompare": {
         "apps": {
             "dicompare 0.1.2": {
-                "version": "20260123",
+                "version": "20260127",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -713,7 +713,7 @@
     "ezbids": {
         "apps": {
             "ezbids 1.1.0": {
-                "version": "20260123",
+                "version": "20260127",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2023,12 +2023,12 @@
                 "exec": "rstudio"
             },
             "rstudio 2023.12.1": {
-                "version": "20260123",
+                "version": "20260127",
                 "exec": "",
                 "apptainer_args": []
             },
             "rstudioGUI-rstudio 2023.12.1": {
-                "version": "20260123",
+                "version": "20260127",
                 "exec": "rstudio",
                 "apptainer_args": []
             }
