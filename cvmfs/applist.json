@@ -512,7 +512,7 @@
             ]
         },
         {
-            "application": "dicompare_0.1.2_20260123",
+            "application": "dicompare_0.1.2_20260127",
             "categories": [
                 "data organisation",
                 "quality control"
@@ -561,7 +561,7 @@
             ]
         },
         {
-            "application": "ezbids_1.1.0_20260123",
+            "application": "ezbids_1.1.0_20260127",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -1504,7 +1504,7 @@
             ]
         },
         {
-            "application": "rstudio_2023.12.1_20260123",
+            "application": "rstudio_2023.12.1_20260127",
             "categories": [
                 "statistics"
             ]
