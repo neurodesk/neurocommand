@@ -13,7 +13,7 @@
     },
     "ezbids": {
       "title": "ezBIDS",
-      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/ezbids/icon.png",
+      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/ezbids/icon.svg",
       "startup_command": "ezbids start",
       "start_page": "/ezbids/",
       "startup_timeout": 300,
@@ -30,7 +30,7 @@
     },
     "rstudio": {
       "title": "RStudio Server",
-      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/rstudio/icon.png",
+      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/rstudio/icon.svg",
       "startup_command": "rstudio-server-start",
       "startup_timeout": 120,
       "description": "RStudio IDE for R - web-based version",
