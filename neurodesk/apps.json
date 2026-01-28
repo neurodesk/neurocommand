@@ -56,6 +56,16 @@
             "sumaGUI-afni 25.2.03": {
                 "version": "20250717",
                 "exec": "suma"
+            },
+            "afni 26.0.07": {
+                "version": "20260128",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.0.07": {
+                "version": "20260128",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
