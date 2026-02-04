@@ -10,6 +10,13 @@ on:
       - 'neurodesk/apps.json'
       - 'neurodesk/write_log.py'
 
+# Prevent race conditions when multiple PRs are merged in quick succession.
+# This ensures only one instance of this workflow runs at a time.
+# If a second trigger occurs while the first is running, it will wait (queue).
+concurrency:
+  group: update-neurocontainers
+  cancel-in-progress: false
+
 jobs:
   upload_containers_simg:
     runs-on: self-hosted
