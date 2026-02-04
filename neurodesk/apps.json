@@ -1974,6 +1974,18 @@
             "rodent imaging"
         ]
     },
+    "radtract": {
+        "apps": {
+            "radtract 0.2.3": {
+                "version": "20260203",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
     "relion": {
         "apps": {
             "relion 4.0.1.sm61": {
@@ -2038,12 +2050,12 @@
                 "exec": "rstudio"
             },
             "rstudio 2023.12.1": {
-                "version": "20260127",
+                "version": "20260204",
                 "exec": "",
                 "apptainer_args": []
             },
             "rstudioGUI-rstudio 2023.12.1": {
-                "version": "20260127",
+                "version": "20260204",
                 "exec": "rstudio",
                 "apptainer_args": []
             }
