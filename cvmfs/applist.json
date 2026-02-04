@@ -1475,6 +1475,12 @@
             ]
         },
         {
+            "application": "radtract_0.2.3_20260203",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "relion_4.0.1.sm61_20240528",
             "categories": [
                 "cryo EM"
@@ -1517,7 +1523,7 @@
             ]
         },
         {
-            "application": "rstudio_2023.12.1_20260127",
+            "application": "rstudio_2023.12.1_20260204",
             "categories": [
                 "statistics"
             ]
