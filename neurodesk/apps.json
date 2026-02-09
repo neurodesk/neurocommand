@@ -1872,6 +1872,18 @@
             "diffusion imaging"
         ]
     },
+    "qsmbly": {
+        "apps": {
+            "qsmbly 0.3.0": {
+                "version": "20260210",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "qsmxt": {
         "apps": {
             "qsmxt 5.1.0": {
