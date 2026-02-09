@@ -2062,12 +2062,12 @@
                 "exec": "rstudio"
             },
             "rstudio 2023.12.1": {
-                "version": "20260205",
+                "version": "20260210",
                 "exec": "",
                 "apptainer_args": []
             },
             "rstudioGUI-rstudio 2023.12.1": {
-                "version": "20260205",
+                "version": "20260210",
                 "exec": "rstudio",
                 "apptainer_args": []
             }
