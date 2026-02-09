@@ -1350,6 +1350,12 @@
             ]
         },
         {
+            "application": "qsmbly_0.3.0_20260210",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "qsmxt_5.1.0_20230905",
             "categories": [
                 "phase processing",
