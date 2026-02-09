@@ -30,7 +30,7 @@
     },
     "qsmbly": {
       "title": "QSMbly",
-      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/qsmbly/icon.ico",
+      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/qsmbly/icon.svg",
       "startup_command": "qsmbly start",
       "startup_timeout": 120,
       "description": "Browser-based Quantitative Susceptibility Mapping using WebAssembly",
