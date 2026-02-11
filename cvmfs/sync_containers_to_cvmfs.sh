@@ -8,6 +8,30 @@
 
 #The cronjob logfile gets cleared after every successful run
 
+DRYRUN="${DRYRUN:-true}"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dryrun|-n)
+            DRYRUN=true
+            shift
+            ;;
+        *)
+            echo "[WARNING] Unknown argument: $1"
+            shift
+            ;;
+    esac
+done
+
+if [[ "${DRYRUN,,}" == "1" || "${DRYRUN,,}" == "true" || "${DRYRUN,,}" == "yes" ]]; then
+    DRYRUN=true
+else
+    DRYRUN=false
+fi
+
+if [[ "$DRYRUN" == "true" ]]; then
+    echo "[INFO] DRYRUN enabled: cleanup will only print stale paths and skip deletions."
+fi
+
 
 LOCKFILE=~/ISRUNNING.lock
 if [[ -f $LOCKFILE ]]; then
@@ -45,6 +69,9 @@ fi;
 Field_Separator=$IFS
 echo $Field_Separator
 
+declare -A KEEP_IMAGES
+declare -A KEEP_MODULE_FILES
+
 
 while IFS= read -r LINE
 do
@@ -62,6 +89,7 @@ do
     echo "[DEBUG] TOOLNAME: $TOOLNAME"
     echo "[DEBUG] TOOLVERSION: ${TOOLVERSION}"
     echo "[DEBUG] BUILDDATE: $BUILDDATE"
+    KEEP_IMAGES["$IMAGENAME_BUILDDATE"]=1
 
     echo "check if $IMAGENAME_BUILDDATE is already on cvmfs:"
     if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE/commands.txt" ]]
@@ -130,8 +158,10 @@ do
     do
         echo $CATEGORY
         CATEGORY="${CATEGORY// /_}"
+        MODULE_TARGET_BASE="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
 
         if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}" ]]; then
+            KEEP_MODULE_FILES["$MODULE_TARGET_BASE"]=1
             if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}" ]]
             then
                 echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
@@ -164,6 +194,7 @@ do
 
 
         if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
+            KEEP_MODULE_FILES["$MODULE_TARGET_BASE.lua"]=1
             if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
                 echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
                 echo "Checking if files are up-to-date:"
@@ -197,6 +228,76 @@ do
     IFS=$Field_Separator
 
 done < /home/ec2-user/neurocommand/cvmfs/log.txt
+
+# remove unpacked container versions and module files that no longer exist in log.txt:
+CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
+MODULES_ROOT="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules"
+STALE_IMAGES=()
+STALE_MODULE_FILES=()
+
+if [[ ${#KEEP_IMAGES[@]} -eq 0 ]]; then
+    echo "[WARNING] No container entries were parsed from log.txt. Skipping stale cleanup."
+else
+    for CONTAINER_PATH in "$CONTAINERS_ROOT"/*; do
+        [[ -d "$CONTAINER_PATH" ]] || continue
+        CONTAINER_NAME="$(basename "$CONTAINER_PATH")"
+
+        # Only manage unpacked container directories (skip folders like modules/).
+        if [[ ! -f "$CONTAINER_PATH/commands.txt" ]]; then
+            continue
+        fi
+
+        if [[ -z "${KEEP_IMAGES[$CONTAINER_NAME]+x}" ]]; then
+            STALE_IMAGES+=("$CONTAINER_NAME")
+        fi
+    done
+
+    for CATEGORY_PATH in "$MODULES_ROOT"/*; do
+        [[ -d "$CATEGORY_PATH" ]] || continue
+        for TOOL_PATH in "$CATEGORY_PATH"/*; do
+            [[ -d "$TOOL_PATH" ]] || continue
+            for MODULE_FILE_PATH in "$TOOL_PATH"/*; do
+                [[ -f "$MODULE_FILE_PATH" ]] || continue
+                if [[ -z "${KEEP_MODULE_FILES[$MODULE_FILE_PATH]+x}" ]]; then
+                    STALE_MODULE_FILES+=("$MODULE_FILE_PATH")
+                fi
+            done
+        done
+    done
+
+    if [[ ${#STALE_IMAGES[@]} -eq 0 && ${#STALE_MODULE_FILES[@]} -eq 0 ]]; then
+        echo "[INFO] No stale containers or module files found to remove."
+    else
+        if [[ ${#STALE_IMAGES[@]} -gt 0 ]]; then
+            echo "[INFO] Stale containers not present in log.txt:"
+            printf '  - %s\n' "${STALE_IMAGES[@]}"
+        else
+            echo "[INFO] No stale container directories found."
+        fi
+
+        if [[ ${#STALE_MODULE_FILES[@]} -gt 0 ]]; then
+            echo "[INFO] Stale module files not present in log.txt:"
+            printf '  - %s\n' "${STALE_MODULE_FILES[@]}"
+        else
+            echo "[INFO] No stale module files found."
+        fi
+
+        if [[ "$DRYRUN" == "true" ]]; then
+            echo "[INFO] DRYRUN enabled, skipping deletion and publish."
+        else
+            cvmfs_server transaction neurodesk.ardc.edu.au
+
+            for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
+                rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
+            done
+            for STALE_MODULE_FILE in "${STALE_MODULE_FILES[@]}"; do
+                rm -f "$STALE_MODULE_FILE"
+            done
+
+            cd ~/temp && cvmfs_server publish -m "removed stale containers/modules not present in log.txt" neurodesk.ardc.edu.au
+        fi
+    fi
+fi
 
 # finally, run a check - takes about 4 hours to complete
 # cvmfs_server check
