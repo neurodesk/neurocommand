@@ -279,10 +279,12 @@ else
     open_cvmfs_transaction neurodesk.ardc.edu.au
 
     for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
-        rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
+        echo "[INFO] Deleting stale container directory: $CONTAINERS_ROOT/$STALE_IMAGE"
+        sudo rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
     done
     for STALE_MODULE_FILE in "${STALE_MODULE_FILES[@]}"; do
-        rm -f "$STALE_MODULE_FILE"
+        echo "[INFO] Deleting stale module file: $STALE_MODULE_FILE"
+        sudo rm -f "$STALE_MODULE_FILE"
     done
 
     cd ~/temp && cvmfs_server publish -m "removed stale containers/modules not present in log.txt" neurodesk.ardc.edu.au
@@ -311,7 +313,8 @@ bash build.sh --lxde --edit
 cd ~/temp
 cvmfs_server publish -m "update neurocommond for menus" neurodesk.ardc.edu.au
 
-rm -rf $LOCKFILE
+echo "[INFO] Deleting lockfile: $LOCKFILE"
+sudo rm -rf "$LOCKFILE"
 mv ~/cronjob.log ~/cronjob_previous_run.log
 
 # check if catalog is OK:
