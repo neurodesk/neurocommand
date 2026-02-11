@@ -8,30 +8,6 @@
 
 #The cronjob logfile gets cleared after every successful run
 
-DRYRUN="${DRYRUN:-true}"
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --dryrun|-n)
-            DRYRUN=true
-            shift
-            ;;
-        *)
-            echo "[WARNING] Unknown argument: $1"
-            shift
-            ;;
-    esac
-done
-
-if [[ "${DRYRUN,,}" == "1" || "${DRYRUN,,}" == "true" || "${DRYRUN,,}" == "yes" ]]; then
-    DRYRUN=true
-else
-    DRYRUN=false
-fi
-
-if [[ "$DRYRUN" == "true" ]]; then
-    echo "[INFO] DRYRUN enabled: cleanup will only print stale paths and skip deletions."
-fi
-
 open_cvmfs_transaction() {
     local repo="$1"
     local output
@@ -98,18 +74,18 @@ while IFS= read -r LINE
 do
     echo "LINE: $LINE"
     IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< ${LINE})"
-    echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
+    # echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
 
     CATEGORIES=`echo $LINE | awk -F"categories:" '{print $2}'`
-    echo "CATEGORIES: $CATEGORIES"
+    # echo "CATEGORIES: $CATEGORIES"
 
-    echo "check if $IMAGENAME_BUILDDATE is in module files:"
+    # echo "check if $IMAGENAME_BUILDDATE is in module files:"
     TOOLNAME="$(cut -d'_' -f1 <<< ${IMAGENAME_BUILDDATE})"
     TOOLVERSION="$(cut -d'_' -f2 <<< ${IMAGENAME_BUILDDATE})"
     BUILDDATE="$(cut -d'_' -f3 <<< ${IMAGENAME_BUILDDATE})"
-    echo "[DEBUG] TOOLNAME: $TOOLNAME"
-    echo "[DEBUG] TOOLVERSION: ${TOOLVERSION}"
-    echo "[DEBUG] BUILDDATE: $BUILDDATE"
+    # echo "[DEBUG] TOOLNAME: $TOOLNAME"
+    # echo "[DEBUG] TOOLVERSION: ${TOOLVERSION}"
+    # echo "[DEBUG] BUILDDATE: $BUILDDATE"
     KEEP_IMAGES["$IMAGENAME_BUILDDATE"]=1
 
     echo "check if $IMAGENAME_BUILDDATE is already on cvmfs:"
@@ -256,68 +232,60 @@ MODULES_ROOT="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules"
 STALE_IMAGES=()
 STALE_MODULE_FILES=()
 
-if [[ ${#KEEP_IMAGES[@]} -eq 0 ]]; then
-    echo "[WARNING] No container entries were parsed from log.txt. Skipping stale cleanup."
-else
-    for CONTAINER_PATH in "$CONTAINERS_ROOT"/*; do
-        [[ -d "$CONTAINER_PATH" ]] || continue
-        CONTAINER_NAME="$(basename "$CONTAINER_PATH")"
+for CONTAINER_PATH in "$CONTAINERS_ROOT"/*; do
+    [[ -d "$CONTAINER_PATH" ]] || continue
+    CONTAINER_NAME="$(basename "$CONTAINER_PATH")"
 
-        # Only manage unpacked container directories (skip folders like modules/).
-        if [[ ! -f "$CONTAINER_PATH/commands.txt" ]]; then
-            continue
-        fi
+    # Only manage unpacked container directories (skip folders like modules/).
+    if [[ ! -f "$CONTAINER_PATH/commands.txt" ]]; then
+        continue
+    fi
 
-        if [[ -z "${KEEP_IMAGES[$CONTAINER_NAME]+x}" ]]; then
-            STALE_IMAGES+=("$CONTAINER_NAME")
-        fi
-    done
+    if [[ -z "${KEEP_IMAGES[$CONTAINER_NAME]+x}" ]]; then
+        STALE_IMAGES+=("$CONTAINER_NAME")
+    fi
+done
 
-    for CATEGORY_PATH in "$MODULES_ROOT"/*; do
-        [[ -d "$CATEGORY_PATH" ]] || continue
-        for TOOL_PATH in "$CATEGORY_PATH"/*; do
-            [[ -d "$TOOL_PATH" ]] || continue
-            for MODULE_FILE_PATH in "$TOOL_PATH"/*; do
-                [[ -f "$MODULE_FILE_PATH" ]] || continue
-                if [[ -z "${KEEP_MODULE_FILES[$MODULE_FILE_PATH]+x}" ]]; then
-                    STALE_MODULE_FILES+=("$MODULE_FILE_PATH")
-                fi
-            done
+for CATEGORY_PATH in "$MODULES_ROOT"/*; do
+    [[ -d "$CATEGORY_PATH" ]] || continue
+    for TOOL_PATH in "$CATEGORY_PATH"/*; do
+        [[ -d "$TOOL_PATH" ]] || continue
+        for MODULE_FILE_PATH in "$TOOL_PATH"/*; do
+            [[ -f "$MODULE_FILE_PATH" ]] || continue
+            if [[ -z "${KEEP_MODULE_FILES[$MODULE_FILE_PATH]+x}" ]]; then
+                STALE_MODULE_FILES+=("$MODULE_FILE_PATH")
+            fi
         done
     done
+done
 
-    if [[ ${#STALE_IMAGES[@]} -eq 0 && ${#STALE_MODULE_FILES[@]} -eq 0 ]]; then
-        echo "[INFO] No stale containers or module files found to remove."
+if [[ ${#STALE_IMAGES[@]} -eq 0 && ${#STALE_MODULE_FILES[@]} -eq 0 ]]; then
+    echo "[INFO] No stale containers or module files found to remove."
+else
+    if [[ ${#STALE_IMAGES[@]} -gt 0 ]]; then
+        echo "[INFO] Stale containers not present in log.txt:"
+        printf '  - %s\n' "${STALE_IMAGES[@]}"
     else
-        if [[ ${#STALE_IMAGES[@]} -gt 0 ]]; then
-            echo "[INFO] Stale containers not present in log.txt:"
-            printf '  - %s\n' "${STALE_IMAGES[@]}"
-        else
-            echo "[INFO] No stale container directories found."
-        fi
-
-        if [[ ${#STALE_MODULE_FILES[@]} -gt 0 ]]; then
-            echo "[INFO] Stale module files not present in log.txt:"
-            printf '  - %s\n' "${STALE_MODULE_FILES[@]}"
-        else
-            echo "[INFO] No stale module files found."
-        fi
-
-        if [[ "$DRYRUN" == "true" ]]; then
-            echo "[INFO] DRYRUN enabled, skipping deletion and publish."
-        else
-            open_cvmfs_transaction neurodesk.ardc.edu.au
-
-            for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
-                rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
-            done
-            for STALE_MODULE_FILE in "${STALE_MODULE_FILES[@]}"; do
-                rm -f "$STALE_MODULE_FILE"
-            done
-
-            cd ~/temp && cvmfs_server publish -m "removed stale containers/modules not present in log.txt" neurodesk.ardc.edu.au
-        fi
+        echo "[INFO] No stale container directories found."
     fi
+
+    if [[ ${#STALE_MODULE_FILES[@]} -gt 0 ]]; then
+        echo "[INFO] Stale module files not present in log.txt:"
+        printf '  - %s\n' "${STALE_MODULE_FILES[@]}"
+    else
+        echo "[INFO] No stale module files found."
+    fi
+
+    open_cvmfs_transaction neurodesk.ardc.edu.au
+
+    for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
+        rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
+    done
+    for STALE_MODULE_FILE in "${STALE_MODULE_FILES[@]}"; do
+        rm -f "$STALE_MODULE_FILE"
+    done
+
+    cd ~/temp && cvmfs_server publish -m "removed stale containers/modules not present in log.txt" neurodesk.ardc.edu.au
 fi
 
 # finally, run a check - takes about 4 hours to complete
