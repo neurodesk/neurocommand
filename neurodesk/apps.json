@@ -1875,7 +1875,7 @@
     "qsmbly": {
         "apps": {
             "qsmbly 0.3.0": {
-                "version": "20260210",
+                "version": "20260211",
                 "exec": "",
                 "apptainer_args": []
             }
