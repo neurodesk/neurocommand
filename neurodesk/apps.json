@@ -1878,6 +1878,11 @@
                 "version": "20260211",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "qsmbly 0.4.0": {
+                "version": "20260211",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
