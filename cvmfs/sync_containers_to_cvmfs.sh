@@ -32,6 +32,27 @@ if [[ "$DRYRUN" == "true" ]]; then
     echo "[INFO] DRYRUN enabled: cleanup will only print stale paths and skip deletions."
 fi
 
+open_cvmfs_transaction() {
+    local repo="$1"
+    local output
+    output="$(cvmfs_server transaction "$repo" 2>&1)"
+    local status=$?
+
+    if [[ $status -eq 0 ]]; then
+        [[ -n "$output" ]] && echo "$output"
+        return 0
+    fi
+
+    if grep -q "another transaction is already open" <<< "$output"; then
+        echo "[INFO] Reusing existing open transaction for $repo."
+        return 0
+    fi
+
+    echo "$output"
+    echo "[ERROR] Unable to continue without a CVMFS transaction for $repo."
+    exit 2
+}
+
 
 LOCKFILE=~/ISRUNNING.lock
 if [[ -f $LOCKFILE ]]; then
@@ -107,7 +128,7 @@ do
             # in case of problems:
             # cvmfs_server check
             # If you get bad whitelist error, check if the repository is signed: sudo /usr/bin/cvmfs_server resign neurodesk.ardc.edu.au
-            cvmfs_server transaction neurodesk.ardc.edu.au
+            open_cvmfs_transaction neurodesk.ardc.edu.au
 
             cd /cvmfs/neurodesk.ardc.edu.au/containers/
             git clone https://github.com/NeuroDesk/transparent-singularity $IMAGENAME_BUILDDATE
@@ -172,12 +193,12 @@ do
                     echo "files contents are identical"
                 else
                     echo "files differ - copy again:"
-                    cvmfs_server transaction neurodesk.ardc.edu.au
+                    open_cvmfs_transaction neurodesk.ardc.edu.au
                     cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
                     cd ~/temp && cvmfs_server publish -m "updating modules for $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
                 fi
             else
-                cvmfs_server transaction neurodesk.ardc.edu.au
+                open_cvmfs_transaction neurodesk.ardc.edu.au
                 echo "[DEBUG] mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/"
                 mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/
                 echo "[DEBUG] cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
@@ -204,12 +225,12 @@ do
                     echo "files contents are identical"
                 else
                     echo "files differ - copy again:"
-                    cvmfs_server transaction neurodesk.ardc.edu.au
+                    open_cvmfs_transaction neurodesk.ardc.edu.au
                     cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
                     cd ~/temp && cvmfs_server publish -m "updating modules for $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
                 fi
             else
-                cvmfs_server transaction neurodesk.ardc.edu.au
+                open_cvmfs_transaction neurodesk.ardc.edu.au
                 echo "[DEBUG] mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/"
                 mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/
                 echo "[DEBUG] cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua"
@@ -285,7 +306,7 @@ else
         if [[ "$DRYRUN" == "true" ]]; then
             echo "[INFO] DRYRUN enabled, skipping deletion and publish."
         else
-            cvmfs_server transaction neurodesk.ardc.edu.au
+            open_cvmfs_transaction neurodesk.ardc.edu.au
 
             for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
                 rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
@@ -315,7 +336,7 @@ fi
 # sudo vi /etc/xdg/menus/lxde-applications.menu
 #copy content of a real lxde-applications.menu file and save!
 
-cvmfs_server transaction neurodesk.ardc.edu.au
+open_cvmfs_transaction neurodesk.ardc.edu.au
 cd /cvmfs/neurodesk.ardc.edu.au/neurocommand
 git pull
 bash build.sh --lxde --edit
