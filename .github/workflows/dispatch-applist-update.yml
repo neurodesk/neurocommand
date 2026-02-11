@@ -1,0 +1,21 @@
+name: Dispatch applist update
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cvmfs/applist.json'
+      - 'cvmfs/log.txt'
+
+jobs:
+  dispatch_update:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Notify neurodesk.github.io
+      run: |
+        curl -X POST https://api.github.com/repos/NeuroDesk/neurodesk.github.io/dispatches \
+        -H 'Accept: application/vnd.github.v3+json' \
+        -u ${{ secrets.ACCESS_TOKEN }} \
+        --data '{"event_type": "NeuroDesk/neurocommand applist.json update"}'

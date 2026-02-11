@@ -1,0 +1,48 @@
+name: Consolidate apps.json queue
+
+on:
+  workflow_dispatch:
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+      - closed
+    paths:
+      - 'neurodesk/apps.json'
+
+concurrency:
+  group: appsjson-queue
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  consolidate_appsjson:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      with:
+        ref: main
+        fetch-depth: 0
+    - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+      with:
+        python-version: 3.11
+    - name: Consolidate open apps.json pull requests
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python3 .github/workflows/scripts/consolidate_appsjson_queue.py \
+          --repo "${{ github.repository }}" \
+          --graphql-url "${{ github.graphql_url }}" \
+          --base-ref main \
+          --target-file neurodesk/apps.json \
+          --consolidated-branch bot/appsjson-consolidated \
+          --report-file .github/appsjson-consolidation-report.md \
+          --enable-auto-merge \
+          --auto-merge-method SQUASH
