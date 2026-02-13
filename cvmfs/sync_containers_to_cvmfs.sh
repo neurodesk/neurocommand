@@ -288,17 +288,25 @@ else
 
         echo "[INFO] Disabling executables in stale container directory: $STALE_CONTAINER_PATH"
         while IFS= read -r -d '' EXECUTABLE_PATH; do
+            if [[ ! -w "$EXECUTABLE_PATH" ]]; then
+                echo "[INFO] Skipping non-writable executable: $EXECUTABLE_PATH"
+                continue
+            fi
             cat > "$EXECUTABLE_PATH" << EOF
 #!/usr/bin/env bash
 echo "This container was disabled due to a known bug or vulnerability. To keep using the software please use a different version. If you absolutely need this container for reproducibility you can pull it from docker hub via the command apptainer pull docker://vnmd/$DOCKER_IMAGE_REF"
 EOF
             chmod +x "$EXECUTABLE_PATH"
-        done < <(find "$STALE_CONTAINER_PATH" -type f -perm /111 -print0)
+        done < <(
+            find "$STALE_CONTAINER_PATH" \
+                \( -type d -name "*.simg" -prune \) -o \
+                -type f -perm /111 -print0
+        )
 
         STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
-        if [[ -f "$STALE_CONTAINER_IMAGE" ]]; then
+        if [[ -e "$STALE_CONTAINER_IMAGE" ]]; then
             echo "[INFO] Deleting stale container image: $STALE_CONTAINER_IMAGE"
-            rm -f "$STALE_CONTAINER_IMAGE"
+            rm -rf "$STALE_CONTAINER_IMAGE"
         fi
     done
 
