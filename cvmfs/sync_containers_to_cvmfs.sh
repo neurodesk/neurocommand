@@ -67,7 +67,6 @@ Field_Separator=$IFS
 echo $Field_Separator
 
 declare -A KEEP_IMAGES
-declare -A KEEP_MODULE_FILES
 
 
 while IFS= read -r LINE
@@ -158,7 +157,6 @@ do
         MODULE_TARGET_BASE="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
 
         if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}" ]]; then
-            KEEP_MODULE_FILES["$MODULE_TARGET_BASE"]=1
             if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}" ]]
             then
                 echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
@@ -191,7 +189,6 @@ do
 
 
         if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
-            KEEP_MODULE_FILES["$MODULE_TARGET_BASE.lua"]=1
             if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
                 echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
                 echo "Checking if files are up-to-date:"
@@ -226,11 +223,9 @@ do
 
 done < /home/ec2-user/neurocommand/cvmfs/log.txt
 
-# remove unpacked container versions and module files that no longer exist in log.txt:
+# disable unpacked container versions that no longer exist in log.txt:
 CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
-MODULES_ROOT="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules"
 STALE_IMAGES=()
-STALE_MODULE_FILES=()
 
 for CONTAINER_PATH in "$CONTAINERS_ROOT"/*; do
     [[ -d "$CONTAINER_PATH" ]] || continue
@@ -246,48 +241,36 @@ for CONTAINER_PATH in "$CONTAINERS_ROOT"/*; do
     fi
 done
 
-for CATEGORY_PATH in "$MODULES_ROOT"/*; do
-    [[ -d "$CATEGORY_PATH" ]] || continue
-    for TOOL_PATH in "$CATEGORY_PATH"/*; do
-        [[ -d "$TOOL_PATH" ]] || continue
-        for MODULE_FILE_PATH in "$TOOL_PATH"/*; do
-            [[ -f "$MODULE_FILE_PATH" ]] || continue
-            if [[ -z "${KEEP_MODULE_FILES[$MODULE_FILE_PATH]+x}" ]]; then
-                STALE_MODULE_FILES+=("$MODULE_FILE_PATH")
-            fi
-        done
-    done
-done
-
-if [[ ${#STALE_IMAGES[@]} -eq 0 && ${#STALE_MODULE_FILES[@]} -eq 0 ]]; then
-    echo "[INFO] No stale containers or module files found to remove."
+if [[ ${#STALE_IMAGES[@]} -eq 0 ]]; then
+    echo "[INFO] No stale container directories found to disable."
 else
-    if [[ ${#STALE_IMAGES[@]} -gt 0 ]]; then
-        echo "[INFO] Stale containers not present in log.txt:"
-        printf '  - %s\n' "${STALE_IMAGES[@]}"
-    else
-        echo "[INFO] No stale container directories found."
-    fi
-
-    if [[ ${#STALE_MODULE_FILES[@]} -gt 0 ]]; then
-        echo "[INFO] Stale module files not present in log.txt:"
-        printf '  - %s\n' "${STALE_MODULE_FILES[@]}"
-    else
-        echo "[INFO] No stale module files found."
-    fi
+    echo "[INFO] Stale containers not present in log.txt:"
+    printf '  - %s\n' "${STALE_IMAGES[@]}"
+    echo "[INFO] Module files in /cvmfs/neurodesk.ardc.edu.au/containers/modules are intentionally kept."
 
     open_cvmfs_transaction neurodesk.ardc.edu.au
 
     for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
-        echo "[INFO] Deleting stale container directory: $CONTAINERS_ROOT/$STALE_IMAGE"
-        sudo rm -rf "$CONTAINERS_ROOT/$STALE_IMAGE"
-    done
-    for STALE_MODULE_FILE in "${STALE_MODULE_FILES[@]}"; do
-        echo "[INFO] Deleting stale module file: $STALE_MODULE_FILE"
-        sudo rm -f "$STALE_MODULE_FILE"
+        STALE_CONTAINER_PATH="$CONTAINERS_ROOT/$STALE_IMAGE"
+        DOCKER_IMAGE_REF="${STALE_IMAGE%_*}:${STALE_IMAGE##*_}"
+
+        echo "[INFO] Disabling executables in stale container directory: $STALE_CONTAINER_PATH"
+        while IFS= read -r -d '' EXECUTABLE_PATH; do
+            cat > "$EXECUTABLE_PATH" << EOF
+#!/usr/bin/env bash
+echo "This container was disabled due to a known bug or vulnerability. To keep using the software please use a different version. If you absolutely need this container for reproducibility you can pull it from docker hub via the command apptainer pull docker://vnmd/$DOCKER_IMAGE_REF"
+EOF
+            chmod +x "$EXECUTABLE_PATH"
+        done < <(find "$STALE_CONTAINER_PATH" -type f -perm /111 -print0)
+
+        STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
+        if [[ -f "$STALE_CONTAINER_IMAGE" ]]; then
+            echo "[INFO] Deleting stale container image: $STALE_CONTAINER_IMAGE"
+            rm -f "$STALE_CONTAINER_IMAGE"
+        fi
     done
 
-    cd ~/temp && cvmfs_server publish -m "removed stale containers/modules not present in log.txt" neurodesk.ardc.edu.au
+    cd ~/temp && cvmfs_server publish -m "disabled stale containers not present in log.txt and removed stale .simg files" neurodesk.ardc.edu.au
 fi
 
 # finally, run a check - takes about 4 hours to complete
