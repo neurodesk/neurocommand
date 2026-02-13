@@ -29,6 +29,38 @@ open_cvmfs_transaction() {
     exit 2
 }
 
+neurocommand_has_upstream_updates() {
+    local repo_path="$1"
+    local local_head upstream_ref remote_name remote_branch remote_head
+
+    local_head="$(git -C "$repo_path" rev-parse HEAD 2>/dev/null)" || {
+        echo "[WARNING] Unable to read local git HEAD in $repo_path. Proceeding with menu rebuild."
+        return 0
+    }
+
+    upstream_ref="$(git -C "$repo_path" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)" || {
+        echo "[WARNING] Unable to determine upstream branch in $repo_path. Proceeding with menu rebuild."
+        return 0
+    }
+
+    remote_name="${upstream_ref%%/*}"
+    remote_branch="${upstream_ref#*/}"
+    remote_head="$(git -C "$repo_path" ls-remote "$remote_name" "refs/heads/$remote_branch" 2>/dev/null | awk 'NR==1 {print $1}')"
+
+    if [[ -z "$remote_head" ]]; then
+        echo "[WARNING] Unable to read remote HEAD for $upstream_ref. Proceeding with menu rebuild."
+        return 0
+    fi
+
+    if [[ "$local_head" == "$remote_head" ]]; then
+        echo "[INFO] neurocommand is already at $upstream_ref ($local_head)."
+        return 1
+    fi
+
+    echo "[INFO] neurocommand update available: local=$local_head remote=$remote_head ($upstream_ref)."
+    return 0
+}
+
 
 LOCKFILE=~/ISRUNNING.lock
 if [[ -f $LOCKFILE ]]; then
@@ -289,12 +321,17 @@ fi
 # sudo vi /etc/xdg/menus/lxde-applications.menu
 #copy content of a real lxde-applications.menu file and save!
 
-open_cvmfs_transaction neurodesk.ardc.edu.au
-cd /cvmfs/neurodesk.ardc.edu.au/neurocommand
-git pull
-bash build.sh --lxde --edit
-cd ~/temp
-cvmfs_server publish -m "update neurocommond for menus" neurodesk.ardc.edu.au
+NEUROCOMMAND_REPO="/cvmfs/neurodesk.ardc.edu.au/neurocommand"
+if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
+    open_cvmfs_transaction neurodesk.ardc.edu.au
+    cd "$NEUROCOMMAND_REPO"
+    git pull
+    bash build.sh --lxde --edit
+    cd ~/temp
+    cvmfs_server publish -m "update neurocommond for menus" neurodesk.ardc.edu.au
+else
+    echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
+fi
 
 echo "[INFO] Deleting lockfile: $LOCKFILE"
 sudo rm -rf "$LOCKFILE"
