@@ -82,7 +82,7 @@ git pull
 cd cvmfs
 
 # check if there is enough free space - otherwise don't do anything:
-FREE=`df -k --output=avail /storage | tail -n1`
+FREE=`df -k --output=avail / | tail -n1`
 if [[ $FREE -lt 100000000 ]]; then               # 100GB = 
     echo "There is not enough free disk space!"
     exit 1
