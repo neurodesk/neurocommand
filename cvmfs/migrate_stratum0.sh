@@ -85,3 +85,6 @@ vi /etc/cron.d/sync_containers_to_cvmfs
 
 
 # test on one of our stratum 1 with the IP of the new cvmfs-server. Then move DNS over
+
+mv ~/ec2-user/* .
+rmdir ~/ec2-user
