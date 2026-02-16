@@ -313,8 +313,7 @@ EOF
     cd ~/temp && cvmfs_server publish -m "disabled stale containers not present in log.txt and removed stale .simg files" neurodesk.ardc.edu.au
 fi
 
-# finally, run a check - takes about 4 hours to complete
-# cvmfs_server check
+
 
 
 # update neurocommand installation for the lxde menus:
@@ -345,12 +344,4 @@ echo "[INFO] Deleting lockfile: $LOCKFILE"
 sudo rm -rf "$LOCKFILE"
 mv ~/cronjob.log ~/cronjob_previous_run.log
 
-# check if catalog is OK:
-# cvmfs_server list-catalogs -e
 
-
-# garbage collection:
-# sudo cvmfs_server gc neurodesk.ardc.edu.au
-
-# Display tags
-# cvmfs_server tag -l
