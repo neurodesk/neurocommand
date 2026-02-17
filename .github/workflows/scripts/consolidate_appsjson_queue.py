@@ -6,23 +6,27 @@ Rules implemented:
 - Compute each PR's changed tools using merge-base(main, pr_head).
 - Apply those tool changes to a consolidated apps.json snapshot.
 - Later PRs overwrite earlier PRs for the same tool.
-- Close fully superseded PRs that only modify neurodesk/apps.json.
+- Close apps.json-only source PRs after their changes are consolidated.
 """
 
 from __future__ import annotations
 
 import argparse
 import copy
+import difflib
 import json
 import os
 import subprocess
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+
+DIFF_COMMENT_MARKER = "<!-- appsjson-consolidation-diff -->"
+MAX_PR_BODY_DIFF_CHARS = 15_000
+MAX_PR_COMMENT_DIFF_CHARS = 55_000
 
 
 @dataclass
@@ -46,7 +50,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base-ref", default="main")
     parser.add_argument("--target-file", default="neurodesk/apps.json")
     parser.add_argument("--consolidated-branch", default="bot/appsjson-consolidated")
-    parser.add_argument("--report-file", default=".github/appsjson-consolidation-report.md")
     parser.add_argument("--enable-auto-merge", action="store_true")
     parser.add_argument(
         "--auto-merge-method",
@@ -218,20 +221,48 @@ def write_json(path: str, payload: Dict[str, Any]) -> None:
     out.write_text(json.dumps(payload, indent=4) + "\n", encoding="utf-8")
 
 
-def write_report(
-    path: str,
+def render_appsjson_diff(
+    target_file: str,
+    base_payload: Dict[str, Any],
+    consolidated_payload: Dict[str, Any],
+) -> str:
+    base_text = json.dumps(base_payload, indent=4) + "\n"
+    consolidated_text = json.dumps(consolidated_payload, indent=4) + "\n"
+    diff_lines = difflib.unified_diff(
+        base_text.splitlines(),
+        consolidated_text.splitlines(),
+        fromfile=f"a/{target_file}",
+        tofile=f"b/{target_file}",
+        lineterm="",
+    )
+    return "\n".join(diff_lines)
+
+
+def truncate_diff(diff_text: str, max_chars: int) -> tuple[str, bool]:
+    if len(diff_text) <= max_chars:
+        return diff_text, False
+
+    if max_chars < 100:
+        return diff_text[:max_chars], True
+
+    clipped = diff_text[: max_chars - 40]
+    if "\n" in clipped:
+        clipped = clipped.rsplit("\n", 1)[0]
+    return f"{clipped}\n... (diff truncated)", True
+
+
+def build_consolidation_pr_body(
     base_ref: str,
     target_file: str,
     relevant_prs: List[PullRequest],
     applied_tools: Dict[str, int],
-    superseded_prs: List[PullRequest],
+    closed_prs: List[PullRequest],
     should_have_consolidated_pr: bool,
+    appsjson_diff: str,
 ) -> str:
-    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
     lines: List[str] = []
-    lines.append("# apps.json Consolidation Report")
+    lines.append("# apps.json Queue Consolidation")
     lines.append("")
-    lines.append(f"Generated at: {generated_at}")
     lines.append(f"Base branch: `{base_ref}`")
     lines.append(f"Target file: `{target_file}`")
     lines.append("")
@@ -253,9 +284,9 @@ def write_report(
         lines.append("- No tool-level changes were applied.")
 
     lines.append("")
-    lines.append("## Superseded PRs")
-    if superseded_prs:
-        for pr in superseded_prs:
+    lines.append("## Source PRs Closed By Consolidation")
+    if closed_prs:
+        for pr in closed_prs:
             lines.append(f"- #{pr.number}: {pr.title}")
     else:
         lines.append("- None")
@@ -267,11 +298,22 @@ def write_report(
     else:
         lines.append("- No consolidated PR is required (queue output matches `main`).")
 
-    report = "\n".join(lines) + "\n"
-    out = Path(path)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(report, encoding="utf-8")
-    return report
+    lines.append("")
+    lines.append("## Proposed `apps.json` Changes")
+    if appsjson_diff:
+        diff_for_body, is_truncated = truncate_diff(appsjson_diff, MAX_PR_BODY_DIFF_CHARS)
+        lines.append("```diff")
+        lines.append(diff_for_body)
+        lines.append("```")
+        if is_truncated:
+            lines.append("")
+            lines.append(
+                "_Diff truncated in PR body due to size. Full latest diff is posted in a PR comment._"
+            )
+    else:
+        lines.append("- No net changes.")
+
+    return "\n".join(lines) + "\n"
 
 
 def stage_and_push_branch(
@@ -357,25 +399,73 @@ def upsert_consolidated_pr(
     return int(created["number"])
 
 
-def close_superseded_prs(
+def post_consolidated_diff_comment(
     api_url: str,
     repo: str,
     token: str,
-    superseded_prs: List[PullRequest],
+    consolidated_pr_number: int,
+    target_file: str,
+    appsjson_diff: str,
+) -> bool:
+    diff_for_comment, is_truncated = truncate_diff(appsjson_diff, MAX_PR_COMMENT_DIFF_CHARS)
+    lines: List[str] = []
+    lines.append(DIFF_COMMENT_MARKER)
+    lines.append("### Proposed `apps.json` changes")
+    lines.append("")
+    lines.append(f"Latest queue consolidation diff for `{target_file}`:")
+    lines.append("")
+    if diff_for_comment:
+        lines.append("```diff")
+        lines.append(diff_for_comment)
+        lines.append("```")
+        if is_truncated:
+            lines.append("")
+            lines.append("_Diff truncated due to GitHub comment size limits._")
+    else:
+        lines.append("- No net changes.")
+
+    comment_body = "\n".join(lines)
+
+    existing_comments = github_paginated_get(
+        api_url,
+        f"/repos/{repo}/issues/{consolidated_pr_number}/comments",
+        token,
+    )
+    for comment in reversed(existing_comments):
+        body = comment.get("body") or ""
+        if DIFF_COMMENT_MARKER in body:
+            if body == comment_body:
+                return False
+            break
+
+    github_request(
+        "POST",
+        api_url,
+        f"/repos/{repo}/issues/{consolidated_pr_number}/comments",
+        token,
+        payload={"body": comment_body},
+    )
+    return True
+
+
+def close_consolidated_source_prs(
+    api_url: str,
+    repo: str,
+    token: str,
+    source_prs: List[PullRequest],
     consolidated_pr_number: Optional[int],
 ) -> None:
-    if not superseded_prs:
+    if not source_prs:
         return
 
-    for pr in superseded_prs:
+    for pr in source_prs:
         message = (
-            "This PR's `neurodesk/apps.json` changes are fully superseded by newer queue entries "
-            "and were consolidated into "
+            "This PR's `neurodesk/apps.json` changes were consolidated into "
         )
         if consolidated_pr_number is not None:
             message += f"#{consolidated_pr_number}. "
         else:
-            message += "the latest queue snapshot. "
+            message += "the latest queue snapshot with no net pending diff. "
         message += "Closing to keep `apps.json` updates linear and deterministic."
 
         github_request(
@@ -487,7 +577,42 @@ def main() -> int:
 
     base_ref = f"refs/remotes/origin/{args.base_ref}"
     base_payload = read_json_from_git(base_ref, args.target_file)
-    consolidated_payload: Dict[str, Any] = copy.deepcopy(base_payload)
+    existing_consolidated_pr = find_open_head_pr(
+        args.api_url,
+        args.repo,
+        owner,
+        args.consolidated_branch,
+        args.base_ref,
+        token,
+    )
+
+    existing_consolidated_payload: Dict[str, Any] = copy.deepcopy(base_payload)
+    existing_consolidated_has_non_target_files = False
+    if existing_consolidated_pr is not None:
+        existing_pr_files = list_pull_request_files(
+            args.api_url,
+            args.repo,
+            int(existing_consolidated_pr["number"]),
+            token,
+        )
+        existing_consolidated_has_non_target_files = any(
+            file_path != args.target_file for file_path in existing_pr_files
+        )
+
+        consolidated_ref = f"refs/remotes/origin/{args.consolidated_branch}"
+        fetch_consolidated = run_git(
+            [
+                "fetch",
+                "--no-tags",
+                "origin",
+                f"+refs/heads/{args.consolidated_branch}:{consolidated_ref}",
+            ],
+            check=False,
+        )
+        if fetch_consolidated.returncode == 0:
+            existing_consolidated_payload = read_json_from_git(consolidated_ref, args.target_file)
+
+    consolidated_payload: Dict[str, Any] = copy.deepcopy(existing_consolidated_payload)
 
     pr_changed_tools: Dict[int, List[str]] = {}
     final_winner_by_tool: Dict[str, int] = {}
@@ -519,32 +644,40 @@ def main() -> int:
     write_json(args.target_file, consolidated_payload)
 
     consolidated_differs_from_base = consolidated_payload != base_payload
-    should_have_consolidated_pr = bool(relevant_prs) and consolidated_differs_from_base
+    consolidated_differs_from_existing = consolidated_payload != existing_consolidated_payload
+    should_have_consolidated_pr = consolidated_differs_from_base
+    needs_branch_push = should_have_consolidated_pr and (
+        existing_consolidated_pr is None
+        or consolidated_differs_from_existing
+        or existing_consolidated_has_non_target_files
+    )
 
-    superseded_prs: List[PullRequest] = []
+    consolidated_source_prs: List[PullRequest] = []
     for pr in relevant_prs:
         changed = pr_changed_tools.get(pr.number, [])
-        if not changed:
-            continue
-        won_any_tool = any(final_winner_by_tool.get(tool) == pr.number for tool in changed)
-        if (not won_any_tool) and pr.apps_only:
-            superseded_prs.append(pr)
+        if pr.apps_only and changed:
+            consolidated_source_prs.append(pr)
 
-    report_body = write_report(
-        args.report_file,
+    appsjson_diff = render_appsjson_diff(
+        args.target_file,
+        base_payload,
+        consolidated_payload,
+    )
+    pr_body = build_consolidation_pr_body(
         args.base_ref,
         args.target_file,
         relevant_prs,
         final_winner_by_tool,
-        superseded_prs,
+        consolidated_source_prs,
         should_have_consolidated_pr,
+        appsjson_diff,
     )
 
-    if should_have_consolidated_pr:
+    if needs_branch_push:
         stage_and_push_branch(
             base_ref=args.base_ref,
             head_branch=args.consolidated_branch,
-            files=[args.target_file, args.report_file],
+            files=[args.target_file],
             commit_message="Consolidate pending neurodesk/apps.json updates",
         )
 
@@ -558,8 +691,20 @@ def main() -> int:
         head_branch=args.consolidated_branch,
         should_exist=should_have_consolidated_pr,
         title=consolidated_pr_title,
-        body=report_body,
+        body=pr_body,
     )
+
+    diff_comment_status = "n/a"
+    if consolidated_pr_number is not None:
+        comment_created = post_consolidated_diff_comment(
+            api_url=args.api_url,
+            repo=args.repo,
+            token=token,
+            consolidated_pr_number=consolidated_pr_number,
+            target_file=args.target_file,
+            appsjson_diff=appsjson_diff,
+        )
+        diff_comment_status = "posted" if comment_created else "unchanged"
 
     auto_merge_status: Optional[str] = None
     if args.enable_auto_merge and consolidated_pr_number is not None:
@@ -580,19 +725,25 @@ def main() -> int:
                 file=sys.stderr,
             )
 
-    close_superseded_prs(
+    close_consolidated_source_prs(
         api_url=args.api_url,
         repo=args.repo,
         token=token,
-        superseded_prs=superseded_prs,
+        source_prs=consolidated_source_prs,
         consolidated_pr_number=consolidated_pr_number,
     )
 
     print("Consolidation summary:")
     print(f"- Relevant PRs: {[pr.number for pr in relevant_prs]}")
     print(f"- Consolidated tools: {len(final_winner_by_tool)}")
-    print(f"- Superseded PRs closed: {[pr.number for pr in superseded_prs]}")
+    print(f"- Source PRs closed: {[pr.number for pr in consolidated_source_prs]}")
     print(f"- Consolidated PR number: {consolidated_pr_number}")
+    print(f"- Consolidated branch pushed: {'yes' if needs_branch_push else 'no'}")
+    print(
+        "- Existing consolidated PR had non-target files: "
+        f"{'yes' if existing_consolidated_has_non_target_files else 'no'}"
+    )
+    print(f"- Consolidated PR diff comment: {diff_comment_status}")
     if args.enable_auto_merge:
         print(f"- Consolidated PR auto-merge: {auto_merge_status or 'n/a'}")
 

@@ -43,6 +43,5 @@ jobs:
           --base-ref main \
           --target-file neurodesk/apps.json \
           --consolidated-branch bot/appsjson-consolidated \
-          --report-file .github/appsjson-consolidation-report.md \
           --enable-auto-merge \
           --auto-merge-method SQUASH
