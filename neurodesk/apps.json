@@ -952,6 +952,16 @@
                 "exec": "fsleyes",
                 "apptainer_args": []
             },
+            "fsl 6.0.7.19": {
+                "version": "20260217",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fsleyesGUI-fsl 6.0.7.19": {
+                "version": "20260217",
+                "exec": "fsleyes",
+                "apptainer_args": []
+            },
             "fsl 6.0.7.4": {
                 "version": "20231005",
                 "exec": ""
