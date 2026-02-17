@@ -335,7 +335,7 @@ if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
     git pull
     bash build.sh --lxde --edit
     cd ~/temp
-    cvmfs_server publish -m "update neurocommond for menus" neurodesk.ardc.edu.au
+    cvmfs_server publish -m "update neurocommand for menus" neurodesk.ardc.edu.au
 else
     echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
 fi
