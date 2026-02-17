@@ -114,6 +114,7 @@ fsl_6.0.7.1_20230809 categories:diffusion imaging,functional imaging,image regis
 fsl_6.0.7.14_20241018 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.16_20250131 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.18_20250928 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
+fsl_6.0.7.19_20260217 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.4_20231005 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsl_6.0.7.8_20240913 categories:diffusion imaging,functional imaging,image registration,image segmentation,structural imaging,
 fsqc_2.1.4_20251126 categories:quality control,
