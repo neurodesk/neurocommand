@@ -22,8 +22,7 @@ jobs:
     runs-on: self-hosted
     permissions:
       id-token: write
-      contents: write
-      pull-requests: write
+      contents: read
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       with:
