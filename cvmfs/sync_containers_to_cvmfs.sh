@@ -4,7 +4,7 @@
 #This script runs on the CVMFS STRATUM 0 server every 5 minutes
 
 #sudo vi /etc/cron.d/sync_containers_to_cvmfs
-#*/5 * * * * ec2-user cd ~ && bash /home/ec2-user/neurocommand/cvmfs/sync_containers_to_cvmfs.sh
+#*/5 * * * * ec2-user cd ~ && bash /home/rocky/neurocommand/cvmfs/sync_containers_to_cvmfs.sh
 
 #The cronjob logfile gets cleared after every successful run
 
@@ -253,7 +253,7 @@ do
     
     IFS=$Field_Separator
 
-done < /home/ec2-user/neurocommand/cvmfs/log.txt
+done < /home/rocky/neurocommand/cvmfs/log.txt
 
 # disable unpacked container versions that no longer exist in log.txt:
 CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
