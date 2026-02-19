@@ -11,7 +11,7 @@
 open_cvmfs_transaction() {
     local repo="$1"
     local output
-    output="$(cvmfs_server transaction "$repo" 2>&1)"
+    output="$(sudo cvmfs_server transaction "$repo" 2>&1)"
     local status=$?
 
     if [[ $status -eq 0 ]]; then
