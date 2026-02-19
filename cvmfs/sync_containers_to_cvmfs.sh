@@ -306,11 +306,11 @@ EOF
         STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         if [[ -e "$STALE_CONTAINER_IMAGE" ]]; then
             echo "[INFO] Deleting stale container image: $STALE_CONTAINER_IMAGE"
-            rm -rf "$STALE_CONTAINER_IMAGE"
+            sudo rm -rf "$STALE_CONTAINER_IMAGE"
         fi
     done
 
-    cd ~/temp && cvmfs_server publish -m "disabled stale containers not present in log.txt and removed stale .simg files" neurodesk.ardc.edu.au
+    cd ~ && sudo cvmfs_server publish -m "disabled stale containers not present in log.txt and removed stale .simg files" neurodesk.ardc.edu.au
 fi
 
 
