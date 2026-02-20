@@ -40,6 +40,78 @@ abort_cvmfs_transaction() {
     (cd "$HOME" && sudo cvmfs_server abort "$repo")
 }
 
+ensure_lxde_menu_prereqs() {
+    local repo_path="$1"
+    local appmenu="/etc/xdg/menus/lxde-applications.menu"
+    local appmenu_dir="/etc/xdg/menus"
+    local appdir="/usr/share/applications"
+    local deskdir="/usr/share/desktop-directories"
+    local fallback_menu=""
+    local candidate
+    local appmenu_candidates=(
+        "$repo_path/test/lxde-applications.menu"
+        "$HOME/neurocommand/test/lxde-applications.menu"
+    )
+
+    sudo mkdir -p "$appmenu_dir" "$appdir" "$deskdir"
+
+    for candidate in "${appmenu_candidates[@]}"; do
+        if [[ -f "$candidate" ]]; then
+            fallback_menu="$candidate"
+            break
+        fi
+    done
+
+    if [[ ! -f "$appmenu" ]]; then
+        if [[ -n "$fallback_menu" ]]; then
+            echo "[INFO] Creating missing LXDE app menu from template: $appmenu"
+            sudo cp "$fallback_menu" "$appmenu"
+        else
+            echo "[WARNING] No LXDE app menu template found; creating minimal $appmenu."
+            sudo tee "$appmenu" > /dev/null << 'EOF'
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+    <Name>Applications</Name>
+    <DefaultAppDirs/>
+    <DefaultDirectoryDirs/>
+    <DefaultMergeDirs/>
+</Menu>
+EOF
+        fi
+        sudo chmod 644 "$appmenu"
+    fi
+
+    if ! compgen -G "$appdir/*.desktop" > /dev/null; then
+        local placeholder_desktop="$appdir/code.desktop"
+        echo "[INFO] Creating placeholder desktop entry: $placeholder_desktop"
+        sudo tee "$placeholder_desktop" > /dev/null << 'EOF'
+[Desktop Entry]
+Name=Code
+Comment=Placeholder desktop entry for Neurodesk menu generation
+Exec=true
+Type=Application
+Terminal=false
+Categories=Utility;
+EOF
+        sudo chmod 644 "$placeholder_desktop"
+    fi
+
+    if ! compgen -G "$deskdir/*.directory" > /dev/null; then
+        local placeholder_directory="$deskdir/lxde-menu-system.directory"
+        echo "[INFO] Creating placeholder directory entry: $placeholder_directory"
+        sudo tee "$placeholder_directory" > /dev/null << 'EOF'
+[Desktop Entry]
+Name=System
+Comment=Placeholder directory entry for Neurodesk menu generation
+Type=Directory
+Icon=applications-system
+EOF
+        sudo chmod 644 "$placeholder_directory"
+    fi
+}
+
 neurocommand_has_upstream_updates() {
     local repo_path="$1"
     local local_head upstream_ref remote_name remote_branch remote_head
@@ -370,11 +442,15 @@ fi
 
 NEUROCOMMAND_REPO="/cvmfs/neurodesk.ardc.edu.au/neurocommand"
 if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
+    ensure_lxde_menu_prereqs "$NEUROCOMMAND_REPO"
     open_cvmfs_transaction neurodesk.ardc.edu.au
     cd "$NEUROCOMMAND_REPO"
-    git pull
-    bash build.sh --lxde --edit
-    publish_cvmfs_transaction neurodesk.ardc.edu.au "update neurocommand for menus"
+    if git pull && bash build.sh --lxde --edit; then
+        publish_cvmfs_transaction neurodesk.ardc.edu.au "update neurocommand for menus"
+    else
+        echo "[ERROR] LXDE menu rebuild failed; aborting CVMFS transaction."
+        abort_cvmfs_transaction neurodesk.ardc.edu.au
+    fi
 else
     echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
 fi

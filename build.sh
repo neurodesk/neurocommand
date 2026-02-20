@@ -59,6 +59,11 @@ if [ "$lxde" = true ]; then
     neurodesk_appmenu=/etc/xdg/menus/lxde-applications.menu
     neurodesk_appdir=/usr/share/applications/
     neurodesk_deskdir=/usr/share/desktop-directories/
+    lxde_fallback_appmenu="${_base}/test/lxde-applications.menu"
+    if [[ ! -f "$neurodesk_appmenu" && -f "$lxde_fallback_appmenu" ]]; then
+        echo "appmenu> $neurodesk_appmenu not found, using fallback $lxde_fallback_appmenu"
+        neurodesk_appmenu="$lxde_fallback_appmenu"
+    fi
     neurodesk_edit=n
     echo "deskenv> lxde preset" 
     echo
