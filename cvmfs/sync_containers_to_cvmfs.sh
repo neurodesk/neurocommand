@@ -144,6 +144,62 @@ neurocommand_has_upstream_updates() {
     return 0
 }
 
+regenerate_log_from_apps_json() {
+    local repo_path="$1"
+    local generated_log="$repo_path/log.txt"
+    local target_log="$repo_path/cvmfs/log.txt"
+
+    echo "[INFO] Regenerating cvmfs/log.txt from neurodesk/apps.json."
+
+    rm -f "$generated_log"
+
+    if ! (cd "$repo_path" && python3 neurodesk/write_log.py); then
+        echo "[ERROR] Failed to generate log.txt from neurodesk/apps.json."
+        exit 2
+    fi
+
+    # Keep the same formatting conventions as the container upload pipeline.
+    sed -i '/^$/d' "$generated_log"
+    sed -i 's/[][]//g' "$generated_log"
+    sed -i -e 's/^[ \t]*//' -e 's/[ \t]*$//' "$generated_log"
+
+    mv -f "$generated_log" "$target_log"
+    echo "[INFO] Updated $target_log"
+}
+
+commit_log_to_github_if_changed() {
+    local repo_path="$1"
+    local log_rel_path="cvmfs/log.txt"
+
+    if git -C "$repo_path" diff --quiet -- "$log_rel_path"; then
+        echo "[INFO] No changes in $log_rel_path; skipping git commit/push."
+        return 0
+    fi
+
+    echo "[INFO] Committing regenerated $log_rel_path to GitHub."
+    git -C "$repo_path" add "$log_rel_path"
+
+    if [[ -z "$(git -C "$repo_path" config --get user.name)" ]]; then
+        git -C "$repo_path" config user.name "neurodesk-cvmfs-bot"
+    fi
+    if [[ -z "$(git -C "$repo_path" config --get user.email)" ]]; then
+        git -C "$repo_path" config user.email "neurodesk-cvmfs-bot@users.noreply.github.com"
+    fi
+
+    if ! git -C "$repo_path" commit -m "Regenerate cvmfs/log.txt from apps.json"; then
+        echo "[WARNING] Unable to commit $log_rel_path; continuing."
+        return 1
+    fi
+
+    if ! git -C "$repo_path" push; then
+        echo "[WARNING] Unable to push updated $log_rel_path; continuing."
+        return 1
+    fi
+
+    echo "[INFO] Successfully committed and pushed $log_rel_path."
+    return 0
+}
+
 
 LOCKFILE=~/ISRUNNING.lock
 if [[ -f $LOCKFILE ]]; then
@@ -158,10 +214,13 @@ fi
 export RCLONE_VERBOSE=2
 # rclone copy  nectar:/neurodesk/ aws:/neurodesk
 
-cd ~/neurocommand/
+NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 
-# update application list (the log.txt file gets build in the neurocommand action once all containers are uploaded.):
+cd "$NEUROCOMMAND_LOCAL_REPO"
+
+# Pull latest changes, regenerate log.txt from apps.json, then sync CVMFS from that log.
 git pull
+regenerate_log_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
 cd cvmfs
 
 # check if there is enough free space - otherwise don't do anything:
@@ -336,7 +395,7 @@ do
     
     IFS=$Field_Separator
 
-done < /home/rocky/neurocommand/cvmfs/log.txt
+done < "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt"
 
 # disable unpacked container versions that no longer exist in log.txt:
 CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
@@ -458,6 +517,8 @@ if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
 else
     echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
 fi
+
+commit_log_to_github_if_changed "$NEUROCOMMAND_LOCAL_REPO"
 
 echo "[INFO] Deleting lockfile: $LOCKFILE"
 sudo rm -rf "$LOCKFILE"
