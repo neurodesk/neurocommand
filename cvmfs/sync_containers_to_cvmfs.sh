@@ -371,9 +371,12 @@ else
         DISABLE_NOTICE="This container was disabled due to a known bug or vulnerability."
         REPRO_PULL_HINT="docker://vnmd/$DOCKER_IMAGE_REF"
 
-        while IFS= read -r -d '' EXECUTABLE_PATH; do
-            if [[ ! -w "$EXECUTABLE_PATH" ]]; then
-                echo "[INFO] Skipping non-writable executable: $EXECUTABLE_PATH"
+        while IFS= read -r EXECUTABLE_NAME; do
+            [[ -n "$EXECUTABLE_NAME" ]] || continue
+            EXECUTABLE_PATH="$STALE_CONTAINER_PATH/$EXECUTABLE_NAME"
+
+            # Only disable top-level command wrappers generated from commands.txt.
+            if [[ ! -f "$EXECUTABLE_PATH" || ! -x "$EXECUTABLE_PATH" ]]; then
                 continue
             fi
 
@@ -387,6 +390,11 @@ else
                 TRANSACTION_OPEN=1
             fi
 
+            if [[ ! -w "$EXECUTABLE_PATH" ]]; then
+                echo "[WARNING] Unable to disable non-writable wrapper: $EXECUTABLE_PATH"
+                continue
+            fi
+
             if [[ $CONTAINER_CHANGES_MADE -eq 0 ]]; then
                 echo "[INFO] Disabling executables in stale container directory: $STALE_CONTAINER_PATH"
             fi
@@ -398,11 +406,7 @@ EOF
             chmod +x "$EXECUTABLE_PATH"
             CONTAINER_CHANGES_MADE=1
             STALE_CHANGES_MADE=1
-        done < <(
-            find "$STALE_CONTAINER_PATH" \
-                \( -type d -name "*.simg" -prune \) -o \
-                -type f -perm /111 -print0
-        )
+        done < "$STALE_CONTAINER_PATH/commands.txt"
 
         STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         if [[ -e "$STALE_CONTAINER_IMAGE" ]]; then
