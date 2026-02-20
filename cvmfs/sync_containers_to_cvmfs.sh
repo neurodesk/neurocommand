@@ -264,7 +264,7 @@ declare -A KEEP_IMAGES
 
 while IFS= read -r LINE
 do
-    echo "LINE: $LINE"
+    # echo "LINE: $LINE"
     IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< ${LINE})"
     # echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
 
@@ -280,7 +280,7 @@ do
     # echo "[DEBUG] BUILDDATE: $BUILDDATE"
     KEEP_IMAGES["$IMAGENAME_BUILDDATE"]=1
 
-    echo "check if $IMAGENAME_BUILDDATE is already on cvmfs:"
+    # echo "check if $IMAGENAME_BUILDDATE is already on cvmfs:"
     if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE/commands.txt" ]]
     then
         echo "$IMAGENAME_BUILDDATE exists on cvmfs"
@@ -341,7 +341,7 @@ do
     # fi
 
     # set internal field separator for the string list
-    echo $CATEGORIES
+    # echo $CATEGORIES
     IFS=','
     for CATEGORY in $CATEGORIES;
     do
