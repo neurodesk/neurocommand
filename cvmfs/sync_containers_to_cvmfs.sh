@@ -177,6 +177,22 @@ regenerate_log_from_apps_json() {
     echo "[INFO] Updated $target_log"
 }
 
+git_pull_rebase_non_interactive() {
+    local repo_path="$1"
+
+    if ! GIT_TERMINAL_PROMPT=0 \
+         GIT_MERGE_AUTOEDIT=no \
+         GIT_EDITOR=true \
+         GIT_SEQUENCE_EDITOR=true \
+         git -C "$repo_path" pull --rebase --autostash; then
+        echo "[WARNING] Non-interactive git pull --rebase failed in $repo_path."
+        git -C "$repo_path" rebase --abort >/dev/null 2>&1 || true
+        return 1
+    fi
+
+    return 0
+}
+
 commit_log_to_github_if_changed() {
     local repo_path="$1"
     local log_rel_path="cvmfs/log.txt"
@@ -203,7 +219,7 @@ commit_log_to_github_if_changed() {
 
     if ! git -C "$repo_path" push; then
         echo "[WARNING] Initial push failed for $log_rel_path. Attempting git pull --rebase and one push retry."
-        if ! git -C "$repo_path" pull --rebase; then
+        if ! git_pull_rebase_non_interactive "$repo_path"; then
             echo "[WARNING] Rebase failed while retrying push for $log_rel_path; continuing."
             git -C "$repo_path" rebase --abort >/dev/null 2>&1 || true
             return 1
@@ -238,7 +254,9 @@ NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 cd "$NEUROCOMMAND_LOCAL_REPO"
 
 # Pull latest changes, regenerate log.txt from apps.json, then sync CVMFS from that log.
-git pull --rebase
+if ! git_pull_rebase_non_interactive "$NEUROCOMMAND_LOCAL_REPO"; then
+    echo "[WARNING] Continuing with local checkout because pull --rebase failed."
+fi
 regenerate_log_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
 cd cvmfs
 
@@ -531,7 +549,7 @@ if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
     ensure_lxde_menu_prereqs "$NEUROCOMMAND_REPO"
     open_cvmfs_transaction neurodesk.ardc.edu.au
     # Run repo updates in a subshell so the parent shell never keeps cwd in /cvmfs.
-    if (cd "$NEUROCOMMAND_REPO" && git pull --rebase && bash build.sh --lxde --edit); then
+    if (git_pull_rebase_non_interactive "$NEUROCOMMAND_REPO" && cd "$NEUROCOMMAND_REPO" && bash build.sh --lxde --edit); then
         publish_cvmfs_transaction neurodesk.ardc.edu.au "update neurocommand for menus"
     else
         echo "[ERROR] LXDE menu rebuild failed; aborting CVMFS transaction."
