@@ -425,10 +425,18 @@ else
 
     for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
         STALE_CONTAINER_PATH="$CONTAINERS_ROOT/$STALE_IMAGE"
+        STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         DOCKER_IMAGE_REF="${STALE_IMAGE%_*}:${STALE_IMAGE##*_}"
         CONTAINER_CHANGES_MADE=0
         DISABLE_NOTICE="This container was disabled due to a known bug or vulnerability."
         REPRO_PULL_HINT="docker://vnmd/$DOCKER_IMAGE_REF"
+
+        # If the stale image payload was already removed in an earlier run,
+        # skip expensive per-wrapper checks for this container directory.
+        if [[ ! -e "$STALE_CONTAINER_IMAGE" ]]; then
+            echo "[INFO] Skipping stale wrapper checks for $STALE_CONTAINER_PATH because $STALE_IMAGE.simg is already absent."
+            continue
+        fi
 
         while IFS= read -r EXECUTABLE_NAME; do
             [[ -n "$EXECUTABLE_NAME" ]] || continue
@@ -467,7 +475,6 @@ EOF
             STALE_CHANGES_MADE=1
         done < "$STALE_CONTAINER_PATH/commands.txt"
 
-        STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         if [[ -e "$STALE_CONTAINER_IMAGE" ]]; then
             if [[ $TRANSACTION_OPEN -eq 0 ]]; then
                 open_cvmfs_transaction neurodesk.ardc.edu.au

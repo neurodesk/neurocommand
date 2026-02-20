@@ -2,7 +2,7 @@
 # New rocky linux 10 machine
 ssh rocky@203.101.224.225
 
-sudo yum install vim htop gcc git screen rsync
+sudo yum install vim htop gcc git screen rsync apptainer
 
 # disable cron jobs on old machine and copy keys/cronjobs over:
 sudo vi /etc/cron.d/cvmfs_resign
