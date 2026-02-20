@@ -29,6 +29,17 @@ open_cvmfs_transaction() {
     exit 2
 }
 
+publish_cvmfs_transaction() {
+    local repo="$1"
+    local message="$2"
+    (cd "$HOME" && sudo cvmfs_server publish -m "$message" "$repo")
+}
+
+abort_cvmfs_transaction() {
+    local repo="$1"
+    (cd "$HOME" && sudo cvmfs_server abort "$repo")
+}
+
 neurocommand_has_upstream_updates() {
     local repo_path="$1"
     local local_head upstream_ref remote_name remote_branch remote_head
@@ -155,9 +166,9 @@ do
             retVal=$?
             if [ $retVal -ne 0 ]; then
                 echo "Error in Transparent singularity. Check the log. Aborting!"
-                cd ~/temp && cvmfs_server abort 
+                abort_cvmfs_transaction neurodesk.ardc.edu.au
             else
-                cd ~/temp && cvmfs_server publish -m "added $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
+                publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
             fi
         else
             echo "[WARNING] ========================================================="
@@ -201,7 +212,7 @@ do
                     echo "files differ - copy again:"
                     open_cvmfs_transaction neurodesk.ardc.edu.au
                     cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
-                    cd ~/temp && cvmfs_server publish -m "updating modules for $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
+                    publish_cvmfs_transaction neurodesk.ardc.edu.au "updating modules for $IMAGENAME_BUILDDATE"
                 fi
             else
                 open_cvmfs_transaction neurodesk.ardc.edu.au
@@ -209,7 +220,7 @@ do
                 mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/
                 echo "[DEBUG] cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
                 cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
-                cd ~/temp && cvmfs_server publish -m "added modules for $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
+                publish_cvmfs_transaction neurodesk.ardc.edu.au "added modules for $IMAGENAME_BUILDDATE"
                 if  [[ -f /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION} ]]; then
                     echo "module file $CATEGORY/$TOOLNAME/${TOOLVERSION} written. This worked!"
                 else
@@ -232,7 +243,7 @@ do
                     echo "files differ - copy again:"
                     open_cvmfs_transaction neurodesk.ardc.edu.au
                     cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
-                    cd ~/temp && cvmfs_server publish -m "updating modules for $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
+                    publish_cvmfs_transaction neurodesk.ardc.edu.au "updating modules for $IMAGENAME_BUILDDATE"
                 fi
             else
                 open_cvmfs_transaction neurodesk.ardc.edu.au
@@ -240,7 +251,7 @@ do
                 mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/
                 echo "[DEBUG] cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua"
                 cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
-                cd ~/temp && cvmfs_server publish -m "added modules for $IMAGENAME_BUILDDATE" neurodesk.ardc.edu.au
+                publish_cvmfs_transaction neurodesk.ardc.edu.au "added modules for $IMAGENAME_BUILDDATE"
                 if  [[ -f /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua ]]; then
                     echo "module file $CATEGORY/$TOOLNAME/${TOOLVERSION} written. This worked!"
                 else
@@ -310,7 +321,7 @@ EOF
         fi
     done
 
-    cd ~ && sudo cvmfs_server publish -m "disabled stale containers not present in log.txt and removed stale .simg files" neurodesk.ardc.edu.au
+    publish_cvmfs_transaction neurodesk.ardc.edu.au "disabled stale containers not present in log.txt and removed stale .simg files"
 fi
 
 
@@ -334,8 +345,7 @@ if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
     cd "$NEUROCOMMAND_REPO"
     git pull
     bash build.sh --lxde --edit
-    cd ~/temp
-    cvmfs_server publish -m "update neurocommand for menus" neurodesk.ardc.edu.au
+    publish_cvmfs_transaction neurodesk.ardc.edu.au "update neurocommand for menus"
 else
     echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
 fi
@@ -343,5 +353,3 @@ fi
 echo "[INFO] Deleting lockfile: $LOCKFILE"
 sudo rm -rf "$LOCKFILE"
 mv ~/cronjob.log ~/cronjob_previous_run.log
-
-
