@@ -287,8 +287,6 @@ done
 if [[ ${#STALE_IMAGES[@]} -eq 0 ]]; then
     echo "[INFO] No stale container directories found to disable."
 else
-    echo "[INFO] Stale containers not present in log.txt:"
-    printf '  - %s\n' "${STALE_IMAGES[@]}"
     echo "[INFO] Module files in /cvmfs/neurodesk.ardc.edu.au/containers/modules are intentionally kept."
 
     STALE_CHANGES_MADE=0
