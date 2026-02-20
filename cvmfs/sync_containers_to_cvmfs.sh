@@ -238,7 +238,7 @@ NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 cd "$NEUROCOMMAND_LOCAL_REPO"
 
 # Pull latest changes, regenerate log.txt from apps.json, then sync CVMFS from that log.
-git pull
+git pull --rebase
 regenerate_log_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
 cd cvmfs
 
@@ -357,7 +357,7 @@ do
                 FILE1=/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}
                 FILE2=/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
                 if cmp --silent -- "$FILE1" "$FILE2"; then
-                    # echo "files contents are identical"
+                    continue
                 else
                     echo "files differ - copy again:"
                     open_cvmfs_transaction neurodesk.ardc.edu.au
@@ -531,7 +531,7 @@ if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
     ensure_lxde_menu_prereqs "$NEUROCOMMAND_REPO"
     open_cvmfs_transaction neurodesk.ardc.edu.au
     # Run repo updates in a subshell so the parent shell never keeps cwd in /cvmfs.
-    if (cd "$NEUROCOMMAND_REPO" && git pull && bash build.sh --lxde --edit); then
+    if (cd "$NEUROCOMMAND_REPO" && git pull --rebase && bash build.sh --lxde --edit); then
         publish_cvmfs_transaction neurodesk.ardc.edu.au "update neurocommand for menus"
     else
         echo "[ERROR] LXDE menu rebuild failed; aborting CVMFS transaction."
