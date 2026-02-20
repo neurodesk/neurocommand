@@ -291,23 +291,43 @@ else
     printf '  - %s\n' "${STALE_IMAGES[@]}"
     echo "[INFO] Module files in /cvmfs/neurodesk.ardc.edu.au/containers/modules are intentionally kept."
 
-    open_cvmfs_transaction neurodesk.ardc.edu.au
+    STALE_CHANGES_MADE=0
+    TRANSACTION_OPEN=0
 
     for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
         STALE_CONTAINER_PATH="$CONTAINERS_ROOT/$STALE_IMAGE"
         DOCKER_IMAGE_REF="${STALE_IMAGE%_*}:${STALE_IMAGE##*_}"
+        CONTAINER_CHANGES_MADE=0
+        DISABLE_NOTICE="This container was disabled due to a known bug or vulnerability."
+        REPRO_PULL_HINT="docker://vnmd/$DOCKER_IMAGE_REF"
 
-        echo "[INFO] Disabling executables in stale container directory: $STALE_CONTAINER_PATH"
         while IFS= read -r -d '' EXECUTABLE_PATH; do
             if [[ ! -w "$EXECUTABLE_PATH" ]]; then
                 echo "[INFO] Skipping non-writable executable: $EXECUTABLE_PATH"
                 continue
             fi
+
+            if grep -Fq "$DISABLE_NOTICE" "$EXECUTABLE_PATH" 2>/dev/null && \
+               grep -Fq "$REPRO_PULL_HINT" "$EXECUTABLE_PATH" 2>/dev/null; then
+                continue
+            fi
+
+            if [[ $TRANSACTION_OPEN -eq 0 ]]; then
+                open_cvmfs_transaction neurodesk.ardc.edu.au
+                TRANSACTION_OPEN=1
+            fi
+
+            if [[ $CONTAINER_CHANGES_MADE -eq 0 ]]; then
+                echo "[INFO] Disabling executables in stale container directory: $STALE_CONTAINER_PATH"
+            fi
+
             cat > "$EXECUTABLE_PATH" << EOF
 #!/usr/bin/env bash
 echo "This container was disabled due to a known bug or vulnerability. To keep using the software please use a different version. If you absolutely need this container for reproducibility you can pull it from docker hub via the command apptainer pull docker://vnmd/$DOCKER_IMAGE_REF"
 EOF
             chmod +x "$EXECUTABLE_PATH"
+            CONTAINER_CHANGES_MADE=1
+            STALE_CHANGES_MADE=1
         done < <(
             find "$STALE_CONTAINER_PATH" \
                 \( -type d -name "*.simg" -prune \) -o \
@@ -316,12 +336,23 @@ EOF
 
         STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         if [[ -e "$STALE_CONTAINER_IMAGE" ]]; then
+            if [[ $TRANSACTION_OPEN -eq 0 ]]; then
+                open_cvmfs_transaction neurodesk.ardc.edu.au
+                TRANSACTION_OPEN=1
+            fi
             echo "[INFO] Deleting stale container image: $STALE_CONTAINER_IMAGE"
             sudo rm -rf "$STALE_CONTAINER_IMAGE"
+            CONTAINER_CHANGES_MADE=1
+            STALE_CHANGES_MADE=1
         fi
+
     done
 
-    publish_cvmfs_transaction neurodesk.ardc.edu.au "disabled stale containers not present in log.txt and removed stale .simg files"
+    if [[ $STALE_CHANGES_MADE -eq 1 ]]; then
+        publish_cvmfs_transaction neurodesk.ardc.edu.au "disabled stale containers not present in log.txt and removed stale .simg files"
+    else
+        echo "[INFO] No stale container changes detected; skipping publish."
+    fi
 fi
 
 
