@@ -345,19 +345,19 @@ do
     IFS=','
     for CATEGORY in $CATEGORIES;
     do
-        echo $CATEGORY
+        # echo $CATEGORY
         CATEGORY="${CATEGORY// /_}"
         MODULE_TARGET_BASE="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
 
         if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}" ]]; then
             if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}" ]]
             then
-                echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
-                echo "Checking if files are up-to-date:"
+                # echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
+                # echo "Checking if files are up-to-date:"
                 FILE1=/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}
                 FILE2=/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
                 if cmp --silent -- "$FILE1" "$FILE2"; then
-                    echo "files contents are identical"
+                    # echo "files contents are identical"
                 else
                     echo "files differ - copy again:"
                     open_cvmfs_transaction neurodesk.ardc.edu.au
@@ -437,8 +437,6 @@ done
 if [[ ${#STALE_IMAGES[@]} -eq 0 ]]; then
     echo "[INFO] No stale container directories found to disable."
 else
-    echo "[INFO] Module files in /cvmfs/neurodesk.ardc.edu.au/containers/modules are intentionally kept."
-
     STALE_CHANGES_MADE=0
     TRANSACTION_OPEN=0
 
@@ -453,7 +451,6 @@ else
         # If the stale image payload was already removed in an earlier run,
         # skip expensive per-wrapper checks for this container directory.
         if [[ ! -e "$STALE_CONTAINER_IMAGE" ]]; then
-            echo "[INFO] Skipping stale wrapper checks for $STALE_CONTAINER_PATH because $STALE_IMAGE.simg is already absent."
             continue
         fi
 
