@@ -401,12 +401,12 @@ do
 
         if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
             if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
-                echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
-                echo "Checking if files are up-to-date:"
+                # echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
+                # echo "Checking if files are up-to-date:"
                 FILE1=/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua
                 FILE2=/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
                 if cmp --silent -- "$FILE1" "$FILE2"; then
-                    echo "files contents are identical"
+                    continue
                 else
                     echo "files differ - copy again:"
                     open_cvmfs_transaction neurodesk.ardc.edu.au
