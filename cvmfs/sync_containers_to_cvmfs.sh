@@ -32,12 +32,22 @@ open_cvmfs_transaction() {
 publish_cvmfs_transaction() {
     local repo="$1"
     local message="$2"
-    (cd "$HOME" && sudo cvmfs_server publish -m "$message" "$repo")
+    # Publishing remounts the CVMFS repo; ensure this shell is not left in /cvmfs.
+    cd "$HOME" || {
+        echo "[ERROR] Unable to switch to $HOME before publishing $repo."
+        exit 2
+    }
+    sudo cvmfs_server publish -m "$message" "$repo"
 }
 
 abort_cvmfs_transaction() {
     local repo="$1"
-    (cd "$HOME" && sudo cvmfs_server abort "$repo")
+    # Keep cwd stable outside /cvmfs before abort/remount operations.
+    cd "$HOME" || {
+        echo "[ERROR] Unable to switch to $HOME before aborting $repo."
+        exit 2
+    }
+    sudo cvmfs_server abort "$repo"
 }
 
 ensure_lxde_menu_prereqs() {
@@ -192,8 +202,17 @@ commit_log_to_github_if_changed() {
     fi
 
     if ! git -C "$repo_path" push; then
-        echo "[WARNING] Unable to push updated $log_rel_path; continuing."
-        return 1
+        echo "[WARNING] Initial push failed for $log_rel_path. Attempting git pull --rebase and one push retry."
+        if ! git -C "$repo_path" pull --rebase; then
+            echo "[WARNING] Rebase failed while retrying push for $log_rel_path; continuing."
+            git -C "$repo_path" rebase --abort >/dev/null 2>&1 || true
+            return 1
+        fi
+
+        if ! git -C "$repo_path" push; then
+            echo "[WARNING] Push retry failed for $log_rel_path; continuing."
+            return 1
+        fi
     fi
 
     echo "[INFO] Successfully committed and pushed $log_rel_path."
@@ -514,8 +533,8 @@ NEUROCOMMAND_REPO="/cvmfs/neurodesk.ardc.edu.au/neurocommand"
 if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
     ensure_lxde_menu_prereqs "$NEUROCOMMAND_REPO"
     open_cvmfs_transaction neurodesk.ardc.edu.au
-    cd "$NEUROCOMMAND_REPO"
-    if git pull && bash build.sh --lxde --edit; then
+    # Run repo updates in a subshell so the parent shell never keeps cwd in /cvmfs.
+    if (cd "$NEUROCOMMAND_REPO" && git pull && bash build.sh --lxde --edit); then
         publish_cvmfs_transaction neurodesk.ardc.edu.au "update neurocommand for menus"
     else
         echo "[ERROR] LXDE menu rebuild failed; aborting CVMFS transaction."
