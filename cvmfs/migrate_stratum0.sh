@@ -82,7 +82,8 @@ ls /etc/cron.d/
 # uncomment! 
 vi /etc/cron.d/cvmfs_resign
 vi /etc/cron.d/sync_containers_to_cvmfs
-
+sudo chown root:root /etc/cron.d/sync_containers_to_cvmfs
+sudo chown root:root /etc/cron.d/cvmfs_resign
 
 # test on one of our stratum 1 with the IP of the new cvmfs-server. Then move DNS over
 
