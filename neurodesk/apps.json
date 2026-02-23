@@ -871,12 +871,14 @@
                 "exec": "freeview"
             },
             "freesurfer 8.1.0": {
-                "version": "20250812",
-                "exec": ""
+                "version": "20260222",
+                "exec": "",
+                "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.1.0": {
-                "version": "20250812",
-                "exec": "freeview"
+                "version": "20260222",
+                "exec": "freeview",
+                "apptainer_args": []
             }
         },
         "categories": [
