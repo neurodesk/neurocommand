@@ -1,4 +1,6 @@
 ssh rocky@203.101.224.225
+ssh rocky@stratum0.neurodesk.cloud.edu.au
+
 
 
 #  run a check - takes about 4 hours to complete

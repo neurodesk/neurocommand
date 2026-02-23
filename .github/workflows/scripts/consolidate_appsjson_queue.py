@@ -612,40 +612,46 @@ def main() -> int:
         if fetch_consolidated.returncode == 0:
             existing_consolidated_payload = read_json_from_git(consolidated_ref, args.target_file)
 
-    consolidated_payload: Dict[str, Any] = copy.deepcopy(existing_consolidated_payload)
+    consolidation_active = existing_consolidated_pr is not None or len(relevant_prs) > 1
+
+    if consolidation_active:
+        consolidated_payload: Dict[str, Any] = copy.deepcopy(existing_consolidated_payload)
+    else:
+        consolidated_payload = copy.deepcopy(base_payload)
 
     pr_changed_tools: Dict[int, List[str]] = {}
     final_winner_by_tool: Dict[str, int] = {}
 
-    for pr in relevant_prs:
-        run_git([
-            "fetch",
-            "--no-tags",
-            "origin",
-            f"+refs/pull/{pr.number}/head:refs/remotes/origin/pr/{pr.number}",
-        ])
+    if consolidation_active:
+        for pr in relevant_prs:
+            run_git([
+                "fetch",
+                "--no-tags",
+                "origin",
+                f"+refs/pull/{pr.number}/head:refs/remotes/origin/pr/{pr.number}",
+            ])
 
-        pr_ref = f"refs/remotes/origin/pr/{pr.number}"
-        merge_base = run_git(["merge-base", base_ref, pr_ref]).stdout.strip()
+            pr_ref = f"refs/remotes/origin/pr/{pr.number}"
+            merge_base = run_git(["merge-base", base_ref, pr_ref]).stdout.strip()
 
-        before_payload = read_json_from_git(merge_base, args.target_file)
-        after_payload = read_json_from_git(pr_ref, args.target_file)
+            before_payload = read_json_from_git(merge_base, args.target_file)
+            after_payload = read_json_from_git(pr_ref, args.target_file)
 
-        changed = changed_tools(before_payload, after_payload)
-        pr_changed_tools[pr.number] = changed
+            changed = changed_tools(before_payload, after_payload)
+            pr_changed_tools[pr.number] = changed
 
-        for tool in changed:
-            if tool in after_payload:
-                consolidated_payload[tool] = copy.deepcopy(after_payload[tool])
-            elif tool in consolidated_payload:
-                del consolidated_payload[tool]
-            final_winner_by_tool[tool] = pr.number
+            for tool in changed:
+                if tool in after_payload:
+                    consolidated_payload[tool] = copy.deepcopy(after_payload[tool])
+                elif tool in consolidated_payload:
+                    del consolidated_payload[tool]
+                final_winner_by_tool[tool] = pr.number
 
     write_json(args.target_file, consolidated_payload)
 
     consolidated_differs_from_base = consolidated_payload != base_payload
     consolidated_differs_from_existing = consolidated_payload != existing_consolidated_payload
-    should_have_consolidated_pr = consolidated_differs_from_base
+    should_have_consolidated_pr = consolidation_active and consolidated_differs_from_base
     needs_branch_push = should_have_consolidated_pr and (
         existing_consolidated_pr is None
         or consolidated_differs_from_existing
@@ -653,10 +659,11 @@ def main() -> int:
     )
 
     consolidated_source_prs: List[PullRequest] = []
-    for pr in relevant_prs:
-        changed = pr_changed_tools.get(pr.number, [])
-        if pr.apps_only and changed:
-            consolidated_source_prs.append(pr)
+    if consolidation_active:
+        for pr in relevant_prs:
+            changed = pr_changed_tools.get(pr.number, [])
+            if pr.apps_only and changed:
+                consolidated_source_prs.append(pr)
 
     appsjson_diff = render_appsjson_diff(
         args.target_file,
