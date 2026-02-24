@@ -873,12 +873,12 @@
                 "apptainer_args": []
             },
             "freesurfer 8.1.0": {
-                "version": "20260222",
+                "version": "20260223",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.1.0": {
-                "version": "20260222",
+                "version": "20260223",
                 "exec": "freeview",
                 "apptainer_args": []
             }
