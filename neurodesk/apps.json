@@ -119,6 +119,11 @@
             "ants 2.6.0": {
                 "version": "20250424",
                 "exec": ""
+            },
+            "ants 2.6.5": {
+                "version": "20260225",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
