@@ -119,6 +119,11 @@
             "ants 2.6.0": {
                 "version": "20250424",
                 "exec": ""
+            },
+            "ants 2.6.5": {
+                "version": "20260225",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -873,12 +878,12 @@
                 "apptainer_args": []
             },
             "freesurfer 8.1.0": {
-                "version": "20260223",
+                "version": "20260225",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.1.0": {
-                "version": "20260223",
+                "version": "20260225",
                 "exec": "freeview",
                 "apptainer_args": []
             }
