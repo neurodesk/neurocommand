@@ -565,6 +565,18 @@
             "data organisation"
         ]
     },
+    "datalad": {
+        "apps": {
+            "datalad 1.3.1": {
+                "version": "20260227",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data management"
+        ]
+    },
     "dcm2bids": {
         "apps": {
             "dcm2bids 3.2.0": {
