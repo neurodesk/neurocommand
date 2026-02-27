@@ -2164,6 +2164,16 @@
             "3DSlicerGUI-slicer 5.0.3": {
                 "version": "20221025",
                 "exec": "Slicer"
+            },
+            "slicer 5.10.0": {
+                "version": "20260226",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "slicerGUI-slicer 5.10.0": {
+                "version": "20260226",
+                "exec": "Slicer",
+                "apptainer_args": []
             }
         },
         "categories": [
