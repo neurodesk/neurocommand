@@ -256,10 +256,10 @@ def build_menu(installdir, deskenv, sh_prefix):
         climode = True
 
     shutil.copyfile('neurodesk/neurodesk-applications.menu', installdir/'neurodesk-applications.menu')
-    shutil.copyfile('neurodesk/fetch_and_run.sh', installdir)
-    shutil.copyfile('neurodesk/fetch_containers.sh', installdir)
-    shutil.copyfile('neurodesk/configparser.sh', installdir)
-    shutil.copyfile('config.ini', installdir)
+    shutil.copyfile('neurodesk/fetch_and_run.sh', os.path.join(installdir, os.path.basename('neurodesk/fetch_and_run.sh')))
+    shutil.copyfile('neurodesk/fetch_containers.sh', os.path.join(installdir, os.path.basename('neurodesk/fetch_containers.sh')))
+    shutil.copyfile('neurodesk/configparser.sh', os.path.join(installdir, os.path.basename('neurodesk/configparser.sh')))
+    shutil.copyfile('config.ini', os.path.join(installdir, os.path.basename('config.ini')))
     distutils.dir_util.copy_tree('neurodesk/transparent-singularity', str(installdir/'transparent-singularity'))
     os.chmod(installdir/'fetch_and_run.sh', 0o755)
     os.chmod(installdir/'fetch_containers.sh', 0o755)
