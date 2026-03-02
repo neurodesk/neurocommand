@@ -21,11 +21,11 @@ def write_directory_file(name, file_dir, icon_dir):
         icon_path = icon_dir/f"aedapt.png"
     icon_src = (Path(__file__).parent/'icons'/icon_path.name)
     try:
-        shutil.copy(icon_src, icon_path)
+        shutil.copyfile(icon_src, icon_path)
     except FileNotFoundError:
         logging.warning(f'{icon_src} not found')
         icon_src = (Path(__file__).parent/'icons/neurodesk.png')
-        shutil.copy(icon_src, icon_path)
+        shutil.copyfile(icon_src, icon_path)
 
     # Generate `.directory` file
     entry = configparser.ConfigParser()
@@ -155,11 +155,11 @@ class NeurodeskApp:
         icon_path = self.installdir/f"icons/{self.name.split()[0]}.png"
         icon_src = Path(__file__).parent/'icons'/icon_path.name
         try:
-            shutil.copy(icon_src, icon_path)
+            shutil.copyfile(icon_src, icon_path)
         except FileNotFoundError:
             logging.warning(f'{icon_src} not found')
             icon_src = (Path(__file__).parent/'icons/neurodesk.png')
-            shutil.copy(icon_src, icon_path)
+            shutil.copyfile(icon_src, icon_path)
         entry = configparser.ConfigParser()
         entry.optionxform = str
 
@@ -255,11 +255,11 @@ def build_menu(installdir, deskenv, sh_prefix):
     if deskenv == 'cli':
         climode = True
 
-    shutil.copy('neurodesk/neurodesk-applications.menu', installdir/'neurodesk-applications.menu')
-    shutil.copy('neurodesk/fetch_and_run.sh', installdir)
-    shutil.copy('neurodesk/fetch_containers.sh', installdir)
-    shutil.copy('neurodesk/configparser.sh', installdir)
-    shutil.copy('config.ini', installdir)
+    shutil.copyfile('neurodesk/neurodesk-applications.menu', installdir/'neurodesk-applications.menu')
+    shutil.copyfile('neurodesk/fetch_and_run.sh', installdir)
+    shutil.copyfile('neurodesk/fetch_containers.sh', installdir)
+    shutil.copyfile('neurodesk/configparser.sh', installdir)
+    shutil.copyfile('config.ini', installdir)
     distutils.dir_util.copy_tree('neurodesk/transparent-singularity', str(installdir/'transparent-singularity'))
     os.chmod(installdir/'fetch_and_run.sh', 0o755)
     os.chmod(installdir/'fetch_containers.sh', 0o755)
