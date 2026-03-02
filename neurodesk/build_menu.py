@@ -13,6 +13,21 @@ import logging
 import distutils.dir_util
 from typing import Optional, List
 
+
+def chmod_if_new(path: Path, mode: int, existed_before: bool) -> None:
+    """Set file mode only when this run created the target file."""
+    if not existed_before:
+        os.chmod(path, mode)
+
+
+def copyfile_with_mode(src: Path, dest: Path, mode: Optional[int] = None) -> None:
+    """Copy a file and optionally chmod only when destination is newly created."""
+    dest_existed = dest.exists()
+    shutil.copyfile(src, dest)
+    if mode is not None:
+        chmod_if_new(dest, mode, dest_existed)
+
+
 def write_directory_file(name, file_dir, icon_dir):
     logging.info(f"Adding submenu for '{name}'")
     file_path = file_dir/f"{name.lower().replace(' ', '-')}.directory"
@@ -37,8 +52,10 @@ def write_directory_file(name, file_dir, icon_dir):
         "Type": "Directory",
     }
     file_dir.mkdir(exist_ok=True)
+    file_existed = file_path.exists()
     with open(Path(file_path), "w",) as directory_file:
         entry.write(directory_file, space_around_delimiters=False)
+    chmod_if_new(file_path, 0o644, file_existed)
     return file_path
 
 
@@ -58,6 +75,7 @@ def add_menu(installdir: Path, name: Text, category: Text) -> None:
 
     # Add entry to `.menu` file
     menu_path = installdir/"neurodesk-applications.menu"
+    menu_existed = menu_path.exists()
     with open(menu_path, "r") as xml_file:
         s = xml_file.read()
     s = re.sub(r"\s+(?=<)", "", s)
@@ -81,7 +99,7 @@ def add_menu(installdir: Path, name: Text, category: Text) -> None:
                 f.write('<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"\n ')
                 f.write('"http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">\n\n')
                 f.write(xmlstr[xmlstr.find("?>") + 3 :])
-            os.chmod(menu_path, 0o644)
+            chmod_if_new(menu_path, 0o644, menu_existed)
             break
 
 
@@ -139,6 +157,7 @@ class NeurodeskApp:
         self.bin_path = self.installdir/"bin"
         self.bin_path.mkdir(exist_ok=True)
         self.sh_path = self.bin_path/f"{self.basename}.sh"
+        sh_existed = self.sh_path.exists()
         with open(self.sh_path, "w",) as self.sh_file:
             self.sh_file.write("#!/usr/bin/env bash\n")
             self.sh_file.write(f"{self.sh_prefix} ")
@@ -149,7 +168,7 @@ class NeurodeskApp:
             else:
                 self.sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
             self.sh_file.write('\n')
-        os.chmod(self.sh_path, 0o755)
+        chmod_if_new(self.sh_path, 0o755, sh_existed)
 
     def add_app_menu(self) -> None:
         icon_path = self.installdir/f"icons/{self.name.split()[0]}.png"
@@ -189,9 +208,10 @@ class NeurodeskApp:
         applications_path.mkdir(exist_ok=True)
         desktop_path = applications_path/f"{self.basename}.desktop"
 
+        desktop_existed = desktop_path.exists()
         with open(desktop_path, "w",) as desktop_file:
             entry.write(desktop_file, space_around_delimiters=False)
-        os.chmod(desktop_path, 0o644)
+        chmod_if_new(desktop_path, 0o644, desktop_existed)
 
 
 def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_prefix='')  -> None:
@@ -255,15 +275,12 @@ def build_menu(installdir, deskenv, sh_prefix):
     if deskenv == 'cli':
         climode = True
 
-    shutil.copyfile('neurodesk/neurodesk-applications.menu', installdir/'neurodesk-applications.menu')
-    shutil.copyfile('neurodesk/fetch_and_run.sh', os.path.join(installdir, os.path.basename('neurodesk/fetch_and_run.sh')))
-    shutil.copyfile('neurodesk/fetch_containers.sh', os.path.join(installdir, os.path.basename('neurodesk/fetch_containers.sh')))
-    shutil.copyfile('neurodesk/configparser.sh', os.path.join(installdir, os.path.basename('neurodesk/configparser.sh')))
-    shutil.copyfile('config.ini', os.path.join(installdir, os.path.basename('config.ini')))
+    copyfile_with_mode(Path('neurodesk/neurodesk-applications.menu'), installdir/'neurodesk-applications.menu')
+    copyfile_with_mode(Path('neurodesk/fetch_and_run.sh'), installdir/'fetch_and_run.sh', mode=0o755)
+    copyfile_with_mode(Path('neurodesk/fetch_containers.sh'), installdir/'fetch_containers.sh', mode=0o755)
+    copyfile_with_mode(Path('neurodesk/configparser.sh'), installdir/'configparser.sh', mode=0o755)
+    copyfile_with_mode(Path('config.ini'), installdir/'config.ini')
     distutils.dir_util.copy_tree('neurodesk/transparent-singularity', str(installdir/'transparent-singularity'))
-    os.chmod(installdir/'fetch_and_run.sh', 0o755)
-    os.chmod(installdir/'fetch_containers.sh', 0o755)
-    os.chmod(installdir/'configparser.sh', 0o755)
 
     if not climode:
         directories_path = installdir/"desktop-directories"
