@@ -5,13 +5,12 @@ import os
 import sys
 from pathlib import Path
 import re
-from typing import Text
+from typing import Callable, List, Optional, Text, TextIO
 import xml.etree.ElementTree as et
 from xml.dom import minidom
 import shutil
 import logging
 import distutils.dir_util
-from typing import Optional, List
 
 
 def chmod_if_new(path: Path, mode: int, existed_before: bool) -> None:
@@ -20,12 +19,56 @@ def chmod_if_new(path: Path, mode: int, existed_before: bool) -> None:
         os.chmod(path, mode)
 
 
+def _stat_mode(path: Path) -> Optional[int]:
+    if not path.exists():
+        return None
+    return path.stat().st_mode & 0o777
+
+
+def _restore_mode(path: Path, existed_before: bool, was_recreated: bool, previous_mode: Optional[int]) -> None:
+    """Preserve mode when replacing an existing non-writable file."""
+    if existed_before and was_recreated and previous_mode is not None:
+        os.chmod(path, previous_mode)
+
+
+def writefile_with_mode(path: Path, writer: Callable[[TextIO], None], mode: Optional[int] = None) -> None:
+    """Write file content with fallback for non-writable existing files."""
+    path_existed = path.exists()
+    previous_mode = _stat_mode(path)
+    was_recreated = False
+    try:
+        with open(path, "w") as fh:
+            writer(fh)
+    except PermissionError:
+        if not path_existed:
+            raise
+        path.unlink()
+        was_recreated = True
+        with open(path, "w") as fh:
+            writer(fh)
+    if mode is not None:
+        chmod_if_new(path, mode, path_existed)
+    _restore_mode(path, path_existed, was_recreated, previous_mode)
+
+
 def copyfile_with_mode(src: Path, dest: Path, mode: Optional[int] = None) -> None:
     """Copy a file and optionally chmod only when destination is newly created."""
     dest_existed = dest.exists()
-    shutil.copyfile(src, dest)
+    previous_mode = _stat_mode(dest)
+    was_recreated = False
+    try:
+        shutil.copyfile(src, dest)
+    except PermissionError:
+        # Existing files from prior sudo runs can be non-writable even when
+        # the parent directory is writable. Recreate the file in that case.
+        if not dest_existed:
+            raise
+        dest.unlink()
+        was_recreated = True
+        shutil.copyfile(src, dest)
     if mode is not None:
         chmod_if_new(dest, mode, dest_existed)
+    _restore_mode(dest, dest_existed, was_recreated, previous_mode)
 
 
 def write_directory_file(name, file_dir, icon_dir):
@@ -36,11 +79,11 @@ def write_directory_file(name, file_dir, icon_dir):
         icon_path = icon_dir/f"aedapt.png"
     icon_src = (Path(__file__).parent/'icons'/icon_path.name)
     try:
-        shutil.copyfile(icon_src, icon_path)
+        copyfile_with_mode(icon_src, icon_path)
     except FileNotFoundError:
         logging.warning(f'{icon_src} not found')
         icon_src = (Path(__file__).parent/'icons/neurodesk.png')
-        shutil.copyfile(icon_src, icon_path)
+        copyfile_with_mode(icon_src, icon_path)
 
     # Generate `.directory` file
     entry = configparser.ConfigParser()
@@ -52,10 +95,9 @@ def write_directory_file(name, file_dir, icon_dir):
         "Type": "Directory",
     }
     file_dir.mkdir(exist_ok=True)
-    file_existed = file_path.exists()
-    with open(Path(file_path), "w",) as directory_file:
+    def _write_directory(directory_file):
         entry.write(directory_file, space_around_delimiters=False)
-    chmod_if_new(file_path, 0o644, file_existed)
+    writefile_with_mode(file_path, _write_directory, mode=0o644)
     return file_path
 
 
@@ -75,7 +117,6 @@ def add_menu(installdir: Path, name: Text, category: Text) -> None:
 
     # Add entry to `.menu` file
     menu_path = installdir/"neurodesk-applications.menu"
-    menu_existed = menu_path.exists()
     with open(menu_path, "r") as xml_file:
         s = xml_file.read()
     s = re.sub(r"\s+(?=<)", "", s)
@@ -95,11 +136,11 @@ def add_menu(installdir: Path, name: Text, category: Text) -> None:
             cat_el.text = name.replace(" ", "-")
             cat_el.text = f"{cat_el.text}"
             xmlstr = minidom.parseString(et.tostring(root)).toprettyxml(indent="\t")
-            with open(menu_path, "w") as f:
+            def _write_menu(f):
                 f.write('<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"\n ')
                 f.write('"http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">\n\n')
                 f.write(xmlstr[xmlstr.find("?>") + 3 :])
-            chmod_if_new(menu_path, 0o644, menu_existed)
+            writefile_with_mode(menu_path, _write_menu, mode=0o644)
             break
 
 
@@ -157,28 +198,27 @@ class NeurodeskApp:
         self.bin_path = self.installdir/"bin"
         self.bin_path.mkdir(exist_ok=True)
         self.sh_path = self.bin_path/f"{self.basename}.sh"
-        sh_existed = self.sh_path.exists()
-        with open(self.sh_path, "w",) as self.sh_file:
-            self.sh_file.write("#!/usr/bin/env bash\n")
-            self.sh_file.write(f"{self.sh_prefix} ")
+        def _write_app_sh(self_sh_file):
+            self_sh_file.write("#!/usr/bin/env bash\n")
+            self_sh_file.write(f"{self.sh_prefix} ")
             if sh_exec:
-                self.sh_file.write(f"{sh_exec}")
+                self_sh_file.write(f"{sh_exec}")
             elif self.deskenv == 'mate':
-                self.sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
+                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
             else:
-                self.sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
-            self.sh_file.write('\n')
-        chmod_if_new(self.sh_path, 0o755, sh_existed)
+                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
+            self_sh_file.write('\n')
+        writefile_with_mode(self.sh_path, _write_app_sh, mode=0o755)
 
     def add_app_menu(self) -> None:
         icon_path = self.installdir/f"icons/{self.name.split()[0]}.png"
         icon_src = Path(__file__).parent/'icons'/icon_path.name
         try:
-            shutil.copyfile(icon_src, icon_path)
+            copyfile_with_mode(icon_src, icon_path)
         except FileNotFoundError:
             logging.warning(f'{icon_src} not found')
             icon_src = (Path(__file__).parent/'icons/neurodesk.png')
-            shutil.copyfile(icon_src, icon_path)
+            copyfile_with_mode(icon_src, icon_path)
         entry = configparser.ConfigParser()
         entry.optionxform = str
 
@@ -208,10 +248,9 @@ class NeurodeskApp:
         applications_path.mkdir(exist_ok=True)
         desktop_path = applications_path/f"{self.basename}.desktop"
 
-        desktop_existed = desktop_path.exists()
-        with open(desktop_path, "w",) as desktop_file:
+        def _write_desktop(desktop_file):
             entry.write(desktop_file, space_around_delimiters=False)
-        chmod_if_new(desktop_path, 0o644, desktop_existed)
+        writefile_with_mode(desktop_path, _write_desktop, mode=0o644)
 
 
 def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_prefix='')  -> None:
@@ -242,7 +281,6 @@ def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_pref
 def neurodesk_xml(xml: Path, newxml: Path) -> None:
     oldtag = '<Menu>'
     newtag = '<MergeFile>neurodesk-applications.menu</MergeFile>'
-    tagcount = 0
     replace = True
     
     with open(xml, "r") as fh:
@@ -252,16 +290,18 @@ def neurodesk_xml(xml: Path, newxml: Path) -> None:
                 replace = False
                 break
 
-    with open(newxml, "w") as fh:
+    tagcount = [0]
+    def _write_xml(fh):
         for line in lines:
             if replace and oldtag in line:
-                tagcount += 1
-                if tagcount == 2:
+                tagcount[0] += 1
+                if tagcount[0] == 2:
                     fh.write(re.sub(f'{oldtag}', f'{newtag}\n\t{oldtag}', line))
                 else:
                     fh.write(line)
             else:
                 fh.write(line)
+    writefile_with_mode(newxml, _write_xml)
     try:
         et.parse(newxml)
     except et.ParseError:
