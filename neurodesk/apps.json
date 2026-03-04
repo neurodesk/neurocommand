@@ -377,6 +377,24 @@
             "data organisation"
         ]
     },
+    "blender": {
+        "apps": {
+            "blender 5.0.1": {
+                "version": "20260304",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "blenderGUI-blender 5.0.1": {
+                "version": "20260304",
+                "exec": "blender",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "modeling",
+            "visualization"
+        ]
+    },
     "brainager": {
         "apps": {
             "brainager 2.1.0": {
