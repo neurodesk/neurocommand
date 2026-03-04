@@ -40,6 +40,10 @@ do
     fi 
 done < log.txt
 
+
+echo "[Debug] syncing aws-neurocontainers to nectar because AWS is faster to upload than nectar"
+rclone sync aws-neurocontainers-new:/neurocontainers/ nectar:/neurodesk/ --checksum --progress
+
 echo "[DEBUG] Deleting builds unused longer than 30days from object storage ..."
 rclone delete --min-age 30d nectar:/neurodesk/
 
