@@ -1,0 +1,123 @@
+name: Cleanup unused neurocontainers
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # weekly on Sunday at 00:00 UTC
+
+jobs:
+  cleanup_containers_simg:
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      id-token: write
+      contents: read
+    steps:
+    - name: Detect active upload jobs
+      id: upload_guard
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        python3 - <<'PY'
+        import json
+        import os
+        import urllib.request
+
+        api = "https://api.github.com"
+        repo = os.environ["GITHUB_REPOSITORY"]
+        current_run_id = int(os.environ["GITHUB_RUN_ID"])
+        output_path = os.environ["GITHUB_OUTPUT"]
+        token = os.environ["GH_TOKEN"]
+        upload_job_names = {"upload-nectar", "upload-s3"}
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+        def get_json(url: str) -> dict:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req) as resp:
+                return json.load(resp)
+
+        active_uploads = []
+        runs_url = f"{api}/repos/{repo}/actions/runs?status=in_progress&per_page=100"
+        runs = get_json(runs_url).get("workflow_runs", [])
+
+        for run in runs:
+            run_id = run.get("id")
+            if not run_id or run_id == current_run_id:
+                continue
+
+            jobs_url = f"{api}/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100"
+            jobs = get_json(jobs_url).get("jobs", [])
+            for job in jobs:
+                if (
+                    job.get("name") in upload_job_names
+                    and job.get("status") in {"queued", "in_progress"}
+                ):
+                    active_uploads.append(
+                        {
+                            "run_id": run_id,
+                            "workflow_name": run.get("name"),
+                            "job_name": job.get("name"),
+                        }
+                    )
+
+        with open(output_path, "a", encoding="utf-8") as output_file:
+            if active_uploads:
+                output_file.write("skip_cleanup=true\n")
+                print("[DEBUG] Active upload job(s) detected, skipping cleanup:")
+                for upload in active_uploads:
+                    print(
+                        f"[DEBUG] run_id={upload['run_id']} "
+                        f"workflow={upload['workflow_name']} job={upload['job_name']}"
+                    )
+            else:
+                output_file.write("skip_cleanup=false\n")
+                print("[DEBUG] No active upload jobs found. Cleanup will proceed.")
+        PY
+
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      if: steps.upload_guard.outputs.skip_cleanup != 'true'
+    - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+      if: steps.upload_guard.outputs.skip_cleanup != 'true'
+      with:
+        python-version: 3.8
+    - name: Configure AWS Credentials
+      if: steps.upload_guard.outputs.skip_cleanup != 'true'
+      id: creds
+      uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722
+      with:
+        aws-region: us-east-2
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        output-credentials: true
+        role-duration-seconds: 28800 # 8 hours
+    - name : clean up containers
+      if: steps.upload_guard.outputs.skip_cleanup != 'true'
+      env:
+        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
+        OS_AUTH_URL: ${{ secrets.OS_AUTH_URL }}
+        OS_PROJECT_NAME: ${{ secrets.OS_PROJECT_NAME }}
+        OS_PROJECT_ID: ${{ secrets.OS_PROJECT_ID }}
+        OS_USERNAME: ${{ secrets.OS_USERNAME }}
+        OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
+        OS_APPLICATION_CREDENTIAL_ID: ${{ secrets.OS_APPLICATION_CREDENTIAL_ID }}
+        OS_APPLICATION_CREDENTIAL_SECRET: ${{ secrets.OS_APPLICATION_CREDENTIAL_SECRET }}
+        OS_AUTH_VERSION: ${{ secrets.OS_AUTH_VERSION }}
+        OS_IDENTITY_API_VERSION: ${{ secrets.OS_IDENTITY_API_VERSION }}
+      run: |
+        if ! command -v rclone &> /dev/null; then
+            echo "[DEBUG] Installing rclone"
+            curl https://rclone.org/install.sh | sudo bash
+        fi
+        if ! command -v aws &> /dev/null; then
+            echo "[DEBUG] Installing AWS CLI"
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install && rm -rf aws awscliv2.zip
+        fi
+        rclone config create nectar swift env_auth true
+
+        /bin/bash .github/workflows/cleanup_containers.sh
