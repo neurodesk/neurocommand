@@ -59,5 +59,6 @@ jobs:
 
         python3 .github/workflows/scripts/cleanup_stale_containers.py \
           --s3-bucket "neurocontainers" \
-          --retention-days 7 \
-          --dry-run
+          --retention-days 7 
+          # \
+          # --dry-run
