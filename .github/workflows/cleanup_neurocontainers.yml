@@ -2,8 +2,11 @@ name: Cleanup unused neurocontainers
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 */14 * *' # every 14 days at 00:00 UTC
+  workflow_run:
+    workflows:
+      - Update neurocontainers
+    types:
+      - completed
 
 jobs:
   cleanup_containers_simg:
@@ -26,9 +29,11 @@ jobs:
         api = "https://api.github.com"
         repo = os.environ["GITHUB_REPOSITORY"]
         current_run_id = int(os.environ["GITHUB_RUN_ID"])
+        event_name = os.environ["GITHUB_EVENT_NAME"]
+        event_path = os.environ["GITHUB_EVENT_PATH"]
         output_path = os.environ["GITHUB_OUTPUT"]
         token = os.environ["GH_TOKEN"]
-        upload_job_names = {"upload-nectar", "upload-s3"}
+        upload_job_names = {"upload_containers_simg", "upload-nectar", "upload-s3"}
 
         headers = {
             "Authorization": f"Bearer {token}",
@@ -40,6 +45,47 @@ jobs:
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req) as resp:
                 return json.load(resp)
+
+        def write_skip(skip_cleanup: bool, message: str) -> None:
+            with open(output_path, "a", encoding="utf-8") as output_file:
+                output_file.write(f"skip_cleanup={'true' if skip_cleanup else 'false'}\n")
+            print(message)
+
+        if event_name == "workflow_run":
+            with open(event_path, "r", encoding="utf-8") as event_file:
+                event_payload = json.load(event_file)
+
+            workflow_run = event_payload.get("workflow_run", {})
+            conclusion = workflow_run.get("conclusion")
+            trigger_event = workflow_run.get("event")
+            head_branch = workflow_run.get("head_branch")
+            head_sha = workflow_run.get("head_sha")
+
+            if conclusion != "success" or trigger_event != "push" or head_branch != "main":
+                write_skip(
+                    True,
+                    "[DEBUG] Cleanup skipped: triggering run was not a successful push to main.",
+                )
+                raise SystemExit(0)
+
+            if not head_sha:
+                write_skip(True, "[DEBUG] Cleanup skipped: missing triggering head SHA.")
+                raise SystemExit(0)
+
+            commit = get_json(f"{api}/repos/{repo}/commits/{head_sha}")
+            changed_files = {
+                file_data.get("filename")
+                for file_data in commit.get("files", [])
+                if file_data.get("filename")
+            }
+            if "neurodesk/apps.json" not in changed_files:
+                write_skip(
+                    True,
+                    "[DEBUG] Cleanup skipped: neurodesk/apps.json was not changed in triggering commit.",
+                )
+                raise SystemExit(0)
+
+            print("[DEBUG] Trigger commit includes neurodesk/apps.json; cleanup is eligible to run.")
 
         active_uploads = []
         runs_url = f"{api}/repos/{repo}/actions/runs?status=in_progress&per_page=100"
@@ -65,18 +111,15 @@ jobs:
                         }
                     )
 
-        with open(output_path, "a", encoding="utf-8") as output_file:
-            if active_uploads:
-                output_file.write("skip_cleanup=true\n")
-                print("[DEBUG] Active upload job(s) detected, skipping cleanup:")
-                for upload in active_uploads:
-                    print(
-                        f"[DEBUG] run_id={upload['run_id']} "
-                        f"workflow={upload['workflow_name']} job={upload['job_name']}"
-                    )
-            else:
-                output_file.write("skip_cleanup=false\n")
-                print("[DEBUG] No active upload jobs found. Cleanup will proceed.")
+        if active_uploads:
+            write_skip(True, "[DEBUG] Active upload job(s) detected, skipping cleanup:")
+            for upload in active_uploads:
+                print(
+                    f"[DEBUG] run_id={upload['run_id']} "
+                    f"workflow={upload['workflow_name']} job={upload['job_name']}"
+                )
+        else:
+            write_skip(False, "[DEBUG] No active upload jobs found. Cleanup will proceed.")
         PY
 
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
