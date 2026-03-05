@@ -8,6 +8,10 @@ on:
     types:
       - completed
 
+concurrency:
+  group: cleanup-neurocontainers
+  cancel-in-progress: true
+
 jobs:
   cleanup_containers_simg:
     runs-on: ubuntu-24.04
