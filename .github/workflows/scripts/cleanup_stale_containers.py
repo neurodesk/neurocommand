@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import re
 import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -37,9 +38,39 @@ def normalize_log(log_path: Path) -> None:
 
 
 def parse_iso8601(timestamp: str) -> Optional[datetime]:
-    if not timestamp:
+    if not timestamp or not isinstance(timestamp, str):
         return None
-    normalized = timestamp.replace("Z", "+00:00")
+
+    # rclone lsjson may emit nanosecond precision and different UTC offset forms.
+    # Python 3.8's datetime.fromisoformat cannot parse >6 fractional digits.
+    ts = timestamp.strip()
+    if not ts:
+        return None
+
+    if ts.endswith("Z"):
+        ts = ts[:-1] + "+00:00"
+
+    match = re.match(
+        r"^(?P<base>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})"
+        r"(?P<fraction>\.\d+)?"
+        r"(?P<offset>[+-]\d{2}:\d{2}|[+-]\d{4})?$",
+        ts,
+    )
+    if match:
+        base = match.group("base")
+        fraction = match.group("fraction") or ""
+        offset = match.group("offset") or "+00:00"
+
+        if fraction:
+            fraction = "." + fraction[1:7].ljust(6, "0")
+
+        if re.fullmatch(r"[+-]\d{4}", offset):
+            offset = f"{offset[:3]}:{offset[3:]}"
+
+        normalized = f"{base}{fraction}{offset}"
+    else:
+        normalized = ts
+
     try:
         parsed = datetime.fromisoformat(normalized)
     except ValueError:
