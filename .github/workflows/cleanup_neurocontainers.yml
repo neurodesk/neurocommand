@@ -3,7 +3,7 @@ name: Cleanup unused neurocontainers
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' # weekly on Sunday at 00:00 UTC
+    - cron: '0 0 */14 * *' # every 14 days at 00:00 UTC
 
 jobs:
   cleanup_containers_simg:
