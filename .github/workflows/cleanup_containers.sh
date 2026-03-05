@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+S3_BUCKET="neurocontainers"
+
 #creating logfile with available containers
 python3 neurodesk/write_log.py
 pip3 install requests
@@ -27,8 +29,8 @@ do
     IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< "${LINE}")"
     echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
 
-    IMAGENAME="$(cut -d'_' -f1,2 <<< ${IMAGENAME_BUILDDATE})"
-    BUILDDATE="$(cut -d'_' -f3 <<< ${IMAGENAME_BUILDDATE})"
+    IMAGENAME="$(cut -d'_' -f1,2 <<< "${IMAGENAME_BUILDDATE}")"
+    BUILDDATE="$(cut -d'_' -f3 <<< "${IMAGENAME_BUILDDATE}")"
     echo "[DEBUG] IMAGENAME: $IMAGENAME"
     echo "[DEBUG] BUILDDATE: $BUILDDATE"
     OBJECT_KEY="${IMAGENAME_BUILDDATE}.simg"
@@ -39,12 +41,11 @@ do
         rclone touch "nectar:/neurodesk/${OBJECT_KEY}"
 
         # Refresh S3 object's LastModified timestamp (used by lifecycle expiration)
-        if aws s3api head-object --bucket neurocontainers --key "${OBJECT_KEY}" > /dev/null 2>&1; then
-            aws s3api copy-object \
-              --bucket neurocontainers \
-              --copy-source "neurocontainers/${OBJECT_KEY}" \
-              --key "${OBJECT_KEY}" \
-              --metadata-directive COPY > /dev/null
+        if aws s3api head-object --bucket "${S3_BUCKET}" --key "${OBJECT_KEY}" > /dev/null 2>&1; then
+            aws s3 cp "s3://${S3_BUCKET}/${OBJECT_KEY}" "s3://${S3_BUCKET}/${OBJECT_KEY}" \
+              --copy-props default \
+              --only-show-errors \
+              --no-progress > /dev/null
             echo "[DEBUG] Refreshed AWS timestamp for ${OBJECT_KEY}"
         else
             echo "[DEBUG] ${OBJECT_KEY} not found in AWS S3; skipping timestamp refresh"
