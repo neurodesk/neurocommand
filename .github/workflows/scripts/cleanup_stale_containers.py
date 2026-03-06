@@ -5,7 +5,7 @@ import re
 import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Tuple
 
 
 def run_command(cmd: List[str]) -> None:
@@ -105,6 +105,112 @@ def list_nectar_objects(remote_root: str) -> List[dict]:
     except subprocess.CalledProcessError as exc:
         raise SystemExit(f"[ERROR] Failed to list objects in {remote_root}: {exc}")
     return json.loads(lsjson)
+
+
+def list_nectar_objects_optional(remote_root: str) -> Optional[List[dict]]:
+    result = subprocess.run(
+        ["rclone", "lsjson", "--recursive", "--files-only", remote_root],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        err = result.stderr.strip() or result.stdout.strip() or f"exit status {result.returncode}"
+        print(f"[DEBUG] Unable to list {remote_root}; skipping optional check ({err})")
+        return None
+
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        print(f"[DEBUG] Unable to parse lsjson output for {remote_root}; skipping optional check ({exc})")
+        return None
+
+
+def parse_remote_container(remote_root: str) -> Optional[Tuple[str, str]]:
+    if ":" not in remote_root:
+        return None
+
+    remote, path = remote_root.split(":", 1)
+    path = path.lstrip("/")
+    if not remote or not path:
+        return None
+
+    container = path.split("/", 1)[0]
+    if not container:
+        return None
+
+    return remote, container
+
+
+def check_orphaned_segments(remote_root: str, dry_run: bool) -> None:
+    parsed = parse_remote_container(remote_root)
+    if parsed is None:
+        print(f"[DEBUG] Could not infer Swift container from {remote_root}; skipping orphaned-segment check")
+        return
+
+    remote, container = parsed
+    segments_remote = f"{remote}:/{container}_segments/"
+
+    manifests = list_nectar_objects_optional(remote_root)
+    if manifests is None:
+        return
+
+    segments = list_nectar_objects_optional(segments_remote)
+    if segments is None:
+        print(
+            f"[DEBUG] Segment container {segments_remote} is not available; "
+            "skipping orphaned-segment check"
+        )
+        return
+
+    manifest_keys = {obj.get("Path", "") for obj in manifests if obj.get("Path")}
+    orphaned_segments = []
+    for obj in segments:
+        segment_path = obj.get("Path", "")
+        if not segment_path:
+            continue
+        manifest_candidate = segment_path.split("/", 1)[0]
+        if manifest_candidate and manifest_candidate not in manifest_keys:
+            orphaned_segments.append(segment_path)
+
+    print(
+        f"[DEBUG] Orphaned-segment scan: checked {len(segments)} segment object(s) in {segments_remote}"
+    )
+    if not orphaned_segments:
+        print("[DEBUG] Orphaned-segment scan: no orphaned segment objects found")
+        return
+
+    print(f"[WARNING] Orphaned-segment scan: found {len(orphaned_segments)} orphaned segment object(s)")
+    orphaned_segments = sorted(orphaned_segments)
+
+    if dry_run:
+        preview_limit = 20
+        for segment_path in orphaned_segments[:preview_limit]:
+            print(
+                f"[DRY-RUN] Would delete orphaned segment: "
+                f"{segments_remote.rstrip('/')}/{segment_path}"
+            )
+        if len(orphaned_segments) > preview_limit:
+            print(
+                f"[DRY-RUN] ... and {len(orphaned_segments) - preview_limit} more "
+                "orphaned segment object(s)"
+            )
+        return
+
+    deleted = 0
+    failed = 0
+    for segment_path in orphaned_segments:
+        segment_obj = f"{segments_remote.rstrip('/')}/{segment_path}"
+        try:
+            print(f"[DEBUG] Deleting orphaned segment: {segment_obj}")
+            subprocess.run(["rclone", "deletefile", segment_obj], check=True)
+            deleted += 1
+        except subprocess.CalledProcessError as exc:
+            failed += 1
+            print(f"[WARNING] Failed to delete orphaned segment {segment_obj}: {exc}")
+
+    print(f"[DEBUG] Deleted {deleted} orphaned segment object(s) from {segments_remote}")
+    if failed:
+        print(f"[WARNING] Failed deleting {failed} orphaned segment object(s) from {segments_remote}")
 
 
 def list_s3_objects(bucket: str) -> List[dict]:
@@ -263,6 +369,8 @@ def main() -> None:
         )
     else:
         print(f"[DEBUG] Deleted {len(aws_to_delete)} stale object(s) from AWS S3 bucket {args.s3_bucket}")
+
+    check_orphaned_segments(args.remote_root, args.dry_run)
 
 
 if __name__ == "__main__":
