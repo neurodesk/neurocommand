@@ -9,7 +9,7 @@ from tqdm import tqdm
 from urllib3.exceptions import ProtocolError
 from requests.exceptions import ChunkedEncodingError, ConnectionError
 
-ZENODO_API_URL = "https://sandbox.zenodo.org/api/deposit/depositions"
+ZENODO_API_URL = "https://zenodo.org/api/deposit/depositions"
 
 def get_license(container_name, gh_token):
     """

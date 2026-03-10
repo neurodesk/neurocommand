@@ -25,7 +25,7 @@ def fetch_zenodo_dois(zenodo_token):
     all_depositions = []
     page_size = 100
     page = 1
-    url = "https://sandbox.zenodo.org/api/deposit/depositions"
+    url = "https://zenodo.org/api/deposit/depositions"
 
     while True:
         # print(f"Fetching page {page} of packages from Zenodo")
