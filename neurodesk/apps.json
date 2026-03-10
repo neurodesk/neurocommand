@@ -619,43 +619,14 @@
     },
     "deepretinotopy": {
         "apps": {
-            "deepretinotopy 1.0.10": {
-                "version": "20250409",
-                "exec": ""
-            },
             "deepretinotopy 1.0.11": {
                 "version": "20250714",
                 "exec": ""
-            },
-            "deepretinotopy 1.0.12": {
-                "version": "20250804",
-                "exec": ""
-            },
-            "deepretinotopy 1.0.14": {
-                "version": "20250813",
-                "exec": ""
-            },
-            "deepretinotopy 1.0.15": {
-                "version": "20250820",
-                "exec": ""
-            },
-            "deepretinotopy 1.0.16": {
-                "version": "20250902",
-                "exec": "",
-                "apptainer_args": []
             },
             "deepretinotopy 1.0.18": {
                 "version": "20250909",
                 "exec": "",
                 "apptainer_args": []
-            },
-            "deepretinotopy 1.0.5": {
-                "version": "20240609",
-                "exec": ""
-            },
-            "deepretinotopy 1.0.8": {
-                "version": "20250207",
-                "exec": ""
             }
         },
         "categories": [
@@ -2431,6 +2402,11 @@
             },
             "vesselboost 2.0.0": {
                 "version": "20260224",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vesselboost 2.0.1": {
+                "version": "20260309",
                 "exec": "",
                 "apptainer_args": []
             }
