@@ -1639,6 +1639,11 @@
                 "version": "20260305",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "musclemap 1.2.4": {
+                "version": "20260311",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
