@@ -879,12 +879,12 @@
                 "apptainer_args": []
             },
             "freesurfer 8.1.0": {
-                "version": "20260306",
+                "version": "20260311",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.1.0": {
-                "version": "20260306",
+                "version": "20260311",
                 "exec": "freeview",
                 "apptainer_args": []
             }
@@ -1635,11 +1635,6 @@
     },
     "musclemap": {
         "apps": {
-            "musclemap 1.2.1": {
-                "version": "20260305",
-                "exec": "",
-                "apptainer_args": []
-            },
             "musclemap 1.2.4": {
                 "version": "20260311",
                 "exec": "",
