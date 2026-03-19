@@ -2210,6 +2210,18 @@
             "data organisation"
         ]
     },
+    "spant": {
+        "apps": {
+            "spant 3.7.0": {
+                "version": "20260319",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "spectroscopy"
+        ]
+    },
     "spinalcordtoolbox": {
         "apps": {
             "spinalcordtoolbox 5.4": {
