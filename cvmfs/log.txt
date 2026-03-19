@@ -231,6 +231,7 @@ slicer_5.0.3_20221025 categories:image registration,image segmentation,structura
 slicer_5.10.0_20260226 categories:image registration,image segmentation,structural imaging,visualization,
 slicersalt_3.0.0_20210301 categories:shape analysis,
 sovabids_0.3.1a0_20221202 categories:data organisation,
+spant_3.7.0_20260319 categories:spectroscopy,
 spinalcordtoolbox_5.4_20211208 categories:spine,
 spinalcordtoolbox_5.5_20220419 categories:spine,
 spinalcordtoolbox_5.6_20220503 categories:spine,
