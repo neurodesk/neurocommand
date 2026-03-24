@@ -497,6 +497,18 @@
             "structural imaging"
         ]
     },
+    "cbsb0stats": {
+        "apps": {
+            "cbsb0stats 1.2.0": {
+                "version": "20260316",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
     "clearswi": {
         "apps": {
             "clearswi 1.0.0": {
@@ -2363,6 +2375,18 @@
         },
         "categories": [
             "cryo EM"
+        ]
+    },
+    "totalsegmentator": {
+        "apps": {
+            "totalsegmentator 2.5.0": {
+                "version": "20260323",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
         ]
     },
     "trackvis": {
