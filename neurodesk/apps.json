@@ -831,6 +831,11 @@
                 "version": "20260107",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "fmriprep 25.2.5": {
+                "version": "20260325",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2365,6 +2370,18 @@
             "cryo EM"
         ]
     },
+    "totalsegmentator": {
+        "apps": {
+            "totalsegmentator 2.5.0": {
+                "version": "20260323",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
     "trackvis": {
         "apps": {
             "trackvis 0.6.1": {
@@ -2400,22 +2417,9 @@
     },
     "vesselboost": {
         "apps": {
-            "vesselboost 0.9.1": {
-                "version": "20231031",
-                "exec": ""
-            },
-            "vesselboost 0.9.4": {
-                "version": "20240404",
-                "exec": ""
-            },
             "vesselboost 1.0.0": {
                 "version": "20240815",
                 "exec": ""
-            },
-            "vesselboost 2.0.0": {
-                "version": "20260224",
-                "exec": "",
-                "apptainer_args": []
             },
             "vesselboost 2.0.1": {
                 "version": "20260309",
