@@ -1424,6 +1424,18 @@
             "structural imaging"
         ]
     },
+    "mipview": {
+        "apps": {
+            "mipview 0.1.2": {
+                "version": "20260330",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "visualization"
+        ]
+    },
     "mitkdiffusion": {
         "apps": {
             "mitkdiffusion 1.2.0": {
