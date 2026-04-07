@@ -1349,9 +1349,15 @@
             "matlabGUI-matlab 2024b": {
                 "version": "20250117",
                 "exec": "matlab"
+            },
+            "matlab 2025b": {
+                "version": "20260406",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
+            "machine learning",
             "programming",
             "visualization"
         ]
