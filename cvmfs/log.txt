@@ -153,6 +153,7 @@ micapipe_v0.2.3_20241030 categories:diffusion imaging,functional imaging,structu
 minc_1.9.17_20210105 categories:image registration,image segmentation,structural imaging,
 minc_1.9.18_20230208 categories:image registration,image segmentation,structural imaging,
 mipview_0.1.2_20260406 categories:visualization,
+mipview_0.1.4_20260407 categories:visualization,
 mitkdiffusion_1.2.0_20230720 categories:diffusion imaging,
 mne_0.23.4_20220121 categories:electrophysiology,
 mne_1.0.0_20220325 categories:electrophysiology,
