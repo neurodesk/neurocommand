@@ -1440,6 +1440,16 @@
                 "version": "20260406",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "mipview 0.1.4": {
+                "version": "20260407",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "MipViewGUI-mipview 0.1.4": {
+                "version": "20260407",
+                "exec": "mipview",
+                "apptainer_args": []
             }
         },
         "categories": [
