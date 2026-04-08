@@ -447,8 +447,6 @@ for CONTAINER_PATH in /cvmfs/neurodesk.ardc.edu.au/containers/*/; do
     CONTAINER_NAME="$(basename "$CONTAINER_PATH")"
     # Only consider unpacked container directories (have commands.txt)
     [[ -f "$CONTAINER_PATH/commands.txt" ]] || continue
-    # Only consider containers we want to keep
-    [[ -n "${KEEP_IMAGES[$CONTAINER_NAME]+x}" ]] || continue
 
     C_TOOLNAME="$(cut -d'_' -f1 <<< "$CONTAINER_NAME")"
     C_TOOLVERSION="$(cut -d'_' -f2 <<< "$CONTAINER_NAME")"
@@ -461,30 +459,52 @@ for CONTAINER_PATH in /cvmfs/neurodesk.ardc.edu.au/containers/*/; do
     fi
 done
 
+echo "[DEBUG] Found ${#LATEST_BUILDDATE[@]} unique tool+version combinations."
+
 for KEY in "${!LATEST_BUILDDATE[@]}"; do
     C_TOOLNAME="$(cut -d'_' -f1 <<< "$KEY")"
     C_TOOLVERSION="$(cut -d'_' -f2 <<< "$KEY")"
     LATEST_DIR="${LATEST_CONTAINER_DIR[$KEY]}"
     LATEST_NAME="$(basename "$LATEST_DIR")"
-    MODULE_FILE="$MODULES_ROOT/$C_TOOLNAME/${C_TOOLVERSION}.lua"
 
-    if [[ ! -f "$MODULE_FILE" ]]; then
+    # Check both .lua and non-.lua module file formats
+    MODULE_FILES_TO_UPDATE=()
+    for MODULE_CANDIDATE in "$MODULES_ROOT/$C_TOOLNAME/${C_TOOLVERSION}.lua" "$MODULES_ROOT/$C_TOOLNAME/${C_TOOLVERSION}"; do
+        if [[ -f "$MODULE_CANDIDATE" ]]; then
+            MODULE_FILES_TO_UPDATE+=("$MODULE_CANDIDATE")
+        fi
+    done
+
+    if [[ ${#MODULE_FILES_TO_UPDATE[@]} -eq 0 ]]; then
+        echo "[DEBUG] No module file found for $C_TOOLNAME/${C_TOOLVERSION} (latest: $LATEST_NAME)"
         continue
     fi
 
-    # Check if the module file already points to the latest container
-    if grep -q "prepend_path(\"PATH\", \".*${LATEST_NAME}\")" "$MODULE_FILE" 2>/dev/null; then
+    NEEDS_UPDATE=0
+    for MODULE_FILE in "${MODULE_FILES_TO_UPDATE[@]}"; do
+        # Check if the module file already points to the latest container
+        if ! grep -q "${LATEST_NAME}" "$MODULE_FILE" 2>/dev/null; then
+            NEEDS_UPDATE=1
+            echo "[DEBUG] Module file $MODULE_FILE does not reference $LATEST_NAME"
+            break
+        fi
+    done
+
+    if [[ $NEEDS_UPDATE -eq 0 ]]; then
         continue
     fi
 
     echo "[INFO] Updating module $C_TOOLNAME/${C_TOOLVERSION} to point to latest: $LATEST_NAME"
     open_cvmfs_transaction neurodesk.ardc.edu.au
-    # Update the prepend_path line to point to the latest container directory
-    sed -i "s|prepend_path(\"PATH\", \".*${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|prepend_path(\"PATH\", \"${LATEST_DIR%/}\")|" "$MODULE_FILE"
-    # Update the whatis line
-    sed -i "s|whatis(\"${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|whatis(\"${LATEST_NAME}\")|" "$MODULE_FILE"
-    # Update any BASEPATH references in environment variables
-    sed -i "s|${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*/|${LATEST_NAME}/|g" "$MODULE_FILE"
+    for MODULE_FILE in "${MODULE_FILES_TO_UPDATE[@]}"; do
+        echo "[DEBUG] Updating $MODULE_FILE"
+        # Update the prepend_path line to point to the latest container directory
+        sed -i "s|prepend_path(\"PATH\", \".*${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|prepend_path(\"PATH\", \"${LATEST_DIR%/}\")|" "$MODULE_FILE"
+        # Update the whatis line
+        sed -i "s|whatis(\"${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|whatis(\"${LATEST_NAME}\")|" "$MODULE_FILE"
+        # Update any container path references (e.g. in env vars set by BASEPATH)
+        sed -i "s|${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*|${LATEST_NAME}|g" "$MODULE_FILE"
+    done
     publish_cvmfs_transaction neurodesk.ardc.edu.au "updated module $C_TOOLNAME/${C_TOOLVERSION} to point to $LATEST_NAME"
 done
 
