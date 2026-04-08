@@ -226,7 +226,7 @@ class NeurodeskApp:
             entry["Desktop Entry"] = {
                 "Name": self.exec_name,
                 "GenericName": self.exec_name,
-                "Comment": self.name + " " + self.version,
+                "Comment": self.name,
                 "Exec": f"mate-terminal --window --title \"{self.name}\" -e \'/bin/bash {str(self.sh_path)}\'",
                 "Icon": icon_path,
                 "Type": "Application",
@@ -236,7 +236,7 @@ class NeurodeskApp:
             entry["Desktop Entry"] = {
                 "Name": self.exec_name,
                 "GenericName": self.exec_name,
-                "Comment": self.name + " " + self.version,
+                "Comment": self.name,
                 "Exec": f"/bin/bash {str(self.sh_path)}",
                 "Icon": icon_path,
                 "Type": "Application",

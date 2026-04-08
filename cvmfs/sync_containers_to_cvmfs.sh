@@ -434,6 +434,60 @@ do
 
 done < "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt"
 
+# Ensure module files point to the latest builddate for each tool+version.
+# The module file is only created when a container is first deployed, so it may
+# point to an older builddate if a newer container was deployed before an older one.
+echo "[INFO] Checking that module files point to the latest builddate for each tool+version."
+MODULES_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers/modules"
+declare -A LATEST_BUILDDATE
+declare -A LATEST_CONTAINER_DIR
+
+for CONTAINER_PATH in /cvmfs/neurodesk.ardc.edu.au/containers/*/; do
+    [[ -d "$CONTAINER_PATH" ]] || continue
+    CONTAINER_NAME="$(basename "$CONTAINER_PATH")"
+    # Only consider unpacked container directories (have commands.txt)
+    [[ -f "$CONTAINER_PATH/commands.txt" ]] || continue
+    # Only consider containers we want to keep
+    [[ -n "${KEEP_IMAGES[$CONTAINER_NAME]+x}" ]] || continue
+
+    C_TOOLNAME="$(cut -d'_' -f1 <<< "$CONTAINER_NAME")"
+    C_TOOLVERSION="$(cut -d'_' -f2 <<< "$CONTAINER_NAME")"
+    C_BUILDDATE="$(cut -d'_' -f3 <<< "$CONTAINER_NAME")"
+    KEY="${C_TOOLNAME}_${C_TOOLVERSION}"
+
+    if [[ -z "${LATEST_BUILDDATE[$KEY]+x}" ]] || [[ "$C_BUILDDATE" > "${LATEST_BUILDDATE[$KEY]}" ]]; then
+        LATEST_BUILDDATE["$KEY"]="$C_BUILDDATE"
+        LATEST_CONTAINER_DIR["$KEY"]="$CONTAINER_PATH"
+    fi
+done
+
+for KEY in "${!LATEST_BUILDDATE[@]}"; do
+    C_TOOLNAME="$(cut -d'_' -f1 <<< "$KEY")"
+    C_TOOLVERSION="$(cut -d'_' -f2 <<< "$KEY")"
+    LATEST_DIR="${LATEST_CONTAINER_DIR[$KEY]}"
+    LATEST_NAME="$(basename "$LATEST_DIR")"
+    MODULE_FILE="$MODULES_ROOT/$C_TOOLNAME/${C_TOOLVERSION}.lua"
+
+    if [[ ! -f "$MODULE_FILE" ]]; then
+        continue
+    fi
+
+    # Check if the module file already points to the latest container
+    if grep -q "prepend_path(\"PATH\", \".*${LATEST_NAME}\")" "$MODULE_FILE" 2>/dev/null; then
+        continue
+    fi
+
+    echo "[INFO] Updating module $C_TOOLNAME/${C_TOOLVERSION} to point to latest: $LATEST_NAME"
+    open_cvmfs_transaction neurodesk.ardc.edu.au
+    # Update the prepend_path line to point to the latest container directory
+    sed -i "s|prepend_path(\"PATH\", \".*${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|prepend_path(\"PATH\", \"${LATEST_DIR%/}\")|" "$MODULE_FILE"
+    # Update the whatis line
+    sed -i "s|whatis(\"${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|whatis(\"${LATEST_NAME}\")|" "$MODULE_FILE"
+    # Update any BASEPATH references in environment variables
+    sed -i "s|${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*/|${LATEST_NAME}/|g" "$MODULE_FILE"
+    publish_cvmfs_transaction neurodesk.ardc.edu.au "updated module $C_TOOLNAME/${C_TOOLVERSION} to point to $LATEST_NAME"
+done
+
 # disable unpacked container versions that no longer exist in log.txt:
 CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
 STALE_IMAGES=()
