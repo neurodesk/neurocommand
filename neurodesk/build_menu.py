@@ -204,9 +204,9 @@ class NeurodeskApp:
             if sh_exec:
                 self_sh_file.write(f"{sh_exec}")
             elif self.deskenv == 'mate':
-                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
+                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} $@")
             else:
-                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.version} {self.exec} $@")
+                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} $@")
             self_sh_file.write('\n')
         writefile_with_mode(self.sh_path, _write_app_sh, mode=0o755)
 
@@ -320,6 +320,7 @@ def build_menu(installdir, deskenv, sh_prefix):
     copyfile_with_mode(Path('neurodesk/fetch_containers.sh'), installdir/'fetch_containers.sh', mode=0o755)
     copyfile_with_mode(Path('neurodesk/configparser.sh'), installdir/'configparser.sh', mode=0o755)
     copyfile_with_mode(Path('config.ini'), installdir/'config.ini')
+    copyfile_with_mode(Path('neurodesk/apps.json'), installdir/'apps.json')
     distutils.dir_util.copy_tree('neurodesk/transparent-singularity', str(installdir/'transparent-singularity'))
 
     if not climode:
