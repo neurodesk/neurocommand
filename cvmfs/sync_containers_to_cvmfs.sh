@@ -50,6 +50,43 @@ abort_cvmfs_transaction() {
     sudo cvmfs_server abort "$repo"
 }
 
+ensure_nested_catalog_markers_for_container() {
+    local container_dir="$1"
+    local container_name
+    local simg_dir
+    local catalog_dir
+
+    container_name="$(basename "$container_dir")"
+    simg_dir="$container_dir/$container_name.simg"
+
+    # Keep the nested catalogs explicit. The publish step has proven unreliable
+    # at creating these marker files automatically in directories owned by the
+    # sync user.
+    for catalog_dir in \
+        "$container_dir" \
+        "$simg_dir" \
+        "$simg_dir/usr" \
+        "$simg_dir/usr/lib" \
+        "$simg_dir/usr/share"; do
+        if [[ ! -d "$catalog_dir" ]]; then
+            continue
+        fi
+
+        if [[ -f "$catalog_dir/.cvmfscatalog" ]]; then
+            continue
+        fi
+
+        if ! sudo touch "$catalog_dir/.cvmfscatalog"; then
+            echo "[ERROR] Failed to create nested catalog marker: $catalog_dir/.cvmfscatalog"
+            return 1
+        fi
+
+        echo "[INFO] Created nested catalog marker: $catalog_dir/.cvmfscatalog"
+    done
+
+    return 0
+}
+
 ensure_lxde_menu_prereqs() {
     local repo_path="$1"
     local appmenu="/etc/xdg/menus/lxde-applications.menu"
@@ -326,12 +363,16 @@ do
                 echo $PATH
                 export PATH=$PATH:/usr/sbin/
                 ./run_transparent_singularity.sh $IMAGENAME_BUILDDATE --unpack true
+                retVal=$?
+
+                if [[ $retVal -eq 0 ]]; then
+                    ensure_nested_catalog_markers_for_container "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE" || retVal=$?
+                fi
             else
                 echo "[ERROR] IMAGENAME_BUILDDATE is empty"
                 exit 2
             fi
-            
-            retVal=$?
+
             if [ $retVal -ne 0 ]; then
                 echo "Error in Transparent singularity. Check the log. Aborting!"
                 abort_cvmfs_transaction neurodesk.ardc.edu.au
