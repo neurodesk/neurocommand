@@ -2474,6 +2474,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "vesselboost 2.0.20": {
+                "version": "20260413",
+                "exec": "",
+                "apptainer_args": []
+            },
             "vesselboost 2.0.9": {
                 "version": "20260402",
                 "exec": "",
