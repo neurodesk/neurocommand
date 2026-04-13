@@ -10,7 +10,7 @@ pluggy==0.13.1
 py==1.10.0
 pylint==2.6.0
 pyparsing==2.4.7
-pytest==6.1.1
+pytest==9.0.3
 six==1.15.0
 toml==0.10.1
 wrapt==1.12.1
