@@ -834,7 +834,7 @@
                 "apptainer_args": []
             },
             "fmriprep 25.2.5": {
-                "version": "20260325",
+                "version": "20260413",
                 "exec": "",
                 "apptainer_args": []
             }
