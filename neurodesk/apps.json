@@ -182,8 +182,9 @@
                 "exec": ""
             },
             "aslprep 0.7.5": {
-                "version": "20250206",
-                "exec": ""
+                "version": "20260413",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2471,6 +2472,11 @@
             },
             "vesselboost 2.0.1": {
                 "version": "20260309",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vesselboost 2.0.20": {
+                "version": "20260413",
                 "exec": "",
                 "apptainer_args": []
             },
