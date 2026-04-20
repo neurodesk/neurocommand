@@ -2142,6 +2142,19 @@
             "programming"
         ]
     },
+    "rshrf": {
+        "apps": {
+            "rshrf 1.5.8": {
+                "version": "20260325",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "functional imaging"
+        ]
+    },
     "rstudio": {
         "apps": {
             "rstudio 1.4.1106": {
