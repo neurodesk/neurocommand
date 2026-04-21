@@ -2145,7 +2145,7 @@
     "rshrf": {
         "apps": {
             "rshrf 1.5.8": {
-                "version": "20260325",
+                "version": "20260421",
                 "exec": "",
                 "apptainer_args": []
             }
