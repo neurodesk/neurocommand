@@ -56,5 +56,5 @@ jobs:
         OS_IDENTITY_API_VERSION: ${{ secrets.OS_IDENTITY_API_VERSION }}
       run: |
         rclone config create nectar swift env_auth true
-        rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true
+        rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true region us-east-2 no_check_bucket true
         /bin/bash .github/workflows/upload_containers_simg.sh
