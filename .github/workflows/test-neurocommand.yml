@@ -48,7 +48,7 @@ jobs:
             bash -lc '
               set -e
               bash build.sh --cli
-              bash install.sh
+              bash containers.sh all
               bash local/fetch_containers.sh niimath 1.0.0 20240902 niimath
               test -f local/containers/niimath_1.0.0_20240902/niimath_1.0.0_20240902.simg
               test -f local/containers/niimath_1.0.0_20240902/niimath
