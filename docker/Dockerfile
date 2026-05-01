@@ -3,6 +3,9 @@
 # Neurodesk for Command Line: CVMFS, Lmod, Apptainer and neurocommand modules.
 
 ARG BASE_IMAGE_TAG=2026-04-27
+ARG APPTAINER_VERSION=1.4.5
+
+FROM ghcr.io/apptainer/apptainer:${APPTAINER_VERSION} AS apptainer
 
 FROM quay.io/jupyter/docker-stacks-foundation:${BASE_IMAGE_TAG}
 ARG BASE_IMAGE_TAG
@@ -17,10 +20,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN if [ -f /usr/bin/systemctl ]; then mv /usr/bin/systemctl /usr/bin/systemctl.orig; fi \
     && printf '#!/bin/bash\necho "systemctl is disabled in this container"\n' > /usr/bin/systemctl \
     && chmod +x /usr/bin/systemctl
-
-# Apptainer: PPA first (matches neurodesktop, covers both archs), GitHub
-# release as amd64-only fallback when Launchpad is degraded.
-ARG APPTAINER_VERSION=1.4.5
 
 # CVMFS (CERN apt repo) + Lmod + minimal CLI tooling.
 RUN apt-get update --yes \
@@ -38,30 +37,11 @@ RUN apt-get update --yes \
         bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
-# Apptainer install with PPA-first, GitHub-release-fallback (amd64 only).
-RUN set -e; \
-    arch="$(dpkg --print-architecture)"; \
-    . /etc/os-release; \
-    apt-get update --yes; \
-    if mkdir -p /etc/apt/keyrings \
-        && curl --fail --location --show-error --silent --retry 5 --retry-all-errors --connect-timeout 20 \
-            "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF6B0F5193D4F3301EF491FF0AFE36534FC6218AE" \
-            | gpg --dearmor --yes --output /etc/apt/keyrings/apptainer-ppa.gpg \
-        && printf 'Types: deb\nURIs: https://ppa.launchpadcontent.net/apptainer/ppa/ubuntu\nSuites: %s\nComponents: main\nSigned-By: /etc/apt/keyrings/apptainer-ppa.gpg\n' "$VERSION_CODENAME" > /etc/apt/sources.list.d/apptainer-ppa.sources; then \
-        apt-get -o Acquire::Retries=5 update --yes; \
-        apt-get install --yes --no-install-recommends apptainer; \
-        echo "[apptainer] installed from PPA"; \
-    elif [ "$arch" = "amd64" ]; then \
-        echo "[apptainer] PPA unavailable, falling back to GitHub release"; \
-        wget --tries=3 --timeout=20 -q "https://github.com/apptainer/apptainer/releases/download/v${APPTAINER_VERSION}/apptainer_${APPTAINER_VERSION}_amd64.deb" -O /tmp/apptainer.deb; \
-        apt-get install --yes --no-install-recommends /tmp/apptainer.deb; \
-        rm /tmp/apptainer.deb; \
-        echo "[apptainer] installed from GitHub release v${APPTAINER_VERSION}"; \
-    else \
-        echo "[apptainer] PPA unavailable and no GitHub release for $arch"; \
-        exit 1; \
-    fi; \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
+# Install apptainer from its official multi-arch image. This avoids the
+# Launchpad API and PPA apt fetches, which have been flaky in scheduled builds.
+COPY --from=apptainer /opt/apptainer /opt/apptainer
+RUN ln -sf /opt/apptainer/bin/apptainer /usr/local/bin/apptainer \
+    && ln -sf /opt/apptainer/bin/singularity /usr/local/bin/singularity
 
 # CVMFS client config. Single source of truth lives in neurodesktop; pin a ref
 # (or override at build time) to fetch a known-good snapshot.
