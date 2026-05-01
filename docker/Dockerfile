@@ -17,9 +17,8 @@ RUN if [ -f /usr/bin/systemctl ]; then mv /usr/bin/systemctl /usr/bin/systemctl.
     && printf '#!/bin/bash\necho "systemctl is disabled in this container"\n' > /usr/bin/systemctl \
     && chmod +x /usr/bin/systemctl
 
-# Apptainer install with mirror fallback: try GitHub release first (fast, no
-# Launchpad dependency), fall back to PPA (covers arm64 and Launchpad-up cases
-# where GitHub is unreachable). Same pattern handles outages and arm64 in one.
+# Apptainer: PPA first (matches neurodesktop, covers both archs), GitHub
+# release as amd64-only fallback when Launchpad is degraded.
 ARG APPTAINER_VERSION=1.4.5
 
 # CVMFS (CERN apt repo) + Lmod + minimal CLI tooling.
@@ -38,24 +37,23 @@ RUN apt-get update --yes \
         bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
-# Apptainer install with GitHub-release-first, PPA-fallback.
+# Apptainer install with PPA-first, GitHub-release-fallback (amd64 only).
 RUN set -e; \
     arch="$(dpkg --print-architecture)"; \
-    gh_url="https://github.com/apptainer/apptainer/releases/download/v${APPTAINER_VERSION}/apptainer_${APPTAINER_VERSION}_${arch}.deb"; \
-    if wget --tries=2 --timeout=20 -q "${gh_url}" -O /tmp/apptainer.deb 2>/dev/null \
-       && apt-get update --yes \
-       && apt-get install --yes --no-install-recommends /tmp/apptainer.deb; then \
-        echo "[apptainer] installed from GitHub release v${APPTAINER_VERSION} (${arch})"; \
+    apt-get update --yes; \
+    apt-get install --yes --no-install-recommends software-properties-common; \
+    if timeout 90 sh -c 'add-apt-repository -y ppa:apptainer/ppa && apt-get update --yes && apt-get install --yes --no-install-recommends apptainer'; then \
+        echo "[apptainer] installed from PPA"; \
+    elif [ "$arch" = "amd64" ]; then \
+        echo "[apptainer] PPA unavailable, falling back to GitHub release"; \
+        wget --tries=3 --timeout=20 -q "https://github.com/apptainer/apptainer/releases/download/v${APPTAINER_VERSION}/apptainer_${APPTAINER_VERSION}_amd64.deb" -O /tmp/apptainer.deb; \
+        apt-get install --yes --no-install-recommends /tmp/apptainer.deb; \
+        rm /tmp/apptainer.deb; \
+        echo "[apptainer] installed from GitHub release v${APPTAINER_VERSION}"; \
     else \
-        echo "[apptainer] GitHub release unavailable, falling back to PPA"; \
-        rm -f /tmp/apptainer.deb; \
-        apt-get update --yes; \
-        apt-get install --yes --no-install-recommends software-properties-common; \
-        add-apt-repository -y ppa:apptainer/ppa; \
-        apt-get update --yes; \
-        apt-get install --yes --no-install-recommends apptainer; \
+        echo "[apptainer] PPA unavailable and no GitHub release for $arch"; \
+        exit 1; \
     fi; \
-    rm -f /tmp/apptainer.deb; \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
 # CVMFS client config. Single source of truth lives in neurodesktop; pin a ref
