@@ -5,6 +5,7 @@
 ARG BASE_IMAGE_TAG=2026-04-27
 
 FROM quay.io/jupyter/docker-stacks-foundation:${BASE_IMAGE_TAG}
+ARG BASE_IMAGE_TAG
 
 # foundation drops to NB_USER (jovyan, UID 1000) at the end. We need root for installs.
 USER root
@@ -42,7 +43,9 @@ RUN set -e; \
     arch="$(dpkg --print-architecture)"; \
     apt-get update --yes; \
     apt-get install --yes --no-install-recommends software-properties-common; \
-    if timeout 90 sh -c 'add-apt-repository -y ppa:apptainer/ppa && apt-get update --yes && apt-get install --yes --no-install-recommends apptainer'; then \
+    if timeout 90 add-apt-repository -y ppa:apptainer/ppa; then \
+        apt-get update --yes; \
+        apt-get install --yes --no-install-recommends apptainer; \
         echo "[apptainer] installed from PPA"; \
     elif [ "$arch" = "amd64" ]; then \
         echo "[apptainer] PPA unavailable, falling back to GitHub release"; \
@@ -128,5 +131,3 @@ LABEL org.opencontainers.image.title="neurocommand" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.base.name="quay.io/jupyter/docker-stacks-foundation:${BASE_IMAGE_TAG}"
-
-      
