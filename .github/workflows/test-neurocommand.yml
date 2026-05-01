@@ -40,7 +40,8 @@ jobs:
           if [ "${{ matrix.cvmfs }}" = "disabled" ]; then
             CVMFS_ENV="-e NEURODESK_CVMFS_DISABLE=1"
           fi
-          docker run --rm --privileged $CVMFS_ENV \
+          docker run --rm --privileged --user=root $CVMFS_ENV \
+            -e NB_UID="$(id -u)" -e NB_GID="$(id -g)" \
             -v "${{ github.workspace }}:/work" -w /work \
             ghcr.io/neurodesk/neurocommand:latest \
             bash -lc '
