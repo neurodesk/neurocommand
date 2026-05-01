@@ -41,10 +41,14 @@ RUN apt-get update --yes \
 # Apptainer install with PPA-first, GitHub-release-fallback (amd64 only).
 RUN set -e; \
     arch="$(dpkg --print-architecture)"; \
+    . /etc/os-release; \
     apt-get update --yes; \
-    apt-get install --yes --no-install-recommends software-properties-common; \
-    if timeout 90 add-apt-repository -y ppa:apptainer/ppa; then \
-        apt-get update --yes; \
+    if mkdir -p /etc/apt/keyrings \
+        && curl --fail --location --show-error --silent --retry 5 --retry-all-errors --connect-timeout 20 \
+            "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF6B0F5193D4F3301EF491FF0AFE36534FC6218AE" \
+            | gpg --dearmor --yes --output /etc/apt/keyrings/apptainer-ppa.gpg \
+        && printf 'Types: deb\nURIs: https://ppa.launchpadcontent.net/apptainer/ppa/ubuntu\nSuites: %s\nComponents: main\nSigned-By: /etc/apt/keyrings/apptainer-ppa.gpg\n' "$VERSION_CODENAME" > /etc/apt/sources.list.d/apptainer-ppa.sources; then \
+        apt-get -o Acquire::Retries=5 update --yes; \
         apt-get install --yes --no-install-recommends apptainer; \
         echo "[apptainer] installed from PPA"; \
     elif [ "$arch" = "amd64" ]; then \

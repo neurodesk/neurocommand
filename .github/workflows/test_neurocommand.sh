@@ -2,9 +2,16 @@
 set -e
 
 sudo apt update
-sudo apt install -y software-properties-common
-sudo add-apt-repository -y ppa:apptainer/ppa
-sudo apt update
+sudo apt install -y curl gnupg
+. /etc/os-release
+sudo mkdir -p /etc/apt/keyrings
+curl --fail --location --show-error --silent \
+    --retry 5 --retry-all-errors --connect-timeout 20 \
+    "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF6B0F5193D4F3301EF491FF0AFE36534FC6218AE" \
+    | sudo gpg --dearmor --yes --output /etc/apt/keyrings/apptainer-ppa.gpg
+printf 'Types: deb\nURIs: https://ppa.launchpadcontent.net/apptainer/ppa/ubuntu\nSuites: %s\nComponents: main\nSigned-By: /etc/apt/keyrings/apptainer-ppa.gpg\n' "$VERSION_CODENAME" \
+    | sudo tee /etc/apt/sources.list.d/apptainer-ppa.sources > /dev/null
+sudo apt -o Acquire::Retries=5 update
 sudo apt install -y apptainer apptainer-suid
 
 echo "checking if neurodesk installs and a containers gets downloaded correctly"
