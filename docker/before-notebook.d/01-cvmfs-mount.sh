@@ -1,11 +1,12 @@
 #!/bin/bash
-# Entrypoint for the neurocommand CLI image.
+# Mount CVMFS before the user command runs.
 #
-# Probes regional CVMFS servers, picks the lowest-latency Direct/CDN config,
-# starts autofs (or falls back to a manual mount), then execs the user command.
+# Picked up automatically by the docker-stacks foundation start.sh, which
+# executes /usr/local/bin/before-notebook.d/*.sh as root before dropping
+# privileges to NB_USER.
 #
 # Env knobs:
-#   NEURODESK_CVMFS_DISABLE=1       skip CVMFS entirely (offline / local-only mode)
+#   NEURODESK_CVMFS_DISABLE=1       skip CVMFS entirely (offline / local-only)
 #   NEURODESK_SKIP_REGION_PROBE=1   use the bundled default config without probing
 
 set -e
@@ -108,13 +109,3 @@ probe_and_select_region() {
 }
 
 setup_cvmfs
-
-if [ "$(id -u)" = "0" ] && command -v gosu >/dev/null 2>&1; then
-    if [ $# -eq 0 ]; then exec gosu "${NB_USER}" /bin/bash -l
-    else exec gosu "${NB_USER}" "$@"
-    fi
-else
-    if [ $# -eq 0 ]; then exec /bin/bash -l
-    else exec "$@"
-    fi
-fi

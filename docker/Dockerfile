@@ -33,7 +33,7 @@ RUN apt-get update --yes \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
         tcllib tk \
-        gosu sudo \
+        sudo \
         bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
@@ -88,16 +88,17 @@ RUN rm /tmp/neurocommand-skipcache \
     && bash install.sh \
     && ln -s /neurodesktop-storage/containers /neurocommand/local/containers
 
-COPY entrypoint.sh /usr/local/bin/neurocommand-entrypoint
-RUN chmod 0755 /usr/local/bin/neurocommand-entrypoint
+# CVMFS mount runs as a foundation pre-start hook (start.sh executes
+# /usr/local/bin/before-notebook.d/*.sh as root before dropping to NB_USER).
+COPY before-notebook.d/01-cvmfs-mount.sh /usr/local/bin/before-notebook.d/01-cvmfs-mount.sh
+RUN chmod 0755 /usr/local/bin/before-notebook.d/01-cvmfs-mount.sh
 
 VOLUME /neurodesktop-storage
 WORKDIR /home/${NB_USER}
 
-# Stay as root: the entrypoint mounts CVMFS (needs root) then drops to NB_USER via gosu.
+# Stay as root so foundation start.sh can run hooks (CVMFS mount needs root)
+# before dropping to NB_USER for the user command.
 USER root
-ENTRYPOINT ["/usr/local/bin/neurocommand-entrypoint"]
-CMD []
 
 # Image metadata
 ARG NEUROCOMMAND_VERSION="development"

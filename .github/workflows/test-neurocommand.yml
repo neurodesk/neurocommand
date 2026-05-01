@@ -1,27 +1,54 @@
 name: Test neurocommand
 permissions:
   contents: read
+  packages: read
 
 on:
   workflow_dispatch:
   push:
-    branches: 
+    branches:
       - main
   pull_request:
-    branches: 
+    branches:
       - main
 
 concurrency:
-  group: test-neurocommand
+  group: test-neurocommand-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   test_neurocommand:
-    runs-on: ubuntu-22.04
+    name: test (CVMFS=${{ matrix.cvmfs }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        cvmfs: [enabled, disabled]
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
-      with:
-        python-version: 3.8
-    - name: Test neurocommand version
-      run: /bin/bash .github/workflows/test_neurocommand.sh
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Login to GHCR
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull neurocommand image
+        run: docker pull ghcr.io/neurodesk/neurocommand:latest
+      - name: Run neurocommand fetch test inside image
+        run: |
+          CVMFS_ENV=""
+          if [ "${{ matrix.cvmfs }}" = "disabled" ]; then
+            CVMFS_ENV="-e NEURODESK_CVMFS_DISABLE=1"
+          fi
+          docker run --rm --privileged $CVMFS_ENV \
+            -v "${{ github.workspace }}:/work" -w /work \
+            ghcr.io/neurodesk/neurocommand:latest \
+            bash -lc '
+              set -e
+              bash build.sh --cli
+              bash install.sh
+              bash local/fetch_containers.sh niimath 1.0.0 20240902 niimath
+              test -f local/containers/niimath_1.0.0_20240902/niimath_1.0.0_20240902.simg
+              test -f local/containers/niimath_1.0.0_20240902/niimath
+              echo "[test] OK"
+            '
