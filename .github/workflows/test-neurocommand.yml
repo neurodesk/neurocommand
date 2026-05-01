@@ -34,14 +34,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull neurocommand image
         run: docker pull ghcr.io/neurodesk/neurocommand:latest
+      - name: Make workspace writable by container's jovyan (UID 1000)
+        run: sudo chown -R 1000:100 "${{ github.workspace }}"
       - name: Run neurocommand fetch test inside image
         run: |
           CVMFS_ENV=""
           if [ "${{ matrix.cvmfs }}" = "disabled" ]; then
             CVMFS_ENV="-e NEURODESK_CVMFS_DISABLE=1"
           fi
-          docker run --rm --privileged --user=root $CVMFS_ENV \
-            -e NB_UID="$(id -u)" -e NB_GID="$(id -g)" \
+          docker run --rm --privileged $CVMFS_ENV \
             -v "${{ github.workspace }}:/work" -w /work \
             ghcr.io/neurodesk/neurocommand:latest \
             bash -lc '
@@ -53,3 +54,6 @@ jobs:
               test -f local/containers/niimath_1.0.0_20240902/niimath
               echo "[test] OK"
             '
+      - name: Restore workspace ownership for cleanup
+        if: always()
+        run: sudo chown -R "$(id -u):$(id -g)" "${{ github.workspace }}"
