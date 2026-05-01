@@ -17,8 +17,8 @@ on:
         type: boolean
         required: true
         default: false
-  schedule:
-    - cron: "0 17 * * *"
+  # schedule:
+  #   - cron: "0 17 * * *"
 
 env:
   DOCKERHUB_ORG: ${{ vars.DOCKERHUB_ORG }}
