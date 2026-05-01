@@ -33,6 +33,7 @@ RUN apt-get update --yes \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
         tcllib tk \
+        squashfs-tools \
         sudo \
         bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
