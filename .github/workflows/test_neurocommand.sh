@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-sudo apt update
-sudo apt install -y curl gnupg
-. /etc/os-release
-sudo mkdir -p /etc/apt/keyrings
-curl --fail --location --show-error --silent \
-    --retry 5 --retry-all-errors --connect-timeout 20 \
-    "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF6B0F5193D4F3301EF491FF0AFE36534FC6218AE" \
-    | sudo gpg --dearmor --yes --output /etc/apt/keyrings/apptainer-ppa.gpg
-printf 'Types: deb\nURIs: https://ppa.launchpadcontent.net/apptainer/ppa/ubuntu\nSuites: %s\nComponents: main\nSigned-By: /etc/apt/keyrings/apptainer-ppa.gpg\n' "$VERSION_CODENAME" \
-    | sudo tee /etc/apt/sources.list.d/apptainer-ppa.sources > /dev/null
-sudo apt -o Acquire::Retries=5 update
-sudo apt install -y apptainer apptainer-suid
+APPTAINER_VERSION=1.4.5
+apptainer_container="$(docker create ghcr.io/apptainer/apptainer:${APPTAINER_VERSION})"
+apptainer_tmp="$(mktemp -d)"
+trap 'docker rm -f "$apptainer_container" >/dev/null 2>&1 || true; rm -rf "$apptainer_tmp"' EXIT
+docker cp "${apptainer_container}:/opt/apptainer" "${apptainer_tmp}/apptainer"
+sudo rm -rf /opt/apptainer
+sudo mv "${apptainer_tmp}/apptainer" /opt/apptainer
+sudo ln -sf /opt/apptainer/bin/apptainer /usr/local/bin/apptainer
+sudo ln -sf /opt/apptainer/bin/singularity /usr/local/bin/singularity
 
 echo "checking if neurodesk installs and a containers gets downloaded correctly"
 
