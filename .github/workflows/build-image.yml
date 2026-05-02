@@ -166,7 +166,7 @@ jobs:
             ${{ env.IMAGEID }}:latest \
             ${{ env.DOCKERHUB_ORG }}/${{ env.IMAGENAME }}:latest
       - name: Create github tag
-        if: steps.check_image.outputs.exists != 'true'
+        if: github.ref == 'refs/heads/main' && steps.check_image.outputs.exists != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
