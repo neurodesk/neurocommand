@@ -32,10 +32,8 @@ jobs:
         platform:
           - arch: amd64
             docker_platform: linux/amd64
-          # arm64 disabled until ARC native arm cluster is available;
-          # QEMU-emulated arm64 builds are slow and DNS-flaky.
-          # - arch: arm64
-          #   docker_platform: linux/arm64
+          - arch: arm64
+            docker_platform: linux/arm64
     steps:
       - name: Configure runner
         run: |
@@ -144,13 +142,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Tag arch image as date and latest
+      - name: Create and push multi-arch manifest to GHCR
         if: steps.check_image.outputs.exists != 'true'
         run: |
           docker buildx imagetools create \
             -t ${{ env.IMAGEID }}:${{ env.BUILDDATE }} \
             -t ${{ env.IMAGEID }}:latest \
-            ${{ env.IMAGEID }}:amd64
+            ${{ env.IMAGEID }}:amd64 \
+            ${{ env.IMAGEID }}:arm64
       - name: Install crane
         if: ${{ env.DOCKERHUB_ORG != '' && steps.check_image.outputs.exists != 'true' }}
         run: |
