@@ -22,13 +22,41 @@ RUN if [ -f /usr/bin/systemctl ]; then mv /usr/bin/systemctl /usr/bin/systemctl.
     && chmod +x /usr/bin/systemctl
 
 # CVMFS (CERN apt repo) + Lmod + minimal CLI tooling.
-RUN apt-get update --yes \
+RUN apt_update_with_candidates() { \
+        packages="$*"; \
+        for attempt in 1 2 3 4 5; do \
+            rm -rf /var/lib/apt/lists/*; \
+            if apt-get update --yes -o Acquire::Retries=5; then \
+                missing=""; \
+                for package in ${packages}; do \
+                    candidate="$(apt-cache policy "${package}" | awk '/Candidate:/ { print $2 }')"; \
+                    if [ -z "${candidate}" ] || [ "${candidate}" = "(none)" ]; then \
+                        missing="${missing} ${package}"; \
+                    fi; \
+                done; \
+                if [ -z "${missing}" ]; then \
+                    return 0; \
+                fi; \
+                echo "apt indexes are missing package candidates:${missing}"; \
+            fi; \
+            echo "apt update attempt ${attempt} failed; retrying"; \
+            sleep $((attempt * 10)); \
+        done; \
+        return 1; \
+    }; \
+    apt_update_with_candidates ca-certificates wget curl gnupg \
     && apt-get install --yes --no-install-recommends \
         ca-certificates wget curl gnupg \
     && wget -q https://cvmrepo.s3.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb -O /tmp/cvmfs-release.deb \
     && dpkg -i /tmp/cvmfs-release.deb \
     && rm /tmp/cvmfs-release.deb \
-    && apt-get update --yes \
+    && apt_update_with_candidates \
+        autofs cvmfs uuid-dev \
+        lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
+        tcllib tk \
+        squashfs-tools \
+        sudo \
+        bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get install --yes --no-install-recommends \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
