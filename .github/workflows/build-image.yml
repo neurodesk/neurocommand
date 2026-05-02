@@ -90,19 +90,19 @@ jobs:
             VCS_REF=${{ github.sha }}
           cache-from: type=registry,ref=${{ env.IMAGEID }}:latest
           cache-to: type=inline
-      # - name: Generate issue on job failure
-      #   if: always() && failure()
-      #   uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     GITHUB_WORKFLOW: ${{ github.workflow }}
-      #     GITHUB_SERVER_URL: ${{ github.server_url }}
-      #     GITHUB_REPOSITORY: ${{ github.repository }}
-      #     GITHUB_RUN_ID: ${{ github.run_id }}
-      #   with:
-      #     filename: .github/job_failure_issue_template.md
-      #     update_existing: true
-      #     search_existing: open
+      - name: Generate issue on job failure
+        if: always() && failure()
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        with:
+          filename: .github/job_failure_issue_template.md
+          update_existing: true
+          search_existing: open
 
   merge-manifests:
     needs: build-image
@@ -204,16 +204,16 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: ${{ github.ref }}
-      # - name: Generate issue on job failure
-      #   if: always() && failure()
-      #   uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     GITHUB_WORKFLOW: ${{ github.workflow }}
-      #     GITHUB_SERVER_URL: ${{ github.server_url }}
-      #     GITHUB_REPOSITORY: ${{ github.repository }}
-      #     GITHUB_RUN_ID: ${{ github.run_id }}
-      #   with:
-      #     filename: .github/job_failure_issue_template.md
-      #     update_existing: true
-      #     search_existing: open
+      - name: Generate issue on job failure
+        if: always() && failure()
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        with:
+          filename: .github/job_failure_issue_template.md
+          update_existing: true
+          search_existing: open
