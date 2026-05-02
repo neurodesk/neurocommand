@@ -40,7 +40,7 @@ jobs:
       - name: Configure runner
         run: |
           sudo mkdir -p /mnt/docker
-          echo '{"data-root": "/mnt/docker"}' | sudo tee /etc/docker/daemon.json
+          echo '{"data-root": "/mnt/docker", "dns": ["8.8.8.8", "1.1.1.1"]}' | sudo tee /etc/docker/daemon.json
           sudo systemctl restart docker
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
