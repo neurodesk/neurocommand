@@ -54,14 +54,14 @@ RUN apt_update_with_candidates() { \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
         tcllib tk \
-        squashfs-tools \
+        squashfs-tools fuse-overlayfs squashfuse \
         sudo \
         bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get install --yes --no-install-recommends \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
         tcllib tk \
-        squashfs-tools \
+        squashfs-tools fuse-overlayfs squashfuse \
         sudo \
         bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
@@ -70,7 +70,9 @@ RUN apt_update_with_candidates() { \
 # Launchpad API and PPA apt fetches, which have been flaky in scheduled builds.
 COPY --from=apptainer /opt/apptainer /opt/apptainer
 RUN ln -sf /opt/apptainer/bin/apptainer /usr/local/bin/apptainer \
-    && ln -sf /opt/apptainer/bin/singularity /usr/local/bin/singularity
+    && ln -sf /opt/apptainer/bin/singularity /usr/local/bin/singularity \
+    && rm -rf /opt/apptainer/libexec/apptainer/cni \
+    && sed -i 's/^allow setuid = yes/allow setuid = no/' /opt/apptainer/etc/apptainer/apptainer.conf
 
 # CVMFS client config. Single source of truth lives in neurodesktop; pin a ref
 # (or override at build time) to fetch a known-good snapshot.
