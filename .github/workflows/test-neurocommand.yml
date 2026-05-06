@@ -17,6 +17,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  unit_tests:
+    name: unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: python -m pip install pytest
+      - name: Run unit tests
+        run: python -m pytest -q
+
   test_neurocommand:
     name: test (CVMFS=${{ matrix.cvmfs }})
     runs-on: ubuntu-24.04

@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - '.github/workflows/update-neurocontainers.yml'
+      - '.github/workflows/upload_containers_simg.sh'
       - 'neurodesk/apps.json'
       - 'neurodesk/write_log.py'
 
@@ -20,6 +21,7 @@ concurrency:
 jobs:
   upload_containers_simg:
     runs-on: self-hosted
+    timeout-minutes: 360
     permissions:
       id-token: write
       contents: read
@@ -41,6 +43,7 @@ jobs:
         output-credentials: true
         role-duration-seconds: 28800 # 8 hours
     - name : Check if singularity container files exist in nectar cloud and build & upload if not there
+      timeout-minutes: 330
       env:
         AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
