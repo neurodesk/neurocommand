@@ -9,7 +9,7 @@
       "description": "MRI protocol validation tool - validate DICOMs against community protocols",
       "port": 3001,
       "module": "dicompare",
-      "version": "0.5.1"
+      "version": "0.5.4"
     },
     "ezbids": {
       "title": "ezBIDS",
