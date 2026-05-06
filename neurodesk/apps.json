@@ -1324,8 +1324,9 @@
     "linda": {
         "apps": {
             "linda 0.5.1": {
-                "version": "20250814",
-                "exec": ""
+                "version": "20260502",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
