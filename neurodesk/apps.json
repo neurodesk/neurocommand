@@ -651,6 +651,11 @@
                 "version": "20260211",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "dicompare 0.5.4": {
+                "version": "20260506",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
