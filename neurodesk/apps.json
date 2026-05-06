@@ -2041,6 +2041,11 @@
                 "version": "20260105",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "qsmxt 8.3.2": {
+                "version": "20260421",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
