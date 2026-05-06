@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "upload_containers_simg.sh"
 WORKFLOW = ROOT / ".github" / "workflows" / "update-neurocontainers.yml"
+TEST_WORKFLOW = ROOT / ".github" / "workflows" / "test-neurocommand.yml"
 
 
 def run_bash(script):
@@ -26,6 +27,12 @@ def test_update_neurocontainers_has_explicit_timeouts():
     assert ".github/workflows/upload_containers_simg.sh" in workflow
     assert "timeout-minutes: 360" in workflow
     assert "timeout-minutes: 330" in workflow
+
+
+def test_unit_test_workflow_installs_distutils_provider():
+    workflow = TEST_WORKFLOW.read_text()
+    assert "python-version: \"3.12\"" in workflow
+    assert "python -m pip install pytest setuptools" in workflow
 
 
 def test_singularity_build_retries_with_temp_output(tmp_path):
