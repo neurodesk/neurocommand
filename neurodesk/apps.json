@@ -1727,6 +1727,20 @@
             "image registration"
         ]
     },
+    "neurodesktop": {
+        "apps": {
+            "neurodesktop 20260428": {
+                "version": "20260507",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data management",
+            "programming",
+            "visualization"
+        ]
+    },
     "neurodock": {
         "apps": {
             "neurodock 1.0.0": {
