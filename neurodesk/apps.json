@@ -1329,7 +1329,7 @@
     "linda": {
         "apps": {
             "linda 0.5.1": {
-                "version": "20260502",
+                "version": "20260508",
                 "exec": "",
                 "apptainer_args": []
             }
