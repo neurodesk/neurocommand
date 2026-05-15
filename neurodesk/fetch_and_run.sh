@@ -91,8 +91,9 @@ else
 fi
 module use ${MODS_PATH}
 
-# Check if the module is available
-if ! module avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD_NAME}/${MOD_VERS}"; then
+# Check if the module is available. Ignore stale module caches so newly added
+# local modulefiles are visible before deciding to download the container.
+if ! module --ignore-cache avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD_NAME}/${MOD_VERS}"; then
     echo "[WARNING] fetch_and_run.sh line $LINENO: Module ${MOD_NAME}/${MOD_VERS} not found. Attempting to download container."
 
     # Resolve builddate from apps.json if not provided
