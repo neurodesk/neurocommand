@@ -224,6 +224,18 @@
             "workflows"
         ]
     },
+    "bcbtoolkit": {
+        "apps": {
+            "bcbtoolkit 0.0.0": {
+                "version": "20260518",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "bidsappaa": {
         "apps": {
             "bidsappaa 0.2.0": {
@@ -740,6 +752,18 @@
         },
         "categories": [
             "image registration"
+        ]
+    },
+    "exploreasl": {
+        "apps": {
+            "exploreasl 1.11.0": {
+                "version": "20260514",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
         ]
     },
     "ezbids": {
@@ -1867,6 +1891,18 @@
             "workflows"
         ]
     },
+    "openadscpu": {
+        "apps": {
+            "openadscpu 1.0.0": {
+                "version": "20260518",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
     "oshyx": {
         "apps": {
             "oshyx 0.4": {
@@ -1929,6 +1965,18 @@
         },
         "categories": [
             "molecular biology"
+        ]
+    },
+    "pals": {
+        "apps": {
+            "pals 2.0.1": {
+                "version": "20260518",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
         ]
     },
     "pcntoolkit": {
@@ -2467,6 +2515,18 @@
             "image segmentation"
         ]
     },
+    "synthstroke": {
+        "apps": {
+            "synthstroke 0.0.0": {
+                "version": "20260518",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
     "tgvqsm": {
         "apps": {
             "tgvqsm 1.0.0": {
@@ -2612,54 +2672,6 @@
         },
         "categories": [
             "data organisation"
-        ]
-    },
-    "bcbtoolkit": {
-        "apps": {
-            "bcbtoolkit 0.0.0": {
-                "version": "20260518",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "structural imaging"
-        ]
-    },
-    "exploreasl": {
-        "apps": {
-            "exploreasl 1.11.0": {
-                "version": "20260514",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "workflows"
-        ]
-    },
-    "openadscpu": {
-        "apps": {
-            "openadscpu 1.0.0": {
-                "version": "20260518",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image segmentation"
-        ]
-    },
-    "synthstroke": {
-        "apps": {
-            "synthstroke 0.0.0": {
-                "version": "20260518",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image segmentation"
         ]
     }
 }
