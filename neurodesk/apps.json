@@ -224,6 +224,18 @@
             "workflows"
         ]
     },
+    "bcbtoolkit": {
+        "apps": {
+            "bcbtoolkit 0.0.0": {
+                "version": "20260518",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "bidsappaa": {
         "apps": {
             "bidsappaa 0.2.0": {
