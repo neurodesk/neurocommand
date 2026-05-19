@@ -1,0 +1,86 @@
+name: Sync neurocontainer icons
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+  repository_dispatch:
+    types:
+      - neurocontainers-icons-updated
+
+concurrency:
+  group: sync-neurocontainer-icons
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync_icons:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout neurocommand
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      - name: Checkout neurocontainers
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: NeuroDesk/neurocontainers
+          path: neurocontainers
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+
+      - name: Sync icons
+        run: |
+          python .github/workflows/scripts/sync_neurocontainer_icons.py \
+            --neurocontainers-path neurocontainers \
+            --apps-json neurodesk/apps.json \
+            --icons-dir neurodesk/icons
+
+      - name: Create or update pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: bot/sync-neurocontainer-icons
+          TITLE: Sync icons from neurocontainers
+          BODY: |
+            Updates `neurodesk/icons/*.png` from the base64-encoded `icon` fields in `NeuroDesk/neurocontainers` recipe `build.yaml` files.
+        run: |
+          set -euo pipefail
+
+          if [ -z "$(git status --porcelain -- neurodesk/icons)" ]; then
+            echo "No icon changes to publish."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "${BRANCH}"
+          git add neurodesk/icons
+          git commit -m "${TITLE}"
+
+          remote_sha="$(git ls-remote --heads origin "${BRANCH}" | awk '{print $1}')"
+          if [ -n "${remote_sha}" ]; then
+            git push --force-with-lease="refs/heads/${BRANCH}:${remote_sha}" origin "HEAD:${BRANCH}"
+          else
+            git push origin "HEAD:${BRANCH}"
+          fi
+
+          if gh pr view "${BRANCH}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh pr edit "${BRANCH}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --title "${TITLE}" \
+              --body "${BODY}"
+          else
+            gh pr create \
+              --repo "${GITHUB_REPOSITORY}" \
+              --base main \
+              --head "${BRANCH}" \
+              --title "${TITLE}" \
+              --body "${BODY}"
+          fi
