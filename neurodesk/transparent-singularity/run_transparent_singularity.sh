@@ -250,6 +250,10 @@ while read executable; do \
    echo $executable > $_base/${executable}; \
    echo "#!/usr/bin/env bash" > $executable
    echo "export PWD=\`pwd -P\`" >> $executable
+   echo 'xauthority_opts=()' >> $executable
+   echo 'if [[ -n "${XAUTHORITY:-}" && -f "$XAUTHORITY" ]]; then' >> $executable
+   echo '  xauthority_opts=(--bind "$XAUTHORITY:$XAUTHORITY:ro" --env "XAUTHORITY=$XAUTHORITY")' >> $executable
+   echo 'fi' >> $executable
 
    # neurodesk_singularity_opts is a global variable that can be set in neurodesk for example --nv for gpu support
    # --silent is required to suppress bind mound warnings (e.g. for /etc/localtime)
@@ -263,7 +267,7 @@ while read executable; do \
       fi
    done
    if printf '%s\n' "$required_version" "$singularity_version" | sort -V | head -n1 | grep -q "$required_version"; then
-      echo "singularity --silent exec --cleanenv --env DISPLAY=\$DISPLAY $bindtmpdir \$neurodesk_singularity_opts --pwd \"\$PWD\" $_base/$container $executable \"\$@\"" >> $executable
+      echo "singularity --silent exec --cleanenv --env DISPLAY=\$DISPLAY \"\${xauthority_opts[@]}\" $bindtmpdir \$neurodesk_singularity_opts --pwd \"\$PWD\" $_base/$container $executable \"\$@\"" >> $executable
    else
       echo "Singularity version is older than $required_version. GUIs will not work correctly!"
       echo "singularity --silent exec --cleanenv $bindtmpdir \$neurodesk_singularity_opts --pwd \"\$PWD\" $_base/$container $executable \"\$@\"" >> $executable
