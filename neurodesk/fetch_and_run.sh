@@ -61,9 +61,11 @@ MOD_VERS=$2
 # Otherwise $3 onwards are exec + user args
 if [[ "$3" =~ ^[0-9]{8}$ ]]; then
     MOD_DATE=$3
+    EXPLICIT_MOD_DATE=true
     shift 3
 else
     MOD_DATE=""
+    EXPLICIT_MOD_DATE=false
     shift 2
 fi
 
@@ -92,11 +94,7 @@ else
 fi
 module use ${MODS_PATH}
 
-# Check if the module is available. Ignore stale module caches so newly added
-# local modulefiles are visible before deciding to download the container.
-if ! module --ignore-cache avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD_NAME}/${MOD_VERS}"; then
-    echo "[WARNING] fetch_and_run.sh line $LINENO: Module ${MOD_NAME}/${MOD_VERS} not found. Attempting to download container."
-
+fetch_container() {
     # Resolve builddate from apps.json if not provided
     if [[ -z "$MOD_DATE" ]]; then
         MOD_DATE=$(resolve_builddate "$MOD_NAME" "$MOD_VERS")
@@ -114,6 +112,16 @@ if ! module --ignore-cache avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD
     # shellcheck disable=SC1091
     source "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE"
     module use ${MODS_PATH}
+}
+
+# Check if the module is available. Ignore stale module caches so newly added
+# local modulefiles are visible before deciding to download the container.
+if [[ "$EXPLICIT_MOD_DATE" == "true" ]]; then
+    echo "[INFO] fetch_and_run.sh line $LINENO: Explicit builddate requested; ensuring ${MOD_NAME}_${MOD_VERS}_${MOD_DATE} is installed."
+    fetch_container
+elif ! module --ignore-cache avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD_NAME}/${MOD_VERS}"; then
+    echo "[WARNING] fetch_and_run.sh line $LINENO: Module ${MOD_NAME}/${MOD_VERS} not found. Attempting to download container."
+    fetch_container
 fi
 
 # Load the module - this prepends the container directory to PATH
@@ -124,6 +132,14 @@ module load "${MOD_NAME}/${MOD_VERS}"
 CONTAINER_DIR=$(echo "$PATH" | tr ':' '\n' | head -1)
 CONTAINER_DIR_NAME=$(basename "$CONTAINER_DIR")
 CONTAINER_FILE_NAME="${CONTAINER_DIR}/${CONTAINER_DIR_NAME}.simg"
+
+if [[ "$EXPLICIT_MOD_DATE" == "true" ]]; then
+    REQUESTED_CONTAINER_DIR_NAME="${MOD_NAME}_${MOD_VERS}_${MOD_DATE}"
+    if [[ "$CONTAINER_DIR_NAME" != "$REQUESTED_CONTAINER_DIR_NAME" ]]; then
+        echo "[ERROR] fetch_and_run.sh line $LINENO: Explicit builddate ${MOD_DATE} requested, but module ${MOD_NAME}/${MOD_VERS} resolved to ${CONTAINER_DIR_NAME}. Expected ${REQUESTED_CONTAINER_DIR_NAME}."
+        exit 2
+    fi
+fi
 
 echo "[INFO] fetch_and_run.sh line $LINENO: Container resolved to: $CONTAINER_FILE_NAME"
 echo "[INFO] fetch_and_run.sh line $LINENO: Module '${MOD_NAME}/${MOD_VERS}' is installed. Use the command 'module load ${MOD_NAME}/${MOD_VERS}' outside of this shell to use it."
