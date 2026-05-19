@@ -35,6 +35,13 @@ def test_unit_test_workflow_installs_distutils_provider():
     assert "python -m pip install pytest setuptools" in workflow
 
 
+def test_neurocommand_image_test_asserts_configured_container_root():
+    workflow = TEST_WORKFLOW.read_text()
+    assert 'container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"' in workflow
+    assert 'test -f "${container_root}/niimath_1.0.0_20240902/niimath_1.0.0_20240902.simg"' in workflow
+    assert 'test -f "${container_root}/niimath_1.0.0_20240902/niimath"' in workflow
+
+
 def test_singularity_build_retries_with_temp_output(tmp_path):
     image_home = tmp_path / "images"
     image_home.mkdir()

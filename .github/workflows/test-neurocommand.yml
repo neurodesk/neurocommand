@@ -59,10 +59,11 @@ jobs:
             ghcr.io/neurodesk/neurocommand:latest \
             bash -lc '
               set -e
+              container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"
               bash build.sh --cli
               bash containers.sh all
               bash local/fetch_containers.sh niimath 1.0.0 20240902 niimath
-              test -f local/containers/niimath_1.0.0_20240902/niimath_1.0.0_20240902.simg
-              test -f local/containers/niimath_1.0.0_20240902/niimath
+              test -f "${container_root}/niimath_1.0.0_20240902/niimath_1.0.0_20240902.simg"
+              test -f "${container_root}/niimath_1.0.0_20240902/niimath"
               echo "[test] OK"
             '
