@@ -87,17 +87,47 @@ def test_sync_preserves_manual_icons(tmp_path):
     icons_dir.mkdir()
     manual_icon = icons_dir / "manual.png"
     manual_icon.write_bytes(b"manual icon content")
+    existing_recipe_icon = icons_dir / "alpha.png"
+    existing_recipe_icon.write_bytes(b"existing alpha icon")
 
     write_recipe(neurocontainers_path, "alpha", PNG_DATA_URI)
     write_apps_json(apps_json_path, "alpha")
 
-    sync_neurocontainer_icons.sync_icons(
+    result = sync_neurocontainer_icons.sync_icons(
         neurocontainers_path=neurocontainers_path,
         icons_dir=icons_dir,
         apps_json_path=apps_json_path,
     )
 
     assert manual_icon.read_bytes() == b"manual icon content"
+    assert existing_recipe_icon.read_bytes() == b"existing alpha icon"
+    assert result.changed_icons == []
+
+
+def test_check_mode_ignores_existing_icon_drift(tmp_path):
+    neurocontainers_path = tmp_path / "neurocontainers"
+    icons_dir = tmp_path / "icons"
+    apps_json_path = tmp_path / "apps.json"
+    icons_dir.mkdir()
+    (icons_dir / "alpha.png").write_bytes(b"existing alpha icon")
+
+    write_recipe(neurocontainers_path, "alpha", PNG_DATA_URI)
+    write_apps_json(apps_json_path, "alpha")
+
+    exit_code = sync_neurocontainer_icons.main(
+        [
+            "--neurocontainers-path",
+            str(neurocontainers_path),
+            "--icons-dir",
+            str(icons_dir),
+            "--apps-json",
+            str(apps_json_path),
+            "--check",
+        ]
+    )
+
+    assert exit_code == 0
+    assert (icons_dir / "alpha.png").read_bytes() == b"existing alpha icon"
 
 
 def test_check_mode_reports_drift_without_writing(tmp_path):

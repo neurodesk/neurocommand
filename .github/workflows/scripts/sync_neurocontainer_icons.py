@@ -141,8 +141,7 @@ def sync_icons(
 
     for recipe_icon in recipe_icons:
         target = icons_dir / f"{recipe_icon.name}.png"
-        existing_content = target.read_bytes() if target.exists() else None
-        if existing_content == recipe_icon.content:
+        if target.exists():
             continue
 
         result.changed_icons.append(target)
@@ -154,7 +153,7 @@ def sync_icons(
 
 
 def _print_result(result: SyncResult, *, check: bool) -> None:
-    action = "would update" if check else "updated"
+    action = "would add" if check else "added"
     print(
         "Matched "
         f"{result.matched_recipes} neurocommand apps; found "
