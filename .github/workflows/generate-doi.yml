@@ -14,7 +14,7 @@ jobs:
             app_batches: ${{ steps.list_apps.outputs.app_batches }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
               with:
                 fetch-depth: 0
             - name: Check for apps to publish to Zenodo
@@ -36,11 +36,11 @@ jobs:
             app_batches: ${{ fromJSON(needs.get-updated-apps.outputs.app_batches) }}
       steps:
           - name: Checkout
-            uses: actions/checkout@v4
+            uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
             with:
                 fetch-depth: 0
           - name: Set up Python 3.10
-            uses: actions/setup-python@v5
+            uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
             with:
               python-version: '3.10'
           - name: Install dependencies

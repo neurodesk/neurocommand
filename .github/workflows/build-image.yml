@@ -41,7 +41,7 @@ jobs:
           echo '{"data-root": "/mnt/docker", "dns": ["8.8.8.8", "1.1.1.1"]}' | sudo tee /etc/docker/daemon.json
           sudo systemctl restart docker
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.ref }}
       - name: Set environment variables
@@ -201,7 +201,7 @@ jobs:
           } >> "${GITHUB_STEP_SUMMARY}"
       - name: Checkout repository for failure issue template
         if: always() && failure()
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.ref }}
       - name: Generate issue on job failure
