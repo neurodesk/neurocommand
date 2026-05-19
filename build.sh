@@ -227,6 +227,15 @@ function build_apps () {
     fi
 }
 
+function update_neurocommand_repo () {
+    local sudo_prefix=()
+    if [ "$1" = "sudo" ]; then
+        sudo_prefix=(sudo)
+    fi
+
+    "${sudo_prefix[@]}" git pull --rebase --autostash
+}
+
 if [ "$runsudo" = "true" ]; then
     runsudo="y"
 elif [ -w "$neurodesk_installdir" ]; then
@@ -245,14 +254,14 @@ case "$runsudo" in
     [nN][oO]|[nN])
         echo $neurodesk_installdir
         if [ "$update" = true ]; then
-            git pull
+            update_neurocommand_repo
         fi
         build_apps
         ;;
     *)  
         echo $neurodesk_installdir
         if [ "$update" = true ]; then
-            sudo git pull
+            update_neurocommand_repo sudo
         fi
         sudo bash -c "$(declare -f build_apps); build_apps"
         ;;

@@ -30,6 +30,7 @@ fi
 
 # shellcheck disable=SC1091
 source "${_base}"/configparser.sh "${_base}"/config.ini
+LOCAL_CONTAINERS_PATH="${NEURODESKTOP_LOCAL_CONTAINERS:-${_base}/containers}"
 
 # Resolve builddate from apps.json for a given module name and version
 resolve_builddate() {
@@ -78,7 +79,7 @@ fi
 # Set up module paths for both CVMFS and local containers
 if [[ "$CVMFS_DISABLE" == "false" ]]; then
     CVMFS_MODS_PATH="/cvmfs/neurodesk.ardc.edu.au/containers/modules"
-    LOCAL_MODS_PATH="${_base}/containers/modules"
+    LOCAL_MODS_PATH="${LOCAL_CONTAINERS_PATH}/modules"
     if [[ -d "$CVMFS_MODS_PATH" ]]; then
         MODS_PATH="${LOCAL_MODS_PATH}:${CVMFS_MODS_PATH}"
     else
@@ -87,7 +88,7 @@ if [[ "$CVMFS_DISABLE" == "false" ]]; then
         MODS_PATH="${LOCAL_MODS_PATH}"
     fi
 else
-    MODS_PATH="${_base}/containers/modules"
+    MODS_PATH="${LOCAL_CONTAINERS_PATH}/modules"
 fi
 module use ${MODS_PATH}
 
@@ -109,7 +110,7 @@ if ! module --ignore-cache avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD
     fi
 
     # Download the container
-    export CONTAINER_PATH="${_base}"/containers
+    export CONTAINER_PATH="${LOCAL_CONTAINERS_PATH}"
     # shellcheck disable=SC1091
     source "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE"
     module use ${MODS_PATH}
@@ -161,7 +162,7 @@ if [ $# -eq 0 ]; then
 
             # shellcheck disable=SC1091
             source "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE"
-            module use "${_base}/containers/modules"
+            module use "${LOCAL_CONTAINERS_PATH}/modules"
             module load "${MOD_NAME}/${MOD_VERS}"
             CONTAINER_DIR=$(echo "$PATH" | tr ':' '\n' | head -1)
             CONTAINER_DIR_NAME=$(basename "$CONTAINER_DIR")

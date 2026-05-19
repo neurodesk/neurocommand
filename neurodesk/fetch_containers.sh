@@ -28,7 +28,7 @@ fi
 
 # default path is in the home directory of the user executing the call - except if there is a system wide install:
 export PATH_PREFIX=${neurodesk_installdir}
-export CONTAINER_PATH=${PATH_PREFIX}/containers
+export CONTAINER_PATH=${NEURODESKTOP_LOCAL_CONTAINERS:-${PATH_PREFIX}/containers}
 export MODS_PATH=${CONTAINER_PATH}/modules
 
 echo "[INFO] fetch_containers.sh: CONTAINER_PATH=$CONTAINER_PATH"
@@ -92,5 +92,4 @@ else
    ${CONTAINER_PATH}/${IMG_NAME}/run_transparent_singularity.sh --container ${IMG_NAME}.simg --singularity-opts "${neurodesk_singularity_opts}"
     # rm -rf .git* README.md run_transparent_singularity ts_*
 fi
-
 
