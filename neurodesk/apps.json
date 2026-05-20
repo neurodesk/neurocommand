@@ -2306,6 +2306,19 @@
             "functional imaging"
         ]
     },
+    "segmentator": {
+        "apps": {
+            "segmentator 1.6.1": {
+                "version": "20260519",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
     "sigviewer": {
         "apps": {
             "sigviewer 0.6.4": {
