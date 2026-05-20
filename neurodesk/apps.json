@@ -1769,6 +1769,8 @@
         ]
     },
     "neurodesktop": {
+        "show_in_menu": false,
+        "show_in_applist": false,
         "apps": {
             "neurodesktop 20260428": {
                 "version": "20260509",

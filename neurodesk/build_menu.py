@@ -12,6 +12,8 @@ import shutil
 import logging
 import distutils.dir_util
 
+APP_MENU_KWARGS = {"version", "exec", "terminal", "apptainer_args"}
+
 
 def chmod_if_new(path: Path, mode: int, existed_before: bool) -> None:
     """Set file mode only when this run created the target file."""
@@ -144,6 +146,14 @@ def add_menu(installdir: Path, name: Text, category: Text) -> None:
             break
 
 
+def app_menu_data(app_data: dict) -> dict:
+    return {key: app_data[key] for key in APP_MENU_KWARGS if key in app_data}
+
+
+def visibility_flag(data: dict, name: Text, default: bool = True) -> bool:
+    return data.get(name, default) is not False
+
+
 class NeurodeskApp:
     def __init__(
         self,
@@ -259,22 +269,30 @@ def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_pref
         menu_entries = json.load(json_file)
 
     for menu_name, menu_data in menu_entries.items():
+        default_show_in_menu = visibility_flag(menu_data, "show_in_menu")
+        apps = menu_data.get("apps", {})
+        menu_apps = [
+            app_data
+            for app_data in apps.values()
+            if visibility_flag(app_data, "show_in_menu", default_show_in_menu)
+        ]
         # Add submenu
-        if not cli:
+        if not cli and menu_apps:
             add_menu(installdir, menu_name, 'all applications')
             for category in menu_data.get("categories") or []:
                 add_menu(installdir, menu_name, category)
-        for app_name, app_data in menu_data.get("apps", {}).items():
+        for app_name, app_data in apps.items():
+            show_in_menu = visibility_flag(app_data, "show_in_menu", default_show_in_menu)
             app = NeurodeskApp(
                 deskenv=deskenv,
                 installdir=installdir,
                 sh_prefix=sh_prefix,
                 name=app_name,
                 category=menu_name.replace(" ", "-"),
-                **app_data)
+                **app_menu_data(app_data))
             app.app_names()
             app.add_app_sh()
-            if not cli:
+            if not cli and show_in_menu:
                 app.add_app_menu()
 
 

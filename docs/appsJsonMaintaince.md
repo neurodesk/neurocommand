@@ -57,10 +57,14 @@ The `apps.json` file at `/neurodesk/apps.json` serves as the master registry con
 ```json
 {
   "container_name": {
+    "show_in_menu": true,
+    "show_in_applist": true,
     "apps": {
       "app_name version": {
         "version": "YYYYMMDD",
-        "exec": "command_to_execute"
+        "exec": "command_to_execute",
+        "show_in_menu": true,
+        "show_in_applist": true
       }
     },
     "categories": ["category1", "category2"]
@@ -74,11 +78,15 @@ The `apps.json` file at `/neurodesk/apps.json` serves as the master registry con
 - **Key**: Container name (e.g., "afni", "fsl", "freesurfer")
 - **apps**: Object containing all versions/variants of the container
 - **categories**: Array of category strings for organization
+- **show_in_menu**: Optional. Set to `false` to keep this container published but hide all of its app entries from generated desktop menus.
+- **show_in_applist**: Optional. Set to `false` to keep this container in the deployment log but hide it from generated `cvmfs/applist.json`.
 
 #### Application Level  
 - **Key**: Application name with version (e.g., "afni 24.3.00", "fsleyesGUI-fsl 6.0.7.16")
 - **version**: Build date in YYYYMMDD format (e.g., "20241003")
 - **exec**: Command to execute when launching (empty string "" for CLI-only)
+- **show_in_menu**: Optional application-level override for the container-level menu visibility default.
+- **show_in_applist**: Optional application-level override for the container-level `applist.json` visibility default.
 
 ### Naming Conventions
 

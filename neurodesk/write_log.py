@@ -4,6 +4,13 @@ import json
 from pathlib import Path
 from typing import Text, List, Optional
 
+APP_LOG_KWARGS = {"version", "exec", "terminal", "apptainer_args"}
+
+
+def app_log_data(app_data: dict) -> dict:
+    return {key: app_data[key] for key in APP_LOG_KWARGS if key in app_data}
+
+
 def add_app(
     name: Text,
     version: Text,
@@ -47,4 +54,4 @@ if __name__ == "__main__":
                 category_list = category_list + category + ','
             # Add application, but only if it's not a sub-program of a main container - indicated by dash in program name
             if not "-" in (app_name):
-                add_app(app_name, category=category_list, **app_data)
+                add_app(app_name, category=category_list, **app_log_data(app_data))
