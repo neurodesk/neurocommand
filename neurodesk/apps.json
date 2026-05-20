@@ -133,6 +133,8 @@
         ]
     },
     "apptainer": {
+        "show_in_menu": false,
+        "show_in_applist": false,
         "apps": {
             "apptainer 1.4.4": {
                 "version": "20251030",
@@ -491,6 +493,16 @@
             "cat12 12.9": {
                 "version": "20250307",
                 "exec": ""
+            },
+            "cat12 26.0.rc3": {
+                "version": "20260519",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "cat12GUI-cat12 26.0.rc3": {
+                "version": "20260519",
+                "exec": "bash /opt/cat12/run_spm25.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": []
             },
             "cat12GUI-cat12 r1933": {
                 "version": "20220128",
@@ -1782,6 +1794,8 @@
         ]
     },
     "neurodesktop": {
+        "show_in_menu": false,
+        "show_in_applist": false,
         "apps": {
             "neurodesktop 20260428": {
                 "version": "20260509",
