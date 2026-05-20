@@ -2017,6 +2017,19 @@
             "statistics"
         ]
     },
+    "petprep": {
+        "apps": {
+            "petprep 0.0.5": {
+                "version": "20260519",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "quantitative imaging",
+            "structural imaging"
+        ]
+    },
     "physio": {
         "apps": {
             "physioGUI-physio r2021a": {
