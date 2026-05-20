@@ -133,6 +133,8 @@
         ]
     },
     "apptainer": {
+        "show_in_menu": false,
+        "show_in_applist": false,
         "apps": {
             "apptainer 1.4.4": {
                 "version": "20251030",

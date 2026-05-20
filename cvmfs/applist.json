@@ -109,12 +109,6 @@
             ]
         },
         {
-            "application": "apptainer_1.4.4_20251030",
-            "categories": [
-                "programming"
-            ]
-        },
-        {
             "application": "ashs_2.0.0_20210105",
             "categories": [
                 "hippocampus"
