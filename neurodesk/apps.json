@@ -133,8 +133,6 @@
         ]
     },
     "apptainer": {
-        "show_in_menu": false,
-        "show_in_applist": false,
         "apps": {
             "apptainer 1.4.4": {
                 "version": "20251030",
@@ -1156,6 +1154,19 @@
             "workflows"
         ]
     },
+    "hcpasl": {
+        "apps": {
+            "hcpasl 0.2.0": {
+                "version": "20260519",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "workflows"
+        ]
+    },
     "hdbet": {
         "apps": {
             "hdbet 1.0.0": {
@@ -1771,8 +1782,6 @@
         ]
     },
     "neurodesktop": {
-        "show_in_menu": false,
-        "show_in_applist": false,
         "apps": {
             "neurodesktop 20260428": {
                 "version": "20260509",
