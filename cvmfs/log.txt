@@ -58,7 +58,7 @@ brainnetviewer_1.7.20191031_20240904 categories:functional imaging,visualization
 brainstorm_3.211130_20211207 categories:electrophysiology,
 brkraw_0.3.11_20240320 categories:data organisation,
 cat12_12.9_20250307 categories:image registration,image segmentation,structural imaging,
-cat12_26.0.rc3_20260519 categories:image registration,image segmentation,structural imaging,
+cat12_26.0.rc3_20260520 categories:image registration,image segmentation,structural imaging,
 cat12_r1933_20220128 categories:image registration,image segmentation,structural imaging,
 cat12_r2166_20230601 categories:image registration,image segmentation,structural imaging,
 clearswi_1.0.0_20211018 categories:phase processing,
