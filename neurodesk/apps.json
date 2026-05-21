@@ -1918,6 +1918,18 @@
             "workflows"
         ]
     },
+    "noddi": {
+        "apps": {
+            "noddi 1.0": {
+                "version": "20260520",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
     "openadscpu": {
         "apps": {
             "openadscpu 1.0.0": {
