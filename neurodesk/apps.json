@@ -1464,6 +1464,18 @@
             "visualization"
         ]
     },
+    "matlabruntime": {
+        "apps": {
+            "matlabruntime 2026a": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming"
+        ]
+    },
     "mede": {
         "apps": {
             "mede 0.0.12": {
