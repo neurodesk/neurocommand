@@ -501,7 +501,7 @@
             },
             "cat12GUI-cat12 26.0.rc3": {
                 "version": "20260520",
-                "exec": "bash /opt/cat12/run_spm25.sh /opt/mcr/R2023b/",
+                "exec": "bash run_spm25.sh /opt/mcr/R2023b/",
                 "apptainer_args": []
             },
             "cat12GUI-cat12 r1933": {
@@ -611,6 +611,20 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "cpac": {
+        "apps": {
+            "cpac 1.8.7": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "functional imaging",
+            "workflows"
         ]
     },
     "datalad": {
