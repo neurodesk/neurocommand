@@ -1464,6 +1464,28 @@
             "visualization"
         ]
     },
+    "matlabruntime": {
+        "apps": {
+            "matlabruntime 2024b": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "matlabruntime 2025b": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "matlabruntime 2026a": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming"
+        ]
+    },
     "mede": {
         "apps": {
             "mede 0.0.12": {
@@ -2763,23 +2785,6 @@
         },
         "categories": [
             "data organisation"
-        ]
-    },
-    "matlabruntime": {
-        "apps": {
-            "matlabruntime 2024b": {
-                "version": "20260521",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "matlabruntime 2026a": {
-                "version": "20260521",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "programming"
         ]
     }
 }
