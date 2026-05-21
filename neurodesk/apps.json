@@ -495,13 +495,13 @@
                 "exec": ""
             },
             "cat12 26.0.rc3": {
-                "version": "20260519",
+                "version": "20260520",
                 "exec": "",
                 "apptainer_args": []
             },
             "cat12GUI-cat12 26.0.rc3": {
-                "version": "20260519",
-                "exec": "bash /opt/cat12/run_spm25.sh {{ context.matlab_mcr_root }}/",
+                "version": "20260520",
+                "exec": "bash /opt/cat12/run_spm25.sh /opt/mcr/R2023b/",
                 "apptainer_args": []
             },
             "cat12GUI-cat12 r1933": {
