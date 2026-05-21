@@ -2764,5 +2764,22 @@
         "categories": [
             "data organisation"
         ]
+    },
+    "matlabruntime": {
+        "apps": {
+            "matlabruntime 2024b": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "matlabruntime 2026a": {
+                "version": "20260521",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming"
+        ]
     }
 }
