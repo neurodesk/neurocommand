@@ -1418,6 +1418,19 @@
             "structural imaging"
         ]
     },
+    "lstai": {
+        "apps": {
+            "lstai 1.2.0": {
+                "version": "20260522",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
+        ]
+    },
     "matlab": {
         "apps": {
             "matlab 2022a": {
