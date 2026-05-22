@@ -116,6 +116,40 @@ RUN rm /tmp/neurocommand-skipcache \
     && bash install.sh \
     && ln -s /neurodesktop-storage/containers /neurocommand/local/containers
 
+# Python — notebook execution / CI.
+RUN pip install --no-cache-dir \
+        nbconvert \
+        nbclient \
+        ipykernel \
+        ipywidgets \
+        'huggingface_hub>=0.32.0'
+
+# Python — scientific stack (imported in cell 1 of most notebooks).
+RUN pip install --no-cache-dir \
+        numpy \
+        scipy \
+        pandas \
+        matplotlib \
+        seaborn \
+        Pillow \
+        beautifulsoup4 \
+        ipython \
+        nest_asyncio
+
+# Python — neuroimaging.
+RUN pip install --no-cache-dir \
+        nibabel \
+        nilearn \
+        nipype \
+        pydicom \
+        dipy \
+        mne \
+        pydra \
+        niwrap
+
+# Python — visualization (used by ~43% of notebooks).
+RUN pip install --no-cache-dir ipyniivue
+
 # CVMFS mount runs as a foundation pre-start hook (start.sh executes
 # /usr/local/bin/before-notebook.d/*.sh as root before dropping to NB_USER).
 COPY before-notebook.d/01-cvmfs-mount.sh /usr/local/bin/before-notebook.d/01-cvmfs-mount.sh
