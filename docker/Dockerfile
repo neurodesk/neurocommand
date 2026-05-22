@@ -136,8 +136,12 @@ RUN pip install --no-cache-dir \
         ipython \
         nest_asyncio
 
-# Python — neuroimaging.
-RUN pip install --no-cache-dir \
+# Python — neuroimaging. build-essential is installed and purged in the same
+# layer so transitive deps without an aarch64 wheel (e.g. traits via nipype)
+# can compile from source without leaving the toolchain in the final image.
+RUN apt-get update --yes \
+    && apt-get install --yes --no-install-recommends build-essential \
+    && pip install --no-cache-dir \
         nibabel \
         nilearn \
         nipype \
@@ -145,7 +149,9 @@ RUN pip install --no-cache-dir \
         dipy \
         mne \
         pydra \
-        niwrap
+        niwrap \
+    && apt-get purge --yes --auto-remove build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /root/.cache
 
 # Python — visualization (used by ~43% of notebooks).
 RUN pip install --no-cache-dir ipyniivue
