@@ -17,6 +17,11 @@ on:
         type: boolean
         required: true
         default: false
+      test_tag:
+        description: "Publish to a one-off test tag (e.g. 'py-stack'). Skips :latest, :YYYY-MM-DD, DockerHub, git tag. Use for branch testing."
+        type: string
+        required: false
+        default: ""
   # schedule:
   #   - cron: "0 17 * * *"
 
@@ -50,9 +55,17 @@ jobs:
           BUILDDATE=`date +%Y-%m-%d`
           IMAGEID=ghcr.io/$GITHUB_REPOSITORY
           IMAGEID=$(echo $IMAGEID | tr '[A-Z]' '[a-z]')
+          TEST_TAG="${{ inputs.test_tag }}"
+          if [ -n "$TEST_TAG" ]; then
+            ARCH_TAG="test-${TEST_TAG}-${{ matrix.platform.arch }}"
+          else
+            ARCH_TAG="${{ matrix.platform.arch }}"
+          fi
           echo "BUILDDATE=$BUILDDATE" >> $GITHUB_ENV
           echo "IMAGEID=$IMAGEID" >> $GITHUB_ENV
           echo "IMAGENAME=$IMAGENAME" >> $GITHUB_ENV
+          echo "TEST_TAG=$TEST_TAG" >> $GITHUB_ENV
+          echo "ARCH_TAG=$ARCH_TAG" >> $GITHUB_ENV
       - name: Check if image exists
         if: github.event_name == 'schedule'
         id: check_image
@@ -83,7 +96,7 @@ jobs:
           platforms: ${{ matrix.platform.docker_platform }}
           provenance: false
           push: true
-          tags: ${{ env.IMAGEID }}:${{ matrix.platform.arch }}
+          tags: ${{ env.IMAGEID }}:${{ env.ARCH_TAG }}
           build-args: |
             NEUROCOMMAND_VERSION=${{ env.BUILDDATE }}
             BUILD_DATE=${{ env.BUILDDATE }}
@@ -118,9 +131,11 @@ jobs:
           BUILDDATE=`date +%Y-%m-%d`
           IMAGEID=ghcr.io/$GITHUB_REPOSITORY
           IMAGEID=$(echo $IMAGEID | tr '[A-Z]' '[a-z]')
+          TEST_TAG="${{ inputs.test_tag }}"
           echo "BUILDDATE=$BUILDDATE" >> $GITHUB_ENV
           echo "IMAGEID=$IMAGEID" >> $GITHUB_ENV
           echo "IMAGENAME=$IMAGENAME" >> $GITHUB_ENV
+          echo "TEST_TAG=$TEST_TAG" >> $GITHUB_ENV
       - name: Check if image exists
         if: github.event_name == 'schedule'
         id: check_image
@@ -141,7 +156,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to DockerHub
-        if: ${{ env.DOCKERHUB_ORG != '' && steps.check_image.outputs.exists != 'true' }}
+        if: ${{ env.DOCKERHUB_ORG != '' && env.TEST_TAG == '' && steps.check_image.outputs.exists != 'true' }}
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -149,19 +164,26 @@ jobs:
       - name: Create and push multi-arch manifest to GHCR
         if: steps.check_image.outputs.exists != 'true'
         run: |
-          docker buildx imagetools create \
-            -t ${{ env.IMAGEID }}:${{ env.BUILDDATE }} \
-            -t ${{ env.IMAGEID }}:latest \
-            ${{ env.IMAGEID }}:amd64 \
-            ${{ env.IMAGEID }}:arm64
+          if [ -n "${TEST_TAG}" ]; then
+            docker buildx imagetools create \
+              -t ${IMAGEID}:${TEST_TAG} \
+              ${IMAGEID}:test-${TEST_TAG}-amd64 \
+              ${IMAGEID}:test-${TEST_TAG}-arm64
+          else
+            docker buildx imagetools create \
+              -t ${IMAGEID}:${BUILDDATE} \
+              -t ${IMAGEID}:latest \
+              ${IMAGEID}:amd64 \
+              ${IMAGEID}:arm64
+          fi
       - name: Install crane
-        if: ${{ env.DOCKERHUB_ORG != '' && steps.check_image.outputs.exists != 'true' }}
+        if: ${{ env.DOCKERHUB_ORG != '' && env.TEST_TAG == '' && steps.check_image.outputs.exists != 'true' }}
         run: |
           curl -sL https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz \
             | sudo tar -xz -C /usr/local/bin crane
           crane version
       - name: Copy multi-arch manifest to DockerHub
-        if: ${{ env.DOCKERHUB_ORG != '' && steps.check_image.outputs.exists != 'true' }}
+        if: ${{ env.DOCKERHUB_ORG != '' && env.TEST_TAG == '' && steps.check_image.outputs.exists != 'true' }}
         run: |
           crane copy \
             ${{ env.IMAGEID }}:${{ env.BUILDDATE }} \
@@ -170,7 +192,7 @@ jobs:
             ${{ env.IMAGEID }}:latest \
             ${{ env.DOCKERHUB_ORG }}/${{ env.IMAGENAME }}:latest
       - name: Create github tag
-        if: github.ref == 'refs/heads/main' && steps.check_image.outputs.exists != 'true'
+        if: github.ref == 'refs/heads/main' && env.TEST_TAG == '' && steps.check_image.outputs.exists != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
