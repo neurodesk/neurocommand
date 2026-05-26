@@ -39,6 +39,23 @@ export APPTAINER_BINDPATH=/data,/mnt,/neurodesktop-storage,/tmp,/cvmfs
 export APPTAINERENV_SUBJECTS_DIR=${HOME}/freesurfer-subjects-dir
 export MPLCONFIGDIR=${HOME}/.config/matplotlib-mpldir
 
+# neurodesk_singularity_opts: flags appended to `apptainer $neurodesk_singularity_opts exec ...`
+# by notebooks. Mirrors neurodesktop's logic so the same env layout works for
+# notebook CI consumers that source this file from /opt/neurodesktop/.
+is_apptainer_runtime() {
+    [ -n "${SINGULARITY_NAME:-}" ] || \
+    [ -n "${APPTAINER_NAME:-}" ] || \
+    [ -n "${APPTAINER_CONTAINER:-}" ] || \
+    [ -n "${SINGULARITY_CONTAINER:-}" ] || \
+    [ -d "/.apptainer.d" ] || \
+    [ -d "/.singularity.d" ]
+}
+if is_apptainer_runtime && [ "${EUID:-1000}" -ne 0 ]; then
+    export neurodesk_singularity_opts=" --writable-tmpfs "
+else
+    export neurodesk_singularity_opts=""
+fi
+
 # One-time interactive banner.
 if [ -z "$NEURODESK_MSG_SHOWN" ] && [ -f '/usr/share/module.sh' ] && [[ $- == *i* || -t 1 ]]; then
     export NEURODESK_MSG_SHOWN=1

@@ -104,6 +104,8 @@ RUN mkdir -p /data /neurodesktop-storage \
 # jupyter kernel subshells see MODULEPATH too).
 COPY environment_variables.sh /etc/profile.d/neurodesk.sh
 RUN chmod 0644 /etc/profile.d/neurodesk.sh \
+    && mkdir -p /opt/neurodesktop \
+    && ln -sf /etc/profile.d/neurodesk.sh /opt/neurodesktop/environment_variables.sh \
     && printf '\n# neurodesk env (MODULEPATH, APPTAINER_BINDPATH, etc.)\nif [ -f /etc/profile.d/neurodesk.sh ]; then . /etc/profile.d/neurodesk.sh; fi\n' >> /etc/bash.bashrc \
     && printf '\n# Lmod init\nif [ -f /usr/share/lmod/lmod/init/profile ]; then . /usr/share/lmod/lmod/init/profile; fi\n' >> /etc/bash.bashrc
 
