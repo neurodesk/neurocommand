@@ -781,6 +781,20 @@
             "image registration"
         ]
     },
+    "emuses": {
+        "apps": {
+            "emuses 1.3.0": {
+                "version": "20260526",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning",
+            "modeling",
+            "statistical analysis"
+        ]
+    },
     "exploreasl": {
         "apps": {
             "exploreasl 1.11.0": {
