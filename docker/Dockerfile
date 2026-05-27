@@ -166,6 +166,16 @@ RUN pip install --no-cache-dir \
 # Python — visualization (used by ~43% of notebooks).
 RUN pip install --no-cache-dir ipyniivue
 
+# Restore jovyan ownership of the conda env and home dir after the
+# root-level pip installs above, so jupyter kernel.json (and any other
+# state under $HOME like datalad's cache) remain writable by jovyan
+# at runtime.
+RUN if [ -x /usr/local/bin/fix-permissions ]; then \
+        fix-permissions /opt/conda && fix-permissions /home/${NB_USER}; \
+    else \
+        chown -R ${NB_UID}:${NB_GID} /opt/conda /home/${NB_USER}; \
+    fi
+
 # CVMFS mount runs as a foundation pre-start hook (start.sh executes
 # /usr/local/bin/before-notebook.d/*.sh as root before dropping to NB_USER).
 COPY before-notebook.d/01-cvmfs-mount.sh /usr/local/bin/before-notebook.d/01-cvmfs-mount.sh
