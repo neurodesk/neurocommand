@@ -1419,6 +1419,19 @@
             "structural imaging"
         ]
     },
+    "lstai": {
+        "apps": {
+            "lstai 1.2.0": {
+                "version": "20260522",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
+        ]
+    },
     "matlab": {
         "apps": {
             "matlab 2022a": {
@@ -2591,6 +2604,24 @@
             "structural imaging"
         ]
     },
+    "startrack": {
+        "apps": {
+            "startrack 20250920": {
+                "version": "20260526",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "StarTrack-startrack 20250920": {
+                "version": "20260526",
+                "exec": "startrack",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging",
+            "tractography"
+        ]
+    },
     "surfice": {
         "apps": {
             "surfice 1.0.20210730": {
@@ -2786,19 +2817,6 @@
         },
         "categories": [
             "data organisation"
-        ]
-    },
-    "lstai": {
-        "apps": {
-            "lstai 1.2.0": {
-                "version": "20260522",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image segmentation",
-            "machine learning"
         ]
     }
 }
