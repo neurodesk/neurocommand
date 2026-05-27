@@ -662,6 +662,25 @@
             "data organisation"
         ]
     },
+    "deepdisco": {
+        "apps": {
+            "deepdisco 20251008": {
+                "version": "20260526",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "DeepDisco-deepdisco 20251008": {
+                "version": "20260526",
+                "exec": "deepdisco",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "connectomics",
+            "machine learning",
+            "tractography"
+        ]
+    },
     "deepretinotopy": {
         "apps": {
             "deepretinotopy 1.0.11": {
