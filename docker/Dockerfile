@@ -156,6 +156,13 @@ RUN apt-get update --yes \
     && apt-get purge --yes --auto-remove build-essential \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /root/.cache
 
+# CLI tools notebooks invoke via shell escape (osf, datalad, etc.).
+RUN pip install --no-cache-dir \
+        datalad \
+        datalad-container \
+        datalad-osf \
+        osfclient
+
 # Python — visualization (used by ~43% of notebooks).
 RUN pip install --no-cache-dir ipyniivue
 
