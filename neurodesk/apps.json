@@ -642,8 +642,9 @@
     "dcm2bids": {
         "apps": {
             "dcm2bids 3.2.0": {
-                "version": "20250402",
-                "exec": ""
+                "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2785,6 +2786,19 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "lstai": {
+        "apps": {
+            "lstai 1.2.0": {
+                "version": "20260522",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
         ]
     }
 }
