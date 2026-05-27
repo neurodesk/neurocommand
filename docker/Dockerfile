@@ -124,7 +124,8 @@ RUN pip install --no-cache-dir \
         nbclient \
         ipykernel \
         ipywidgets \
-        'huggingface_hub>=0.32.0'
+        'huggingface_hub>=0.32.0' \
+        jupyterlmod
 
 # Python — scientific stack (imported in cell 1 of most notebooks).
 RUN pip install --no-cache-dir \
