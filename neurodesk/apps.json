@@ -1129,6 +1129,24 @@
             "quality control"
         ]
     },
+    "functionnectome": {
+        "apps": {
+            "functionnectome 2.5.0": {
+                "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "FunctionnectomeGUI-functionnectome 2.5.0": {
+                "version": "20260527",
+                "exec": "FunctionnectomeGUI",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging",
+            "functional imaging"
+        ]
+    },
     "gigaconnectome": {
         "apps": {
             "gigaconnectome 0.6.0": {
