@@ -168,12 +168,15 @@ RUN pip install --no-cache-dir ipyniivue
 
 # Restore jovyan ownership of the conda env and home dir after the
 # root-level pip installs above, so jupyter kernel.json (and any other
-# state under $HOME like datalad's cache) remain writable by jovyan
-# at runtime.
-RUN if [ -x /usr/local/bin/fix-permissions ]; then \
+# state under $HOME like datalad's cache or pip --user installs) remain
+# writable by jovyan at runtime. fix-permissions alone only chgrps; we
+# need a full chown to handle root-owned files from earlier layers.
+RUN chown -R ${NB_UID}:${NB_GID} /opt/conda /home/${NB_USER} \
+    && install -d -o ${NB_UID} -g ${NB_GID} -m 0755 \
+        /home/${NB_USER}/.local \
+        /home/${NB_USER}/.cache \
+    && if [ -x /usr/local/bin/fix-permissions ]; then \
         fix-permissions /opt/conda && fix-permissions /home/${NB_USER}; \
-    else \
-        chown -R ${NB_UID}:${NB_GID} /opt/conda /home/${NB_USER}; \
     fi
 
 # CVMFS mount runs as a foundation pre-start hook (start.sh executes
