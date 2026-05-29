@@ -30,6 +30,11 @@ jobs:
       with:
         ref: main
         fetch-depth: 0
+    - name: Checkout neurocontainers
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        repository: NeuroDesk/neurocontainers
+        path: neurocontainers
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: 3.11
@@ -43,5 +48,7 @@ jobs:
           --base-ref main \
           --target-file neurodesk/apps.json \
           --consolidated-branch bot/appsjson-consolidated \
+          --neurocontainers-path neurocontainers \
+          --icons-dir neurodesk/icons \
           --enable-auto-merge \
           --auto-merge-method SQUASH

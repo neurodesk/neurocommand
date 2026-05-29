@@ -24,6 +24,10 @@ from typing import Any, Dict, Iterable, List, Optional
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+# Reuse the recipe icon sync so apps.json updates carry their icons inline.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sync_neurocontainer_icons import sync_icons  # noqa: E402
+
 DIFF_COMMENT_MARKER = "<!-- appsjson-consolidation-diff -->"
 MAX_PR_BODY_DIFF_CHARS = 15_000
 MAX_PR_COMMENT_DIFF_CHARS = 55_000
@@ -55,6 +59,23 @@ def parse_args() -> argparse.Namespace:
         "--auto-merge-method",
         choices=["MERGE", "SQUASH", "REBASE"],
         default="SQUASH",
+    )
+    parser.add_argument(
+        "--neurocontainers-path",
+        type=Path,
+        default=Path("neurocontainers"),
+        help="Path to a checkout of NeuroDesk/neurocontainers used for icon sync.",
+    )
+    parser.add_argument(
+        "--icons-dir",
+        type=Path,
+        default=Path("neurodesk/icons"),
+        help="Directory where decoded PNG icons are stored.",
+    )
+    parser.add_argument(
+        "--skip-icon-sync",
+        action="store_true",
+        help="Do not sync recipe icons into the consolidated branch.",
     )
     return parser.parse_args()
 
@@ -337,6 +358,44 @@ def stage_and_push_branch(
     return True
 
 
+def sync_consolidated_icons(
+    neurocontainers_path: Path,
+    icons_dir: Path,
+    apps_json_path: str,
+) -> List[str]:
+    """Decode any missing recipe icons for the consolidated apps.json.
+
+    Returns the repository-relative paths of newly written icon files so they
+    can be staged alongside apps.json on the consolidated branch. A failure
+    here (e.g. a malformed upstream icon) is logged but never blocks apps.json
+    consolidation; the icon-coverage test will surface a still-missing icon on
+    the consolidated PR.
+    """
+    recipes_path = neurocontainers_path / "recipes"
+    if not recipes_path.is_dir():
+        print(
+            f"WARNING: {recipes_path} not found; skipping inline icon sync",
+            file=sys.stderr,
+        )
+        return []
+
+    try:
+        result = sync_icons(
+            neurocontainers_path=neurocontainers_path,
+            icons_dir=icons_dir,
+            apps_json_path=Path(apps_json_path),
+        )
+    except Exception as exc:  # noqa: BLE001 - a bad recipe icon must not block apps.json
+        print(f"WARNING: inline icon sync failed: {exc}", file=sys.stderr)
+        return []
+
+    for written in result.written_icons:
+        print(f"Synced icon: {written}")
+    for build_file in result.unsupported_icons:
+        print(f"WARNING: unsupported icon data URI in {build_file}", file=sys.stderr)
+    return [str(path) for path in result.written_icons]
+
+
 def upsert_consolidated_pr(
     api_url: str,
     repo: str,
@@ -595,8 +654,12 @@ def main() -> int:
             int(existing_consolidated_pr["number"]),
             token,
         )
+        # Icons synced alongside apps.json are expected on the consolidated
+        # branch and must not be treated as stray files that force a re-push.
+        icons_prefix = f"{args.icons_dir.as_posix()}/"
         existing_consolidated_has_non_target_files = any(
-            file_path != args.target_file for file_path in existing_pr_files
+            file_path != args.target_file and not file_path.startswith(icons_prefix)
+            for file_path in existing_pr_files
         )
 
         consolidated_ref = f"refs/remotes/origin/{args.consolidated_branch}"
@@ -612,7 +675,9 @@ def main() -> int:
         if fetch_consolidated.returncode == 0:
             existing_consolidated_payload = read_json_from_git(consolidated_ref, args.target_file)
 
-    consolidation_active = existing_consolidated_pr is not None or len(relevant_prs) > 1
+    # Route every apps.json update (even a lone PR) through the consolidated
+    # branch so its recipe icons can be synced inline before merge.
+    consolidation_active = existing_consolidated_pr is not None or len(relevant_prs) >= 1
 
     if consolidation_active:
         consolidated_payload: Dict[str, Any] = copy.deepcopy(existing_consolidated_payload)
@@ -680,11 +745,18 @@ def main() -> int:
         appsjson_diff,
     )
 
+    synced_icon_files: List[str] = []
     if needs_branch_push:
+        if not args.skip_icon_sync:
+            synced_icon_files = sync_consolidated_icons(
+                neurocontainers_path=args.neurocontainers_path,
+                icons_dir=args.icons_dir,
+                apps_json_path=args.target_file,
+            )
         stage_and_push_branch(
             base_ref=args.base_ref,
             head_branch=args.consolidated_branch,
-            files=[args.target_file],
+            files=[args.target_file, *synced_icon_files],
             commit_message="Consolidate pending neurodesk/apps.json updates",
         )
 
@@ -746,6 +818,7 @@ def main() -> int:
     print(f"- Source PRs closed: {[pr.number for pr in consolidated_source_prs]}")
     print(f"- Consolidated PR number: {consolidated_pr_number}")
     print(f"- Consolidated branch pushed: {'yes' if needs_branch_push else 'no'}")
+    print(f"- Icons synced inline: {len(synced_icon_files)}")
     print(
         "- Existing consolidated PR had non-target files: "
         f"{'yes' if existing_consolidated_has_non_target_files else 'no'}"
