@@ -411,7 +411,6 @@
             }
         },
         "categories": [
-            "modeling",
             "visualization"
         ]
     },
@@ -636,7 +635,7 @@
             }
         },
         "categories": [
-            "data management"
+            "data organisation"
         ]
     },
     "dcm2bids": {
@@ -676,9 +675,8 @@
             }
         },
         "categories": [
-            "connectomics",
-            "machine learning",
-            "tractography"
+            "diffusion imaging",
+            "machine learning"
         ]
     },
     "deepretinotopy": {
@@ -810,8 +808,7 @@
         },
         "categories": [
             "machine learning",
-            "modeling",
-            "statistical analysis"
+            "statistics"
         ]
     },
     "exploreasl": {
@@ -1155,7 +1152,8 @@
             }
         },
         "categories": [
-            "other"
+            "bids apps",
+            "functional imaging"
         ]
     },
     "gimp": {
@@ -1929,7 +1927,7 @@
             }
         },
         "categories": [
-            "data management",
+            "data organisation",
             "programming",
             "visualization"
         ]
@@ -2420,6 +2418,11 @@
                 "version": "20260421",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "rshrf 1.7.0": {
+                "version": "20260529",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2681,8 +2684,7 @@
             }
         },
         "categories": [
-            "diffusion imaging",
-            "tractography"
+            "diffusion imaging"
         ]
     },
     "surfice": {
