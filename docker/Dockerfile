@@ -125,7 +125,8 @@ RUN pip install --no-cache-dir \
         ipykernel \
         ipywidgets \
         'huggingface_hub>=0.32.0' \
-        jupyterlmod
+        jupyterlmod \
+        watermark
 
 # Python — scientific stack (imported in cell 1 of most notebooks).
 RUN pip install --no-cache-dir \
