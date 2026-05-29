@@ -1912,8 +1912,7 @@
             }
         },
         "categories": [
-            "data organisation",
-            "image registration"
+            "functional imaging"
         ]
     },
     "neurodesktop": {
@@ -2063,6 +2062,18 @@
         },
         "categories": [
             "image segmentation"
+        ]
+    },
+    "openrefine": {
+        "apps": {
+            "openrefine 3.10.1": {
+                "version": "20260529",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
         ]
     },
     "oshyx": {
@@ -2343,8 +2354,7 @@
         },
         "categories": [
             "data organisation",
-            "image segmentation",
-            "structural imaging"
+            "image segmentation"
         ]
     },
     "rabies": {
