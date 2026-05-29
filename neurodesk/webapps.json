@@ -28,6 +28,15 @@
       "module": "ezbids",
       "version": "1.1.0"
     },
+    "openrefine": {
+      "title": "OpenRefine",
+      "startup_command": "openrefine start",
+      "startup_timeout": 180,
+      "description": "Data cleaning and transformation tool",
+      "port": 3333,
+      "module": "openrefine",
+      "version": "3.10.1"
+    },
     "qsmbly": {
       "title": "QSMbly",
       "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/qsmbly/icon.svg",
