@@ -28,6 +28,16 @@
       "module": "ezbids",
       "version": "1.1.0"
     },
+    "jamovi": {
+      "title": "jamovi",
+      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/jamovi/icon.svg",
+      "startup_command": "jamovi start",
+      "startup_timeout": 120,
+      "description": "Statistical spreadsheet for data analysis",
+      "port": 41337,
+      "module": "jamovi",
+      "version": "2.7.4"
+    },
     "openrefine": {
       "title": "OpenRefine",
       "startup_command": "openrefine start",
