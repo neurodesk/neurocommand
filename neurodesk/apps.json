@@ -612,6 +612,10 @@
             "data organisation"
         ]
     },
+    "cosmomvpa": {
+        "apps": {},
+        "categories": []
+    },
     "cpac": {
         "apps": {
             "cpac 1.8.7": {
