@@ -40,6 +40,7 @@
     },
     "openrefine": {
       "title": "OpenRefine",
+      "icon": "https://raw.githubusercontent.com/NeuroDesk/neurocontainers/main/recipes/openrefine/icon.svg",
       "startup_command": "openrefine start",
       "startup_timeout": 180,
       "description": "Data cleaning and transformation tool",
