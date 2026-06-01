@@ -612,6 +612,18 @@
             "data organisation"
         ]
     },
+    "cosmomvpa": {
+        "apps": {
+            "cosmomvpa 1.1.0": {
+                "version": "20260512",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "statistics"
+        ]
+    },
     "cpac": {
         "apps": {
             "cpac 1.8.7": {
@@ -1314,6 +1326,10 @@
         "categories": [
             "image segmentation"
         ]
+    },
+    "irkernel": {
+        "apps": {},
+        "categories": []
     },
     "itksnap": {
         "apps": {
