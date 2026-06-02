@@ -57,6 +57,7 @@ RUN apt_update_with_candidates() { \
         squashfs-tools fuse-overlayfs squashfuse \
         sudo \
         bc dnsutils git graphviz less nano openssh-client rsync tcsh tree unzip vim zip \
+        libgl1-mesa-dri libglx-mesa0 libosmesa6 libegl1 libegl-mesa0 libglu1-mesa \
     && apt-get install --yes --no-install-recommends \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
@@ -64,6 +65,7 @@ RUN apt_update_with_candidates() { \
         squashfs-tools fuse-overlayfs squashfuse \
         sudo \
         bc dnsutils git graphviz less nano openssh-client rsync tcsh tree unzip vim zip \
+        libgl1-mesa-dri libglx-mesa0 libosmesa6 libegl1 libegl-mesa0 libglu1-mesa \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
 # Install apptainer from its official multi-arch image. This avoids the
