@@ -56,14 +56,14 @@ RUN apt_update_with_candidates() { \
         tcllib tk \
         squashfs-tools fuse-overlayfs squashfuse \
         sudo \
-        bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
+        bc dnsutils git graphviz less nano openssh-client rsync tcsh tree unzip vim zip \
     && apt-get install --yes --no-install-recommends \
         autofs cvmfs uuid-dev \
         lmod lua5.2 lua-bit32 lua-filesystem lua-json lua-lpeg lua-posix lua-term \
         tcllib tk \
         squashfs-tools fuse-overlayfs squashfuse \
         sudo \
-        bc dnsutils git less nano openssh-client rsync tree unzip vim zip \
+        bc dnsutils git graphviz less nano openssh-client rsync tcsh tree unzip vim zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
 
 # Install apptainer from its official multi-arch image. This avoids the
@@ -126,7 +126,8 @@ RUN pip install --no-cache-dir \
         ipywidgets \
         'huggingface_hub>=0.32.0' \
         jupyterlmod \
-        watermark
+        watermark \
+        papermill
 
 # Python — scientific stack (imported in cell 1 of most notebooks).
 RUN pip install --no-cache-dir \
