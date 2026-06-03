@@ -397,6 +397,18 @@
             "data organisation"
         ]
     },
+    "blastct": {
+        "apps": {
+            "blastct 2.0.0": {
+                "version": "20260512",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "blender": {
         "apps": {
             "blender 5.0.1": {
@@ -548,10 +560,27 @@
             "code 230315": {
                 "version": "20230315",
                 "exec": ""
+            },
+            "code 240320": {
+                "version": "20260602",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
             "programming"
+        ]
+    },
+    "condaenvs": {
+        "apps": {
+            "condaenvs 1.0.1": {
+                "version": "20260513",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
         ]
     },
     "conn": {
@@ -612,6 +641,18 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "cosmomvpa": {
+        "apps": {
+            "cosmomvpa 1.1.0": {
+                "version": "20260512",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "statistics"
         ]
     },
     "cpac": {
@@ -1318,6 +1359,10 @@
             "image segmentation"
         ]
     },
+    "irkernel": {
+        "apps": {},
+        "categories": []
+    },
     "itksnap": {
         "apps": {
             "itksnapGUI-itksnap 3.8.0": {
@@ -1923,7 +1968,7 @@
         "show_in_applist": false,
         "apps": {
             "neurodesktop 20260428": {
-                "version": "20260519",
+                "version": "20260512",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2892,46 +2937,6 @@
             "xnat 1.9.2.1": {
                 "version": "20250805",
                 "exec": ""
-            }
-        },
-        "categories": [
-            "data organisation"
-        ]
-    },
-    "cosmomvpa": {
-        "apps": {
-            "cosmomvpa 1.1.0": {
-                "version": "20260512",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "statistics"
-        ]
-    },
-    "irkernel": {
-        "apps": {},
-        "categories": []
-    },
-    "blastct": {
-        "apps": {
-            "blastct 2.0.0": {
-                "version": "20260512",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "structural imaging"
-        ]
-    },
-    "condaenvs": {
-        "apps": {
-            "condaenvs 1.0.1": {
-                "version": "20260513",
-                "exec": "",
-                "apptainer_args": []
             }
         },
         "categories": [
