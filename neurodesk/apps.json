@@ -548,6 +548,11 @@
             "code 230315": {
                 "version": "20230315",
                 "exec": ""
+            },
+            "code 240320": {
+                "version": "20260602",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1923,7 +1928,7 @@
         "show_in_applist": false,
         "apps": {
             "neurodesktop 20260428": {
-                "version": "20260519",
+                "version": "20260512",
                 "exec": "",
                 "apptainer_args": []
             }
