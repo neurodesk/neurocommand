@@ -56,7 +56,7 @@ RUN apt_update_with_candidates() { \
         tcllib tk \
         squashfs-tools fuse-overlayfs squashfuse \
         sudo \
-        bc dnsutils git graphviz less nano openssh-client rsync tcsh tree unzip vim zip \
+        bc dnsutils git graphviz less nano openjdk-21-jre-headless openssh-client rsync tcsh tree unzip vim zip \
         libgl1-mesa-dri libglx-mesa0 libosmesa6 libegl1 libegl-mesa0 libglu1-mesa \
     && apt-get install --yes --no-install-recommends \
         autofs cvmfs uuid-dev \
@@ -64,9 +64,15 @@ RUN apt_update_with_candidates() { \
         tcllib tk \
         squashfs-tools fuse-overlayfs squashfuse \
         sudo \
-        bc dnsutils git graphviz less nano openssh-client rsync tcsh tree unzip vim zip \
+        bc dnsutils git graphviz less nano openjdk-21-jre-headless openssh-client rsync tcsh tree unzip vim zip \
         libgl1-mesa-dri libglx-mesa0 libosmesa6 libegl1 libegl-mesa0 libglu1-mesa \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /root/.cache
+
+# Nextflow (JVM workflow tool; JRE comes from openjdk above). Notebooks expect
+# the binary on PATH — they don't module-load it. Matches neurodesktop.
+RUN curl -fsSL https://get.nextflow.io | bash \
+    && mv nextflow /usr/local/bin/nextflow \
+    && chmod 0755 /usr/local/bin/nextflow
 
 # Install apptainer from its official multi-arch image. This avoids the
 # Launchpad API and PPA apt fetches, which have been flaky in scheduled builds.
@@ -110,6 +116,13 @@ RUN chmod 0644 /etc/profile.d/neurodesk.sh \
     && ln -sf /etc/profile.d/neurodesk.sh /opt/neurodesktop/environment_variables.sh \
     && printf '\n# neurodesk env (MODULEPATH, APPTAINER_BINDPATH, etc.)\nif [ -f /etc/profile.d/neurodesk.sh ]; then . /etc/profile.d/neurodesk.sh; fi\n' >> /etc/bash.bashrc \
     && printf '\n# Lmod init\nif [ -f /usr/share/lmod/lmod/init/profile ]; then . /usr/share/lmod/lmod/init/profile; fi\n' >> /etc/bash.bashrc
+
+# Pin APPTAINER_BINDPATH as a static ENV (not just the sourced env file) so it
+# reaches the jupyter kernel and its apptainer-exec subprocesses even when
+# /etc/bash.bashrc isn't sourced. Without this, module-loaded tools run inside
+# apptainer containers without /cvmfs bound (notebooks that resolve .simg-internal
+# template paths then fail). Mirrors how neurodesktop's kernel wrapper guarantees it.
+ENV APPTAINER_BINDPATH=/data,/mnt,/neurodesktop-storage,/tmp,/cvmfs
 
 # Cache-bust the neurocommand layer when upstream changes (mirrors neurodesktop's pattern).
 ADD https://api.github.com/repos/neurodesk/neurocommand/git/refs/heads/main /tmp/neurocommand-skipcache
