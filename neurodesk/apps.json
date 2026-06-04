@@ -2958,5 +2958,17 @@
             "diffusion imaging",
             "quality control"
         ]
+    },
+    "dwidenoise2": {
+        "apps": {
+            "dwidenoise2 20260603": {
+                "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
     }
 }
