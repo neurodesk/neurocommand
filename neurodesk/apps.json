@@ -2884,12 +2884,15 @@
     "vmtk": {
         "apps": {
             "vmtk 1.5.0": {
-                "version": "20241004",
-                "exec": ""
+                "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "image segmentation"
+            "image segmentation",
+            "shape analysis",
+            "visualization"
         ]
     },
     "xnat": {
@@ -2941,6 +2944,19 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "prequal": {
+        "apps": {
+            "prequal 1.1.0": {
+                "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging",
+            "quality control"
         ]
     }
 }
