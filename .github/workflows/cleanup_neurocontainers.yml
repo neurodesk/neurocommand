@@ -47,13 +47,21 @@ jobs:
         OS_AUTH_VERSION: ${{ secrets.OS_AUTH_VERSION }}
         OS_IDENTITY_API_VERSION: ${{ secrets.OS_IDENTITY_API_VERSION }}
       run: |
+        install_with_retry() {
+            for i in 1 2 3; do
+                "$@" && return 0
+                echo "[DEBUG] attempt $i failed, retrying in $((i*10))s..."
+                sleep $((i*10))
+            done
+            return 1
+        }
         if ! command -v rclone &> /dev/null; then
             echo "[DEBUG] Installing rclone"
-            curl https://rclone.org/install.sh | sudo bash
+            install_with_retry bash -c 'curl -fsSL https://rclone.org/install.sh | sudo bash'
         fi
         if ! command -v aws &> /dev/null; then
             echo "[DEBUG] Installing AWS CLI"
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install && rm -rf aws awscliv2.zip
+            install_with_retry bash -c 'curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip -o awscliv2.zip && sudo ./aws/install --update && rm -rf aws awscliv2.zip'
         fi
         rclone config create nectar swift env_auth true
 
