@@ -1137,12 +1137,12 @@
     "functionnectome": {
         "apps": {
             "functionnectome 2.5.0": {
-                "version": "20260527",
+                "version": "20260604",
                 "exec": "",
                 "apptainer_args": []
             },
             "FunctionnectomeGUI-functionnectome 2.5.0": {
-                "version": "20260527",
+                "version": "20260604",
                 "exec": "FunctionnectomeGUI",
                 "apptainer_args": []
             }
