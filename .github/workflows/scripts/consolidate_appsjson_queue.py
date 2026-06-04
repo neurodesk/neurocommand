@@ -236,10 +236,29 @@ def changed_tools(before: Dict[str, Any], after: Dict[str, Any]) -> List[str]:
     return changed
 
 
+def sort_top_level_keys(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Return ``payload`` with only its top-level (tool) keys sorted.
+
+    The neurocontainers release generator emits tools in alphabetical order but
+    preserves each tool's field order (e.g. ``version``/``exec``/``apptainer_args``
+    and ``apps``/``categories``). Sorting recursively (``sort_keys=True``) would
+    reorder those nested fields and reintroduce churn against the generator's
+    output, so we canonicalise only the top level. New tools added during
+    consolidation land as appended keys; sorting here puts them in their
+    alphabetical place so this repo's apps.json stays byte-compatible with the
+    generator and generator PRs show real changes only.
+    """
+    return {key: payload[key] for key in sorted(payload)}
+
+
 def write_json(path: str, payload: Dict[str, Any]) -> None:
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(payload, indent=4) + "\n", encoding="utf-8")
+    # No trailing newline: the neurocontainers generator emits the file with a
+    # bare ``json.dump(..., indent=4)`` and gates its PRs on ``git diff --quiet``,
+    # so matching it byte-for-byte (top-level sorted, no final newline) is what
+    # keeps generator PRs free of reorder/newline-only churn.
+    out.write_text(json.dumps(sort_top_level_keys(payload), indent=4), encoding="utf-8")
 
 
 def render_appsjson_diff(
@@ -247,8 +266,11 @@ def render_appsjson_diff(
     base_payload: Dict[str, Any],
     consolidated_payload: Dict[str, Any],
 ) -> str:
-    base_text = json.dumps(base_payload, indent=4) + "\n"
-    consolidated_text = json.dumps(consolidated_payload, indent=4) + "\n"
+    # Match write_json's canonical form (top-level keys sorted, no trailing
+    # newline) so the diff shown in the PR body reflects what is actually
+    # committed to the consolidated branch.
+    base_text = json.dumps(sort_top_level_keys(base_payload), indent=4)
+    consolidated_text = json.dumps(sort_top_level_keys(consolidated_payload), indent=4)
     diff_lines = difflib.unified_diff(
         base_text.splitlines(),
         consolidated_text.splitlines(),

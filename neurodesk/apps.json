@@ -397,6 +397,18 @@
             "data organisation"
         ]
     },
+    "blastct": {
+        "apps": {
+            "blastct 2.0.0": {
+                "version": "20260512",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "blender": {
         "apps": {
             "blender 5.0.1": {
@@ -559,6 +571,18 @@
             "programming"
         ]
     },
+    "condaenvs": {
+        "apps": {
+            "condaenvs 1.0.1": {
+                "version": "20260513",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
     "conn": {
         "apps": {
             "connGUI-conn 20b": {
@@ -617,6 +641,18 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "cosmomvpa": {
+        "apps": {
+            "cosmomvpa 1.1.0": {
+                "version": "20260512",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "statistics"
         ]
     },
     "cpac": {
@@ -774,6 +810,18 @@
             "dsistudioGUI-dsistudio chen.2024.04.19": {
                 "version": "20240426",
                 "exec": "dsi_studio"
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "dwidenoise2": {
+        "apps": {
+            "dwidenoise2 20260603": {
+                "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1322,6 +1370,10 @@
         "categories": [
             "image segmentation"
         ]
+    },
+    "irkernel": {
+        "apps": {},
+        "categories": []
     },
     "itksnap": {
         "apps": {
@@ -2199,6 +2251,19 @@
             "functional imaging"
         ]
     },
+    "prequal": {
+        "apps": {
+            "prequal 1.1.0": {
+                "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging",
+            "quality control"
+        ]
+    },
     "pydeface": {
         "apps": {
             "pydeface 2.0.2": {
@@ -2904,71 +2969,6 @@
         },
         "categories": [
             "data organisation"
-        ]
-    },
-    "cosmomvpa": {
-        "apps": {
-            "cosmomvpa 1.1.0": {
-                "version": "20260512",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "statistics"
-        ]
-    },
-    "irkernel": {
-        "apps": {},
-        "categories": []
-    },
-    "blastct": {
-        "apps": {
-            "blastct 2.0.0": {
-                "version": "20260512",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "structural imaging"
-        ]
-    },
-    "condaenvs": {
-        "apps": {
-            "condaenvs 1.0.1": {
-                "version": "20260513",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "data organisation"
-        ]
-    },
-    "prequal": {
-        "apps": {
-            "prequal 1.1.0": {
-                "version": "20260604",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "diffusion imaging",
-            "quality control"
-        ]
-    },
-    "dwidenoise2": {
-        "apps": {
-            "dwidenoise2 20260603": {
-                "version": "20260604",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "diffusion imaging"
         ]
     }
 }
