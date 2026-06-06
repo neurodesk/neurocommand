@@ -2497,11 +2497,6 @@
     },
     "rshrf": {
         "apps": {
-            "rshrf 1.5.8": {
-                "version": "20260421",
-                "exec": "",
-                "apptainer_args": []
-            },
             "rshrf 1.7.0": {
                 "version": "20260529",
                 "exec": "",
@@ -2699,6 +2694,11 @@
             },
             "spinalcordtoolbox 7.2": {
                 "version": "20251211",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "spinalcordtoolbox 7.3.0": {
+                "version": "20260605",
                 "exec": "",
                 "apptainer_args": []
             }
