@@ -2960,6 +2960,18 @@
             "visualization"
         ]
     },
+    "xcpd": {
+        "apps": {
+            "xcpd 0.10.7": {
+                "version": "20260606",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
     "xnat": {
         "apps": {
             "xnat 1.9.2.1": {
