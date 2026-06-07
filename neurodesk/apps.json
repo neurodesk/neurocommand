@@ -2463,6 +2463,11 @@
             "relion 4.0.1.sm61": {
                 "version": "20240528",
                 "exec": ""
+            },
+            "relion 4.0.1.sm75": {
+                "version": "20260606",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2958,6 +2963,18 @@
             "image segmentation",
             "shape analysis",
             "visualization"
+        ]
+    },
+    "xcpd": {
+        "apps": {
+            "xcpd 0.10.7": {
+                "version": "20260606",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
         ]
     },
     "xnat": {
