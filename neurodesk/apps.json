@@ -2810,12 +2810,14 @@
     "synthstrip": {
         "apps": {
             "synthstrip 7.4.1": {
-                "version": "20240913",
-                "exec": ""
+                "version": "20260514",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "image segmentation"
+            "image segmentation",
+            "structural imaging"
         ]
     },
     "synthstroke": {
