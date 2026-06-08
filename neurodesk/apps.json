@@ -77,10 +77,18 @@
             "aidamri 1.1": {
                 "version": "20210708",
                 "exec": ""
+            },
+            "aidamri 2.0": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "rodent imaging"
+            "diffusion imaging",
+            "functional imaging",
+            "rodent imaging",
+            "structural imaging"
         ]
     },
     "amico": {
@@ -1442,6 +1450,19 @@
             "statistics"
         ]
     },
+    "jidt": {
+        "apps": {
+            "jidt 1.6": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming",
+            "statistics"
+        ]
+    },
     "julia": {
         "apps": {
             "julia 1.10.1": {
@@ -1794,6 +1815,11 @@
             "code-mne 1.1.1": {
                 "version": "20220912",
                 "exec": "code"
+            },
+            "mne 1.12.1": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1872,10 +1898,16 @@
             "mrsiproc 0.1.0": {
                 "version": "20231211",
                 "exec": ""
+            },
+            "mrsiproc 0.2.0": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "spectroscopy"
+            "spectroscopy",
+            "workflows"
         ]
     },
     "mrtrix3": {
