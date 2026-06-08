@@ -2922,6 +2922,19 @@
             "diffusion imaging"
         ]
     },
+    "vertexwiser": {
+        "apps": {
+            "vertexwiser 1.5.1": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging",
+            "workflows"
+        ]
+    },
     "vesselapp": {
         "apps": {
             "vesselapp 0.3.1": {
