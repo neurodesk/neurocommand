@@ -1794,6 +1794,11 @@
             "code-mne 1.1.1": {
                 "version": "20220912",
                 "exec": "code"
+            },
+            "mne 1.12.1": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
