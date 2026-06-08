@@ -2591,6 +2591,20 @@
             "statistics"
         ]
     },
+    "samri": {
+        "apps": {
+            "samri 0.5": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "rodent imaging",
+            "workflows"
+        ]
+    },
     "samsrfx": {
         "apps": {
             "samsrfx v10.004": {
@@ -2920,6 +2934,19 @@
         },
         "categories": [
             "diffusion imaging"
+        ]
+    },
+    "vertexwiser": {
+        "apps": {
+            "vertexwiser 1.5.1": {
+                "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging",
+            "workflows"
         ]
     },
     "vesselapp": {
