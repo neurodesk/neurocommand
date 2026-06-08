@@ -42,6 +42,12 @@ def test_icon_sync_workflows_install_svg_converter():
     assert "python -m pip install cairosvg" in APPSJSON_QUEUE_WORKFLOW.read_text()
 
 
+def test_appsjson_queue_does_not_run_on_pr_close_events():
+    workflow = APPSJSON_QUEUE_WORKFLOW.read_text()
+
+    assert "- closed" not in workflow
+
+
 def test_neurocommand_image_test_asserts_configured_container_root():
     workflow = TEST_WORKFLOW.read_text()
     assert 'container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"' in workflow

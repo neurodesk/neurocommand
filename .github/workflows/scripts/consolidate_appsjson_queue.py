@@ -434,18 +434,6 @@ def upsert_consolidated_pr(
     if not should_exist:
         if existing:
             github_request(
-                "POST",
-                api_url,
-                f"/repos/{repo}/issues/{existing['number']}/comments",
-                token,
-                payload={
-                    "body": (
-                        "Closing this queue PR because there are currently no net pending "
-                        "`neurodesk/apps.json` changes to merge."
-                    )
-                },
-            )
-            github_request(
                 "PATCH",
                 api_url,
                 f"/repos/{repo}/pulls/{existing['number']}",
@@ -487,7 +475,7 @@ def post_consolidated_diff_comment(
     consolidated_pr_number: int,
     target_file: str,
     appsjson_diff: str,
-) -> bool:
+) -> str:
     diff_for_comment, is_truncated = truncate_diff(appsjson_diff, MAX_PR_COMMENT_DIFF_CHARS)
     lines: List[str] = []
     lines.append(DIFF_COMMENT_MARKER)
@@ -516,7 +504,17 @@ def post_consolidated_diff_comment(
         body = comment.get("body") or ""
         if DIFF_COMMENT_MARKER in body:
             if body == comment_body:
-                return False
+                return "unchanged"
+            comment_id = comment.get("id")
+            if comment_id is not None:
+                github_request(
+                    "PATCH",
+                    api_url,
+                    f"/repos/{repo}/issues/comments/{comment_id}",
+                    token,
+                    payload={"body": comment_body},
+                )
+                return "updated"
             break
 
     github_request(
@@ -526,7 +524,7 @@ def post_consolidated_diff_comment(
         token,
         payload={"body": comment_body},
     )
-    return True
+    return "created"
 
 
 def close_consolidated_source_prs(
@@ -534,28 +532,11 @@ def close_consolidated_source_prs(
     repo: str,
     token: str,
     source_prs: List[PullRequest],
-    consolidated_pr_number: Optional[int],
 ) -> None:
     if not source_prs:
         return
 
     for pr in source_prs:
-        message = (
-            "This PR's `neurodesk/apps.json` changes were consolidated into "
-        )
-        if consolidated_pr_number is not None:
-            message += f"#{consolidated_pr_number}. "
-        else:
-            message += "the latest queue snapshot with no net pending diff. "
-        message += "Closing to keep `apps.json` updates linear and deterministic."
-
-        github_request(
-            "POST",
-            api_url,
-            f"/repos/{repo}/issues/{pr.number}/comments",
-            token,
-            payload={"body": message},
-        )
         github_request(
             "PATCH",
             api_url,
@@ -797,7 +778,7 @@ def main() -> int:
 
     diff_comment_status = "n/a"
     if consolidated_pr_number is not None:
-        comment_created = post_consolidated_diff_comment(
+        diff_comment_status = post_consolidated_diff_comment(
             api_url=args.api_url,
             repo=args.repo,
             token=token,
@@ -805,7 +786,6 @@ def main() -> int:
             target_file=args.target_file,
             appsjson_diff=appsjson_diff,
         )
-        diff_comment_status = "posted" if comment_created else "unchanged"
 
     auto_merge_status: Optional[str] = None
     if args.enable_auto_merge and consolidated_pr_number is not None:
@@ -831,7 +811,6 @@ def main() -> int:
         repo=args.repo,
         token=token,
         source_prs=consolidated_source_prs,
-        consolidated_pr_number=consolidated_pr_number,
     )
 
     print("Consolidation summary:")
