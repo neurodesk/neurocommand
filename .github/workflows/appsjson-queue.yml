@@ -38,6 +38,8 @@ jobs:
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: 3.11
+    - name: Install icon conversion dependencies
+      run: python -m pip install cairosvg
     - name: Consolidate open apps.json pull requests
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

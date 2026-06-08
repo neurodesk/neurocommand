@@ -35,6 +35,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install icon conversion dependencies
+        run: python -m pip install cairosvg
+
       - name: Sync icons
         run: |
           python .github/workflows/scripts/sync_neurocontainer_icons.py \
