@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import binascii
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
@@ -56,18 +57,45 @@ def _load_app_names(apps_json_path: Path) -> set[str]:
     return set(apps)
 
 
-def _decode_png_data_uri(data_uri: str, source: Path) -> bytes | None:
+def _decode_base64_payload(payload: str, source: Path) -> bytes:
+    try:
+        return base64.b64decode("".join(payload.split()), validate=True)
+    except (binascii.Error, ValueError) as error:
+        raise ValueError(f"{source}: invalid base64 icon data: {error}") from error
+
+
+def _svg_to_png(svg_content: bytes, source: Path) -> bytes:
+    try:
+        import cairosvg
+    except ImportError as error:
+        raise RuntimeError(
+            "SVG recipe icons require cairosvg. Install it with "
+            "`python -m pip install cairosvg`."
+        ) from error
+
+    try:
+        content = cairosvg.svg2png(bytestring=svg_content, output_width=128, output_height=128)
+    except Exception as error:  # noqa: BLE001 - surface converter context to callers
+        raise ValueError(f"{source}: failed to convert SVG icon to PNG: {error}") from error
+
+    if not content.startswith(PNG_MAGIC):
+        raise ValueError(f"{source}: converted SVG icon is not a PNG")
+    return content
+
+
+def _decode_icon_data_uri(data_uri: str, source: Path) -> bytes | None:
     match = DATA_URI_RE.match(data_uri)
     if not match:
         return None
 
-    if match.group("media_type").lower() != "png":
-        return None
+    media_type = match.group("media_type").lower()
+    content = _decode_base64_payload(match.group("payload"), source)
 
-    try:
-        content = base64.b64decode(match.group("payload"), validate=True)
-    except ValueError as error:
-        raise ValueError(f"{source}: invalid base64 icon data: {error}") from error
+    if media_type == "svg+xml":
+        return _svg_to_png(content, source)
+
+    if media_type != "png":
+        return None
 
     if not content.startswith(PNG_MAGIC):
         raise ValueError(f"{source}: decoded icon is not a PNG")
@@ -111,7 +139,7 @@ def collect_recipe_icons(
 
         result.icons_found += 1
         try:
-            content = _decode_png_data_uri(icon_value, build_file)
+            content = _decode_icon_data_uri(icon_value, build_file)
         except ValueError:
             result.invalid_icons.append(build_file)
             raise

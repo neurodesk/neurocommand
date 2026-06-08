@@ -7,6 +7,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "upload_containers_simg.sh"
 WORKFLOW = ROOT / ".github" / "workflows" / "update-neurocontainers.yml"
 TEST_WORKFLOW = ROOT / ".github" / "workflows" / "test-neurocommand.yml"
+APPSJSON_QUEUE_WORKFLOW = ROOT / ".github" / "workflows" / "appsjson-queue.yml"
+SYNC_ICONS_WORKFLOW = ROOT / ".github" / "workflows" / "sync-icons.yml"
 
 
 def run_bash(script):
@@ -32,7 +34,12 @@ def test_update_neurocontainers_has_explicit_timeouts():
 def test_unit_test_workflow_installs_distutils_provider():
     workflow = TEST_WORKFLOW.read_text()
     assert "python-version: \"3.12\"" in workflow
-    assert "python -m pip install pytest setuptools" in workflow
+    assert "python -m pip install pytest setuptools cairosvg" in workflow
+
+
+def test_icon_sync_workflows_install_svg_converter():
+    assert "python -m pip install cairosvg" in SYNC_ICONS_WORKFLOW.read_text()
+    assert "python -m pip install cairosvg" in APPSJSON_QUEUE_WORKFLOW.read_text()
 
 
 def test_neurocommand_image_test_asserts_configured_container_root():

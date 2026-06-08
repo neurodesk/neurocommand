@@ -18,6 +18,14 @@ PNG_BYTES = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII="
 )
 PNG_DATA_URI = "data:image/png;base64," + base64.b64encode(PNG_BYTES).decode()
+SVG_BYTES = (
+    b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+    b'<rect width="64" height="64" fill="#1f2937"/>'
+    b'<circle cx="32" cy="32" r="20" fill="#60a5fa"/>'
+    b"</svg>"
+)
+SVG_DATA_URI = "data:image/svg+xml;base64," + base64.b64encode(SVG_BYTES).decode()
+PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 
 def write_recipe(neurocontainers_path, name, icon_value=None):
@@ -54,13 +62,37 @@ def test_sync_decodes_matching_recipe_icon(tmp_path):
     assert (icons_dir / "alpha.png").read_bytes() == PNG_BYTES
 
 
+def test_sync_converts_matching_recipe_svg_icon(tmp_path):
+    neurocontainers_path = tmp_path / "neurocontainers"
+    icons_dir = tmp_path / "icons"
+    apps_json_path = tmp_path / "apps.json"
+
+    write_recipe(neurocontainers_path, "alpha", SVG_DATA_URI)
+    write_apps_json(apps_json_path, "alpha")
+
+    result = sync_neurocontainer_icons.sync_icons(
+        neurocontainers_path=neurocontainers_path,
+        icons_dir=icons_dir,
+        apps_json_path=apps_json_path,
+    )
+
+    written = (icons_dir / "alpha.png").read_bytes()
+    assert result.matched_recipes == 1
+    assert result.icons_found == 1
+    assert result.unsupported_icons == []
+    assert result.changed_icons == [icons_dir / "alpha.png"]
+    assert result.written_icons == [icons_dir / "alpha.png"]
+    assert written.startswith(PNG_MAGIC)
+    assert written != SVG_BYTES
+
+
 def test_sync_ignores_missing_unsupported_and_unmanaged_icons(tmp_path):
     neurocontainers_path = tmp_path / "neurocontainers"
     icons_dir = tmp_path / "icons"
     apps_json_path = tmp_path / "apps.json"
 
     write_recipe(neurocontainers_path, "missing-icon")
-    write_recipe(neurocontainers_path, "unsupported-icon", "data:image/svg+xml;base64,PHN2Zy8+")
+    write_recipe(neurocontainers_path, "unsupported-icon", "data:image/jpeg;base64,ZmFrZQ==")
     write_recipe(neurocontainers_path, "unmanaged", PNG_DATA_URI)
     write_apps_json(apps_json_path, "missing-icon", "unsupported-icon")
 
