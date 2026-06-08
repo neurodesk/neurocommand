@@ -10,7 +10,6 @@ on:
       - reopened
       - synchronize
       - ready_for_review
-      - closed
     paths:
       - 'neurodesk/apps.json'
 
