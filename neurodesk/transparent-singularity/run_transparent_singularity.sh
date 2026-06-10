@@ -305,7 +305,7 @@ moduleName=`echo $container | cut -d _ -f 2`
 
 echo "-- -*- lua -*-" > ${modulePath}/${moduleName}.lua
 echo "help([===[" >> ${modulePath}/${moduleName}.lua 
-cat README.md >> ${modulePath}/${moduleName}.lua
+bash "$_base/ts_sanitize_lua_help.sh" README.md >> ${modulePath}/${moduleName}.lua
 echo "]===])" >> ${modulePath}/${moduleName}.lua
 
 echo "whatis(\"${container}\")" >> ${modulePath}/${moduleName}.lua

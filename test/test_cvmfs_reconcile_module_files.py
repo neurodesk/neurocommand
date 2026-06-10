@@ -30,7 +30,7 @@ def make_container(repo_root, container_name):
     (container / "commands.txt").write_text("datalad\n")
 
 
-def test_reconciles_existing_public_modules_before_stale_disable(tmp_path):
+def test_reconciles_current_public_modules_and_removes_stale_categories(tmp_path):
     repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
     old_container = "datalad_1.3.1_20260227"
     latest_container = "datalad_1.3.1_20260512"
@@ -54,12 +54,13 @@ def test_reconciles_existing_public_modules_before_stale_disable(tmp_path):
     changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
     reconcile_module_files.apply_changes(changes)
 
-    for module_file in (canonical, current_public, old_category_public):
+    for module_file in (canonical, current_public):
         text = module_file.read_text()
         assert latest_container in text
         assert old_container not in text
 
     assert current_public.read_text() == canonical.read_text()
+    assert not old_category_public.exists()
 
 
 def test_latest_build_comes_from_log_not_leftover_container_dirs(tmp_path):
@@ -103,6 +104,42 @@ def test_current_category_module_is_created_from_canonical(tmp_path):
     reconcile_module_files.apply_changes(changes)
 
     assert public.read_text() == canonical.read_text()
+
+
+def test_reconciliation_sanitizes_lmod_cache_delimiter_in_help_text(tmp_path):
+    repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
+    latest_container = "gigaconnectome_0.6.0_20250630"
+    log_path = tmp_path / "log.txt"
+
+    make_container(repo_root, latest_container)
+    log_path.write_text(f"{latest_container} categories:bids apps,\n")
+
+    canonical = repo_root / "containers" / "modules" / "gigaconnectome" / "0.6.0.lua"
+    canonical.parent.mkdir(parents=True)
+    canonical.write_text(
+        "\n".join(
+            [
+                "-- -*- lua -*-",
+                "help([===[",
+                "usage: giga_connectome [--participant-label LABEL [LABEL ...]]",
+                "]===])",
+                f'whatis("{latest_container}")',
+                (
+                    "prepend_path(\"PATH\", "
+                    f'"/cvmfs/neurodesk.ardc.edu.au/containers/{latest_container}")'
+                ),
+                "",
+            ]
+        )
+    )
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    reconcile_module_files.apply_changes(changes)
+
+    text = canonical.read_text()
+    assert "[LABEL ...] ]" in text
+    assert "]]" not in text
+    assert "]===])" in text
 
 
 def test_check_mode_exit_status_distinguishes_drift(tmp_path):

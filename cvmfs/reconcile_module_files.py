@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 import sys
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -22,7 +23,7 @@ class ContainerEntry:
 @dataclass(frozen=True)
 class PlannedChange:
     path: Path
-    content: str
+    content: Optional[str]
     reason: str
 
 
@@ -107,6 +108,7 @@ def update_module_content(
     container_pattern = rf"{re.escape(tool)}_{re.escape(version)}_[0-9]+"
     latest_dir_text = str(latest_dir)
 
+    content = sanitize_module_help_content(content)
     content = re.sub(
         rf'prepend_path\("PATH", "[^"]*{container_pattern}"\)',
         f'prepend_path("PATH", "{latest_dir_text}")',
@@ -118,6 +120,19 @@ def update_module_content(
         content,
     )
     return re.sub(container_pattern, latest_name, content)
+
+
+def sanitize_help_text(text: str) -> str:
+    return text.replace("]]", "] ]")
+
+
+def sanitize_module_help_content(content: str) -> str:
+    return re.sub(
+        r"(help\(\[===\[)(.*?)(\]===\]\))",
+        lambda match: match.group(1) + sanitize_help_text(match.group(2)) + match.group(3),
+        content,
+        flags=re.DOTALL,
+    )
 
 
 def existing_public_module_candidates(
@@ -134,6 +149,13 @@ def existing_public_module_candidates(
     return [candidate for candidate in candidates if candidate.is_file()]
 
 
+def public_module_category(public_modules_root: Path, module_file: Path) -> Optional[str]:
+    try:
+        return module_file.relative_to(public_modules_root).parts[0]
+    except (IndexError, ValueError):
+        return None
+
+
 def add_change(
     changes: dict[Path, PlannedChange],
     path: Path,
@@ -143,6 +165,11 @@ def add_change(
     if path.exists() and path.read_text() == content:
         return
     changes[path] = PlannedChange(path=path, content=content, reason=reason)
+
+
+def add_delete(changes: dict[Path, PlannedChange], path: Path, reason: str) -> None:
+    if path.exists():
+        changes[path] = PlannedChange(path=path, content=None, reason=reason)
 
 
 def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedChange]:
@@ -157,6 +184,7 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
     for (tool, version), entry in sorted(latest_by_key.items()):
         latest_name = entry.image
         latest_dir = containers_root / latest_name
+        expected_public_categories = set(categories.get((tool, version), ()))
 
         canonical_contents: dict[str, str] = {}
         canonical_candidates = (
@@ -183,6 +211,15 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
             )
 
         for module_file in existing_public_module_candidates(public_modules_root, tool, version):
+            module_category = public_module_category(public_modules_root, module_file)
+            if module_category not in expected_public_categories:
+                add_delete(
+                    changes,
+                    module_file,
+                    f"remove stale public {module_category}/{tool}/{module_file.name}",
+                )
+                continue
+
             updated = update_module_content(
                 module_file.read_text(),
                 tool=tool,
@@ -212,8 +249,11 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
 
 def apply_changes(changes: list[PlannedChange]) -> None:
     for change in changes:
-        change.path.parent.mkdir(parents=True, exist_ok=True)
-        change.path.write_text(change.content)
+        if change.content is None:
+            change.path.unlink(missing_ok=True)
+        else:
+            change.path.parent.mkdir(parents=True, exist_ok=True)
+            change.path.write_text(change.content)
 
 
 def build_parser() -> argparse.ArgumentParser:
