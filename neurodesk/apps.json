@@ -716,12 +716,12 @@
     "deepdisco": {
         "apps": {
             "deepdisco 20251008": {
-                "version": "20260526",
+                "version": "20260611",
                 "exec": "",
                 "apptainer_args": []
             },
             "DeepDisco-deepdisco 20251008": {
-                "version": "20260526",
+                "version": "20260611",
                 "exec": "deepdisco",
                 "apptainer_args": []
             }
