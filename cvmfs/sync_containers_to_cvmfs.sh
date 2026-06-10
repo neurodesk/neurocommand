@@ -311,9 +311,6 @@ fi;
 # export IMAGENAME_BUILDDATE=spm12_r7219_20201120
 # export LINE='fsl_6.0.4_20210105 categories:functional imaging,structural imaging,diffusion imaging,image segmentation,image registration,'
 
-Field_Separator=$IFS
-echo $Field_Separator
-
 declare -A KEEP_IMAGES
 
 
@@ -323,16 +320,6 @@ do
     IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< ${LINE})"
     # echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
 
-    CATEGORIES=`echo $LINE | awk -F"categories:" '{print $2}'`
-    # echo "CATEGORIES: $CATEGORIES"
-
-    # echo "check if $IMAGENAME_BUILDDATE is in module files:"
-    TOOLNAME="$(cut -d'_' -f1 <<< ${IMAGENAME_BUILDDATE})"
-    TOOLVERSION="$(cut -d'_' -f2 <<< ${IMAGENAME_BUILDDATE})"
-    BUILDDATE="$(cut -d'_' -f3 <<< ${IMAGENAME_BUILDDATE})"
-    # echo "[DEBUG] TOOLNAME: $TOOLNAME"
-    # echo "[DEBUG] TOOLVERSION: ${TOOLVERSION}"
-    # echo "[DEBUG] BUILDDATE: $BUILDDATE"
     KEEP_IMAGES["$IMAGENAME_BUILDDATE"]=1
 
     # echo "check if $IMAGENAME_BUILDDATE is already on cvmfs:"
@@ -399,155 +386,36 @@ do
     #         chmod 755 $CUSTOM_ENV
     # fi
 
-    # set internal field separator for the string list
-    # echo $CATEGORIES
-    IFS=','
-    for CATEGORY in $CATEGORIES;
-    do
-        # echo $CATEGORY
-        CATEGORY="${CATEGORY// /_}"
-        MODULE_TARGET_BASE="/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
-
-        if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}" ]]; then
-            if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}" ]]
-            then
-                # echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
-                # echo "Checking if files are up-to-date:"
-                FILE1=/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}
-                FILE2=/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
-                if cmp --silent -- "$FILE1" "$FILE2"; then
-                    continue
-                else
-                    echo "files differ - copy again:"
-                    open_cvmfs_transaction neurodesk.ardc.edu.au
-                    cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
-                    publish_cvmfs_transaction neurodesk.ardc.edu.au "updating modules for $IMAGENAME_BUILDDATE"
-                fi
-            else
-                open_cvmfs_transaction neurodesk.ardc.edu.au
-                echo "[DEBUG] mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/"
-                mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/
-                echo "[DEBUG] cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
-                cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}
-                publish_cvmfs_transaction neurodesk.ardc.edu.au "added modules for $IMAGENAME_BUILDDATE"
-                if  [[ -f /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION} ]]; then
-                    echo "module file $CATEGORY/$TOOLNAME/${TOOLVERSION} written. This worked!"
-                else
-                    echo "Something went wrong: cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION} /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}"
-                    exit 2
-                fi
-            fi
-        fi
-
-
-        if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
-            if [[ -a "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua" ]]; then
-                # echo "$IMAGENAME_BUILDDATE exists in module $CATEGORY"
-                # echo "Checking if files are up-to-date:"
-                FILE1=/cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua
-                FILE2=/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
-                if cmp --silent -- "$FILE1" "$FILE2"; then
-                    continue
-                else
-                    echo "files differ - copy again:"
-                    open_cvmfs_transaction neurodesk.ardc.edu.au
-                    cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
-                    publish_cvmfs_transaction neurodesk.ardc.edu.au "updating modules for $IMAGENAME_BUILDDATE"
-                fi
-            else
-                open_cvmfs_transaction neurodesk.ardc.edu.au
-                echo "[DEBUG] mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/"
-                mkdir -p /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/
-                echo "[DEBUG] cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua"
-                cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua
-                publish_cvmfs_transaction neurodesk.ardc.edu.au "added modules for $IMAGENAME_BUILDDATE"
-                if  [[ -f /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua ]]; then
-                    echo "module file $CATEGORY/$TOOLNAME/${TOOLVERSION} written. This worked!"
-                else
-                    echo "Something went wrong: cp /cvmfs/neurodesk.ardc.edu.au/containers/modules/$TOOLNAME/${TOOLVERSION}.lua /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/$CATEGORY/$TOOLNAME/${TOOLVERSION}.lua"
-                    exit 2
-                fi
-            fi
-        fi
-    done
-    
-    IFS=$Field_Separator
-
 done < "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt"
 
-# Ensure module files point to the latest builddate for each tool+version.
-# The module file is only created when a container is first deployed, so it may
-# point to an older builddate if a newer container was deployed before an older one.
-echo "[INFO] Checking that module files point to the latest builddate for each tool+version."
-MODULES_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers/modules"
-declare -A LATEST_BUILDDATE
-declare -A LATEST_CONTAINER_DIR
+echo "[INFO] Checking that module files point to the latest kept container builds."
+if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_module_files.py" \
+    --repo-root /cvmfs/neurodesk.ardc.edu.au \
+    --log "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt" \
+    --check; then
+    RECONCILE_STATUS=0
+else
+    RECONCILE_STATUS=$?
+fi
 
-for CONTAINER_PATH in /cvmfs/neurodesk.ardc.edu.au/containers/*/; do
-    [[ -d "$CONTAINER_PATH" ]] || continue
-    CONTAINER_NAME="$(basename "$CONTAINER_PATH")"
-    # Only consider unpacked container directories (have commands.txt)
-    [[ -f "$CONTAINER_PATH/commands.txt" ]] || continue
-
-    C_TOOLNAME="$(cut -d'_' -f1 <<< "$CONTAINER_NAME")"
-    C_TOOLVERSION="$(cut -d'_' -f2 <<< "$CONTAINER_NAME")"
-    C_BUILDDATE="$(cut -d'_' -f3 <<< "$CONTAINER_NAME")"
-    KEY="${C_TOOLNAME}_${C_TOOLVERSION}"
-
-    if [[ -z "${LATEST_BUILDDATE[$KEY]+x}" ]] || [[ "$C_BUILDDATE" > "${LATEST_BUILDDATE[$KEY]}" ]]; then
-        LATEST_BUILDDATE["$KEY"]="$C_BUILDDATE"
-        LATEST_CONTAINER_DIR["$KEY"]="$CONTAINER_PATH"
-    fi
-done
-
-echo "[DEBUG] Found ${#LATEST_BUILDDATE[@]} unique tool+version combinations."
-
-for KEY in "${!LATEST_BUILDDATE[@]}"; do
-    C_TOOLNAME="$(cut -d'_' -f1 <<< "$KEY")"
-    C_TOOLVERSION="$(cut -d'_' -f2 <<< "$KEY")"
-    LATEST_DIR="${LATEST_CONTAINER_DIR[$KEY]}"
-    LATEST_NAME="$(basename "$LATEST_DIR")"
-
-    # Check both .lua and non-.lua module file formats
-    MODULE_FILES_TO_UPDATE=()
-    for MODULE_CANDIDATE in "$MODULES_ROOT/$C_TOOLNAME/${C_TOOLVERSION}.lua" "$MODULES_ROOT/$C_TOOLNAME/${C_TOOLVERSION}"; do
-        if [[ -f "$MODULE_CANDIDATE" ]]; then
-            MODULE_FILES_TO_UPDATE+=("$MODULE_CANDIDATE")
-        fi
-    done
-
-    if [[ ${#MODULE_FILES_TO_UPDATE[@]} -eq 0 ]]; then
-        echo "[DEBUG] No module file found for $C_TOOLNAME/${C_TOOLVERSION} (latest: $LATEST_NAME)"
-        continue
-    fi
-
-    NEEDS_UPDATE=0
-    for MODULE_FILE in "${MODULE_FILES_TO_UPDATE[@]}"; do
-        # Check if the module file already points to the latest container
-        if ! grep -q "${LATEST_NAME}" "$MODULE_FILE" 2>/dev/null; then
-            NEEDS_UPDATE=1
-            echo "[DEBUG] Module file $MODULE_FILE does not reference $LATEST_NAME"
-            break
-        fi
-    done
-
-    if [[ $NEEDS_UPDATE -eq 0 ]]; then
-        continue
-    fi
-
-    echo "[INFO] Updating module $C_TOOLNAME/${C_TOOLVERSION} to point to latest: $LATEST_NAME"
+if [[ $RECONCILE_STATUS -eq 1 ]]; then
+    echo "[INFO] Reconciling canonical and public module files before stale containers are disabled."
     open_cvmfs_transaction neurodesk.ardc.edu.au
-    for MODULE_FILE in "${MODULE_FILES_TO_UPDATE[@]}"; do
-        echo "[DEBUG] Updating $MODULE_FILE"
-        # Update the prepend_path line to point to the latest container directory
-        sed -i "s|prepend_path(\"PATH\", \".*${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|prepend_path(\"PATH\", \"${LATEST_DIR%/}\")|" "$MODULE_FILE"
-        # Update the whatis line
-        sed -i "s|whatis(\"${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*\")|whatis(\"${LATEST_NAME}\")|" "$MODULE_FILE"
-        # Update any container path references (e.g. in env vars set by BASEPATH)
-        sed -i "s|${C_TOOLNAME}_${C_TOOLVERSION}_[0-9]*|${LATEST_NAME}|g" "$MODULE_FILE"
-    done
-    publish_cvmfs_transaction neurodesk.ardc.edu.au "updated module $C_TOOLNAME/${C_TOOLVERSION} to point to $LATEST_NAME"
-done
+    if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_module_files.py" \
+        --repo-root /cvmfs/neurodesk.ardc.edu.au \
+        --log "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt"; then
+        publish_cvmfs_transaction neurodesk.ardc.edu.au "reconciled module files to latest kept containers"
+    else
+        echo "[ERROR] Module reconciliation failed. Aborting CVMFS transaction."
+        abort_cvmfs_transaction neurodesk.ardc.edu.au
+        exit 2
+    fi
+elif [[ $RECONCILE_STATUS -eq 0 ]]; then
+    echo "[INFO] Module files are already reconciled."
+else
+    echo "[ERROR] Module reconciliation check failed."
+    exit 2
+fi
 
 # disable unpacked container versions that no longer exist in log.txt:
 CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
