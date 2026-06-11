@@ -21,7 +21,7 @@ PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 
 @dataclass(frozen=True)
 class RecipeIcon:
-    name: str
+    names: tuple[str, ...]
     source: Path
     content: bytes
 
@@ -47,14 +47,30 @@ def _parse_top_level_scalar(text: str, key: str) -> str | None:
     return value
 
 
-def _load_app_names(apps_json_path: Path) -> set[str]:
+def _visibility_flag(data: dict, name: str, default: bool = True) -> bool:
+    return data.get(name, default) is not False
+
+
+def _load_app_icon_names(apps_json_path: Path) -> dict[str, set[str]]:
     with apps_json_path.open() as apps_json_file:
         apps = json.load(apps_json_file)
 
     if not isinstance(apps, dict):
         raise ValueError(f"{apps_json_path} must contain a JSON object")
 
-    return set(apps)
+    app_icon_names = {}
+    for menu_name, menu_data in apps.items():
+        icon_names = {menu_name}
+        if isinstance(menu_data, dict):
+            default_show_in_menu = _visibility_flag(menu_data, "show_in_menu")
+            for app_name, app_data in (menu_data.get("apps") or {}).items():
+                if not isinstance(app_data, dict):
+                    app_data = {}
+                if _visibility_flag(app_data, "show_in_menu", default_show_in_menu):
+                    icon_names.add(app_name.split()[0])
+        app_icon_names[menu_name] = icon_names
+
+    return app_icon_names
 
 
 def _decode_base64_payload(payload: str, source: Path) -> bytes:
@@ -115,7 +131,7 @@ def _iter_build_files(neurocontainers_path: Path) -> list[Path]:
 
 def collect_recipe_icons(
     neurocontainers_path: Path,
-    app_names: set[str],
+    app_icon_names: dict[str, set[str]],
     result: SyncResult,
 ) -> list[RecipeIcon]:
     icons: list[RecipeIcon] = []
@@ -125,10 +141,10 @@ def collect_recipe_icons(
         declared_name = _parse_top_level_scalar(text, "name")
         recipe_name = build_file.parent.name
 
-        if recipe_name in app_names:
-            icon_name = recipe_name
-        elif declared_name in app_names:
-            icon_name = declared_name
+        if recipe_name in app_icon_names:
+            icon_names = app_icon_names[recipe_name]
+        elif declared_name in app_icon_names:
+            icon_names = app_icon_names[declared_name]
         else:
             continue
 
@@ -148,7 +164,7 @@ def collect_recipe_icons(
             result.unsupported_icons.append(build_file)
             continue
 
-        icons.append(RecipeIcon(name=icon_name, source=build_file, content=content))
+        icons.append(RecipeIcon(names=tuple(sorted(icon_names)), source=build_file, content=content))
 
     return icons
 
@@ -161,21 +177,22 @@ def sync_icons(
     check: bool = False,
 ) -> SyncResult:
     result = SyncResult()
-    app_names = _load_app_names(apps_json_path)
-    recipe_icons = collect_recipe_icons(neurocontainers_path, app_names, result)
+    app_icon_names = _load_app_icon_names(apps_json_path)
+    recipe_icons = collect_recipe_icons(neurocontainers_path, app_icon_names, result)
 
     if not check:
         icons_dir.mkdir(parents=True, exist_ok=True)
 
     for recipe_icon in recipe_icons:
-        target = icons_dir / f"{recipe_icon.name}.png"
-        if target.exists():
-            continue
+        for icon_name in recipe_icon.names:
+            target = icons_dir / f"{icon_name}.png"
+            if target.exists():
+                continue
 
-        result.changed_icons.append(target)
-        if not check:
-            target.write_bytes(recipe_icon.content)
-            result.written_icons.append(target)
+            result.changed_icons.append(target)
+            if not check:
+                target.write_bytes(recipe_icon.content)
+                result.written_icons.append(target)
 
     return result
 

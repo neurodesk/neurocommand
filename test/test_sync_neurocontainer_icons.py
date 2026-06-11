@@ -62,6 +62,47 @@ def test_sync_decodes_matching_recipe_icon(tmp_path):
     assert (icons_dir / "alpha.png").read_bytes() == PNG_BYTES
 
 
+def test_sync_writes_visible_app_alias_icons_from_recipe_icon(tmp_path):
+    neurocontainers_path = tmp_path / "neurocontainers"
+    icons_dir = tmp_path / "icons"
+    apps_json_path = tmp_path / "apps.json"
+
+    write_recipe(neurocontainers_path, "brainvisa", PNG_DATA_URI)
+    apps_json_path.write_text(
+        json.dumps(
+            {
+                "brainvisa": {
+                    "apps": {
+                        "brainvisa 6.0.36": {},
+                        "brainvisaGUI-brainvisa 6.0.36": {"exec": "brainvisa"},
+                        "anatomistGUI-brainvisa 6.0.36": {"exec": "anatomist"},
+                        "hiddenGUI-brainvisa 6.0.36": {"show_in_menu": False},
+                    }
+                }
+            }
+        )
+    )
+
+    result = sync_neurocontainer_icons.sync_icons(
+        neurocontainers_path=neurocontainers_path,
+        icons_dir=icons_dir,
+        apps_json_path=apps_json_path,
+    )
+
+    expected_icons = [
+        icons_dir / "anatomistGUI-brainvisa.png",
+        icons_dir / "brainvisa.png",
+        icons_dir / "brainvisaGUI-brainvisa.png",
+    ]
+    assert result.matched_recipes == 1
+    assert result.icons_found == 1
+    assert result.changed_icons == expected_icons
+    assert result.written_icons == expected_icons
+    for icon_path in expected_icons:
+        assert icon_path.read_bytes() == PNG_BYTES
+    assert not (icons_dir / "hiddenGUI-brainvisa.png").exists()
+
+
 def test_sync_converts_matching_recipe_svg_icon(tmp_path):
     neurocontainers_path = tmp_path / "neurocontainers"
     icons_dir = tmp_path / "icons"
