@@ -488,6 +488,32 @@
             "electrophysiology"
         ]
     },
+    "brainvisa": {
+        "apps": {
+            "brainvisa 6.0.36": {
+                "version": "20260611",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "brainvisaGUI-brainvisa 6.0.36": {
+                "version": "20260611",
+                "exec": "brainvisa",
+                "apptainer_args": []
+            },
+            "anatomistGUI-brainvisa 6.0.36": {
+                "version": "20260611",
+                "exec": "anatomist",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging",
+            "visualization",
+            "workflows"
+        ]
+    },
     "brkraw": {
         "apps": {
             "brkraw 0.3.11": {
