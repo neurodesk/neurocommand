@@ -2851,12 +2851,12 @@
     "startrack": {
         "apps": {
             "startrack 20250920": {
-                "version": "20260526",
+                "version": "20260611",
                 "exec": "",
                 "apptainer_args": []
             },
             "StarTrack-startrack 20250920": {
-                "version": "20260526",
+                "version": "20260611",
                 "exec": "startrack",
                 "apptainer_args": []
             }
