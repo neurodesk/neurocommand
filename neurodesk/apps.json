@@ -488,6 +488,22 @@
             "electrophysiology"
         ]
     },
+    "brainsuite": {
+        "apps": {
+            "brainsuite 23a": {
+                "version": "20260611",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "diffusion imaging",
+            "functional imaging",
+            "quality control",
+            "structural imaging"
+        ]
+    },
     "brainvisa": {
         "apps": {
             "brainvisa 6.0.36": {
