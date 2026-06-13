@@ -1596,6 +1596,53 @@
             "workflows"
         ]
     },
+    "libreoffice": {
+        "apps": {
+            "libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "libreofficeGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "libreoffice",
+                "apptainer_args": []
+            },
+            "libreofficeWriterGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "lowriter",
+                "apptainer_args": []
+            },
+            "libreofficeCalcGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "localc",
+                "apptainer_args": []
+            },
+            "libreofficeImpressGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "loimpress",
+                "apptainer_args": []
+            },
+            "libreofficeDrawGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "lodraw",
+                "apptainer_args": []
+            },
+            "libreofficeBaseGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "lobase",
+                "apptainer_args": []
+            },
+            "libreofficeMathGUI-libreoffice 26.2.4": {
+                "version": "20260613",
+                "exec": "lomath",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
     "linda": {
         "apps": {
             "linda 0.5.1": {
