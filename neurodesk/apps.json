@@ -507,17 +507,17 @@
     "brainvisa": {
         "apps": {
             "brainvisa 6.0.36": {
-                "version": "20260611",
+                "version": "20260612",
                 "exec": "",
                 "apptainer_args": []
             },
             "brainvisaGUI-brainvisa 6.0.36": {
-                "version": "20260611",
+                "version": "20260612",
                 "exec": "brainvisa",
                 "apptainer_args": []
             },
             "anatomistGUI-brainvisa 6.0.36": {
-                "version": "20260611",
+                "version": "20260612",
                 "exec": "anatomist",
                 "apptainer_args": []
             }
