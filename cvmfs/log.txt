@@ -165,6 +165,7 @@ lashis_2.0.0_20260508 categories:hippocampus,image segmentation,structural imagi
 laynii_2.2.1_20220701 categories:functional imaging,
 lcmodel_6.3_20220222 categories:spectroscopy,
 lesymap_0.0.0.9222_20250730 categories:statistics,workflows,
+libreoffice_26.2.4_20260613 categories:data organisation,
 linda_0.5.1_20260508 categories:structural imaging,
 lstai_1.2.0_20260522 categories:image segmentation,machine learning,
 matlab_2022a_20231207 categories:machine learning,programming,visualization,
