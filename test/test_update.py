@@ -18,7 +18,7 @@ def run(command, *, cwd, env=None):
     )
 
 
-def test_update_autostashes_dirty_tracked_files(tmp_path):
+def make_update_fixture(tmp_path):
     seed = tmp_path / "seed"
     origin = tmp_path / "origin.git"
     work = tmp_path / "work"
@@ -56,6 +56,10 @@ def test_update_autostashes_dirty_tracked_files(tmp_path):
     run(["git", "clone", "--quiet", str(origin), str(work)], cwd=tmp_path)
     run(["git", "clone", "--quiet", str(origin), str(upstream)], cwd=tmp_path)
 
+    return origin, work, upstream
+
+
+def push_upstream_fetch_and_run_update(upstream):
     upstream_script = upstream / "neurodesk" / "fetch_and_run.sh"
     upstream_script.write_text(upstream_script.read_text() + "\n# remote update regression\n")
     run(["git", "add", "neurodesk/fetch_and_run.sh"], cwd=upstream)
@@ -75,6 +79,8 @@ def test_update_autostashes_dirty_tracked_files(tmp_path):
     )
     run(["git", "push", "--quiet", "origin", "HEAD:main"], cwd=upstream)
 
+
+def dirty_local_fetch_and_run(work):
     local_script = work / "neurodesk" / "fetch_and_run.sh"
     local_script.write_text(
         local_script.read_text().replace(
@@ -83,7 +89,10 @@ def test_update_autostashes_dirty_tracked_files(tmp_path):
             1,
         )
     )
+    return local_script
 
+
+def python_noop_env(tmp_path):
     stub_bin = tmp_path / "bin"
     stub_bin.mkdir()
     python_stub = stub_bin / "python3"
@@ -92,6 +101,36 @@ def test_update_autostashes_dirty_tracked_files(tmp_path):
 
     env = os.environ.copy()
     env["PATH"] = f"{stub_bin}:{env['PATH']}"
+    return env
+
+
+def test_update_autostashes_dirty_tracked_files(tmp_path):
+    _, work, upstream = make_update_fixture(tmp_path)
+    push_upstream_fetch_and_run_update(upstream)
+    local_script = dirty_local_fetch_and_run(work)
+    env = python_noop_env(tmp_path)
+
+    result = subprocess.run(
+        ["bash", "build.sh", "--update", "--cli"],
+        cwd=work,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert run(["git", "rev-parse", "HEAD"], cwd=work).stdout == run(
+        ["git", "rev-parse", "origin/main"], cwd=work
+    ).stdout
+    assert "# local dirty regression" in local_script.read_text()
+
+
+def test_update_handles_detached_head_checkout(tmp_path):
+    _, work, upstream = make_update_fixture(tmp_path)
+    push_upstream_fetch_and_run_update(upstream)
+    local_script = dirty_local_fetch_and_run(work)
+    run(["git", "checkout", "--quiet", "--detach", "HEAD"], cwd=work)
+    env = python_noop_env(tmp_path)
 
     result = subprocess.run(
         ["bash", "build.sh", "--update", "--cli"],

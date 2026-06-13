@@ -233,7 +233,14 @@ function update_neurocommand_repo () {
         sudo_prefix=(sudo)
     fi
 
-    "${sudo_prefix[@]}" git pull --rebase --autostash
+    if "${sudo_prefix[@]}" git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' >/dev/null 2>&1; then
+        "${sudo_prefix[@]}" git pull --rebase --autostash
+    else
+        local remote_name="${NEUROCOMMAND_UPDATE_REMOTE:-origin}"
+        local remote_branch="${NEUROCOMMAND_UPDATE_BRANCH:-main}"
+        echo "[INFO] No branch upstream detected; updating from ${remote_name}/${remote_branch}."
+        "${sudo_prefix[@]}" git pull --rebase --autostash "$remote_name" "$remote_branch"
+    fi
 }
 
 if [ "$runsudo" = "true" ]; then
