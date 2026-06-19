@@ -446,6 +446,22 @@
             "structural imaging"
         ]
     },
+    "brainlesion": {
+        "apps": {
+            "brainlesion 1.0.0": {
+                "version": "20250805",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "image segmentation",
+            "machine learning",
+            "structural imaging",
+            "workflows"
+        ]
+    },
     "brainlifecli": {
         "apps": {
             "brainlifecli 1.7.0": {
@@ -891,6 +907,18 @@
         },
         "categories": [
             "electrophysiology"
+        ]
+    },
+    "eharmonize": {
+        "apps": {
+            "eharmonize 1.0.0": {
+                "version": "20260611",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
         ]
     },
     "elastix": {
@@ -1836,6 +1864,18 @@
             "image registration",
             "image segmentation",
             "structural imaging"
+        ]
+    },
+    "mipav": {
+        "apps": {
+            "mipav 11.3.3": {
+                "version": "20260611",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "visualization"
         ]
     },
     "mipview": {
@@ -2978,6 +3018,18 @@
         },
         "categories": [
             "image segmentation"
+        ]
+    },
+    "terastitcher": {
+        "apps": {
+            "terastitcher 1.11.10": {
+                "version": "20260619",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "visualization"
         ]
     },
     "tgvqsm": {
