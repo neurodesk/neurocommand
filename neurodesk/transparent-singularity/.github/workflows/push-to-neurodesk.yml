@@ -7,6 +7,12 @@ on:
     branches: [ master ]
 
 jobs:
+  test_invalid_container_metadata:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Test invalid container metadata handling
+      run: /bin/bash .github/workflows/test_invalid_container_metadata.sh
   test_singularity_aria2:
     runs-on: ubuntu-24.04
     steps:
@@ -44,7 +50,7 @@ jobs:
     - name: Test apptainer and curl before pushing to neurocommand
       run: /bin/bash .github/workflows/test_apptainer_aria2.sh
   push_to_neurocommand:
-    needs: [test_singularity_aria2,test_singularity_curl,test_singularity_cvmfs,test_apptainer_aria2,test_apptainer_curl,test_apptainer_cvmfs]
+    needs: [test_invalid_container_metadata,test_singularity_aria2,test_singularity_curl,test_singularity_cvmfs,test_apptainer_aria2,test_apptainer_curl,test_apptainer_cvmfs]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

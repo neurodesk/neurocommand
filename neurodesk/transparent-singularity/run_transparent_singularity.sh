@@ -9,6 +9,11 @@
 
 echo "[DEBUG] This is the run_transparent_singularity.sh script"
 
+fail() {
+   echo "[ERROR] run_transparent_singularity.sh: $*" >&2
+   exit 2
+}
+
 export SINGULARITY_BINDPATH=$SINGULARITY_BINDPATH,$PWD
 
 _script="$(readlink -f ${BASH_SOURCE[0]})" ## who am i? ##
@@ -110,6 +115,10 @@ if [ "$containerEnding" = "$containerDate" ]; then
 fi
 echo "containerEnding: ${containerEnding}"
 
+if [[ -z "$containerName" ]] || [[ -z "$containerVersion" ]] || [[ ! "$containerDate" =~ ^[0-9]{8}$ ]]; then
+   fail "Container name must match name_version_YYYYMMDD[.simg]; got '${container}'. Parsed build date was '${containerDate:-<empty>}'."
+fi
+
 
 # echo "checking for singularity ..."
 qq=`which  singularity`
@@ -149,13 +158,19 @@ else
       url_awss3="https://neurocontainers.s3.us-east-2.amazonaws.com/"
    fi
 
-   if [[ -v url_awss3 ]] || [[ -v url_nectar ]]; then
+   if [[ -n "${url_awss3+x}" ]] || [[ -n "${url_nectar+x}" ]]; then
       # echo "check if aria2 is installed ..."
       qq=`which  aria2c`
       if [[  ${#qq} -lt 1 ]]; then
           echo "aria2 is not installed. Defaulting to curl."
          
-          urls=($url_awss3 $url_nectar)
+          urls=()
+          if [[ -n "${url_awss3+x}" ]]; then
+             urls+=("$url_awss3")
+          fi
+          if [[ -n "${url_nectar+x}" ]]; then
+             urls+=("$url_nectar")
+          fi
           declare -a speeds   
               
           echo "testing which server is fastest."
@@ -188,10 +203,10 @@ else
           container_pull="curl -X GET ${url}${container} -O"
        else 
           aria_args=""
-          if [[ -v url_awss3 ]]; then
+          if [[ -n "${url_awss3+x}" ]]; then
              aria_args="${aria_args} ${url_awss3}${container}"
           fi
-          if [[ -v url_nectar ]]; then
+          if [[ -n "${url_nectar+x}" ]]; then
              aria_args="${aria_args} ${url_nectar}${container}"
           fi
           container_pull="aria2c $aria_args"
@@ -213,24 +228,47 @@ else
    echo "pulling image now ..."
    echo "where am I: $PWD"
    echo "running: $container_pull"
-   $container_pull
+   if ! $container_pull; then
+      fail "Failed to retrieve container '${container}'."
+   fi
 fi
 
-if [[ $unpack = "true" ]]
+if [[ ! -e "$container" ]]; then
+   fail "Container '${container}' was not created by the retrieval step."
+fi
+
+if [[ ${unpack:-} = "true" ]]
 then
    echo "unpacking singularity file to sandbox directory:"
-    singularity build --sandbox temp $container
+   if ! singularity build --sandbox temp $container; then
+      fail "Failed to unpack container '${container}'."
+   fi
     rm -rf $container
     mv temp $container
 fi
 
+rm -f README.md commands.txt commands_raw.txt env.txt
+
 echo "checking if there is a README.md file in the container"
 echo "executing: singularity exec $singularity_opts --pwd $_base $container cat /README.md"
-singularity exec $singularity_opts --pwd $_base $container cat /README.md > README.md
+if ! singularity exec $singularity_opts --pwd $_base $container cat /README.md > README.md; then
+   echo "[WARN] run_transparent_singularity.sh: Could not read /README.md from container '${container}'. Continuing with empty module help." >&2
+   : > README.md
+fi
 
 echo "checking which executables exist inside container"
 echo "executing: singularity exec $singularity_opts --pwd $_base $container $_base/ts_binaryFinder.sh"
-singularity exec $singularity_opts --pwd $_base $container $_base/ts_binaryFinder.sh
+if ! singularity exec $singularity_opts --pwd $_base $container $_base/ts_binaryFinder.sh; then
+   fail "Could not inspect executables in container '${container}'. Not creating wrapper or module files."
+fi
+
+if [[ ! -f "$_base/commands.txt" ]]; then
+   fail "ts_binaryFinder.sh did not create commands.txt for '${container}'. Not creating wrapper or module files."
+fi
+
+if [[ ! -f "$_base/env.txt" ]]; then
+   fail "ts_binaryFinder.sh did not create env.txt for '${container}'. Not creating wrapper or module files."
+fi
 
 echo "create singularity executable for each regular executable in commands.txt"
 # $@ parses command line options.
