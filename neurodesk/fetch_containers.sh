@@ -10,6 +10,12 @@ MOD_NAME=$1
 MOD_VERS=$2
 MOD_DATE=$3
 
+if [[ -z "$MOD_NAME" ]] || [[ -z "$MOD_VERS" ]] || [[ ! "$MOD_DATE" =~ ^[0-9]{8}$ ]]; then
+    echo "[ERROR] fetch_containers.sh: Usage: fetch_containers.sh [name] [version] [YYYYMMDD build date]" >&2
+    echo "[ERROR] fetch_containers.sh: Refusing to create a container path with invalid build date '${MOD_DATE:-<empty>}'." >&2
+    exit 2
+fi
+
 IMG_NAME=${MOD_NAME}_${MOD_VERS}_${MOD_DATE}
 echo "[INFO] fetch_containers.sh: IMG_NAME=$IMG_NAME"
 echo "[INFO] fetch_containers.sh: SINGULARITY_BINDPATH : $SINGULARITY_BINDPATH"
@@ -92,4 +98,3 @@ else
    ${CONTAINER_PATH}/${IMG_NAME}/run_transparent_singularity.sh --container ${IMG_NAME}.simg --singularity-opts "${neurodesk_singularity_opts}"
     # rm -rf .git* README.md run_transparent_singularity ts_*
 fi
-

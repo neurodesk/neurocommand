@@ -151,6 +151,33 @@ grep -qx -- 'fetch demo 1.0 20260519' "$calls"
     assert result.returncode == 0, result.stderr + result.stdout
 
 
+def test_fetch_containers_rejects_missing_builddate():
+    result = subprocess.run(
+        ["bash", str(FETCH_CONTAINERS), "brainvisa", "6.0.36"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+
+    output = result.stderr + result.stdout
+    assert result.returncode == 2, output
+    assert "invalid build date '<empty>'" in output
+    assert "IMG_NAME=brainvisa_6.0.36_" not in output
+
+
+def test_fetch_containers_rejects_malformed_builddate():
+    result = subprocess.run(
+        ["bash", str(FETCH_CONTAINERS), "brainvisa", "6.0.36", "latest"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+
+    output = result.stderr + result.stdout
+    assert result.returncode == 2, output
+    assert "invalid build date 'latest'" in output
+
+
 def test_fetch_containers_honors_neurodesktop_local_containers_override():
     assert (
         "CONTAINER_PATH=${NEURODESKTOP_LOCAL_CONTAINERS:-${PATH_PREFIX}/containers}"
