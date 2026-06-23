@@ -26,7 +26,8 @@ for i in $DEPLOY_BINS; \
 # Remove system applications, because they cause problems:
 grep -vxf ts_binaryFinderExcludes.txt commands_raw.txt > commands.txt
 
-touch env.txt
-env | grep DEPLOY_ENV_ > env.txt
-
-
+env | grep '^DEPLOY_ENV_' > env.txt
+grep_status=$?
+if [[ "$grep_status" -gt 1 ]]; then
+   exit "$grep_status"
+fi
