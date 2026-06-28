@@ -128,13 +128,85 @@ if [[  ${#qq} -lt 1 ]]; then
    exit 2
 fi
 
+# Select the container runtime for image pulls. Both apptainer and SingularityCE
+# support oras:// and docker:// pulls, so use whichever is on the PATH (prefer apptainer).
+if command -v apptainer >/dev/null 2>&1; then
+   container_runtime="apptainer"
+else
+   container_runtime="singularity"
+fi
+
 echo "checking if $container exists in the cvmfs cache ..."
 if  [[ -z "$CVMFS_DISABLE" ]] && [[ -d "/cvmfs/neurodesk.ardc.edu.au/containers/${containerName}_${containerVersion}_${containerDate}/${containerName}_${containerVersion}_${containerDate}.simg" ]]; then
    echo "$container exists in cvmfs"
    storage="cvmfs"
    container_pull="ln -s /cvmfs/neurodesk.ardc.edu.au/containers/${containerName}_${containerVersion}_${containerDate}/${containerName}_${containerVersion}_${containerDate}.simg $container"
 else
-   echo "$container does not exists in cvmfs. Testing Nectar temporary Object storage next: "
+   # Pull SIF artifact from quay.io via OCI 1.1 Referrers API
+   echo "checking if $container is published as v2 OCI on Quay ..."
+   ts_quay_repo="neurodesk/${containerName}"
+   ts_docker_tag="${containerVersion}_${containerDate}"
+   ts_sif_digest=""
+   ts_sif_mediatype="application/vnd.sylabs.sif.layer.v1.sif"
+
+   if command -v curl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+      ts_token=$(curl -sL \
+         "https://quay.io/v2/auth?service=quay.io&scope=repository:${ts_quay_repo}:pull" 2>/dev/null \
+         | jq -r '.token // empty')
+      if [ -n "$ts_token" ] && [ "$ts_token" != "null" ]; then
+         ts_docker_digest=$(curl -sIL -H "Authorization: Bearer $ts_token" \
+            -H "Accept: application/vnd.oci.image.index.v1+json,application/vnd.oci.image.manifest.v1+json,application/vnd.docker.distribution.manifest.v2+json" \
+            "https://quay.io/v2/${ts_quay_repo}/manifests/${ts_docker_tag}" 2>/dev/null \
+            | awk 'tolower($1)=="docker-content-digest:" {print $2}' | tr -d '\r')
+         if [ -n "$ts_docker_digest" ]; then
+            ts_sif_digest=$(curl -sL -H "Authorization: Bearer $ts_token" \
+               "https://quay.io/v2/${ts_quay_repo}/referrers/${ts_docker_digest}?artifactType=${ts_sif_mediatype}" 2>/dev/null \
+               | jq -r '.manifests[0].digest // empty')
+         fi
+      fi
+   fi
+
+   if [ -n "$ts_sif_digest" ] && [ "$ts_sif_digest" != "null" ]; then
+      echo "  found v2 SIF on Quay: $ts_sif_digest"
+      storage="quay-v2"
+      container_pull="$container_runtime pull --name $container oras://quay.io/${ts_quay_repo}@${ts_sif_digest}"
+   fi
+fi
+
+# Pull SIF artifact from ghcr.io via OCI Referrers (tag-schema fallback; GHCR has no native Referrers API)
+if [ -z "$storage" ]; then
+   echo "checking if $container is published as v2 OCI on GHCR ..."
+   ts_ghcr_repo="neurodesk/${containerName}"
+   ts_sif_digest=""
+   if command -v curl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+      ts_token=$(curl -sL \
+         "https://ghcr.io/token?service=ghcr.io&scope=repository:${ts_ghcr_repo}:pull" 2>/dev/null \
+         | jq -r '.token // empty')
+      if [ -n "$ts_token" ] && [ "$ts_token" != "null" ]; then
+         ts_docker_digest=$(curl -sIL -H "Authorization: Bearer $ts_token" \
+            -H "Accept: application/vnd.oci.image.index.v1+json,application/vnd.oci.image.manifest.v1+json,application/vnd.docker.distribution.manifest.v2+json,application/vnd.docker.distribution.manifest.list.v2+json" \
+            "https://ghcr.io/v2/${ts_ghcr_repo}/manifests/${ts_docker_tag}" 2>/dev/null \
+            | awk 'tolower($1)=="docker-content-digest:" {print $2}' | tr -d '\r')
+         if [ -n "$ts_docker_digest" ]; then
+            # GHCR exposes referrers via the OCI fallback tag: sha256-<digest>
+            ts_referrers_tag=$(echo "$ts_docker_digest" | sed 's/:/-/')
+            ts_sif_digest=$(curl -sL -H "Authorization: Bearer $ts_token" \
+               -H "Accept: application/vnd.oci.image.index.v1+json" \
+               "https://ghcr.io/v2/${ts_ghcr_repo}/manifests/${ts_referrers_tag}" 2>/dev/null \
+               | jq -r --arg mt "$ts_sif_mediatype" '.manifests[]? | select(.artifactType==$mt) | .digest' | head -1)
+         fi
+      fi
+   fi
+
+   if [ -n "$ts_sif_digest" ] && [ "$ts_sif_digest" != "null" ]; then
+      echo "  found v2 SIF on GHCR: $ts_sif_digest"
+      storage="ghcr-v2"
+      container_pull="$container_runtime pull --name $container oras://ghcr.io/${ts_ghcr_repo}@${ts_sif_digest}"
+   fi
+fi
+
+if [ -z "$storage" ]; then
+   echo "$container does not exist in cvmfs or v2 oras. Testing Nectar temporary Object storage next: "
    if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/$container"; then      
       echo "$container exists in the temporary builds nectar cache"
       url_nectar="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/"
@@ -212,10 +284,22 @@ else
           container_pull="aria2c $aria_args"
        fi # end of aria2c check
    else # end of check if files exist in object storage
-      # fallback to docker
-      echo "$container does not exist in any cache - loading from docker!"
-      storage="docker"
-      container_pull="singularity pull --name $container docker://vnmd/${containerName}_${containerVersion}:${containerDate}"
+      # Last resort: docker pull (apptainer converts to SIF on the fly). Prefer Quay, then GHCR.
+      echo "$container not in cvmfs / referrers / object storage - falling back to docker pull"
+      ts_docker_tag="${containerVersion}_${containerDate}"
+      ts_q_token=$(curl -sL "https://quay.io/v2/auth?service=quay.io&scope=repository:neurodesk/${containerName}:pull" 2>/dev/null | jq -r '.token // empty' 2>/dev/null)
+      if [ -n "$ts_q_token" ] && curl -sfIL -o /dev/null \
+            -H "Authorization: Bearer $ts_q_token" \
+            -H "Accept: application/vnd.oci.image.index.v1+json,application/vnd.oci.image.manifest.v1+json,application/vnd.docker.distribution.manifest.v2+json,application/vnd.docker.distribution.manifest.list.v2+json" \
+            "https://quay.io/v2/neurodesk/${containerName}/manifests/${ts_docker_tag}" 2>/dev/null; then
+         echo "  docker pull from Quay"
+         storage="quay-docker"
+         container_pull="$container_runtime pull --name $container docker://quay.io/neurodesk/${containerName}:${ts_docker_tag}"
+      else
+         echo "  docker pull from GHCR"
+         storage="ghcr-docker"
+         container_pull="$container_runtime pull --name $container docker://ghcr.io/neurodesk/${containerName}:${ts_docker_tag}"
+      fi
    fi
 fi
 
