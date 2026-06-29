@@ -62,8 +62,8 @@ jobs:
               container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"
               bash build.sh --cli
               bash containers.sh all
-              bash local/fetch_containers.sh niimath 1.0.0 20240902 niimath
-              test -f "${container_root}/niimath_1.0.0_20240902/niimath_1.0.0_20240902.simg"
-              test -f "${container_root}/niimath_1.0.0_20240902/niimath"
+              bash local/fetch_containers.sh niimath 1.0.0 20250617 niimath
+              test -f "${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"
+              test -f "${container_root}/niimath_1.0.0_20250617/niimath"
               echo "[test] OK"
             '
