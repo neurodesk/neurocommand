@@ -2190,11 +2190,11 @@
             "functional imaging"
         ]
     },
-    "neurodesktop": {
+    "neurodesktop-lite": {
         "show_in_menu": false,
         "show_in_applist": false,
         "apps": {
-            "neurodesktop 20260428": {
+            "neurodesktop-lite 20260428": {
                 "version": "20260512",
                 "exec": "",
                 "apptainer_args": []
@@ -2326,6 +2326,24 @@
         },
         "categories": [
             "diffusion imaging"
+        ]
+    },
+    "openads": {
+        "apps": {
+            "openads 1.0.0": {
+                "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging",
+            "image registration",
+            "image segmentation",
+            "machine learning",
+            "structural imaging",
+            "visualization",
+            "workflows"
         ]
     },
     "openadscpu": {
