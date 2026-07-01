@@ -536,6 +536,21 @@
                 "version": "20260613",
                 "exec": "anatomist",
                 "apptainer_args": []
+            },
+            "brainvisa 6.0.38": {
+                "version": "20260701",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "brainvisaGUI-brainvisa 6.0.38": {
+                "version": "20260701",
+                "exec": "brainvisa",
+                "apptainer_args": []
+            },
+            "anatomistGUI-brainvisa 6.0.38": {
+                "version": "20260701",
+                "exec": "anatomist",
+                "apptainer_args": []
             }
         },
         "categories": [
