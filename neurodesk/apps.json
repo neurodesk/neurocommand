@@ -271,8 +271,9 @@
     "bidsappbrainsuite": {
         "apps": {
             "bidsappbrainsuite 21a": {
-                "version": "20230618",
-                "exec": ""
+                "version": "20260703",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -293,8 +294,9 @@
     "bidsappmrtrix3connectome": {
         "apps": {
             "bidsappmrtrix3connectome 0.5.3": {
-                "version": "20230615",
-                "exec": ""
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -304,8 +306,9 @@
     "bidsapppymvpa": {
         "apps": {
             "bidsapppymvpa 2.0.2": {
-                "version": "20230629",
-                "exec": ""
+                "version": "20260630",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -656,7 +659,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20260602",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -698,6 +701,22 @@
         },
         "categories": [
             "functional imaging"
+        ]
+    },
+    "connectomemapper3": {
+        "apps": {
+            "connectomemapper3 3.2.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "diffusion imaging",
+            "functional imaging",
+            "structural imaging",
+            "workflows"
         ]
     },
     "connectomeworkbench": {
@@ -846,6 +865,18 @@
             "machine learning"
         ]
     },
+    "deepsif": {
+        "apps": {
+            "deepsif 0.0.1": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ]
+    },
     "dicompare": {
         "apps": {
             "dicompare 0.1.2": {
@@ -983,6 +1014,18 @@
         "categories": [
             "machine learning",
             "statistics"
+        ]
+    },
+    "esilpd": {
+        "apps": {
+            "esilpd 0.0.1": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology"
         ]
     },
     "exploreasl": {
@@ -1436,7 +1479,7 @@
                 "exec": ""
             },
             "hdbet 2.0.1": {
-                "version": "20260612",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1905,6 +1948,18 @@
             "workflows"
         ]
     },
+    "mimosa": {
+        "apps": {
+            "mimosa 0.5.8": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
     "minc": {
         "apps": {
             "minc 1.9.17": {
@@ -2092,6 +2147,18 @@
         },
         "categories": [
             "phase processing"
+        ]
+    },
+    "mrsimetabolicconnectome": {
+        "apps": {
+            "mrsimetabolicconnectome 1.0.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
         ]
     },
     "mrsiproc": {
@@ -2320,12 +2387,13 @@
     "niistat": {
         "apps": {
             "niistat 1.0.20191216": {
-                "version": "20220111",
-                "exec": ""
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "functional imaging"
+            "statistics"
         ]
     },
     "nipype": {
@@ -2499,13 +2567,15 @@
     },
     "physio": {
         "apps": {
-            "physioGUI-physio r2021a": {
-                "version": "20220220",
-                "exec": "bash run_spm12.sh /opt/mcr/v99/ fmri"
-            },
             "physio r2021a": {
-                "version": "20220220",
-                "exec": ""
+                "version": "20260702",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "physioGUI-physio r2021a": {
+                "version": "20260702",
+                "exec": "bash run_spm12.sh /opt/mcr/v99/ fmri",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2675,6 +2745,11 @@
             "quickshear 1.1.0": {
                 "version": "20240606",
                 "exec": ""
+            },
+            "quickshear 1.2.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3007,13 +3082,15 @@
     },
     "spm12": {
         "apps": {
-            "spm12GUI-spm12 r7771": {
-                "version": "20230609",
-                "exec": "bash run_spm12.sh /opt/mcr/v97/"
-            },
             "spm12 r7771": {
-                "version": "20230609",
-                "exec": ""
+                "version": "20260702",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "spm12GUI-spm12 r7771": {
+                "version": "20260702",
+                "exec": "bash run_spm12.sh /opt/mcr/v97/",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3023,10 +3100,22 @@
             "structural imaging"
         ]
     },
+    "spm12bi": {
+        "apps": {
+            "spm12bi latest": {
+                "version": "20260702",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
     "spm25": {
         "apps": {
             "spm25 25.01.02": {
-                "version": "20251210",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3283,6 +3372,19 @@
             "image segmentation",
             "shape analysis",
             "visualization"
+        ]
+    },
+    "wftfi": {
+        "apps": {
+            "wftfi 1.0.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "phase processing",
+            "quantitative imaging"
         ]
     },
     "xcpd": {
