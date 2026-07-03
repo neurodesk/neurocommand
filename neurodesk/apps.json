@@ -1436,7 +1436,7 @@
                 "exec": ""
             },
             "hdbet 2.0.1": {
-                "version": "20260612",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2094,6 +2094,18 @@
             "phase processing"
         ]
     },
+    "mrsimetabolicconnectome": {
+        "apps": {
+            "mrsimetabolicconnectome 1.0.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
+        ]
+    },
     "mrsiproc": {
         "apps": {
             "mrsiproc 0.0.1": {
@@ -2675,6 +2687,11 @@
             "quickshear 1.1.0": {
                 "version": "20240606",
                 "exec": ""
+            },
+            "quickshear 1.2.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3026,7 +3043,7 @@
     "spm25": {
         "apps": {
             "spm25 25.01.02": {
-                "version": "20251210",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
