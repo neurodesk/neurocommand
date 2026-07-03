@@ -700,6 +700,22 @@
             "functional imaging"
         ]
     },
+    "connectomemapper3": {
+        "apps": {
+            "connectomemapper3 3.2.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "diffusion imaging",
+            "functional imaging",
+            "structural imaging",
+            "workflows"
+        ]
+    },
     "connectomeworkbench": {
         "apps": {
             "connectomeworkbench 1.4.2": {
@@ -983,6 +999,18 @@
         "categories": [
             "machine learning",
             "statistics"
+        ]
+    },
+    "esilpd": {
+        "apps": {
+            "esilpd 0.0.1": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology"
         ]
     },
     "exploreasl": {
@@ -1436,7 +1464,7 @@
                 "exec": ""
             },
             "hdbet 2.0.1": {
-                "version": "20260612",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2094,6 +2122,18 @@
             "phase processing"
         ]
     },
+    "mrsimetabolicconnectome": {
+        "apps": {
+            "mrsimetabolicconnectome 1.0.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
+        ]
+    },
     "mrsiproc": {
         "apps": {
             "mrsiproc 0.0.1": {
@@ -2320,12 +2360,13 @@
     "niistat": {
         "apps": {
             "niistat 1.0.20191216": {
-                "version": "20220111",
-                "exec": ""
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "functional imaging"
+            "statistics"
         ]
     },
     "nipype": {
@@ -2499,13 +2540,15 @@
     },
     "physio": {
         "apps": {
-            "physioGUI-physio r2021a": {
-                "version": "20220220",
-                "exec": "bash run_spm12.sh /opt/mcr/v99/ fmri"
-            },
             "physio r2021a": {
-                "version": "20220220",
-                "exec": ""
+                "version": "20260702",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "physioGUI-physio r2021a": {
+                "version": "20260702",
+                "exec": "bash run_spm12.sh /opt/mcr/v99/ fmri",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2675,6 +2718,11 @@
             "quickshear 1.1.0": {
                 "version": "20240606",
                 "exec": ""
+            },
+            "quickshear 1.2.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3023,10 +3071,22 @@
             "structural imaging"
         ]
     },
+    "spm12bi": {
+        "apps": {
+            "spm12bi latest": {
+                "version": "20260702",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
     "spm25": {
         "apps": {
             "spm25 25.01.02": {
-                "version": "20251210",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3283,6 +3343,19 @@
             "image segmentation",
             "shape analysis",
             "visualization"
+        ]
+    },
+    "wftfi": {
+        "apps": {
+            "wftfi 1.0.0": {
+                "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "phase processing",
+            "quantitative imaging"
         ]
     },
     "xcpd": {
