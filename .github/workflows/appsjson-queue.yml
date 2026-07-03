@@ -2,6 +2,13 @@ name: Consolidate apps.json queue
 
 on:
   workflow_dispatch:
+  schedule:
+    # Merge the consolidated PR a few times a day; between ticks the queue
+    # only accumulates updates, which keeps notification volume low.
+    - cron: '25 */6 * * *'
+  push:
+    branches:
+      - update-apps-json
   pull_request_target:
     branches:
       - main
@@ -39,17 +46,27 @@ jobs:
         python-version: 3.11
     - name: Install icon conversion dependencies
       run: python -m pip install cairosvg
-    - name: Consolidate open apps.json pull requests
+    - name: Consolidate pending apps.json updates
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Merging with GITHUB_TOKEN would not trigger the push workflows on
+        # main (update-neurocontainers etc.), so merges use this PAT.
+        MERGE_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
+        MERGE_ARGS=""
+        # Scheduled and manual runs merge the consolidated PR; PR/push events
+        # only fold new updates into it, so bursts of releases collapse into
+        # one merge per schedule tick.
+        if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          MERGE_ARGS="--merge-consolidated"
+        fi
         python3 .github/workflows/scripts/consolidate_appsjson_queue.py \
           --repo "${{ github.repository }}" \
-          --graphql-url "${{ github.graphql_url }}" \
           --base-ref main \
           --target-file neurodesk/apps.json \
           --consolidated-branch bot/appsjson-consolidated \
+          --source-branch update-apps-json \
           --neurocontainers-path neurocontainers \
           --icons-dir neurodesk/icons \
-          --enable-auto-merge \
-          --auto-merge-method SQUASH
+          --merge-method squash \
+          $MERGE_ARGS

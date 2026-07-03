@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
-"""Consolidate open neurodesk/apps.json PRs into a single queue PR.
+"""Consolidate pending neurodesk/apps.json updates into a single queue PR.
 
 Rules implemented:
-- Process open PRs that touch neurodesk/apps.json in created_at order.
-- Compute each PR's changed tools using merge-base(main, pr_head).
+- Process queue sources in created_at order. A source is either an open PR
+  that touches neurodesk/apps.json or the PR-less bot branch that the
+  neurocontainers release automation force-pushes (``--source-branch``).
+- Compute each source's changed tools using merge-base(main, source_head).
 - Apply those tool changes to a consolidated apps.json snapshot.
-- Later PRs overwrite earlier PRs for the same tool.
-- Close apps.json-only source PRs after their changes are consolidated.
+- Later sources overwrite earlier sources for the same tool.
+- With ``--merge-consolidated`` (scheduled/manual runs), squash-merge the
+  consolidated PR directly via the REST API. Auto-merge cannot be used here:
+  the repository disallows it, and with no required status checks GitHub
+  rejects enabling auto-merge on an already-mergeable PR anyway.
+- Close source PRs (apps.json plus synced icons only) once their changes are
+  in main — either merged in this run or already contained in the base.
 """
 
 from __future__ import annotations
@@ -18,9 +25,12 @@ import json
 import os
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
@@ -41,24 +51,54 @@ class PullRequest:
     html_url: str
     files: List[str]
 
-    @property
-    def apps_only(self) -> bool:
-        return all(path == "neurodesk/apps.json" for path in self.files)
+    def consolidatable(self, target_file: str, icons_prefix: str) -> bool:
+        """True when the PR only touches apps.json and its synced icons.
+
+        Generator PRs ship icon PNGs alongside apps.json, and the consolidated
+        branch re-syncs those icons itself, so such PRs are fully represented
+        by the consolidation and safe to close.
+        """
+        return all(
+            path == target_file or path.startswith(icons_prefix)
+            for path in self.files
+        )
+
+
+@dataclass
+class QueueSource:
+    """One ordered input to the queue: an open PR or the bot source branch."""
+
+    created_at: str
+    ref: str
+    label: str
+    title: str
+    pr: Optional[PullRequest] = None
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", required=True, help="owner/repo")
     parser.add_argument("--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com"))
-    parser.add_argument("--graphql-url", default=os.environ.get("GITHUB_GRAPHQL_URL", "https://api.github.com/graphql"))
     parser.add_argument("--base-ref", default="main")
     parser.add_argument("--target-file", default="neurodesk/apps.json")
     parser.add_argument("--consolidated-branch", default="bot/appsjson-consolidated")
-    parser.add_argument("--enable-auto-merge", action="store_true")
     parser.add_argument(
-        "--auto-merge-method",
-        choices=["MERGE", "SQUASH", "REBASE"],
-        default="SQUASH",
+        "--source-branch",
+        default="update-apps-json",
+        help=(
+            "PR-less branch that the neurocontainers release automation "
+            "force-pushes; consumed as a queue source when it exists."
+        ),
+    )
+    parser.add_argument(
+        "--merge-consolidated",
+        action="store_true",
+        help="Squash-merge the consolidated PR via the REST API at the end of the run.",
+    )
+    parser.add_argument(
+        "--merge-method",
+        choices=["merge", "squash", "rebase"],
+        default="squash",
     )
     parser.add_argument(
         "--neurocontainers-path",
@@ -153,29 +193,6 @@ def github_paginated_get(
     return items
 
 
-def github_graphql_request(graphql_url: str, token: str, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
-    payload = json.dumps({"query": query, "variables": variables}).encode("utf-8")
-    req = Request(
-        graphql_url,
-        method="POST",
-        data=payload,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
-    )
-    with urlopen(req) as resp:
-        body = resp.read().decode("utf-8")
-    parsed = json.loads(body) if body else {}
-    errors = parsed.get("errors") or []
-    if errors:
-        messages = "; ".join(error.get("message", "unknown graphql error") for error in errors)
-        raise RuntimeError(messages)
-    return parsed.get("data", {})
-
-
 def list_open_pull_requests(api_url: str, repo: str, token: str) -> List[Dict[str, Any]]:
     prs = github_paginated_get(
         api_url,
@@ -227,6 +244,11 @@ def read_json_from_git(ref: str, path: str) -> Dict[str, Any]:
     if not isinstance(parsed, dict):
         raise RuntimeError(f"Expected top-level JSON object in {path} at {ref}")
     return parsed
+
+
+def parse_timestamp(value: str) -> datetime:
+    """Normalise GitHub API and ``git log %cI`` timestamps for ordering."""
+    return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
 
 
 def changed_tools(before: Dict[str, Any], after: Dict[str, Any]) -> List[str]:
@@ -297,8 +319,8 @@ def truncate_diff(diff_text: str, max_chars: int) -> tuple[str, bool]:
 def build_consolidation_pr_body(
     base_ref: str,
     target_file: str,
-    relevant_prs: List[PullRequest],
-    applied_tools: Dict[str, int],
+    sources: List[QueueSource],
+    applied_tools: Dict[str, str],
     closed_prs: List[PullRequest],
     should_have_consolidated_pr: bool,
     appsjson_diff: str,
@@ -310,19 +332,18 @@ def build_consolidation_pr_body(
     lines.append(f"Target file: `{target_file}`")
     lines.append("")
 
-    if relevant_prs:
-        lines.append("## PR Processing Order")
-        for pr in relevant_prs:
-            lines.append(f"- #{pr.number} ({pr.created_at}): {pr.title}")
+    lines.append("## Source Processing Order")
+    if sources:
+        for source in sources:
+            lines.append(f"- {source.label} ({source.created_at}): {source.title}")
     else:
-        lines.append("## PR Processing Order")
-        lines.append("- No open pull requests currently modify `neurodesk/apps.json`.")
+        lines.append("- No pending sources currently modify `neurodesk/apps.json`.")
 
     lines.append("")
     lines.append("## Final Tool Winners")
     if applied_tools:
         for tool in sorted(applied_tools.keys()):
-            lines.append(f"- `{tool}` -> #{applied_tools[tool]}")
+            lines.append(f"- `{tool}` -> {applied_tools[tool]}")
     else:
         lines.append("- No tool-level changes were applied.")
 
@@ -546,73 +567,63 @@ def close_consolidated_source_prs(
         )
 
 
-def enable_pull_request_auto_merge(
-    graphql_url: str,
-    owner: str,
-    repo_name: str,
+def merge_pull_request(
+    api_url: str,
+    repo: str,
     token: str,
     pr_number: int,
     merge_method: str,
+    attempts: int = 5,
+    retry_delay_seconds: float = 10.0,
 ) -> str:
-    lookup_query = """
-query($owner: String!, $name: String!, $number: Int!) {
-  repository(owner: $owner, name: $name) {
-    pullRequest(number: $number) {
-      id
-      autoMergeRequest {
-        enabledAt
-      }
-    }
-  }
-}
-"""
+    """Squash/merge a PR via REST, retrying while GitHub computes mergeability.
 
-    lookup = github_graphql_request(
-        graphql_url,
-        token,
-        lookup_query,
-        {"owner": owner, "name": repo_name, "number": pr_number},
-    )
-    pr_data = ((lookup.get("repository") or {}).get("pullRequest")) or {}
-    pr_id = pr_data.get("id")
-    if not pr_id:
-        raise RuntimeError(f"could not resolve PR node id for #{pr_number}")
-
-    if pr_data.get("autoMergeRequest") is not None:
-        return "already enabled"
-
-    mutation = """
-mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
-  enablePullRequestAutoMerge(input: {
-    pullRequestId: $pullRequestId
-    mergeMethod: $mergeMethod
-  }) {
-    pullRequest {
-      number
-    }
-  }
-}
-"""
-    github_graphql_request(
-        graphql_url,
-        token,
-        mutation,
-        {"pullRequestId": pr_id, "mergeMethod": merge_method},
-    )
-    return "enabled"
+    The consolidated branch is force-pushed moments before this call, so the
+    first attempts can fail with 405 (mergeability not yet computed) or 409
+    (head moved). Anything still failing after the retries is reported as a
+    status string rather than raised, so consolidation output is preserved.
+    """
+    last_error = "unknown error"
+    for attempt in range(1, attempts + 1):
+        try:
+            github_request(
+                "PUT",
+                api_url,
+                f"/repos/{repo}/pulls/{pr_number}/merge",
+                token,
+                payload={"merge_method": merge_method},
+            )
+            return "merged"
+        except HTTPError as exc:
+            detail = ""
+            try:
+                detail = exc.read().decode("utf-8")
+            except Exception:  # noqa: BLE001 - diagnostics only
+                pass
+            last_error = f"HTTP {exc.code} {detail}".strip()
+            if exc.code not in (405, 409) or attempt == attempts:
+                break
+            time.sleep(retry_delay_seconds)
+    return f"failed ({last_error})"
 
 
 def main() -> int:
     args = parse_args()
     token = require_token()
+    # Merging with the default GITHUB_TOKEN would not trigger the push
+    # workflows on main (update-neurocontainers etc.), so merges use a PAT
+    # supplied via MERGE_TOKEN when available.
+    merge_token = os.environ.get("MERGE_TOKEN") or token
 
-    owner, repo_name = args.repo.split("/", 1)
+    owner = args.repo.split("/", 1)[0]
+    icons_prefix = f"{args.icons_dir.as_posix()}/"
 
     run_git(["fetch", "--no-tags", "origin", f"+refs/heads/{args.base_ref}:refs/remotes/origin/{args.base_ref}"])
 
     open_prs_raw = list_open_pull_requests(args.api_url, args.repo, token)
 
     relevant_prs: List[PullRequest] = []
+    source_branch_covered_by_pr = False
     for pr in open_prs_raw:
         head_repo = (pr.get("head") or {}).get("repo") or {}
         head_ref = (pr.get("head") or {}).get("ref")
@@ -625,6 +636,11 @@ def main() -> int:
         files = list_pull_request_files(args.api_url, args.repo, int(pr["number"]), token)
         if args.target_file not in files:
             continue
+        if (
+            head_repo.get("full_name", "").lower() == args.repo.lower()
+            and head_ref == args.source_branch
+        ):
+            source_branch_covered_by_pr = True
         relevant_prs.append(
             PullRequest(
                 number=int(pr["number"]),
@@ -636,6 +652,43 @@ def main() -> int:
         )
 
     relevant_prs.sort(key=lambda pr: (pr.created_at, pr.number))
+
+    sources: List[QueueSource] = [
+        QueueSource(
+            created_at=pr.created_at,
+            ref=f"refs/remotes/origin/pr/{pr.number}",
+            label=f"#{pr.number}",
+            title=pr.title,
+            pr=pr,
+        )
+        for pr in relevant_prs
+    ]
+
+    # The neurocontainers release automation force-pushes a PR-less branch;
+    # consume it as a queue source unless an open PR already tracks it.
+    if args.source_branch and not source_branch_covered_by_pr:
+        source_branch_ref = f"refs/remotes/origin/{args.source_branch}"
+        fetched = run_git(
+            [
+                "fetch",
+                "--no-tags",
+                "origin",
+                f"+refs/heads/{args.source_branch}:{source_branch_ref}",
+            ],
+            check=False,
+        )
+        if fetched.returncode == 0:
+            commit_date = run_git(["log", "-1", "--format=%cI", source_branch_ref]).stdout.strip()
+            sources.append(
+                QueueSource(
+                    created_at=commit_date,
+                    ref=source_branch_ref,
+                    label=f"branch `{args.source_branch}`",
+                    title="neurocontainers release automation branch",
+                )
+            )
+
+    sources.sort(key=lambda source: (parse_timestamp(source.created_at), source.label))
 
     base_ref = f"refs/remotes/origin/{args.base_ref}"
     base_payload = read_json_from_git(base_ref, args.target_file)
@@ -659,7 +712,6 @@ def main() -> int:
         )
         # Icons synced alongside apps.json are expected on the consolidated
         # branch and must not be treated as stray files that force a re-push.
-        icons_prefix = f"{args.icons_dir.as_posix()}/"
         existing_consolidated_has_non_target_files = any(
             file_path != args.target_file and not file_path.startswith(icons_prefix)
             for file_path in existing_pr_files
@@ -678,42 +730,42 @@ def main() -> int:
         if fetch_consolidated.returncode == 0:
             existing_consolidated_payload = read_json_from_git(consolidated_ref, args.target_file)
 
-    # Route every apps.json update (even a lone PR) through the consolidated
-    # branch so its recipe icons can be synced inline before merge.
-    consolidation_active = existing_consolidated_pr is not None or len(relevant_prs) >= 1
+    # Route every apps.json update (even a lone source) through the
+    # consolidated branch so its recipe icons can be synced inline before merge.
+    consolidation_active = existing_consolidated_pr is not None or len(sources) >= 1
 
     if consolidation_active:
         consolidated_payload: Dict[str, Any] = copy.deepcopy(existing_consolidated_payload)
     else:
         consolidated_payload = copy.deepcopy(base_payload)
 
-    pr_changed_tools: Dict[int, List[str]] = {}
-    final_winner_by_tool: Dict[str, int] = {}
+    source_changed_tools: Dict[str, List[str]] = {}
+    final_winner_by_tool: Dict[str, str] = {}
 
     if consolidation_active:
-        for pr in relevant_prs:
-            run_git([
-                "fetch",
-                "--no-tags",
-                "origin",
-                f"+refs/pull/{pr.number}/head:refs/remotes/origin/pr/{pr.number}",
-            ])
+        for source in sources:
+            if source.pr is not None:
+                run_git([
+                    "fetch",
+                    "--no-tags",
+                    "origin",
+                    f"+refs/pull/{source.pr.number}/head:{source.ref}",
+                ])
 
-            pr_ref = f"refs/remotes/origin/pr/{pr.number}"
-            merge_base = run_git(["merge-base", base_ref, pr_ref]).stdout.strip()
+            merge_base = run_git(["merge-base", base_ref, source.ref]).stdout.strip()
 
             before_payload = read_json_from_git(merge_base, args.target_file)
-            after_payload = read_json_from_git(pr_ref, args.target_file)
+            after_payload = read_json_from_git(source.ref, args.target_file)
 
             changed = changed_tools(before_payload, after_payload)
-            pr_changed_tools[pr.number] = changed
+            source_changed_tools[source.label] = changed
 
             for tool in changed:
                 if tool in after_payload:
                     consolidated_payload[tool] = copy.deepcopy(after_payload[tool])
                 elif tool in consolidated_payload:
                     del consolidated_payload[tool]
-                final_winner_by_tool[tool] = pr.number
+                final_winner_by_tool[tool] = source.label
 
     write_json(args.target_file, consolidated_payload)
 
@@ -728,9 +780,12 @@ def main() -> int:
 
     consolidated_source_prs: List[PullRequest] = []
     if consolidation_active:
-        for pr in relevant_prs:
-            changed = pr_changed_tools.get(pr.number, [])
-            if pr.apps_only and changed:
+        for source in sources:
+            pr = source.pr
+            if pr is None:
+                continue
+            changed = source_changed_tools.get(source.label, [])
+            if changed and pr.consolidatable(args.target_file, icons_prefix):
                 consolidated_source_prs.append(pr)
 
     appsjson_diff = render_appsjson_diff(
@@ -741,7 +796,7 @@ def main() -> int:
     pr_body = build_consolidation_pr_body(
         args.base_ref,
         args.target_file,
-        relevant_prs,
+        sources,
         final_winner_by_tool,
         consolidated_source_prs,
         should_have_consolidated_pr,
@@ -787,36 +842,42 @@ def main() -> int:
             appsjson_diff=appsjson_diff,
         )
 
-    auto_merge_status: Optional[str] = None
-    if args.enable_auto_merge and consolidated_pr_number is not None:
-        try:
-            auto_merge_result = enable_pull_request_auto_merge(
-                graphql_url=args.graphql_url,
-                owner=owner,
-                repo_name=repo_name,
-                token=token,
-                pr_number=consolidated_pr_number,
-                merge_method=args.auto_merge_method,
-            )
-            auto_merge_status = f"{auto_merge_result} ({args.auto_merge_method})"
-        except Exception as exc:
-            auto_merge_status = f"failed ({exc})"
+    merge_status: Optional[str] = None
+    if args.merge_consolidated and consolidated_pr_number is not None:
+        merge_status = merge_pull_request(
+            api_url=args.api_url,
+            repo=args.repo,
+            token=merge_token,
+            pr_number=consolidated_pr_number,
+            merge_method=args.merge_method,
+        )
+        if merge_status != "merged":
             print(
-                f"WARNING: Failed to enable auto-merge for PR #{consolidated_pr_number}: {exc}",
+                f"WARNING: Failed to merge consolidated PR #{consolidated_pr_number}: {merge_status}",
                 file=sys.stderr,
             )
 
-    close_consolidated_source_prs(
-        api_url=args.api_url,
-        repo=args.repo,
-        token=token,
-        source_prs=consolidated_source_prs,
-    )
+    # Only close source PRs once their changes have actually landed on main:
+    # either the consolidated PR merged in this run, or the queue output
+    # already matches main. Otherwise leave them open for the next
+    # scheduled merge run.
+    changes_already_in_main = consolidation_active and not should_have_consolidated_pr
+    sources_landed = changes_already_in_main or merge_status == "merged"
+    if sources_landed:
+        close_consolidated_source_prs(
+            api_url=args.api_url,
+            repo=args.repo,
+            token=token,
+            source_prs=consolidated_source_prs,
+        )
 
     print("Consolidation summary:")
-    print(f"- Relevant PRs: {[pr.number for pr in relevant_prs]}")
+    print(f"- Queue sources: {[source.label for source in sources]}")
     print(f"- Consolidated tools: {len(final_winner_by_tool)}")
-    print(f"- Source PRs closed: {[pr.number for pr in consolidated_source_prs]}")
+    print(
+        "- Source PRs closed: "
+        f"{[pr.number for pr in consolidated_source_prs] if sources_landed else '[] (pending merge)'}"
+    )
     print(f"- Consolidated PR number: {consolidated_pr_number}")
     print(f"- Consolidated branch pushed: {'yes' if needs_branch_push else 'no'}")
     print(f"- Icons synced inline: {len(synced_icon_files)}")
@@ -825,8 +886,8 @@ def main() -> int:
         f"{'yes' if existing_consolidated_has_non_target_files else 'no'}"
     )
     print(f"- Consolidated PR diff comment: {diff_comment_status}")
-    if args.enable_auto_merge:
-        print(f"- Consolidated PR auto-merge: {auto_merge_status or 'n/a'}")
+    if args.merge_consolidated:
+        print(f"- Consolidated PR merge: {merge_status or 'n/a'}")
 
     return 0
 
