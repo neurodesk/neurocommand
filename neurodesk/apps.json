@@ -3026,7 +3026,7 @@
     "spm25": {
         "apps": {
             "spm25 25.01.02": {
-                "version": "20251210",
+                "version": "20260629",
                 "exec": "",
                 "apptainer_args": []
             }
