@@ -14,6 +14,18 @@ fail() {
    exit 2
 }
 
+# Why this fallback exists:
+# GHCR (and Quay) redirect blob downloads to a CDN URL that is signed with an
+# absolute expiry (observed on GHCR: pkg-containers.githubusercontent.com with
+# se=<next hour boundary>, i.e. valid for anywhere between a few minutes and
+# ~1 hour depending on when the pull starts). A SIF is pushed as one single
+# ORAS blob, and apptainer downloads it in one HTTP/2 stream with no resume
+# and no retry. When a large image (>~5 GiB) on a slow link outlives the
+# signed URL, the CDN resets the stream and apptainer dies with:
+#   FATAL: ... stream error: stream ID 1; PROTOCOL_ERROR; received from peer
+# The registry entry itself is fine - the same pull succeeds on a faster link.
+# Nectar object-storage URLs do not expire mid-download and curl retries, so
+# after a failed ORAS pull we fall back to Nectar instead of aborting.
 download_container_from_nectar() {
    local fallback_container="$1"
    local nectar_url
