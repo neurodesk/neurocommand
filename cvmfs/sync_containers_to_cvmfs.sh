@@ -47,7 +47,10 @@ abort_cvmfs_transaction() {
         echo "[ERROR] Unable to switch to $HOME before aborting $repo."
         exit 2
     }
-    sudo cvmfs_server abort "$repo"
+    # -f keeps this non-interactive: without it the y/N prompt reads from this
+    # script's stdin (log.txt inside the sync loop), eating a container line
+    # and leaving the transaction open.
+    sudo cvmfs_server abort -f "$repo"
 }
 
 ensure_nested_catalog_markers_for_container() {
@@ -363,7 +366,8 @@ do
                 export SINGULARITY_BINDPATH=/cvmfs
                 echo $PATH
                 export PATH=$PATH:/usr/sbin/
-                ./run_transparent_singularity.sh $IMAGENAME_BUILDDATE --unpack true
+                # stdin is log.txt inside this loop; keep child processes from consuming it
+                ./run_transparent_singularity.sh $IMAGENAME_BUILDDATE --unpack true < /dev/null
                 retVal=$?
 
                 if [[ $retVal -eq 0 ]]; then
