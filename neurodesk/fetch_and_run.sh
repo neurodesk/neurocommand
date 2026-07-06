@@ -201,7 +201,8 @@ if [ $# -eq 0 ]; then
         read -n 1 -s -r -p "Press any key to continue..."
     fi
 else
-    # Additional command provided -> Run it via the module environment
-    echo "[INFO] fetch_and_run.sh line $LINENO: Running command '${@}'."
-    ${@}
+    # Additional command provided -> Run it via the module environment.
+    # Quoted expansion keeps arguments intact (e.g. document paths with spaces).
+    echo "[INFO] fetch_and_run.sh line $LINENO: Running command '${*}'."
+    "${@}"
 fi
