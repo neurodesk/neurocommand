@@ -14,6 +14,60 @@ fail() {
    exit 2
 }
 
+download_container_from_nectar() {
+   local fallback_container="$1"
+   local nectar_url
+   local nectar_urls=(
+      "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/"
+      "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/"
+   )
+
+   if ! command -v curl >/dev/null 2>&1; then
+      echo "[WARN] curl is not available; cannot use Nectar fallback for '${fallback_container}'." >&2
+      return 1
+   fi
+
+   for nectar_url in "${nectar_urls[@]}"; do
+      echo "checking Nectar fallback: ${nectar_url}${fallback_container}"
+      if ! curl --output /dev/null --silent --head --fail "${nectar_url}${fallback_container}"; then
+         continue
+      fi
+
+      echo "downloading from Nectar fallback: ${nectar_url}${fallback_container}"
+      rm -f "$fallback_container"
+      if curl --fail --location --retry 5 --retry-delay 10 \
+            --output "$fallback_container" "${nectar_url}${fallback_container}"; then
+         return 0
+      fi
+      rm -f "$fallback_container"
+   done
+
+   return 1
+}
+
+run_container_pull_with_fallback() {
+   if [[ -z "${container_pull:-}" ]]; then
+      echo "[ERROR] No retrieval command was selected for '${container}'." >&2
+      return 1
+   fi
+
+   echo "running: $container_pull"
+   if $container_pull; then
+      return 0
+   fi
+
+   local pull_status=$?
+   if [[ "$storage" = "quay-v2" ]] || [[ "$storage" = "ghcr-v2" ]]; then
+      echo "[WARN] ORAS pull failed for '${container}'. Trying Nectar object-storage fallback." >&2
+      if download_container_from_nectar "$container"; then
+         return 0
+      fi
+      echo "[ERROR] ORAS pull failed with status ${pull_status}, and Nectar fallback did not retrieve '${container}'." >&2
+   fi
+
+   return "$pull_status"
+}
+
 export SINGULARITY_BINDPATH=$SINGULARITY_BINDPATH,$PWD
 
 _script="$(readlink -f ${BASH_SOURCE[0]})" ## who am i? ##
@@ -311,8 +365,7 @@ if  [[ -e $container ]]; then
 else
    echo "pulling image now ..."
    echo "where am I: $PWD"
-   echo "running: $container_pull"
-   if ! $container_pull; then
+   if ! run_container_pull_with_fallback; then
       fail "Failed to retrieve container '${container}'."
    fi
 fi
