@@ -14,6 +14,49 @@ import distutils.dir_util
 
 APP_MENU_KWARGS = {"version", "exec", "terminal", "apptainer_args"}
 
+# MIME types claimed by document-editing executables, keyed by the app's exec
+# name. Entries here get a MimeType= declaration and a %F field code in their
+# .desktop file so file managers can open documents with them via double-click.
+# text/csv is deliberately not claimed so csv data files keep opening in a
+# text editor.
+EXEC_MIMETYPES = {
+    "lowriter": [
+        "application/vnd.oasis.opendocument.text",
+        "application/vnd.oasis.opendocument.text-template",
+        "application/vnd.oasis.opendocument.text-master",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+        "application/rtf",
+    ],
+    "localc": [
+        "application/vnd.oasis.opendocument.spreadsheet",
+        "application/vnd.oasis.opendocument.spreadsheet-template",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+    ],
+    "loimpress": [
+        "application/vnd.oasis.opendocument.presentation",
+        "application/vnd.oasis.opendocument.presentation-template",
+        "application/vnd.ms-powerpoint",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "application/vnd.openxmlformats-officedocument.presentationml.template",
+    ],
+    "lodraw": [
+        "application/vnd.oasis.opendocument.graphics",
+        "application/vnd.oasis.opendocument.graphics-template",
+        "application/vnd.visio",
+    ],
+    "lobase": [
+        "application/vnd.oasis.opendocument.database",
+        "application/vnd.sun.xml.base",
+    ],
+    "lomath": [
+        "application/vnd.oasis.opendocument.formula",
+    ],
+}
+
 
 def chmod_if_new(path: Path, mode: int, existed_before: bool) -> None:
     """Set file mode only when this run created the target file."""
@@ -214,9 +257,9 @@ class NeurodeskApp:
             if sh_exec:
                 self_sh_file.write(f"{sh_exec}")
             elif self.deskenv == 'mate':
-                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} $@")
+                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} \"$@\"")
             else:
-                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} $@")
+                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} \"$@\"")
             self_sh_file.write('\n')
         writefile_with_mode(self.sh_path, _write_app_sh, mode=0o755)
 
@@ -229,7 +272,8 @@ class NeurodeskApp:
             logging.warning(f'{icon_src} not found')
             icon_src = (Path(__file__).parent/'icons/neurodesk.png')
             copyfile_with_mode(icon_src, icon_path)
-        entry = configparser.ConfigParser()
+        # interpolation=None so Exec field codes like %F are written verbatim
+        entry = configparser.ConfigParser(interpolation=None)
         entry.optionxform = str
 
         if self.deskenv == 'mate':
@@ -253,6 +297,10 @@ class NeurodeskApp:
                 "Categories": self.category,
                 "Terminal": str(self.terminal).lower()
             }
+            mimetypes = EXEC_MIMETYPES.get(self.exec)
+            if mimetypes:
+                entry["Desktop Entry"]["Exec"] += " %F"
+                entry["Desktop Entry"]["MimeType"] = ";".join(mimetypes) + ";"
 
         applications_path = self.installdir/"applications"
         applications_path.mkdir(exist_ok=True)
