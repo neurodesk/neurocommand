@@ -52,11 +52,11 @@ run_container_pull_with_fallback() {
    fi
 
    echo "running: $container_pull"
-   if $container_pull; then
+   local pull_status=0
+   $container_pull || pull_status=$?
+   if [[ $pull_status -eq 0 ]]; then
       return 0
    fi
-
-   local pull_status=$?
    if [[ "$storage" = "quay-v2" ]] || [[ "$storage" = "ghcr-v2" ]]; then
       echo "[WARN] ORAS pull failed for '${container}'. Trying Nectar object-storage fallback." >&2
       if download_container_from_nectar "$container"; then

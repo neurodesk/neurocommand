@@ -341,7 +341,21 @@ do
             open_cvmfs_transaction neurodesk.ardc.edu.au
 
             cd /cvmfs/neurodesk.ardc.edu.au/containers/
-            git clone https://github.com/NeuroDesk/transparent-singularity $IMAGENAME_BUILDDATE
+
+            # A leftover directory from a previous failed run would make git clone
+            # fail and silently reuse a stale transparent-singularity checkout.
+            # The outer commands.txt check already skipped completed installs, so
+            # anything here is an incomplete install and safe to remove.
+            if [[ -e "$IMAGENAME_BUILDDATE" ]]; then
+                echo "[WARNING] Removing stale leftover directory from a previous failed run: $IMAGENAME_BUILDDATE"
+                sudo rm -rf "$IMAGENAME_BUILDDATE"
+            fi
+
+            if ! git clone https://github.com/NeuroDesk/transparent-singularity "$IMAGENAME_BUILDDATE"; then
+                echo "[ERROR] Failed to clone transparent-singularity for $IMAGENAME_BUILDDATE. Aborting transaction."
+                abort_cvmfs_transaction neurodesk.ardc.edu.au
+                continue
+            fi
 
             # check if $IMAGENAME_BUILDDATE variable is not empty:
             if [[ -n "$IMAGENAME_BUILDDATE" ]]; then
