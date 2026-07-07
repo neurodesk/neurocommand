@@ -2378,6 +2378,11 @@
                 "version": "20251016",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "niimath 1.0.20260703": {
+                "version": "20260706",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
