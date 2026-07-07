@@ -374,6 +374,19 @@
             "data organisation"
         ]
     },
+    "bidsmanager": {
+        "apps": {
+            "bidsmanager 1.2.3": {
+                "version": "20260707",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "data organisation"
+        ]
+    },
     "bidsme": {
         "apps": {
             "bidsme 1.9.3": {
@@ -405,6 +418,24 @@
             }
         },
         "categories": [
+            "data organisation"
+        ]
+    },
+    "bidsvue": {
+        "apps": {
+            "bidsvue 0.1.20260704": {
+                "version": "20260707",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "BIDSvue-bidsvue 0.1.20260704": {
+                "version": "20260707",
+                "exec": "bidsvue",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
             "data organisation"
         ]
     },
