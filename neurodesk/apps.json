@@ -3119,12 +3119,12 @@
     "spm12": {
         "apps": {
             "spm12 r7771": {
-                "version": "20260702",
+                "version": "20260708",
                 "exec": "",
                 "apptainer_args": []
             },
             "spm12GUI-spm12 r7771": {
-                "version": "20260702",
+                "version": "20260708",
                 "exec": "bash run_spm12.sh /opt/mcr/v97/",
                 "apptainer_args": []
             }
