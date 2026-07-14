@@ -283,8 +283,9 @@
     "bidsapphcppipelines": {
         "apps": {
             "bidsapphcppipelines 4.3.0": {
-                "version": "20230524",
-                "exec": ""
+                "version": "20260703",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
