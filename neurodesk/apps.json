@@ -1479,6 +1479,18 @@
             "data organisation"
         ]
     },
+    "gouhfi": {
+        "apps": {
+            "gouhfi 0.0.1": {
+                "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
     "halfpipe": {
         "apps": {
             "halfpipe 1.2.3": {
@@ -2850,6 +2862,18 @@
         },
         "categories": [
             "diffusion imaging"
+        ]
+    },
+    "rapidtide": {
+        "apps": {
+            "rapidtide 3.1.11": {
+                "version": "20260714",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
         ]
     },
     "relion": {
