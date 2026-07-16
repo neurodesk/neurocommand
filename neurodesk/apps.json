@@ -909,6 +909,20 @@
             "electrophysiology"
         ]
     },
+    "dhcpstructuralpipeline": {
+        "apps": {
+            "dhcpstructuralpipeline 1.1": {
+                "version": "20260716",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging",
+            "workflows"
+        ]
+    },
     "dicompare": {
         "apps": {
             "dicompare 0.1.2": {
