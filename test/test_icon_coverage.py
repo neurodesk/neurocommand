@@ -36,6 +36,7 @@ DIRECTORY_NAMES = [
     "Phase Processing",
     "Molecular Biology",
     "Statistics",
+    "Fetal Imaging",
 ]
 
 

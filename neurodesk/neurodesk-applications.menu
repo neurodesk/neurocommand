@@ -248,6 +248,15 @@
 				</And>
 			</Include>
 		</Menu>
+		<Menu>
+			<Name>Fetal Imaging</Name>
+			<Directory>neurodesk/fetal-imaging.directory</Directory>
+			<Include>
+				<And>
+					<Category>fetal-imaging</Category>
+				</And>
+			</Include>
+		</Menu>
 	</Menu> <!-- End Neurodesk -->
 
 </Menu> <!-- End Applications -->
