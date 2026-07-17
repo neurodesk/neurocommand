@@ -1133,6 +1133,35 @@
             "body"
         ]
     },
+    "fetalsegmentation": {
+        "apps": {
+            "fetalsegmentation 20241116": {
+                "version": "20260716",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "fetal imaging",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "fetalsynthseg": {
+        "apps": {
+            "fetalsynthseg 1.0.0": {
+                "version": "20260716",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "fetal imaging",
+            "image segmentation",
+            "machine learning"
+        ]
+    },
     "fieldtrip": {
         "apps": {
             "fieldtrip 20211114": {
@@ -2346,6 +2375,21 @@
             "body"
         ]
     },
+    "nesvor": {
+        "apps": {
+            "nesvor 0.5.0": {
+                "version": "20260716",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "fetal imaging",
+            "image reconstruction",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
     "networkcorrespondancetoolkit": {
         "apps": {
             "networkcorrespondancetoolkit 0.3.3": {
@@ -3260,6 +3304,21 @@
         },
         "categories": [
             "visualization"
+        ]
+    },
+    "svrtk": {
+        "apps": {
+            "svrtk 20260626": {
+                "version": "20260716",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "fetal imaging",
+            "image reconstruction",
+            "structural imaging"
         ]
     },
     "syncro": {
