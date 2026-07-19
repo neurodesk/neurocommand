@@ -3309,7 +3309,7 @@
     "svrtk": {
         "apps": {
             "svrtk 20260626": {
-                "version": "20260716",
+                "version": "20260718",
                 "exec": "",
                 "apptainer_args": []
             }
