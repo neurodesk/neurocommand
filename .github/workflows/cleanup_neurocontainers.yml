@@ -21,6 +21,13 @@ jobs:
       contents: read
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+    - name: Check out neurocontainers release metadata
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      with:
+        repository: neurodesk/neurocontainers
+        path: neurocontainers-release-metadata
+        sparse-checkout: releases
+        sparse-checkout-cone-mode: true
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: 3.8
@@ -67,5 +74,6 @@ jobs:
 
         python3 .github/workflows/scripts/cleanup_stale_containers.py \
           --s3-bucket "neurocontainers" \
+          --releases-dir "neurocontainers-release-metadata/releases" \
           --retention-days 7 \
           --apply

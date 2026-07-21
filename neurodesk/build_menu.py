@@ -9,6 +9,7 @@ from typing import Callable, List, Optional, Text, TextIO
 import xml.etree.ElementTree as et
 from xml.dom import minidom
 import shutil
+import shlex
 import logging
 import distutils.dir_util
 
@@ -240,10 +241,14 @@ class NeurodeskApp:
         self.category = f"{self.category}"
         if self.exec:
             # assumes that executable name is before the dash and after the dash the normal container name and version
-            self.container_name = self.name.split("-")[1]
-            self.exec_name = self.name.split("-")[0] + " " + self.name.split("-")[1].split(" ")[1]
-        else: 
-            self.container_name = self.name
+            display_name, container_spec = self.name.split("-", 1)
+            self.container_name, self.container_version = container_spec.rsplit(" ", 1)
+            self.exec_name = f"{display_name} {self.container_version}"
+        else:
+            if " " in self.name:
+                self.container_name, self.container_version = self.name.rsplit(" ", 1)
+            else:
+                self.container_name, self.container_version = self.name, ""
             self.exec_name = self.name
 
     def add_app_sh(self, sh_exec=""):
@@ -257,9 +262,17 @@ class NeurodeskApp:
             if sh_exec:
                 self_sh_file.write(f"{sh_exec}")
             elif self.deskenv == 'mate':
-                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} \"$@\"")
+                self_sh_file.write(
+                    f"{shlex.quote(str(fetch_and_run_sh))} "
+                    f"{shlex.quote(self.container_name)} {shlex.quote(self.container_version)} "
+                    f"{shlex.quote(self.exec)} \"$@\""
+                )
             else:
-                self_sh_file.write(f"{str(fetch_and_run_sh)} {self.container_name} {self.exec} \"$@\"")
+                self_sh_file.write(
+                    f"{shlex.quote(str(fetch_and_run_sh))} "
+                    f"{shlex.quote(self.container_name)} {shlex.quote(self.container_version)} "
+                    f"{shlex.quote(self.exec)} \"$@\""
+                )
             self_sh_file.write('\n')
         writefile_with_mode(self.sh_path, _write_app_sh, mode=0o755)
 

@@ -52,3 +52,9 @@ def test_wrapper_script_quotes_forwarded_args(tmp_path):
     app = make_app(tmp_path, "libreofficeWriterGUI-libreoffice 26.2.4", "lowriter")
     sh_content = Path(app.sh_path).read_text()
     assert '"$@"' in sh_content
+
+
+def test_wrapper_script_preserves_named_variant_container(tmp_path):
+    app = make_app(tmp_path, "viewerGUI-tool_arm64 1.2.3", "viewer")
+    sh_content = Path(app.sh_path).read_text()
+    assert " tool_arm64 1.2.3 viewer" in sh_content
