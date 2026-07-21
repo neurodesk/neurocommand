@@ -30,6 +30,12 @@ def make_container(repo_root, container_name):
     (container / "commands.txt").write_text("datalad\n")
 
 
+def test_parse_image_name_supports_named_variants():
+    assert reconcile_module_files.parse_image_name(
+        "fsl_gpu_arm64_6.0.7_20260721.simg"
+    ) == ("fsl_gpu_arm64", "6.0.7", "20260721")
+
+
 def test_reconciles_current_public_modules_and_removes_stale_categories(tmp_path):
     repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
     old_container = "datalad_1.3.1_20260227"

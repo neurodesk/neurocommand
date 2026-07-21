@@ -96,6 +96,29 @@ def load_expected_keys(log_path: Path) -> Set[str]:
     return expected_keys
 
 
+def load_release_keys(releases_dir: Path) -> Set[str]:
+    """Return image keys referenced by neurocontainers release metadata."""
+    expected_keys: Set[str] = set()
+    if not releases_dir.is_dir():
+        raise SystemExit(f"[ERROR] Releases directory not found: {releases_dir}")
+
+    for release_path in releases_dir.glob("*/*.json"):
+        try:
+            release = json.loads(release_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise SystemExit(f"[ERROR] Could not read release metadata {release_path}: {exc}")
+
+        apps = release.get("apps", {})
+        for app in apps.values():
+            builddate = app.get("version")
+            if not isinstance(builddate, str) or not re.fullmatch(r"[0-9]{8}", builddate):
+                continue
+            image = app.get("image") or f"{release_path.parent.name}_{release_path.stem}"
+            expected_keys.add(f"{image}_{builddate}.simg")
+
+    return expected_keys
+
+
 def list_nectar_objects(remote_root: str) -> List[dict]:
     try:
         lsjson = subprocess.check_output(
@@ -256,6 +279,10 @@ def main() -> None:
     parser.add_argument("--s3-bucket", required=True, help="S3 bucket name")
     parser.add_argument("--remote-root", default="nectar:/neurodesk/", help="Nectar remote path")
     parser.add_argument("--log-path", default="log.txt", help="Path to log file")
+    parser.add_argument(
+        "--releases-dir",
+        help="Path to neurocontainers release metadata; referenced images are protected",
+    )
     parser.add_argument("--retention-days", type=int, default=30, help="Retention period in days")
     parser.add_argument(
         "--skip-log-generation",
@@ -283,6 +310,10 @@ def main() -> None:
         generate_log(log_path)
         normalize_log(log_path)
     expected_keys = load_expected_keys(log_path)
+    if args.releases_dir:
+        release_keys = load_release_keys(Path(args.releases_dir))
+        expected_keys.update(release_keys)
+        print(f"[DEBUG] Protected container count from release metadata: {len(release_keys)}")
 
     print(f"[DEBUG] Expected container count from log: {len(expected_keys)}")
     print(f"[DEBUG] Retention window for stale deletions: {args.retention_days} day(s)")

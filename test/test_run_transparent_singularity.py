@@ -21,7 +21,7 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     calls = tmp_path / "calls.log"
-    container = "demo_1.0_20260629.simg"
+    container = "demo_arm64_1.0_20260629.simg"
 
     write_executable(
         bin_dir / "apptainer",
@@ -46,12 +46,12 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
             exit 0
         fi
 
-        if [[ "$args" == *"ghcr.io/v2/neurodesk/demo/manifests/1.0_20260629"* && "$args" == *"-sIL"* ]]; then
+        if [[ "$args" == *"ghcr.io/v2/neurodesk/demo_arm64/manifests/1.0_20260629"* && "$args" == *"-sIL"* ]]; then
             printf 'HTTP/1.1 200 OK\\r\\nDocker-Content-Digest: sha256:docker\\r\\n\\r\\n'
             exit 0
         fi
 
-        if [[ "$args" == *"ghcr.io/v2/neurodesk/demo/manifests/sha256-docker"* ]]; then
+        if [[ "$args" == *"ghcr.io/v2/neurodesk/demo_arm64/manifests/sha256-docker"* ]]; then
             echo '{{"manifests":[{{"artifactType":"application/vnd.sylabs.sif.layer.v1.sif","digest":"sha256:sif"}}]}}'
             exit 0
         fi
@@ -154,11 +154,12 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     call_log = calls.read_text()
     assert (
-        "apptainer pull --name demo_1.0_20260629.simg "
-        "oras://ghcr.io/neurodesk/demo@sha256:sif"
+        "apptainer pull --name demo_arm64_1.0_20260629.simg "
+        "oras://ghcr.io/neurodesk/demo_arm64@sha256:sif"
     ) in call_log
     assert (
-        "nectar-download demo_1.0_20260629.simg "
+        "nectar-download demo_arm64_1.0_20260629.simg "
         "https://object-store.rc.nectar.org.au/v1/"
     ) in call_log
-    assert (workdir / "demo_1.0_20260629.simg").is_dir()
+    assert (workdir / "demo_arm64_1.0_20260629.simg").is_dir()
+    assert (tmp_path / "modules" / "demo_arm64" / "1.0.lua").is_file()
