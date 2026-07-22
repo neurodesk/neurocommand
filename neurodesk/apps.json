@@ -880,6 +880,19 @@
             "machine learning"
         ]
     },
+    "deepisles": {
+        "apps": {
+            "deepisles 1.1": {
+                "version": "20260715",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
     "deepretinotopy": {
         "apps": {
             "deepretinotopy 1.0.11": {
@@ -1865,6 +1878,19 @@
             "structural imaging"
         ]
     },
+    "lipsia": {
+        "apps": {
+            "lipsia 3.1.1": {
+                "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "machine learning"
+        ]
+    },
     "lqt": {
         "apps": {
             "lqt 0.1.0": {
@@ -2341,6 +2367,18 @@
             "mrtrix3src latest": {
                 "version": "latest",
                 "exec": ""
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "mrtrix3src": {
+        "apps": {
+            "mrtrix3src latest": {
+                "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
