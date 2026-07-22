@@ -162,23 +162,27 @@ if [ -z "$container" ]; then
       echo "-------------------------------------"
 fi
 
-containerName="$(cut -d'_' -f1 <<< ${container})"
+containerFile="${container##*/}"
+if [[ "$containerFile" == *.simg ]]; then
+   containerEnding="simg"
+   containerStem="${containerFile%.simg}"
+else
+   containerEnding="simg"
+   containerStem="$containerFile"
+fi
+
+containerDate="${containerStem##*_}"
+containerNameAndVersion="${containerStem%_*}"
+containerVersion="${containerNameAndVersion##*_}"
+containerName="${containerNameAndVersion%_*}"
 echo "containerName: ${containerName}"
 
-containerVersion="$(cut -d'_' -f2 <<< ${container})"
 echo "containerVersion: ${containerVersion}"
-
-containerDateAndFileEnding="$(cut -d'_' -f3 <<< ${container})"
-containerDate="$(cut -d'.' -f1 <<< ${containerDateAndFileEnding})"
-containerEnding="$(cut -d'.' -f2 <<< ${containerDateAndFileEnding})"
 
 echo "containerDate: ${containerDate}"
 
 # if no container extension is given, assume .simg
-if [ "$containerEnding" = "$containerDate" ]; then
-   containerEnding="simg"
-   container=${containerName}_${containerVersion}_${containerDate}.${containerEnding}
-fi
+container=${containerStem}.${containerEnding}
 echo "containerEnding: ${containerEnding}"
 
 if [[ -z "$containerName" ]] || [[ -z "$containerVersion" ]] || [[ ! "$containerDate" =~ ^[0-9]{8}$ ]]; then
@@ -411,8 +415,8 @@ if ! singularity exec $singularity_opts --pwd $_base $container $_base/ts_binary
    fail "Could not inspect executables in container '${container}'. Not creating wrapper or module files."
 fi
 
-if [[ ! -f "$_base/commands.txt" ]]; then
-   fail "ts_binaryFinder.sh did not create commands.txt for '${container}'. Not creating wrapper or module files."
+if [[ ! -s "$_base/commands.txt" ]]; then
+   fail "ts_binaryFinder.sh did not create a non-empty commands.txt for '${container}'. Not creating wrapper or module files."
 fi
 
 if [[ ! -f "$_base/env.txt" ]]; then
@@ -479,15 +483,15 @@ chmod a+x deactivate_${container}.sh
 
 # e.g. export container=matlab_2024b_20250117
 echo "create module files one directory up"
-modulePath=$_base/../modules/`echo $container | cut -d _ -f 1`
+modulePath="$_base/../modules/${containerName}"
 echo $modulePath
 # e.g. ../modules/matlab
 mkdir $modulePath -p
 
-moduleSoftwareName=`echo $container | cut -d _ -f 1`
+moduleSoftwareName="${containerName}"
 # e.g. matlab
 
-moduleName=`echo $container | cut -d _ -f 2`
+moduleName="${containerVersion}"
 # e.g. 2024b
 
 echo "-- -*- lua -*-" > ${modulePath}/${moduleName}.lua
