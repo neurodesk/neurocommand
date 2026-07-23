@@ -925,7 +925,7 @@
     "dhcpstructuralpipeline": {
         "apps": {
             "dhcpstructuralpipeline 1.1": {
-                "version": "20260716",
+                "version": "20260722",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2011,7 +2011,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20260714",
+                "version": "20260722",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2416,7 +2416,7 @@
     "nesvor": {
         "apps": {
             "nesvor 0.5.0": {
-                "version": "20260716",
+                "version": "20260722",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2424,7 +2424,6 @@
         "categories": [
             "fetal imaging",
             "image reconstruction",
-            "machine learning",
             "structural imaging"
         ]
     },
@@ -2490,6 +2489,19 @@
             "functional imaging",
             "structural imaging",
             "workflows"
+        ]
+    },
+    "niftymic": {
+        "apps": {
+            "niftymic 0.9": {
+                "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "fetal imaging",
+            "image reconstruction"
         ]
     },
     "niftyreg": {
