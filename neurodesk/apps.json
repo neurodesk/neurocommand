@@ -1164,7 +1164,7 @@
     "fetalsynthseg": {
         "apps": {
             "fetalsynthseg 1.0.0": {
-                "version": "20260716",
+                "version": "20260722",
                 "exec": "",
                 "apptainer_args": []
             }
