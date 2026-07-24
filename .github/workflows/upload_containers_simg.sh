@@ -308,7 +308,7 @@ main() {
     cd cvmfs
     echo "[Debug] generate applist.json file for website"
     python json_gen.py --apps-json ../neurodesk/apps.json # this generates the applist.json for the website
-    # these files will be committed via uses: stefanzweifel/git-auto-commit-action@v4
+    # The CVMFS Stratum 0 regenerates and publishes these files after synchronization.
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

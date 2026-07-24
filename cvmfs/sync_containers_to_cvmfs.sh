@@ -194,12 +194,13 @@ neurocommand_has_upstream_updates() {
     return 0
 }
 
-regenerate_log_from_apps_json() {
+regenerate_metadata_from_apps_json() {
     local repo_path="$1"
     local generated_log="$repo_path/log.txt"
     local target_log="$repo_path/cvmfs/log.txt"
+    local target_applist="$repo_path/cvmfs/applist.json"
 
-    echo "[INFO] Regenerating cvmfs/log.txt from neurodesk/apps.json."
+    echo "[INFO] Regenerating CVMFS metadata from neurodesk/apps.json."
 
     rm -f "$generated_log"
 
@@ -215,6 +216,16 @@ regenerate_log_from_apps_json() {
 
     mv -f "$generated_log" "$target_log"
     echo "[INFO] Updated $target_log"
+
+    if ! python3 "$repo_path/cvmfs/json_gen.py" \
+        --log-path "$target_log" \
+        --output "$target_applist" \
+        --apps-json "$repo_path/neurodesk/apps.json"; then
+        echo "[ERROR] Failed to generate applist.json from $target_log."
+        exit 2
+    fi
+
+    echo "[INFO] Updated $target_applist"
 }
 
 git_pull_rebase_non_interactive() {
@@ -233,17 +244,17 @@ git_pull_rebase_non_interactive() {
     return 0
 }
 
-commit_log_to_github_if_changed() {
+commit_generated_metadata_to_github_if_changed() {
     local repo_path="$1"
-    local log_rel_path="cvmfs/log.txt"
+    local generated_rel_paths=("cvmfs/log.txt" "cvmfs/applist.json")
 
-    if git -C "$repo_path" diff --quiet -- "$log_rel_path"; then
-        echo "[INFO] No changes in $log_rel_path; skipping git commit/push."
+    if git -C "$repo_path" diff --quiet -- "${generated_rel_paths[@]}"; then
+        echo "[INFO] No generated metadata changes; skipping git commit/push."
         return 0
     fi
 
-    echo "[INFO] Committing regenerated $log_rel_path to GitHub."
-    git -C "$repo_path" add "$log_rel_path"
+    echo "[INFO] Committing regenerated CVMFS metadata to GitHub."
+    git -C "$repo_path" add "${generated_rel_paths[@]}"
 
     if [[ -z "$(git -C "$repo_path" config --get user.name)" ]]; then
         git -C "$repo_path" config user.name "neurodesk-cvmfs-bot"
@@ -252,26 +263,26 @@ commit_log_to_github_if_changed() {
         git -C "$repo_path" config user.email "neurodesk-cvmfs-bot@users.noreply.github.com"
     fi
 
-    if ! git -C "$repo_path" commit -m "Regenerate cvmfs/log.txt from apps.json"; then
-        echo "[WARNING] Unable to commit $log_rel_path; continuing."
+    if ! git -C "$repo_path" commit -m "Regenerate CVMFS metadata from apps.json"; then
+        echo "[WARNING] Unable to commit generated CVMFS metadata; continuing."
         return 1
     fi
 
     if ! git -C "$repo_path" push; then
-        echo "[WARNING] Initial push failed for $log_rel_path. Attempting git pull --rebase and one push retry."
+        echo "[WARNING] Initial metadata push failed. Attempting git pull --rebase and one push retry."
         if ! git_pull_rebase_non_interactive "$repo_path"; then
-            echo "[WARNING] Rebase failed while retrying push for $log_rel_path; continuing."
+            echo "[WARNING] Rebase failed while retrying metadata push; continuing."
             git -C "$repo_path" rebase --abort >/dev/null 2>&1 || true
             return 1
         fi
 
         if ! git -C "$repo_path" push; then
-            echo "[WARNING] Push retry failed for $log_rel_path; continuing."
+            echo "[WARNING] Metadata push retry failed; continuing."
             return 1
         fi
     fi
 
-    echo "[INFO] Successfully committed and pushed $log_rel_path."
+    echo "[INFO] Successfully committed and pushed generated CVMFS metadata."
     return 0
 }
 
@@ -293,11 +304,11 @@ NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 
 cd "$NEUROCOMMAND_LOCAL_REPO"
 
-# Pull latest changes, regenerate log.txt from apps.json, then sync CVMFS from that log.
+# Pull latest changes, regenerate published metadata from apps.json, then sync CVMFS.
 if ! git_pull_rebase_non_interactive "$NEUROCOMMAND_LOCAL_REPO"; then
     echo "[WARNING] Continuing with local checkout because pull --rebase failed."
 fi
-regenerate_log_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
+regenerate_metadata_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
 cd cvmfs
 
 # check if there is enough free space - otherwise don't do anything:
@@ -560,7 +571,7 @@ else
     echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
 fi
 
-commit_log_to_github_if_changed "$NEUROCOMMAND_LOCAL_REPO"
+commit_generated_metadata_to_github_if_changed "$NEUROCOMMAND_LOCAL_REPO"
 
 echo "[INFO] Deleting lockfile: $LOCKFILE"
 sudo rm -rf "$LOCKFILE"

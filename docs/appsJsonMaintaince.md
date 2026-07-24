@@ -286,7 +286,7 @@ python json_gen.py
 ```
 - Converts `log.txt` to `applist.json`
 - Used by Neurodesk website for container listing
-- Auto-commits changes via GitHub Actions
+- The CVMFS Stratum 0 regenerates and commits `log.txt` and `applist.json` together after synchronization
 
 ### 3. Storage Locations
 
