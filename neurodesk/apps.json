@@ -2942,11 +2942,22 @@
             "qupathGUI-qupath 0.6.0": {
                 "version": "20250805",
                 "exec": "QuPath"
+            },
+            "qupath 0.7.0": {
+                "version": "20260723",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qupathGUI-qupath 0.7.0": {
+                "version": "20260723",
+                "exec": "QuPath",
+                "apptainer_args": []
             }
         },
         "categories": [
             "data organisation",
-            "image segmentation"
+            "image segmentation",
+            "structural imaging"
         ]
     },
     "rabies": {
