@@ -2363,10 +2363,6 @@
                 "version": "20260107",
                 "exec": "mrview",
                 "apptainer_args": []
-            },
-            "mrtrix3src latest": {
-                "version": "latest",
-                "exec": ""
             }
         },
         "categories": [
