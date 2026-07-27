@@ -384,6 +384,13 @@
             ]
         },
         {
+            "application": "braid_1.0.0_20260722",
+            "categories": [
+                "diffusion imaging",
+                "machine learning"
+            ]
+        },
+        {
             "application": "brainager_2.1.0_20251220",
             "categories": [
                 "structural imaging"
@@ -494,9 +501,27 @@
             ]
         },
         {
+            "application": "civet_2.1.1_20260727",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "clearswi_1.0.0_20211018",
             "categories": [
                 "phase processing"
+            ]
+        },
+        {
+            "application": "clinica_0.10.0_20260722",
+            "categories": [
+                "workflows"
+            ]
+        },
+        {
+            "application": "clinicadl_1.6.1_20260722",
+            "categories": [
+                "workflows"
             ]
         },
         {
@@ -622,6 +647,12 @@
             "categories": [
                 "image segmentation",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "deeplabcut_2.3.11_20260722",
+            "categories": [
+                "machine learning"
             ]
         },
         {
@@ -1259,6 +1290,12 @@
             "application": "lcmodel_6.3_20220222",
             "categories": [
                 "spectroscopy"
+            ]
+        },
+        {
+            "application": "lesionquantificationtoolkit_0.1.0_20260727",
+            "categories": [
+                "structural imaging"
             ]
         },
         {
@@ -2412,6 +2449,12 @@
             "categories": [
                 "image segmentation",
                 "shape analysis",
+                "visualization"
+            ]
+        },
+        {
+            "application": "voreen_5.3.0_20260722",
+            "categories": [
                 "visualization"
             ]
         },
