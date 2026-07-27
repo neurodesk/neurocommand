@@ -497,7 +497,7 @@
     "brainlesion": {
         "apps": {
             "brainlesion 1.0.0": {
-                "version": "20250805",
+                "version": "20260727",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -964,6 +964,11 @@
                 "version": "20250909",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "deepretinotopy 1.0.19": {
+                "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1075,6 +1080,11 @@
     },
     "dwidenoise2": {
         "apps": {
+            "dwidenoise2 1.0.0": {
+                "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dwidenoise2 20260603": {
                 "version": "20260604",
                 "exec": "",
@@ -1261,6 +1271,19 @@
         },
         "categories": [
             "functional imaging"
+        ]
+    },
+    "flames": {
+        "apps": {
+            "flames 1.0.0": {
+                "version": "20260612",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
         ]
     },
     "fmriprep": {
@@ -2261,14 +2284,6 @@
                 "version": "20220607",
                 "exec": "code"
             },
-            "mneextended 1.1.0": {
-                "version": "20220819",
-                "exec": ""
-            },
-            "codemneextended-mneextended 1.1.0": {
-                "version": "20220819",
-                "exec": "code"
-            },
             "mne 1.1.1": {
                 "version": "20220912",
                 "exec": ""
@@ -2285,6 +2300,19 @@
         },
         "categories": [
             "electrophysiology"
+        ]
+    },
+    "mneextended": {
+        "apps": {
+            "mneextended 1.1.0": {
+                "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology",
+            "programming"
         ]
     },
     "mricrogl": {
@@ -2512,7 +2540,7 @@
         "show_in_applist": false,
         "apps": {
             "neurodesktop-lite 20260428": {
-                "version": "20260512",
+                "version": "20260727",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2780,6 +2808,19 @@
         },
         "categories": [
             "image segmentation"
+        ]
+    },
+    "panoptica": {
+        "apps": {
+            "panoptica 2.1.3": {
+                "version": "20260728",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "quality control"
         ]
     },
     "pcntoolkit": {
