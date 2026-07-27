@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+reviews:
+  # Do not post skipped-review comments; they create notifications for PRs
+  # that are intentionally outside CodeRabbit's review scope.
+  review_status: false
+  path_filters:
+    - "!neurodesk/apps.json"
+  auto_review:
+    ignore_title_keywords:
+      - "Consolidate pending apps.json updates"
+      - "Update apps.json from neurocontainers releases"
