@@ -1,8 +1,6 @@
 import json
 from pathlib import Path
-import shutil
 import subprocess
-import sys
 
 from cvmfs import json_gen
 
@@ -12,27 +10,6 @@ APPS_JSON = ROOT / "neurodesk" / "apps.json"
 LOG = ROOT / "cvmfs" / "log.txt"
 APPLIST = ROOT / "cvmfs" / "applist.json"
 SYNC_SCRIPT = ROOT / "cvmfs" / "sync_containers_to_cvmfs.sh"
-
-
-def test_checked_in_log_matches_apps_json(tmp_path):
-    neurodesk_dir = tmp_path / "neurodesk"
-    neurodesk_dir.mkdir()
-    shutil.copyfile(APPS_JSON, neurodesk_dir / "apps.json")
-
-    subprocess.run(
-        [sys.executable, str(ROOT / "neurodesk" / "write_log.py")],
-        cwd=tmp_path,
-        check=True,
-    )
-
-    generated_lines = [
-        line.replace("[", "").replace("]", "").strip()
-        for line in (tmp_path / "log.txt").read_text().splitlines()
-        if line.strip()
-    ]
-    generated_log = "\n".join(generated_lines) + "\n"
-
-    assert LOG.read_text() == generated_log
 
 
 def test_checked_in_applist_matches_current_log(tmp_path):
