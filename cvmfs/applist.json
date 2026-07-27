@@ -397,7 +397,7 @@
             ]
         },
         {
-            "application": "brainlesion_1.0.0_20250805",
+            "application": "brainlesion_1.0.0_20260727",
             "categories": [
                 "data organisation",
                 "image segmentation",
@@ -670,6 +670,13 @@
             ]
         },
         {
+            "application": "deepretinotopy_1.0.19_20260727",
+            "categories": [
+                "functional imaging",
+                "machine learning"
+            ]
+        },
+        {
             "application": "deepsif_0.0.1_20260629",
             "categories": [
                 "electrophysiology"
@@ -730,6 +737,12 @@
         },
         {
             "application": "dsistudio_chen.2024.04.19_20240426",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "dwidenoise2_1.0.0_20260727",
             "categories": [
                 "diffusion imaging"
             ]
@@ -835,6 +848,13 @@
             "application": "fitlins_0.11.0_20260611",
             "categories": [
                 "functional imaging"
+            ]
+        },
+        {
+            "application": "flames_1.0.0_20260612",
+            "categories": [
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
@@ -1510,12 +1530,6 @@
             ]
         },
         {
-            "application": "mneextended_1.1.0_20220819",
-            "categories": [
-                "electrophysiology"
-            ]
-        },
-        {
             "application": "mne_1.1.1_20220912",
             "categories": [
                 "electrophysiology"
@@ -1525,6 +1539,13 @@
             "application": "mne_1.12.1_20260608",
             "categories": [
                 "electrophysiology"
+            ]
+        },
+        {
+            "application": "mneextended_1.1.0_20260727",
+            "categories": [
+                "electrophysiology",
+                "programming"
             ]
         },
         {
@@ -1820,6 +1841,13 @@
             "application": "pals_2.0.1_20260518",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "panoptica_2.1.3_20260728",
+            "categories": [
+                "image segmentation",
+                "quality control"
             ]
         },
         {
