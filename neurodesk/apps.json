@@ -469,6 +469,19 @@
             "visualization"
         ]
     },
+    "braid": {
+        "apps": {
+            "braid 1.0.0": {
+                "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging",
+            "machine learning"
+        ]
+    },
     "brainager": {
         "apps": {
             "brainager 2.1.0": {
@@ -669,6 +682,18 @@
             "structural imaging"
         ]
     },
+    "civet": {
+        "apps": {
+            "civet 2.1.1": {
+                "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
     "clearswi": {
         "apps": {
             "clearswi 1.0.0": {
@@ -678,6 +703,30 @@
         },
         "categories": [
             "phase processing"
+        ]
+    },
+    "clinica": {
+        "apps": {
+            "clinica 0.10.0": {
+                "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
+        ]
+    },
+    "clinicadl": {
+        "apps": {
+            "clinicadl 1.6.1": {
+                "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
         ]
     },
     "code": {
@@ -891,6 +940,18 @@
         "categories": [
             "image segmentation",
             "structural imaging"
+        ]
+    },
+    "deeplabcut": {
+        "apps": {
+            "deeplabcut 2.3.11": {
+                "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning"
         ]
     },
     "deepretinotopy": {
@@ -1805,6 +1866,18 @@
         },
         "categories": [
             "spectroscopy"
+        ]
+    },
+    "lesionquantificationtoolkit": {
+        "apps": {
+            "lesionquantificationtoolkit 0.1.0": {
+                "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
         ]
     },
     "lesymap": {
@@ -3582,6 +3655,23 @@
         "categories": [
             "image segmentation",
             "shape analysis",
+            "visualization"
+        ]
+    },
+    "voreen": {
+        "apps": {
+            "voreen 5.3.0": {
+                "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "voreenGUI-voreen 5.3.0": {
+                "version": "20260722",
+                "exec": "voreenve",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
             "visualization"
         ]
     },
