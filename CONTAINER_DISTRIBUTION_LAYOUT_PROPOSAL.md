@@ -1,584 +1,436 @@
-# Proposal: container identity, CVMFS layout, and OCI manifests
+# Proposal: manifest-backed container distribution
 
 > Status: draft for maintainer review<br>
-> Scope: `neurodesk/neurocontainers`, `neurodesk/neurocommand`, and
-> `neurodesk/neurodesktop`<br>
-> GitHub state reviewed: 2026-07-28
+> Required implementation repositories: `neurodesk/neurocontainers` and
+> `neurodesk/neurocommand`<br>
+> Conditional implementation repository: `neurodesk/neurodesktop`<br>
+> Repository state reviewed: 2026-07-28
 
-## Summary
+## Decision requested
 
-This proposal replaces the flat CVMFS container namespace:
-
-```text
-/containers/<name>_<version>_<builddate>/
-```
-
-with an explicit release hierarchy:
+Adopt a versioned release manifest as the contract between Neurocontainers,
+OCI registries, CVMFS, Neurocommand, and Neurodesktop, and publish new releases
+under:
 
 ```text
-/containers/<name>/<version>_<variant>_<builddate>/
+/containers/<name>/<software-version>_<cvmfs-variant>_<build-date>/
 ```
 
-It also makes a generated release manifest, rather than a parsed filename or an
-`apps.json` display key, the contract between container building, OCI
-publication, CVMFS publication, module generation, local downloads, and
-Neurodesktop.
+For example:
 
-The proposed OCI representation is:
+```text
+/containers/fsl/6.0.7.16_amd64_20260728/
+/containers/fsl/6.0.7.16_arm64_20260728/
+/containers/fsl/6.0.7.16_gpu-amd64_20260728/
+```
 
-- one OCI repository per logical tool, such as `quay.io/neurodesk/fsl`;
-- one immutable tag per software version, product flavour, and build date;
-- an OCI image index at that tag, with one child manifest per supported
-  platform;
-- one SIF artifact attached to each platform-specific child manifest through
-  OCI 1.1 referrers; and
-- one Neurodesk release-manifest artifact attached to the top-level image
-  index.
+The change has five non-negotiable properties:
 
-The important distinction is that a Neurodesk product **flavour** such as
-`default`, `gpu`, `cuda12`, or `mpi` is not an OCI platform variant.
-Architecture selection belongs in the OCI image index. Product flavour remains
-an explicit release dimension and, where necessary, an OCI tag dimension.
+1. A release is identified by logical name, software version, build variant,
+   and build date. A platform artifact adds an OCI platform such as
+   `linux/amd64`.
+2. One immutable OCI tag points to an image index, even when the release
+   currently has only one platform. Each platform-specific SIF is attached to
+   the corresponding child image manifest.
+3. The complete existing CVMFS path remains valid for every newly published
+   release before generated views expose it. Old clients and stored paths do
+   not need to understand manifests.
+4. Existing releases are not moved, rewritten, backfilled, or deleted by this
+   change.
+5. The implementation is delivered as one coordinated merge train with two
+   required linked PRs. A Neurodesktop PR is added only if exact-head testing
+   proves that source changes are necessary.
 
-The recommended change is delivered as one coordinated merge train. The new
-resolver, manifest producer, CVMFS layout, and legacy compatibility views land
-together through linked PRs. New and legacy paths and tags are published in the
-same release, resolve to the same content, and this change does not move or
-delete any existing container.
+This deliberately changes the target distribution model described in
+[neurocommand#733](https://github.com/neurodesk/neurocommand/issues/733).
+Neurocontainers may still fan out concrete build candidates such as
+`fsl_gpu_arm64`, but the published manifest keeps logical name, build variant,
+and platform as separate fields. The old concrete name is retained as an
+explicit compatibility identity.
 
-## Proposed decisions
+## Scope
 
-1. Define a release as the tuple:
+### Included
 
-   ```text
-   (name, software_version, flavour, platform, build_date)
-   ```
+- the release identity and schema;
+- the new CVMFS release path;
+- the complete legacy CVMFS path for each new release;
+- multi-platform OCI indexes and platform-specific SIF referrers;
+- immutable release history;
+- manifest-driven `apps.json`, `cvmfs/log.txt`, modules, launchers, publication,
+  and keep-lists;
+- publication gating so generated views expose only a complete OCI and CVMFS
+  release;
+- a shared Neurocommand resolver for new releases;
+- exact-head testing across the linked PRs; and
+- rollback without deleting immutable content.
 
-2. Derive a concrete CVMFS `variant` identifier from `flavour` and `platform`:
+### Not included
 
-   | Flavour | OCI platform | CVMFS variant |
-   |---|---|---|
-   | `default` | `linux/amd64` | `amd64` |
-   | `default` | `linux/arm64` | `arm64` |
-   | `gpu` | `linux/amd64` | `gpu-amd64` |
-   | `gpu` | `linux/arm64` | `gpu-arm64` |
-   | `cuda12` | `linux/amd64` | `cuda12-amd64` |
+- converting existing CVMFS releases to the new hierarchy;
+- removing flat CVMFS paths, legacy OCI tags, object-store SIFs, or filename
+  parsing;
+- changing `/cvmfs/neurodesk.ardc.edu.au`, the public module roots, or
+  `module load <name>/<version>`;
+- redesigning the full release-withdrawal or retention policy;
+- deleting any object as part of activation;
+- signatures, SBOMs, or attestations beyond leaving room for OCI referrers; or
+- unrelated module portability and packaging work.
 
-3. Keep the logical tool name stable across platforms. For example, ARM FSL is
-   represented as `name=fsl`, `platform=linux/arm64`, rather than requiring
-   `name=fsl_arm64`.
+Keeping these items out is part of the safety case. They can be proposed
+separately after the new contract is operating.
 
-4. Never infer release fields by splitting an application display name, OCI
-   repository, or CVMFS path. Those strings are projections of explicit
-   metadata.
+## Why this change
 
-5. Use an OCI image index for architecture selection. Do not use OCI
-   `platform.variant` for Neurodesk concepts such as `gpu`; OCI defines that
-   field for CPU variants such as ARM `v8` or x86-64 `v2`.
+### The flat name is an accidental schema
 
-6. Attach each SIF to the platform-specific child manifest, not only to the
-   top-level multi-platform index. A SIF is architecture-specific and should
-   have one unambiguous subject.
-
-7. Treat immutable tags and digests as release identities. Floating tags are
-   convenience pointers only and must never be recorded as the reproducibility
-   reference.
-
-8. Generate `apps.json`, CVMFS inventory, modulefiles, cleanup keep-lists, and
-   application lists from release manifests. `cvmfs/log.txt` remains a
-   compatibility output for existing consumers, but not the source of truth.
-
-9. Make the complete existing CVMFS pathname a required compatibility view for
-   every release published in the new layout. Supporting the old resolver alone
-   is insufficient because external users may have stored direct paths.
-
-## Motivation
-
-### The current filename is carrying too many meanings
-
-Current code commonly assumes that a container is exactly:
+Current code commonly treats a release as:
 
 ```text
 <name>_<version>_<YYYYMMDD>
 ```
 
-This assumption appears in:
+That string is parsed independently by:
 
 - [`neurodesk/fetch_containers.sh`](neurodesk/fetch_containers.sh);
 - [`neurodesk/fetch_and_run.sh`](neurodesk/fetch_and_run.sh);
 - [`neurodesk/transparent-singularity/run_transparent_singularity.sh`](neurodesk/transparent-singularity/run_transparent_singularity.sh);
-- [`cvmfs/reconcile_module_files.py`](cvmfs/reconcile_module_files.py);
 - [`cvmfs/sync_containers_to_cvmfs.sh`](cvmfs/sync_containers_to_cvmfs.sh);
+- [`cvmfs/reconcile_module_files.py`](cvmfs/reconcile_module_files.py);
 - [`containers.sh`](containers.sh);
-- [`.github/workflows/upload_containers_simg.sh`](.github/workflows/upload_containers_simg.sh);
-- DOI and stale-object maintenance workflows; and
-- `neurodesktop/config/test_neurodesktop.sh` in the Neurodesktop repository.
+- upload, cleanup, and DOI workflows; and
+- Neurodesktop's
+  [`config/test_neurodesktop.sh`](https://github.com/neurodesk/neurodesktop/blob/main/config/test_neurodesktop.sh).
 
-That works for the 365 current entries in `cvmfs/log.txt`, all of which have
-exactly two underscores. It does not provide a durable grammar for names,
-versions, product flavours, and architectures that may themselves contain
-delimiters.
+Draft [neurocommand#767](https://github.com/neurodesk/neurocommand/pull/767)
+correctly parses legacy names from the right so concrete names containing
+underscores work. That is necessary compatibility hardening, but it should not
+become the schema for new releases.
 
-Draft Neurocommand PR
-[#767](https://github.com/neurodesk/neurocommand/pull/767) correctly makes the
-legacy parser work from the right, allowing concrete names such as
-`fsl_gpu_arm64`. That is a useful compatibility fix, but continuing to improve
-filename parsing would leave the filename as an undocumented database schema.
+### Two active Neurocontainers changes need one release boundary
 
-### Variant and multi-architecture work is already active
+Draft [neurocontainers#2913](https://github.com/neurodesk/neurocontainers/pull/2913)
+fans one recipe out into architecture and named-variant candidates. Draft
+[neurocontainers#2914](https://github.com/neurodesk/neurocontainers/pull/2914)
+builds and tests an unprivileged candidate, then promotes the exact tested
+Docker archive, SIF, checksums, recipe fingerprint, PR, and commit after merge.
 
-The relevant work is not hypothetical:
+They overlap in build and release workflows. Merging both unchanged would leave
+the secure one-PR promotion path AMD64-only while the variant path continues
+through the older release flow. This proposal makes their integration, rather
+than their independent merge, a prerequisite.
 
-- Neurocontainers issue
-  [#1092](https://github.com/neurodesk/neurocontainers/issues/1092) requests
-  first-class container variations.
-- Neurocommand issue
-  [#733](https://github.com/neurodesk/neurocommand/issues/733) tracks ARM
-  publication and contains maintainer direction to make variation a general
-  builder feature.
-- Draft Neurocontainers PR
-  [#2913](https://github.com/neurodesk/neurocontainers/pull/2913) implements
-  variant fan-out for default, ARM, GPU, CUDA, and combined variants.
-- Draft Neurocommand PR
-  [#767](https://github.com/neurodesk/neurocommand/pull/767) adapts deployment,
-  module reconciliation, menu generation, and cleanup to those concrete names.
-- Neurocontainers issue
-  [#2593](https://github.com/neurodesk/neurocontainers/issues/2593) records
-  agreement to publish multi-architecture artifacts under the same OCI tags and
-  let clients select the appropriate object.
+### Presentation metadata is not a safe inventory
 
-The builder fan-out in PR #2913 should be preserved. This proposal changes how
-the resulting axes are represented at the distribution boundary: base name,
-flavour, and platform remain separate fields instead of being recoverable only
-from a concatenated concrete name.
+`apps.json` is a user-facing view. Releases may be hidden from menus while
+their artifacts must still be retained. Neurocommand issue
+[#733](https://github.com/neurodesk/neurocommand/issues/733) records ARM SIFs
+being removed after cleanup used the UI-derived log as its keep-list.
 
-### Release metadata already needs to become authoritative
+An immutable release manifest can generate `apps.json` and `cvmfs/log.txt`, but
+neither generated view should decide whether an artifact exists or is retained.
 
-Neurocontainers issue
-[#2796](https://github.com/neurodesk/neurocontainers/issues/2796) asks full
-tests to resolve an artifact from release metadata instead of hard-coded SIF
-wildcards. Neurocommand issue #733 documents how ARM artifacts that existed in
-release metadata were omitted from `apps.json` and then deleted by cleanup
-because cleanup used the UI publication view as its keep-list.
+## Identity model
 
-Draft Neurocontainers PR
-[#2914](https://github.com/neurodesk/neurocontainers/pull/2914) is a strong
-foundation: it binds a tested Docker archive, SIF, checksum, recipe fingerprint,
-commit, PR, and generated release JSON into a promotion manifest. The layout
-work should extend that manifest to cover every flavour and platform, rather
-than introduce a second metadata path.
+The document uses these terms precisely:
 
-### CVMFS is naturally hierarchical
+| Term | Meaning | Example |
+|---|---|---|
+| Logical name | Stable recipe/tool identity | `fsl` |
+| Software version | Upstream software version | `6.0.7.16` |
+| Build variant | Neurodesk build choice, independent of CPU architecture | `default`, `gpu`, `cuda12` |
+| Build date | Eight-digit UTC release build identifier | `20260728` |
+| Release | One logical build across its supported platforms | `fsl/6.0.7.16/default/20260728` |
+| Platform artifact | One release plus an OCI platform | release + `linux/arm64` |
+| CVMFS variant | Filesystem projection of build variant and platform | `arm64`, `gpu-amd64` |
+| Legacy identity | Complete concrete name used by existing clients | `fsl_arm64_6.0.7.16_20260728` |
 
-CVMFS recommends nested catalogs at software release boundaries because
-releases are normally immutable and clients generally use only one release at a
-time. The new `<name>/<release>` hierarchy gives us a stable place for that
-boundary and avoids putting every release directly in the large
-`/containers` directory.
-
-## Terminology and identity rules
-
-### Logical name
-
-`name` is the stable recipe/tool identity, for example `fsl`, `dcm2niix`, or
-`deepretinotopy`.
-
-- It is the Neurocontainers recipe directory name.
-- It is the OCI repository name.
-- It is the first directory beneath CVMFS `/containers`.
-- It does not include architecture.
-- It does not include the default product flavour.
-
-### Software version
-
-`software_version` is the upstream tool version, not the container build date.
-The existing release JSON field named `version` inside an app currently stores
-the build date, so the new schema must use unambiguous names:
-
-```json
-{
-  "software_version": "6.0.7.16",
-  "build_date": "20260728"
-}
-```
-
-For the proposed underscore-delimited CVMFS release directory, new software
-versions should be restricted to:
+The release identity is:
 
 ```text
-[A-Za-z0-9][A-Za-z0-9.+-]*
+(name, software_version, build_variant, build_date)
 ```
 
-In particular, `_` and `/` are not permitted in a newly published version.
-Existing versions should be audited before enforcing this. Code must still use
-manifest fields rather than parse the release directory.
-
-### Flavour
-
-`flavour` describes a Neurodesk product/build choice such as:
+The platform artifact identity is:
 
 ```text
-default
-gpu
-cuda12
-mpi
-openrecon
+(name, software_version, build_variant, build_date, platform)
 ```
 
-It is independent of CPU architecture. A recipe may constrain a flavour to a
-set of supported platforms.
+This distinction matters. One release manifest and OCI image index can describe
+multiple platform artifacts.
 
-Flavour identifiers should match:
+### Normalization
 
-```text
-[a-z0-9][a-z0-9.-]*
-```
+- Platforms use OCI values such as `linux/amd64` and `linux/arm64`.
+- Recipe inputs such as `x86_64` and `aarch64` are normalized during the build.
+- Build variants use stable lower-case identifiers such as `default`, `gpu`,
+  and `cuda12`.
+- The schema validates every value before using it in a path or OCI tag.
+- `/` and path traversal are forbidden in path components.
+- Clients never recover fields by splitting a path, display name, or OCI tag.
 
-This deliberately excludes `_`, keeping the CVMFS release directory
-human-readable and delimiter-safe.
+The 230 current recipe versions reviewed for this proposal fit OCI tag
+components. The implementation PR must repeat that audit in CI and use one
+checked-in validation rule rather than introducing different shell and Python
+rules.
 
-### Platform
+### CVMFS variant projection
 
-`platform` uses OCI terminology:
+The manifest stores the projection explicitly:
 
-```text
-linux/amd64
-linux/arm64
-```
+| Build variant | Platform | CVMFS variant |
+|---|---|---|
+| `default` | `linux/amd64` | `amd64` |
+| `default` | `linux/arm64` | `arm64` |
+| `gpu` | `linux/amd64` | `gpu-amd64` |
+| `gpu` | `linux/arm64` | `gpu-arm64` |
+| `cuda12` | `linux/amd64` | `cuda12-amd64` |
 
-Recipe aliases such as `x86_64` and `aarch64` can remain accepted at input, but
-release metadata should normalize them to OCI values. If a genuine CPU variant
-is required, it is recorded separately, for example:
+The order is always `<build-variant>-<architecture>`, with `default` omitted.
+Consumers read `cvmfs_variant` from the manifest; they do not reproduce this
+rule.
 
-```json
-{
-  "os": "linux",
-  "architecture": "arm64",
-  "variant": "v8"
-}
-```
+### Immutability
 
-### CVMFS variant
+An immutable tag, manifest path, or CVMFS release directory must not be
+overwritten with different content. Promotion fails when the same
+`(name, software_version, build_variant, build_date)` already exists with
+another digest.
 
-The `variant` in the requested CVMFS path is a concrete, filesystem-safe
-projection of flavour and platform:
+This proposal retains the requested `YYYYMMDD` build date. A second, different
+same-day build is rejected. Extending the build identifier is a future schema
+decision, not an implicit suffix added by one workflow.
 
-```text
-default + amd64 -> amd64
-default + arm64 -> arm64
-gpu     + amd64 -> gpu-amd64
-gpu     + arm64 -> gpu-arm64
-```
+## CVMFS layout and backwards compatibility
 
-This projection is generated and stored in the release manifest as
-`cvmfs_variant`; clients do not reconstruct it.
+### Canonical release
 
-### Build date and immutability
-
-`build_date` remains an eight-digit UTC date:
-
-```text
-YYYYMMDD
-```
-
-An immutable tag or CVMFS release directory must not be overwritten with
-different content. Promotion must fail if the same
-`(name, version, flavour, build_date)` already exists with another digest.
-
-This implies at most one distinct release of a name/version/flavour on a UTC
-date. If same-day rebuilds are required, maintainers should approve an extended
-build identifier such as `YYYYMMDD.2` before implementation. A source commit and
-content digests remain mandatory even when the date is unique.
-
-## Proposed CVMFS layout
-
-Example:
+A newly published AMD64 release looks like:
 
 ```text
 /cvmfs/neurodesk.ardc.edu.au/
-├── containers/
-│   ├── fsl/
-│   │   ├── 6.0.7.16_amd64_20260728/
-│   │   │   ├── .cvmfscatalog
-│   │   │   ├── release.json
-│   │   │   ├── commands.txt
-│   │   │   ├── bin/
-│   │   │   └── rootfs/
-│   │   ├── 6.0.7.16_arm64_20260728/
-│   │   │   └── ...
-│   │   └── 6.0.7.16_gpu-amd64_20260728/
-│   │       └── ...
-│   ├── dcm2niix/
-│   │   └── v1.0.20240202_arm64_20260728/
-│   │       └── ...
-│   └── modules/
-└── neurodesk-modules/
+└── containers/
+    └── fsl/
+        └── 6.0.7.16_amd64_20260728/
+            ├── .cvmfscatalog
+            ├── release.json
+            ├── commands.txt
+            ├── fsl_6.0.7.16_20260728.simg/
+            └── <existing generated wrappers and metadata>
 ```
 
-Each release directory is immutable after a successful publish.
+The inner layout intentionally remains compatible with today's publisher. In
+particular, this proposal does **not** rename the unpacked `.simg` directory to
+`rootfs` or move wrappers into a new `bin` directory. Those changes are not
+needed to introduce the hierarchy and would increase the activation surface.
 
-### Release directory contents
+The release directory is immutable after publication and is a nested catalog
+root. The current nested catalogs inside the unpacked image are preserved until
+separate measurements justify changing them.
 
-`release.json`
-: A byte-for-byte copy of the generated release manifest. It allows inspection
-  without consulting GitHub or an OCI registry.
+### Required legacy path
 
-`rootfs/`
-: The unpacked SIF/sandbox tree served lazily by CVMFS. The current layout uses
-  a directory ending in `.simg`, which looks like a file but is an unpacked
-  directory. `rootfs` makes the on-disk representation explicit.
-
-`commands.txt`
-: The validated command inventory generated from the recipe deploy contract.
-  Publication fails if it is missing or empty.
-
-`bin/`
-: Generated transparent wrappers. Modulefiles prepend this directory, rather
-  than relying on every file in the release root being executable.
-
-Additional generated files such as environment metadata may remain in the
-release root, but every field used to regenerate them must be present in
-`release.json`.
-
-### Required legacy path view
-
-For every canonical release, the same CVMFS transaction must publish its exact
-legacy directory and inner `.simg` pathname. For example:
+The same CVMFS transaction creates the canonical directory and the old outer
+name:
 
 ```text
-/containers/fsl_6.0.7.16_20260728/
-└── fsl_6.0.7.16_20260728.simg/
-
-/containers/fsl/6.0.7.16_amd64_20260728/
-└── rootfs/
+/containers/fsl_6.0.7.16_20260728
+  -> fsl/6.0.7.16_amd64_20260728
 ```
 
-Both paths must expose the same rootfs content. The legacy name is derived from
-explicit manifest compatibility fields, not reconstructed by splitting the new
-path. ARM and flavour aliases are equally explicit, for example:
+The complete old path therefore still works:
 
 ```text
-/containers/fsl_arm64_6.0.7.16_20260728/
-  -> /containers/fsl/6.0.7.16_arm64_20260728/
+/containers/fsl_6.0.7.16_20260728/fsl_6.0.7.16_20260728.simg
 ```
 
-Operationally this is a hard-linked compatibility view: there is one payload
-and two stable namespaces. It cannot be implemented as a literal POSIX hard
-link between the directory trees because directories cannot be hard-linked and
-CVMFS emulates file hard-link groups only within one directory. The publisher
-should therefore use directory and inner-name symlinks where the old client
-tests permit them. If a materialized mirror is required, its regular-file
-entries must have the same CVMFS content hashes as the canonical tree; CVMFS
-content-addressed storage then avoids duplicating payload blobs even though
-both namespaces consume catalog entries.
+ARM and named variants use manifest-declared legacy identities:
 
-Publication fails if an expected legacy pathname is absent, resolves outside
-its declared canonical release, or does not expose the same content. Existing
-materialized legacy releases are left untouched rather than rewritten into
-aliases.
+```text
+/containers/fsl_arm64_6.0.7.16_20260728
+  -> fsl/6.0.7.16_arm64_20260728
 
-### Catalog boundaries
+/containers/fsl_gpu_6.0.7.16_20260728
+  -> fsl/6.0.7.16_gpu-amd64_20260728
+```
 
-Every release directory should be a nested catalog root. Prefer a repository
-policy such as a `.cvmfsdirtab` rule for `/containers/*/*` over ad hoc marker
-creation. That rule must explicitly exclude `/containers/modules/*` and any
-compatibility-alias subtree so they are not accidentally treated as release
-catalogs.
+This meets the requested hard-link intent—one payload with two stable
+namespaces—but the outer directory must be a symbolic link, not a literal
+hard link. POSIX does not support directory hard links, and CVMFS emulates file
+hard-link groups only within one directory. A directory symlink also avoids
+duplicating catalog entries for the unpacked image.
 
-The current publisher also creates nested catalogs inside the unpacked image at
-`usr`, `usr/lib`, and `usr/share`. Those deeper boundaries should initially be
-preserved for compatibility, then retained or removed based on
-`cvmfs_server list-catalogs -e` measurements. A release catalog should generally
-contain more than 1,000 and fewer than roughly 200,000 entries; very large
-rootfs trees may still need internal catalogs.
+If the exact-head integration test finds an old client that cannot use the
+directory symlink, the safe fallback is a generated compatibility directory
+whose payload entries have the same CVMFS content hashes. CVMFS
+content-addressed storage avoids duplicate payload blobs, although the
+compatibility directory would add catalog entries. The linked PR must record
+which representation passed testing; it must not silently omit the old path.
 
-### What CVMFS retains
+### Existing releases
 
-Following the direction in Neurocontainers issue #2593:
+Existing flat releases remain exactly where they are. Neurocommand continues
+to resolve them through the legacy path because they have no schema-v1 release
+manifest. This change does not create canonical aliases for the existing
+catalogue and does not rewrite existing nested catalogs.
 
-- CVMFS stores the current active release snapshot needed for normal execution.
-- Git and OCI retain the full release-manifest history.
-- OCI and archival object storage retain old immutable SIFs by digest.
-- Withdrawal disables the active wrappers/module pointer before payload
-  removal.
-- Reproducibility instructions resolve an old manifest to an OCI digest even
-  after that release is no longer materialized in CVMFS.
+That is a permanent supported condition, not an intermediate deployment state:
 
-An artifact is never deleted merely because it is hidden from a menu or absent
-from `apps.json`.
+- old release without schema v1 → legacy resolver;
+- new release with valid schema v1 → manifest resolver;
+- old client accessing a new release → manifest-declared legacy CVMFS path.
 
-## Proposed OCI layout
+### Publication transaction
 
-### Repositories and tags
+For one release, Neurocommand opens one CVMFS transaction and:
 
-Use one repository per logical name:
+1. materializes the canonical release directory;
+2. writes the exact promoted `release.json`;
+3. preserves the current unpacked `.simg`, wrapper, command, and nested-catalog
+   shape;
+4. creates the complete legacy directory alias;
+5. generates or updates modules and compatibility metadata;
+6. verifies both full paths, a non-empty `commands.txt`, module resolution, and
+   an Apptainer/Singularity execution through each path; and
+7. publishes only if every check passes.
+
+Failure aborts the transaction, leaving the previous CVMFS revision visible.
+No cleanup runs inside this transaction.
+
+## OCI layout
+
+### Repository and tags
+
+Use one repository per logical tool:
 
 ```text
 quay.io/neurodesk/<name>
 ghcr.io/neurodesk/<name>
 ```
 
-Immutable default-flavour tag:
+Immutable default-variant tag:
 
 ```text
-<software_version>_<build_date>
+<software-version>_<build-date>
 ```
 
-Immutable named-flavour tag:
+Immutable named-variant tag:
 
 ```text
-<software_version>_<flavour>_<build_date>
+<software-version>_<build-variant>_<build-date>
 ```
 
-Examples:
+For example:
 
 ```text
 quay.io/neurodesk/fsl:6.0.7.16_20260728
 quay.io/neurodesk/fsl:6.0.7.16_gpu_20260728
 ```
 
-These preserve the v2 direction in Neurocontainers issue
-[#2408](https://github.com/neurodesk/neurocontainers/issues/2408), while adding
-an explicit product-flavour dimension.
+Architecture is not encoded in the repository or tag. Floating tags such as
+`<software-version>` or `latest` remain convenience pointers and are advanced
+last. They are never stored as reproducibility references.
 
-After all immutable objects and metadata have been verified, promotion may
-advance these convenience tags:
+### Subject graph
 
-```text
-<software_version>
-<software_version>_<flavour>
-latest
-```
-
-`latest` refers only to the default flavour. A flavour-specific `latest` tag
-should not be added until there is a concrete client requirement and an agreed
-naming rule.
-
-### Image index
-
-The immutable tag resolves to an OCI image index:
+Every immutable release tag resolves to an OCI image index:
 
 ```text
 fsl:6.0.7.16_20260728
-  ├── linux/amd64 -> image manifest sha256:...
-  └── linux/arm64 -> image manifest sha256:...
+├── linux/amd64 image manifest
+│   └── SIF artifact manifest -> tested AMD64 SIF blob
+├── linux/arm64 image manifest
+│   └── SIF artifact manifest -> tested ARM64 SIF blob
+└── Neurodesk release-manifest artifact
 ```
 
-The index contains standard platform descriptors. Architecture must not also be
-encoded into the OCI repository name or immutable tag.
+An index is used even for a release with one platform so clients and promotion
+code have one stable shape.
 
-A named product flavour gets another index:
-
-```text
-fsl:6.0.7.16_gpu_20260728
-  └── linux/amd64 -> image manifest sha256:...
-```
-
-If a flavour later supports ARM, an ARM child can be added only while the
-release is still a candidate. An immutable published index must never be
-mutated; a changed platform set requires a new build date.
-
-### SIF artifacts
-
-Attach a SIF to each child image manifest with:
+The SIF artifact manifest has:
 
 ```text
 artifactType: application/vnd.sylabs.sif.layer.v1.sif
-subject:       <platform-specific image-manifest digest>
+subject:       <exact platform child image-manifest digest>
 ```
 
-Recommended descriptor/manifest annotations include:
+The release-manifest artifact has the top-level image index as its subject. The
+release manifest records the selected child and SIF artifact digests, so a
+runtime does not choose `.manifests[0]` from an untrusted referrers response.
 
-```text
-org.opencontainers.image.title
-org.opencontainers.image.version
-org.opencontainers.image.created
-org.neurodesk.name
-org.neurodesk.software-version
-org.neurodesk.flavour
-org.neurodesk.platform
-org.neurodesk.build-date
-org.neurodesk.sif.sha256
-```
+The publisher supports the OCI 1.1 referrers API and the standard fallback tag
+schema. Each registry listed in a release manifest must contain a complete,
+verified subject graph. A release requires at least one complete registry; a
+best-effort mirror is listed only after its copy is verified.
 
-The labels proposed in Neurocontainers issue
-[#2409](https://github.com/neurodesk/neurocontainers/issues/2409) remain
-applicable to the runnable image manifests. Equivalent annotations should be
-placed on the index and SIF artifact where useful.
+### Promotion order
 
-The resolver must:
+Immutable candidate objects are not active merely because they exist in a
+registry. Trusted promotion:
 
-1. resolve an immutable tag to the top-level index digest;
-2. select the exact child descriptor for the host/requested platform;
-3. query referrers for that child digest;
-4. filter by the SIF artifact type;
-5. verify each returned manifest's subject, platform annotations, and expected
-   checksum;
-6. reject zero or multiple matching SIFs unless the release manifest identifies
-   one exact digest; and
-7. pull the SIF by digest, never by a floating tag.
+1. verifies every required build-variant/platform candidate against its PR head
+   SHA and recipe fingerprint;
+2. pushes and verifies the child image manifests and tested SIF artifacts, and
+   verifies the manifest-declared legacy object-store keys;
+3. creates and verifies the complete image index;
+4. resolves post-push digests for every recorded registry;
+5. generates and validates the immutable release manifest;
+6. attaches the release manifest to the index and commits the same JSON to
+   trusted release history;
+7. asks Neurocommand to publish the canonical and legacy CVMFS paths; and
+8. after Neurocommand acknowledges that CVMFS revision, updates generated
+   presentation views and floating tags.
 
-The current transparent-singularity implementation takes the first matching
-referrer. That is sufficient as an initial v2 experiment but is not a durable
-selection rule.
+A failure before step 6 leaves only immutable registry objects. A failure in
+steps 6 or 7 leaves an immutable manifest in release history but no generated
+view selects it. A partial platform set or missing legacy CVMFS path is never
+represented as an available release.
 
-### Registry compatibility
-
-OCI Distribution 1.1 defines the native
-`/v2/<name>/referrers/<digest>` endpoint and requires clients to fall back to
-the referrers tag schema when that endpoint returns `404`.
-
-Quay currently exposes a native referrers endpoint. The current Neurocommand
-code uses native referrers for Quay and the tag-schema fallback for GHCR. The
-shared resolver should implement the OCI fallback once rather than maintain
-registry-specific `curl` pipelines in shell.
-
-Neurocontainers issue #2408 describes Quay as primary and GHCR as a mirror,
-whereas PR #2914 currently treats GHCR as release-critical and Quay as
-best-effort. Until maintainers ratify one policy, the release manifest should
-record an ordered registry list with a separate index, child, and SIF digest for
-each registry. Clients must not assume different registries preserve identical
-manifest digests.
+Legacy object-store SIFs remain published and retained by this change. They are
+compatibility inputs and rollback assets, not the source of truth for new
+releases.
 
 ## Release manifest
 
-### Storage
+### Ownership and storage
 
-Replace the current one-file-per-version history:
-
-```text
-releases/<name>/<version>.json
-```
-
-with:
+Neurocontainers owns the schema and immutable release history:
 
 ```text
-releases/<name>/<software_version>/<flavour>/<build_date>.json
+schemas/container-release-v1.schema.json
+releases/<name>/<software-version>/<build-variant>/<build-date>.json
 ```
 
-For example:
+The candidate manifest introduced by `neurodesk/neurocontainers#2914` and the
+release manifest in this proposal are different:
 
-```text
-releases/fsl/6.0.7.16/default/20260728.json
-releases/fsl/6.0.7.16/gpu/20260728.json
-```
+- the candidate manifest binds untrusted PR outputs to a tested commit before
+  promotion;
+- the release manifest records the verified, post-push distribution graph.
 
-This retains rebuild history instead of replacing the previous metadata for a
-software version. A generated `latest.json` may exist as a compatibility view,
-but it must contain or resolve to an immutable release ID.
+The release manifest is immutable and contains no mutable lifecycle `status`.
+Committing it to trusted release history records a published distribution
+graph, but does not by itself make the release selectable. Selection occurs
+only after Neurocommand acknowledges the CVMFS revision containing both paths
+and promotion regenerates the presentation views. A future withdrawal can
+change those views or add a separate tombstone while retaining the historical
+manifest and digests; that mechanism is outside this proposal.
 
-The same canonical JSON is:
+The identical release JSON is:
 
 - committed by the trusted Neurocontainers promotion workflow;
-- attached as
-  `application/vnd.neurodesk.container-release.v1+json` to the top-level OCI
-  index;
-- copied to the CVMFS release directory; and
-- consumed when generating Neurocommand views.
+- attached to the OCI image index;
+- copied into the canonical CVMFS release directory; and
+- consumed by Neurocommand to generate compatibility and presentation views.
+
+Neurocommand vendors or fetches the schema with a recorded SHA-256. CI in both
+repositories must fail if their schema bytes or fixtures differ.
 
 ### Illustrative schema
 
-This is a discussion schema, not a final JSON Schema:
+This example establishes field relationships; the implementation PR supplies
+the final JSON Schema:
 
 ```json
 {
@@ -586,9 +438,8 @@ This is a discussion schema, not a final JSON Schema:
   "release_id": "fsl/6.0.7.16/default/20260728",
   "name": "fsl",
   "software_version": "6.0.7.16",
-  "flavour": "default",
+  "build_variant": "default",
   "build_date": "20260728",
-  "status": "published",
   "source": {
     "repository": "neurodesk/neurocontainers",
     "recipe": "recipes/fsl",
@@ -603,13 +454,13 @@ This is a discussion schema, not a final JSON Schema:
         "index_digest": "sha256:...",
         "platforms": {
           "linux/amd64": {
-            "manifest_digest": "sha256:...",
+            "image_manifest_digest": "sha256:...",
             "sif_manifest_digest": "sha256:...",
             "sif_blob_digest": "sha256:...",
             "sif_sha256": "..."
           },
           "linux/arm64": {
-            "manifest_digest": "sha256:...",
+            "image_manifest_digest": "sha256:...",
             "sif_manifest_digest": "sha256:...",
             "sif_blob_digest": "sha256:...",
             "sif_sha256": "..."
@@ -618,23 +469,22 @@ This is a discussion schema, not a final JSON Schema:
       }
     ]
   },
-  "cvmfs": {
-    "repository": "neurodesk.ardc.edu.au",
-    "platforms": {
-      "linux/amd64": {
-        "variant": "amd64",
-        "path": "containers/fsl/6.0.7.16_amd64_20260728",
-        "legacy_rootfs_paths": [
-          "containers/fsl_6.0.7.16_20260728/fsl_6.0.7.16_20260728.simg"
-        ]
-      },
-      "linux/arm64": {
-        "variant": "arm64",
-        "path": "containers/fsl/6.0.7.16_arm64_20260728",
-        "legacy_rootfs_paths": [
-          "containers/fsl_arm64_6.0.7.16_20260728/fsl_arm64_6.0.7.16_20260728.simg"
-        ]
-      }
+  "platforms": {
+    "linux/amd64": {
+      "cvmfs_variant": "amd64",
+      "cvmfs_release_path": "containers/fsl/6.0.7.16_amd64_20260728",
+      "cvmfs_payload_path": "containers/fsl/6.0.7.16_amd64_20260728/fsl_6.0.7.16_20260728.simg",
+      "legacy_release_path": "containers/fsl_6.0.7.16_20260728",
+      "legacy_payload_path": "containers/fsl_6.0.7.16_20260728/fsl_6.0.7.16_20260728.simg",
+      "legacy_object_keys": ["fsl_6.0.7.16_20260728.simg"]
+    },
+    "linux/arm64": {
+      "cvmfs_variant": "arm64",
+      "cvmfs_release_path": "containers/fsl/6.0.7.16_arm64_20260728",
+      "cvmfs_payload_path": "containers/fsl/6.0.7.16_arm64_20260728/fsl_arm64_6.0.7.16_20260728.simg",
+      "legacy_release_path": "containers/fsl_arm64_6.0.7.16_20260728",
+      "legacy_payload_path": "containers/fsl_arm64_6.0.7.16_20260728/fsl_arm64_6.0.7.16_20260728.simg",
+      "legacy_object_keys": ["fsl_arm64_6.0.7.16_20260728.simg"]
     }
   },
   "deploy": {
@@ -663,559 +513,388 @@ This is a discussion schema, not a final JSON Schema:
 }
 ```
 
-The final schema should have a checked-in JSON Schema, a schema version, and
-validation in both repositories. Unknown additive fields should be tolerated
-within a schema version; missing identity, digest, platform, or deploy fields
-should fail publication.
+Required identity, source, platform, digest, path, and deploy fields fail
+validation when absent. Unknown additive fields may be accepted within schema
+version 1, but they cannot change the meaning of an existing field.
 
-## Resolution flow
+## Resolution and generated views
 
-```mermaid
-flowchart LR
-    A[Recipe + variant declaration] --> B[Tested per-platform candidates]
-    B --> C[Trusted promotion]
-    C --> D[Canonical release manifest]
-    D --> E[OCI image index]
-    D --> F[Platform SIF referrers]
-    D --> G[CVMFS release directories]
-    D --> H[apps.json and module views]
-    H --> I[Neurocommand / Neurodesktop resolver]
-    I -->|matching CVMFS path exists| G
-    I -->|CVMFS unavailable| E
-    E --> F
-```
+For a schema-v1 release, the shared Neurocommand resolver:
 
-At runtime:
+1. loads the exact `release_id` named by a generated launcher or module entry
+   from trusted release history;
+2. validates the schema and release identity;
+3. normalizes the host platform and selects its exact platform entry;
+4. uses `cvmfs_payload_path` when it exists;
+5. otherwise pulls the recorded SIF artifact manifest digest from the first
+   complete reachable registry and verifies its subject and blob checksum; and
+6. reports the release ID, platform, path, and digests on failure.
 
-1. A launcher identifies an app by a stable app ID and release ID, not by
-   splitting its label.
-2. The resolver determines the requested flavour and normalizes the host
-   platform.
-3. It selects the platform entry from the release manifest.
-4. If the recorded CVMFS release and `rootfs` exist, it executes that release.
-5. Otherwise it resolves the recorded OCI index and child digest, discovers the
-   exact SIF referrer, verifies it, and pulls it to local storage.
-6. Object-storage URLs and legacy OCI layouts remain last-resort compatibility
-   fallbacks for releases without a valid manifest.
+For a release without a valid schema-v1 manifest, Neurocommand uses the existing
+legacy resolver. This capability detection is automatic; there is no manually
+coordinated feature flag.
 
-This same resolver should be used by:
+The same resolver library or CLI is used by launchers, local download,
+CVMFS preflight, full tests, and diagnostics. Shell entrypoints consume
+structured output rather than implementing separate registry and naming logic.
 
-- `fetch_and_run.sh`;
-- `fetch_containers.sh`;
-- transparent-singularity installation;
-- fulltest artifact selection;
-- CVMFS publication preflight;
-- stale-object cleanup; and
-- diagnostic tooling.
+### Compatibility outputs
 
-The implementation can be a small Python CLI/library shipped by Neurocommand.
-Shell entrypoints should call it and consume structured JSON output. Repeating
-OCI token, manifest, referrer, and filename parsing in multiple shell scripts
-would recreate the current coupling.
+For new releases, Neurocommand generates from the manifest:
 
-## Repository responsibilities
+- `apps.json`;
+- `cvmfs/log.txt`;
+- the CVMFS publication inventory;
+- modulefiles and launchers; and
+- cleanup keep-list entries for both canonical and legacy identities.
 
-### `neurodesk/neurocontainers`
+The formats consumed by old clients remain valid. `apps.json` and
+`cvmfs/log.txt` are generated views, not release authority, and are updated
+only after the CVMFS publication acknowledgement. In particular,
+`cvmfs/log.txt` continues to list the manifest's legacy concrete identity so
+existing scripts and cleanup jobs see the same name they understand.
 
-Neurocontainers owns the declared and built identity:
-
-- recipe schema for product flavours and supported platforms;
-- normalization of architecture aliases;
-- per-flavour/per-platform candidate fan-out;
-- coordinated testing of every index child;
-- generation and validation of the release manifest;
-- immutable OCI image publication;
-- multi-platform index creation;
-- per-platform SIF attachment;
-- provenance, checksum, and optional signature/attestation creation;
-- release-history storage; and
-- generated application metadata.
-
-PR #2913 supplies much of the fan-out logic. It should be adapted so that
-`name`, `flavour`, and `platform` survive as separate fields through the
-builder, rather than only producing names such as `fsl_gpu_arm64`.
-
-PR #2914 supplies the secure candidate-to-promotion boundary. It needs to:
-
-- matrix over concrete flavour/platform candidates;
-- include those fields in its candidate manifest and verification;
-- promote all required children as one coordinated release;
-- create the image index only after all required children pass;
-- attach the tested SIF to each child digest;
-- record post-push digests in the canonical release manifest; and
-- update floating tags only after the immutable graph is complete.
-
-The two draft PRs overlap heavily and should be rebased or integrated before
-implementation of this proposal. Merging both unchanged would leave the one-PR
-flow x86-only and the variant flow on the older release path.
-
-### `neurodesk/neurocommand`
-
-Neurocommand owns materialization and client resolution:
-
-- validate/import Neurocontainers release manifests;
-- generate `apps.json` without encoding identity in display keys;
-- generate the compatibility `cvmfs/log.txt` while it is still required;
-- publish the new CVMFS hierarchy;
-- generate modules and wrappers from manifest fields;
-- resolve local, CVMFS, and OCI locations;
-- select host platform and requested flavour;
-- verify OCI subjects and SIF digests;
-- retain legacy local/object-store fallbacks without removing them in this
-  change;
-- drive cleanup from release state and retention policy; and
-- report actionable diagnostics.
-
-PR #767 remains valuable as a legacy parser and safety improvement. Its
-right-hand parsing should be retained for old flat identities, but new paths
-must use manifest fields directly.
-
-### `neurodesk/neurodesktop`
-
-Neurodesktop remains a consumer:
-
-- install the manifest-backed Neurocommand resolver;
-- keep CVMFS mounting and regional endpoint selection;
-- configure the module path exposed by the new module view;
-- use the resolver in container integration tests instead of constructing a
-  flat CVMFS path; and
-- keep local/offline containers compatible with the same release-directory
-  shape.
-
-No change to the CVMFS repository mount point is proposed:
+The public module roots and default user interface remain:
 
 ```text
-/cvmfs/neurodesk.ardc.edu.au
-```
-
-The changes are below its `containers` directory and in the generated module
-contents.
-
-## Known code impact
-
-This is the minimum inventory identified during review.
-
-| Repository | Area | Current assumption to remove or bridge |
-|---|---|---|
-| neurocommand | `neurodesk/write_log.py` | App display name plus build date produces the image ID. |
-| neurocommand | `neurodesk/build_menu.py` | Display-name parsing derives container and version arguments. |
-| neurocommand | `neurodesk/fetch_and_run.sh` | Resolves only a build date and constructs a module name. |
-| neurocommand | `neurodesk/fetch_containers.sh` | Constructs `IMG_NAME=name_version_date`. |
-| neurocommand | `transparent-singularity/run_transparent_singularity.sh` | Parses identity from underscores and contains registry-specific referrer logic. |
-| neurocommand | `cvmfs/sync_containers_to_cvmfs.sh` | Iterates `log.txt`, creates a flat release directory, and preflights only a legacy object key. |
-| neurocommand | `cvmfs/reconcile_module_files.py` | Parses image strings and rewrites paths with a flat-name regex. |
-| neurocommand | `containers.sh` | Splits every log line into name/version/date columns. |
-| neurocommand | `maintenance/fix_missing_bindpath-directories-on-cvmfs.sh` | Globs `/containers/*/*.simg`. |
-| neurocommand | upload/cleanup workflows | Derive legacy object names by underscore fields and use `apps.json`/`log.txt` as retention truth. |
-| neurocommand | DOI workflow | Derives the recipe name from the first underscore-delimited field. |
-| neurodesktop | `config/jupyter/environment_variables.sh` | Hard-codes current local and CVMFS module directories. |
-| neurodesktop | `config/test_neurodesktop.sh` | Constructs `/containers/package_version_date/package_version_date.simg`. |
-| neurodesktop | Dockerfile/startup | Wires local container storage to Neurocommand's current `containers` directory. |
-| neurocontainers | `builder/release.py` | Generates legacy ARM-specific app/image names. |
-| neurocontainers | `tools/generate_apps_json.py` | Merges one mutable release file per version and currently skips legacy ARM releases. |
-| neurocontainers | build/release workflows | Publish individual images before a coordinated multi-platform release graph exists. |
-| neurocontainers | fulltest tooling | Historically resolves dated SIF filenames rather than a manifest platform entry. |
-
-Tests containing literal flat paths must be updated or retained as explicit
-legacy-compatibility tests, not mechanically replaced.
-
-## Modules and application UX
-
-The CVMFS storage identity and user-facing module identity should be separate.
-
-Recommended module behaviour:
-
-```text
+/cvmfs/neurodesk.ardc.edu.au/containers/modules
+/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules
 module load fsl/6.0.7.16
 ```
 
-selects the default flavour for the host platform.
-
-An explicit flavour may be exposed as:
+The default module selects the host platform. A named build variant is exposed
+without changing the logical tool name:
 
 ```text
 module load fsl/6.0.7.16-gpu
 ```
 
-The modulefile should not point permanently at an AMD64 path in a repository
-also mounted on ARM. It can call a small resolver-generated dispatcher, or
-module generation can emit platform-specific logic using a normalized
-environment value set by Neurocommand/Neurodesktop.
+If a concrete module name such as `fsl_gpu/6.0.7.16` was previously published,
+it remains as a compatibility alias. Module generation may call a
+CVMFS-hosted dispatcher to choose the manifest's platform path, but existing
+module names and roots do not disappear in this change.
 
-This work should also address the broader concerns in Neurocommand issue
-[#152](https://github.com/neurodesk/neurocommand/issues/152):
+### Cleanup boundary
 
-- do not hard-code the CVMFS mount location into generated module content;
-- allow Apptainer or Singularity runtime selection;
-- keep generated module sources reviewable in Git;
-- make runtime flags configurable; and
-- leave room for meta-modules.
+Before producer activation, the Neurocommand PR adds schema-v1 releases and
+their compatibility identities to the keep set. Existing cleanup may continue
+under its current policy, but the linked change must not make either namespace
+eligible for deletion and must not delete legacy OCI, object-store, or CVMFS
+content.
 
-An application label such as `FSLeyes 6.0.7.16` remains presentation only.
-Generated launchers receive explicit `release_id`, `app_id`, and optional
-`flavour`; quoting is mandatory.
+The exact-head cleanup dry run must prove that:
 
-## Cleanup, withdrawal, and reproducibility
+- every release manifest is reachable independently of menu visibility;
+- canonical and legacy CVMFS paths are treated as one retained payload;
+- every recorded child manifest and referrer is retained; and
+- existing releases without schema v1 remain in the legacy keep set.
 
-Release status should be explicit:
+Changing the broader retention or withdrawal policy is outside this proposal.
 
-```text
-candidate -> published -> active -> deprecated -> withdrawn
-```
+## Repository ownership
 
-- `published` means the immutable OCI graph and canonical manifest exist.
-- `active` means normal apps/modules may select it and CVMFS should materialize
-  it.
-- `deprecated` remains runnable but is not the preferred floating target.
-- `withdrawn` removes normal launchers/module pointers and records the reason.
+### Neurocontainers
 
-Cleanup computes reachability from all non-purged release manifests, not from
-the subset visible in `apps.json`.
+Neurocontainers owns:
 
-Before deletion it must account for:
+- recipe build-variant and platform declarations;
+- candidate fan-out and testing;
+- candidate-to-promotion verification;
+- the release JSON Schema and immutable history;
+- OCI image indexes, child manifests, and SIF referrers;
+- post-push digest verification; and
+- generation of trusted release inputs for Neurocommand.
 
-- every configured registry copy;
-- OCI child manifests and their referrers;
-- object-store SIFs;
-- the CVMFS materialized path;
-- floating tags;
-- release manifests;
-- an explicit retention interval; and
-- withdrawal/reproducibility policy.
+The producer PR must integrate the fan-out in
+`neurodesk/neurocontainers#2913` with the promotion boundary in
+`neurodesk/neurocontainers#2914`. The two drafts should not merge independently
+in their current form.
 
-Dry-run output and tests are required. A UI visibility change must never make a
-release eligible for deletion.
+### Neurocommand
 
-For withdrawn CVMFS content, update modules/wrappers and publish that revision
-before removing `rootfs`. Old release metadata must retain an exact OCI digest
-and explain how to reproduce the pull. This preserves the intent of the current
-stale-container wrapper while avoiding reconstruction of a legacy Docker
-reference from a filename.
+Neurocommand owns:
 
-## Security and integrity
+- schema validation and platform selection;
+- manifest-driven generated views;
+- canonical and legacy CVMFS publication in one transaction;
+- modules, launchers, and local download resolution;
+- legacy parsing and fallback;
+- compatibility keep-list generation; and
+- failure diagnostics.
 
-- Resolve tags once, then pin and record digests.
-- Verify the platform child belongs to the expected index.
-- Verify a SIF artifact manifest refers to the selected child digest.
-- Verify artifact type, Neurodesk identity annotations, blob digest, and SIF
-  SHA-256 before execution or CVMFS publication.
-- Do not select `.manifests[0]` without comparison to the canonical release
-  manifest.
-- Preserve the candidate checks, recipe fingerprint, PR number, head commit,
-  Docker checksum, and SIF checksum introduced by PR #2914.
-- Make index assembly an atomic promotion gate: no release manifest or floating
-  tag is published until all required children pass.
-- Record per-registry digests and verify copies after mirroring.
-- Run `cvmfs_server check -s <release-path>` for pilots and regularly run the
-  repository integrity checker.
+The legacy right-hand parser and deployment safety checks in
+`neurodesk/neurocommand#767` remain useful. New schema-v1 paths are read from
+the manifest, not parsed.
 
-Container signing and attestations from Neurocontainers issue
-[#504](https://github.com/neurodesk/neurocontainers/issues/504) can be added to
-the same OCI subject graph without another naming scheme. The manifest schema
-should reserve typed referrer entries for signatures, SBOMs, provenance, and
-security scan results.
+### Neurodesktop
 
-## Coordinated merge plan
+Neurodesktop continues to consume:
 
-This is one cross-repository change, not a sequence of independently deployed
-states. The implementation PRs can be reviewed independently, but they remain
-draft and are validated together at their exact head commits. They are merged
-in one scheduled window only when the complete set is ready.
+- the same CVMFS mount;
+- the same public module roots;
+- the same module names;
+- the same local container root; and
+- valid legacy CVMFS paths.
+
+Its current hard-coded container test should pass unchanged through the legacy
+alias. That is valuable compatibility evidence, not automatically a reason to
+change Neurodesktop. A source PR is opened only if the exact-head run exposes a
+real incompatibility.
+
+## One coordinated merge train
 
 ### Linked PR set
 
-| Order | Repository | PR contents | Merge condition |
+| Order | Repository | Required contents | Activation behaviour |
 |---|---|---|---|
-| 1 | `neurodesk/neurocommand` | Versioned schema consumer, manifest resolver, new and legacy CVMFS views, generated metadata, modules, cleanup reachability, and compatibility tests. The resolver uses the legacy path whenever a complete valid schema-v1 manifest is absent. | Required; safe and dormant before the producer PR merges. |
-| 2 | `neurodesk/neurodesktop` | Consume the resolver for startup and integration tests; remove hard-coded flat container and module paths. | Expected from the current code audit. Omit only if the cross-repository test proves Neurodesktop needs no source change. |
-| 3 | `neurodesk/neurocontainers` | Integrate the variant fan-out from #2913 with the tested candidate promotion from #2914; produce the canonical manifest, multi-platform index, SIF referrers, and immutable release history. | Required and merged last because a valid published manifest activates the new path. |
+| 1 | `neurodesk/neurocommand` | Schema consumer, resolver, manifest-generated compatibility outputs, canonical plus legacy CVMFS publication, module dispatch, keep-list hardening, and tests. | Dormant for releases without schema v1; legacy behaviour remains. |
+| 2 | `neurodesk/neurodesktop` | Only the smallest source change demonstrated necessary by exact-head testing. | Conditional; no PR is preferred when current source passes. |
+| 3 | `neurodesk/neurocontainers` | One integrated or superseding implementation of `neurodesk/neurocontainers#2913` and `neurodesk/neurocontainers#2914`: matrix candidates, complete promotion, schema, OCI graph, and immutable release history. | Merged last; the first trusted schema-v1 release activates the new path for that release. |
 
-This proposal PR, `neurodesk/neurocommand#777`, is the tracker and contract
-review. Every implementation PR body must contain:
+There are two required implementation PRs, not three. If Neurodesktop needs no
+source change, its tested commit or image digest is recorded on the two required
+PRs and this tracker.
+
+Every implementation PR body contains:
 
 ```text
 Part of neurodesk/neurocommand#777
 Depends on <exact linked PR URLs>
-Merge order: neurocommand -> neurodesktop (if required) -> neurocontainers
+Tested with:
+- neurocommand: <commit SHA>
+- neurocontainers: <commit SHA>
+- neurodesktop: <commit SHA or image digest>
+Merge order: neurocommand -> neurodesktop (only if required) -> neurocontainers
 ```
 
-The bodies also link #2913 and #2914 and state whether they are integrated,
-superseded, or must be rebased. A PR must not claim the coordinated change is
-ready while one of its required links is missing or still failing.
+The Neurocontainers PR also states explicitly whether
+`neurodesk/neurocontainers#2913` and `neurodesk/neurocontainers#2914` are
+integrated, superseded, or closed in favour of it. The Neurocommand PR does the
+same for
+`neurodesk/neurocommand#767`: it either uses that PR as its base, incorporates
+its legacy fixes, or supersedes it with equivalent tests.
 
-### Cross-repository contract
+### Exact-head proof before merge
 
-- The linked PRs use the same schema version, identity rules, fixtures, and
-  expected digests. The CI record identifies every tested PR head SHA.
-- Capability detection is data-driven, not a manually coordinated feature
-  flag. Neurocommand selects the new path only for a complete schema-v1
-  manifest that passes schema, identity, subject, platform, and digest checks;
-  otherwise it follows the existing path.
-- New and legacy paths, module views, tags, and generated metadata are outputs
-  of the same canonical release manifest.
-- Existing flat CVMFS paths, OCI tags, and object-store SIFs are retained. Their
-  removal is outside this linked PR set and requires a separate proposal based
-  on usage data and the supported-client policy.
-- Every canonical CVMFS release has its complete legacy directory and inner
-  `.simg` pathname in the same transaction. Both namespaces resolve to the same
-  content hashes.
-- No new code outside the explicit compatibility adapter derives identity by
-  splitting filenames, display labels, OCI repositories, or CVMFS paths.
-- Cleanup is disabled for the new identity until reachability tests cover both
-  views. Nothing in this change makes legacy content eligible for deletion.
+All linked PRs remain draft until one reproducible run checks out their exact
+head commits. That run builds a release fixture containing:
 
-### Pre-merge proof
+- `default` on AMD64 and ARM64 under one OCI index;
+- one named build variant such as `gpu`;
+- an immutable release manifest with exact registry and CVMFS paths; and
+- generated old and new Neurocommand views.
 
-A cross-repository CI or reproducible maintainer run checks out the exact heads
-of all linked PRs and builds one representative release graph. It must cover:
+It then proves:
 
-- a default AMD64 and ARM64 release from one logical tool name;
-- one non-default flavour such as `gpu`;
-- schema rejection and fallback when the manifest is missing, incomplete, or
-  has an unexpected version;
-- SIF selection by child digest with native referrers and the documented
-  fallback-tag scheme;
-- CVMFS enabled and disabled, local/offline reuse, module loading, CLI and GUI
-  wrappers, and Neurodesktop startup;
-- primary-registry failure and verified fallback;
-- generation of `apps.json`, `log.txt`, modulefiles, new paths, and legacy
-  compatibility paths from the same manifest;
-- an old Neurocommand/Neurodesktop client running the compatibility path;
-- every declared `legacy_rootfs_paths` entry working directly without a
-  resolver and exposing the canonical rootfs content hash; and
-- dry-run cleanup proving active, hidden, compatibility, and retained releases
-  remain reachable.
+- schema equality and positive/negative validation in both repositories;
+- candidate tamper detection for source, platform, and every recorded digest;
+- refusal to promote a missing or failed platform child;
+- native-referrers and fallback-tag publication;
+- exact SIF selection by recorded digest;
+- canonical and full legacy CVMFS paths execute the same content;
+- the unchanged Neurodesktop container test can use the legacy path;
+- modules work on AMD64 and ARM64 without changing their public name or root;
+- CVMFS-disabled and local/offline paths work;
+- a missing, incomplete, or unsupported manifest returns to legacy resolution;
+- registry failure uses only another complete, verified registry entry;
+- CVMFS failure aborts publication and leaves the previous revision visible;
+  and
+- cleanup dry-run retains existing, hidden, canonical, and legacy releases.
 
-The resulting manifest, digests, generated-file diff, CVMFS path listing, and
-test results are attached to or linked from every required PR. Testing branch
-names or moving default branches is insufficient; the evidence must name the
-commit SHAs that will merge.
+The manifest, resolved digests, generated-file diff, CVMFS path listing, test
+results, and tested SHAs are linked from each required PR. Testing branch names
+or moving default branches is not sufficient evidence.
 
-### Atomic activation
+### Merge and activation window
 
-GitHub, OCI registries, and CVMFS do not share a distributed transaction.
-Atomicity here means no client can select an incomplete release: the canonical
-manifest is the activation record, it is published only after the OCI graph is
-complete, and absence of the CVMFS path sends the resolver to the digest-pinned
-OCI artifact.
+The linked PRs merge in the table order during one scheduled window. This is an
+ordered merge, not a multi-stage deployment:
 
-The OCI publisher may push immutable candidate blobs and child manifests while
-testing, because those objects do not activate a release. It then:
+1. merge the backwards-compatible Neurocommand consumer;
+2. merge the Neurodesktop compatibility fix only if the proof required one;
+3. merge the integrated Neurocontainers producer; and
+4. promote one already-tested schema-v1 release and observe its OCI, CVMFS, old
+   path, new path, module, and Neurodesktop checks before closing the window.
 
-1. verifies every required flavour/platform child and SIF;
-2. creates and verifies the image index and referrer graph;
-3. records registry-resolved digests in the canonical release manifest;
-4. publishes that immutable manifest; and
-5. advances convenience/floating pointers last.
+GitHub, OCI registries, and CVMFS cannot share one distributed transaction.
+Safety comes from two per-release commit points:
 
-A failure before the final two steps leaves only unreachable immutable
-candidates and does not expose a partial release to clients.
+- trusted release history records only a complete OCI graph; and
+- one CVMFS transaction publishes the canonical and legacy paths together.
 
-CVMFS publication uses one repository transaction. Within it, Neurocommand
-materializes `/containers/<name>/<version>_<variant>_<builddate>`, generates the
-new module view, and creates or preserves the required legacy compatibility
-view. It validates the rootfs, commands, release manifest, modules, paths, and
-legacy resolution before publishing the transaction. On failure it aborts the
-transaction, leaving the previous CVMFS revision visible.
+Generated views select the release only after both commit points succeed. A new
+client can still use the recorded OCI SIF when CVMFS is temporarily unavailable
+after activation. An old client first sees the release only after its legacy
+CVMFS path is published.
 
-For example, a tested directory alias may be:
+### Go/no-go checklist
 
-```text
-/containers/fsl_6.0.7.16_20260728
-  -> /containers/fsl/6.0.7.16_amd64_20260728
-```
+The merge window proceeds only when:
 
-The canonical release must also expose the legacy inner
-`fsl_6.0.7.16_20260728.simg` name as a view of `rootfs` so the complete stored
-path continues to work. An existing materialized legacy path is never replaced
-merely to introduce the alias. The linked PR test must prove the selected
-representation works through Apptainer, CVMFS, modules, an old client, and a
-direct legacy pathname with no resolver involved.
+- [ ] maintainers approve the identity and legacy-path decisions in this
+  document;
+- [ ] the two required PRs link each other and pin the same schema and fixtures;
+- [ ] `neurodesk/neurocontainers#2913` and `neurodesk/neurocontainers#2914`
+  have one agreed integration outcome;
+- [ ] `neurodesk/neurocommand#767` has one agreed prerequisite, integration, or
+  supersession outcome;
+- [ ] all repository-local and exact-head tests pass;
+- [ ] the unchanged Neurodesktop test passes, or its conditional PR is ready;
+- [ ] OCI promotion and CVMFS publication failure injection passes;
+- [ ] generated views remain unchanged when CVMFS publication or its
+  acknowledgement fails;
+- [ ] previous generated metadata, OCI pointer digests, and CVMFS revision are
+  recorded;
+- [ ] destructive cleanup and legacy removal are absent from the diff; and
+- [ ] maintainers for the affected repositories confirm the window.
 
-### Merge window and go/no-go
-
-Merge in the table order during one scheduled window. Earlier PRs contain
-backwards-compatible consumers only; the Neurocontainers producer is the
-activation boundary and merges last. If the expected Neurodesktop change is
-unnecessary, record the test evidence on the tracker rather than opening an
-empty coordination PR.
-
-The merge proceeds only when:
-
-- the contract decisions below are approved;
-- all required PRs approve and pin the same contract;
-- all repository-local and exact-head cross-repository checks pass;
-- the OCI candidate graph and CVMFS transaction both pass preflight;
-- legacy clients resolve the same tested digest through the compatibility view;
-- previous OCI pointer digests and the previous CVMFS revision are recorded;
-- destructive cleanup and legacy removal are absent; and
-- maintainers for every affected repository confirm the merge order and window.
-
-Any failed condition stops the whole merge train. It does not create another
-deployment state to support.
+Failure of any item stops the merge train. It does not create another supported
+mode or justify bypassing compatibility.
 
 ## Rollback
 
-Rollback changes pointers and generated views; it does not rebuild, overwrite,
-or delete immutable content:
+Rollback changes selection and generated views; it does not rebuild or delete
+immutable content.
 
-- before activation, do not merge the producer PR and revert any already-merged
-  consumer PR only if necessary;
-- restore floating OCI pointers to their recorded previous digests;
-- remove or withdraw the activating canonical manifest from generated release
-  state so capability detection returns consumers to the legacy resolver;
-- restore the previous generated `apps.json` and module views;
-- abort an unpublished CVMFS transaction or restore the recorded previous
-  revision after publication; and
-- retain immutable legacy OCI tags, SIF objects, and CVMFS paths throughout.
+- Before a release manifest enters trusted release history, the pushed
+  candidate graph is inert.
+- If promotion fails, do not commit the release manifest or advance floating
+  tags.
+- If CVMFS publication fails after the history commit, leave generated views
+  and floating tags unchanged; the unselected immutable manifest may remain.
+- If activation fails after generated views change, restore the previous
+  `apps.json`, `cvmfs/log.txt`, module views, and floating-tag digests.
+- Abort an unpublished CVMFS transaction. If publication completed, restore the
+  recorded previous CVMFS revision.
+- A new client automatically returns to legacy resolution when the schema-v1
+  release is no longer selected.
+- Existing clients continue using unchanged legacy releases and the retained
+  legacy paths of new releases.
 
-Because consumers automatically fall back when no valid schema-v1 manifest is
-present, producer rollback does not require rebuilding a container or an
-emergency consumer release. Investigation can use the immutable candidate
-objects without exposing them as an active release.
+The immutable release manifest and candidate objects may remain for diagnosis;
+they are not selected and are not deleted during rollback.
 
-## Validation requirements
+## Expected code impact
 
-### Neurocontainers
+This is a review map, not permission to expand the change beyond the stated
+scope.
 
-- JSON Schema positive and negative tests.
-- Variant matrix tests for default, ARM, GPU, and combined flavour/platform
-  cases.
-- Tests that architecture aliases normalize to OCI values.
-- Candidate tamper tests for name, version, flavour, platform, build date,
-  index digest, child digest, and SIF digest.
-- Multi-platform promotion tests that refuse partial indexes.
-- Tests that a same-day conflicting immutable release is rejected.
-- Referrer attachment and mirrored-graph verification tests.
-- Fulltest selection from a platform entry without wildcard filenames.
-
-### Neurocommand
-
-- Manifest loading and forward-compatible schema tests.
-- Host-platform and explicit-flavour selection tests.
-- CVMFS path generation tests for every variant rule.
-- Legacy flat-name parsing tests from PR #767.
-- Native referrers, fallback-tag, missing-referrer, multiple-referrer,
-  wrong-subject, wrong-platform, and bad-digest tests.
-- Module generation without a hard-coded mount path.
-- Exact legacy-path generation and canonical-content equivalence tests.
-- Empty deploy command rejection.
-- Cleanup reachability tests proving hidden and non-active retained releases are
-  not deleted.
-- CVMFS reconciliation tests that use manifest identity rather than regex
-  replacement.
-
-### Neurodesktop
-
-- Startup with an externally mounted CVMFS repository.
-- Startup with an internal FUSE mount.
-- CVMFS-disabled OCI download.
-- AMD64 and ARM64 module selection.
-- Local container persistence across image upgrades.
-- Test-runner lookup through release ID rather than a constructed flat path.
-
-## GitHub context reviewed
-
-As of 2026-07-28, this review inventoried all open items in the two requested
-repositories:
-
-- Neurocommand: 4 open issues and 1 open PR.
-- Neurocontainers: 29 open issues and 2 open PRs.
-
-Directly relevant items:
-
-| Item | Relevance |
-|---|---|
-| [neurocommand#733](https://github.com/neurodesk/neurocommand/issues/733) | ARM publication, variants, parsing breakpoints, artifact cleanup, and maintainer direction. |
-| [neurocommand#152](https://github.com/neurodesk/neurocommand/issues/152) | Module portability, runtime selection, configurable CVMFS mount, and reviewable module generation. |
-| [neurocommand#75](https://github.com/neurodesk/neurocommand/issues/75) | Generated transparent-singularity paths become stale when local storage moves. |
-| [neurocommand#13](https://github.com/neurodesk/neurocommand/issues/13) | Broader packaging of Neurocommand; no direct layout requirement. |
-| [neurocommand#767](https://github.com/neurodesk/neurocommand/pull/767) | Draft end-to-end concrete variant support and the required legacy compatibility parser. |
-| [neurocontainers#1092](https://github.com/neurodesk/neurocontainers/issues/1092) | General CPU/GPU/architecture variation model. |
-| [neurocontainers#1252](https://github.com/neurodesk/neurocontainers/issues/1252) | ARM build infrastructure. |
-| [neurocontainers#2593](https://github.com/neurodesk/neurocontainers/issues/2593) | Same-tag multi-architecture/referrer direction and CVMFS current-snapshot policy. |
-| [neurocontainers#2408](https://github.com/neurodesk/neurocontainers/issues/2408) | v2 OCI repository, immutable tag, SIF referrer, and floating-tag model. |
-| [neurocontainers#2409](https://github.com/neurodesk/neurocontainers/issues/2409) | OCI labels and SIF annotations. |
-| [neurocontainers#2796](https://github.com/neurodesk/neurocontainers/issues/2796) | Fulltest artifact selection from release metadata. |
-| [neurocontainers#1906](https://github.com/neurodesk/neurocontainers/issues/1906) | CVMFS client configuration distribution; mount configuration remains outside this layout proposal. |
-| [neurocontainers#1253](https://github.com/neurodesk/neurocontainers/issues/1253) | CVMFS metrics; useful for measuring compatibility and fallback usage. |
-| [neurocontainers#61](https://github.com/neurodesk/neurocontainers/issues/61) | CVMFS scanning; the manifest enables structured reconciliation. |
-| [neurocontainers#218](https://github.com/neurodesk/neurocontainers/issues/218) | Container metadata/database direction. |
-| [neurocontainers#504](https://github.com/neurodesk/neurocontainers/issues/504) | Signing and supply-chain metadata fit the OCI subject graph. |
-| [neurocontainers#2950](https://github.com/neurodesk/neurocontainers/issues/2950) | Registry-native manifest/config access supports the general move away from pulling content to inspect metadata. |
-| [neurocontainers#2913](https://github.com/neurodesk/neurocontainers/pull/2913) | Draft first-class variant builder and release fan-out. |
-| [neurocontainers#2914](https://github.com/neurodesk/neurocontainers/pull/2914) | Draft tested-candidate promotion and manifest foundation. |
-
-The remaining open Neurocontainers issues are application requests or isolated
-build/release failures and do not change the proposed layout.
-
-## Standards and operational references
-
-- [OCI Image Index Specification](https://github.com/opencontainers/image-spec/blob/main/image-index.md)
-- [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
-- [OCI Distribution Specification: referrers and fallback tag schema](https://github.com/opencontainers/distribution-spec/blob/main/spec.md)
-- [ORAS attached artifacts](https://oras.land/docs/concepts/reftypes/)
-- [ORAS `attach` command](https://oras.land/docs/commands/oras_attach/)
-- [Apptainer OCI registry documentation](https://apptainer.org/docs/user/latest/registry.html)
-- [CVMFS nested catalog recommendations](https://cvmfs.readthedocs.io/en/2.14/cpt-repo/#managing-nested-catalogs)
-- [CVMFS content hashes and hard-link constraints](https://cvmfs.readthedocs.io/en/2.14/cpt-details/#file-catalog)
-- [CVMFS repository integrity checks](https://cvmfs.readthedocs.io/en/stable/cpt-repo.html)
+| Repository | Area | Required change |
+|---|---|---|
+| Neurocontainers | `builder/variants.py` and callers in `neurodesk/neurocontainers#2913` | Preserve logical name, build variant, platform, and legacy concrete identity as separate fields. |
+| Neurocontainers | candidate/promotion code in `neurodesk/neurocontainers#2914` | Matrix over all required candidates and bind every artifact to the tested PR head. |
+| Neurocontainers | release generation | Validate schema, retain build history, record post-push digests, and generate the OCI graph. |
+| Neurocommand | `fetch_and_run.sh`, `fetch_containers.sh`, transparent-singularity | Call one manifest resolver for schema-v1 releases and retain legacy fallback. |
+| Neurocommand | `sync_containers_to_cvmfs.sh` | Consume release manifests and publish canonical plus legacy paths atomically. |
+| Neurocommand | `reconcile_module_files.py` | Use explicit manifest identity for new releases and retain the legacy parser. |
+| Neurocommand | `write_log.py`, `build_menu.py`, `containers.sh` | Generate compatibility views without parsing presentation labels. |
+| Neurocommand | upload/cleanup and DOI workflows | Use manifest inventory and keep both identities; perform no activation-time deletion. |
+| Neurodesktop | `environment_variables.sh`, `test_neurodesktop.sh` | Expected to remain unchanged; use them as compatibility tests. |
 
 ## Alternatives considered
 
 ### Keep the flat layout and parse from the right
 
-This is the lowest-risk compatibility step and PR #767 should retain it for old
-identities. It does not remove coupling between storage paths, module names,
-display names, cleanup keys, and registry names, so it is not the target.
+This is required for old releases and is correctly improved by
+`neurodesk/neurocommand#767`. It does not provide a durable release schema,
+multi-platform OCI selection, or a safe inventory, so it remains a
+compatibility adapter.
 
-### Encode every flavour and architecture into the container name
+### Publish every concrete variant as a separate logical name
 
-This matches the first implementation in PR #2913 and is easy for legacy
-Neurocommand consumers. It creates separate OCI repositories and user-facing
-module names for what are otherwise dimensions of one logical tool, and it does
-not implement the same-tag multi-architecture direction in issue #2593.
+This is the current direction in `neurodesk/neurocommand#733` and the first
+implementation in `neurodesk/neurocontainers#2913`. It is simple for legacy
+consumers, but makes ARM a different tool, creates separate OCI repositories,
+and conflicts with the same-tag multi-architecture direction accepted in
+[neurocontainers#2593](https://github.com/neurodesk/neurocontainers/issues/2593).
+This proposal retains those concrete names only as explicit compatibility
+identities.
 
-This proposal preserves distinct concrete variants but stores their axes in the
-manifest and CVMFS release name. Maintainers should explicitly confirm this
-change from the current draft PR direction.
+### Put architecture in separate OCI tags
 
-### Publish a separate OCI tag for every architecture
+That moves platform selection into custom tag naming and duplicates logic that
+OCI image indexes already standardize. Architecture-specific candidate tags may
+exist during a build, but they are not public release identities.
 
-This works with simple clients but moves host selection into tag naming,
-duplicates floating-tag policy, and conflicts with the agreed image-index
-direction. Architecture-specific tags may exist as temporary build inputs, but
-they are not public release identities.
+### Attach every SIF to the top-level index
 
-### Attach all SIFs only to the top-level index
+A SIF is platform-specific. Attaching it to the exact child image manifest
+gives it an unambiguous OCI platform subject and lets the release manifest
+record one exact SIF per platform.
 
-Custom annotations could distinguish them, but standard platform resolution
-would not identify one SIF subject. Attaching to each child manifest gives the
-SIF the same platform identity as the runnable image.
+### Rename the unpacked payload to `rootfs`
 
-### Continue treating `apps.json` as the canonical inventory
+That name is clearer than a directory ending in `.simg`, but it would require
+another compatibility alias inside every release and changes more publisher,
+module, maintenance, and test code. Keeping the existing inner name is safer
+for this change.
 
-`apps.json` is a presentation/publication view. It cannot safely represent
-candidate, hidden, archived, withdrawn, and multi-platform artifacts without
-becoming another release database. Its past use as a cleanup keep-list already
-deleted valid hidden ARM artifacts.
+### Change Neurodesktop at the same time
 
-## Questions requiring maintainer decision
+Changing code merely because it constructs an old path would weaken the proof
+that old paths remain compatible. The current Neurodesktop test should pass
+unchanged. A third PR is justified only by a demonstrated failure.
 
-| Question | Recommendation |
-|---|---|
-| Should product flavour and platform remain separate internally? | Yes. Derive the single CVMFS `variant` token from both. |
-| Should ARM remain a distinct name such as `fsl_arm64`? | No for the target OCI/CVMFS model; retain it only as a legacy alias. |
-| How should product flavours appear in OCI? | Separate immutable tags/indexes within the same logical repository. |
-| What is the SIF subject? | The exact platform child manifest. |
-| What is the canonical architecture vocabulary? | OCI `amd64` and `arm64`; accept recipe aliases at input. |
-| What is the unpacked CVMFS payload called? | `rootfs`, with a required legacy inner-name view for every published compatibility alias. |
-| What is the release-history path in Neurocontainers? | `releases/<name>/<version>/<flavour>/<build_date>.json`. |
-| Which registry is primary? | Ratify Quay-primary versus GHCR-critical; record and verify each registry independently meanwhile. |
-| What happens on a conflicting same-day rebuild? | Fail promotion; approve an extended build ID before allowing it. |
-| How does `module load name/version` select architecture? | Use the shared resolver/platform dispatcher; never fix the module to AMD64. |
-| How long are flat CVMFS aliases retained? | This change sets no removal date. Removal requires a separate proposal based on observed usage and supported-client policy. |
-| Is the legacy `.simg` object-store path retained? | Yes. Its removal is outside this change and requires measured usage plus a separate proposal. |
+## Consequences
 
-Approval of those decisions is sufficient to open the linked implementation
-PRs and merge them as one coordinated train across the affected repositories.
+The proposal intentionally accepts:
+
+- two CVMFS namespace entries for every new payload;
+- a permanent legacy resolver for historical releases;
+- a schema and generated compatibility views that must be versioned and tested
+  across repositories;
+- an OCI index even for single-platform releases;
+- rejection rather than overwrite for same-day conflicting builds; and
+- a larger coordinated implementation review in exchange for avoiding
+  long-lived mixed contracts.
+
+It avoids:
+
+- moving existing containers;
+- duplicating unpacked payload data in the normal compatibility representation;
+- encoding platform into a logical tool name;
+- choosing artifacts by list order or floating tags;
+- using menu visibility as retention truth; and
+- requiring a Neurodesktop source change without evidence.
+
+## Maintainer ratification
+
+Approval of this document means agreement that:
+
+- [ ] release identity excludes platform, while platform artifact identity adds
+  it;
+- [ ] build variant and platform remain separate manifest fields;
+- [ ] the CVMFS variant is their explicit stored projection;
+- [ ] logical names remain stable in the target OCI/CVMFS model, superseding
+  concrete platform names as the target from
+  `neurodesk/neurocommand#733`;
+- [ ] SIFs attach to platform child manifests;
+- [ ] every new canonical CVMFS release includes its full manifest-declared
+  legacy path in the same transaction;
+- [ ] the existing inner `.simg` layout, legacy module aliases, and public
+  module roots remain;
+- [ ] existing releases are not backfilled or removed;
+- [ ] the immutable release manifest contains no mutable lifecycle status, and
+  generated views activate it only after CVMFS acknowledges both paths; and
+- [ ] implementation uses two required linked PRs, with Neurodesktop conditional
+  on a failing compatibility test.
+
+Once these boxes are agreed, the linked implementation PRs can be opened and
+reviewed as one contract without further design stages.
+
+## Relevant discussions and specifications
+
+- [neurocommand#733: ARM and variant publication](https://github.com/neurodesk/neurocommand/issues/733)
+- [neurocommand#767: legacy named-variant compatibility](https://github.com/neurodesk/neurocommand/pull/767)
+- [neurocontainers#1092: general container variations](https://github.com/neurodesk/neurocontainers/issues/1092)
+- [neurocontainers#2408: v2 OCI repository and tag layout](https://github.com/neurodesk/neurocontainers/issues/2408)
+- [neurocontainers#2593: same-tag multi-architecture direction](https://github.com/neurodesk/neurocontainers/issues/2593)
+- [neurocontainers#2796: fulltest selection from release metadata](https://github.com/neurodesk/neurocontainers/issues/2796)
+- [neurocontainers#2913: first-class variant fan-out](https://github.com/neurodesk/neurocontainers/pull/2913)
+- [neurocontainers#2914: tested candidate promotion](https://github.com/neurodesk/neurocontainers/pull/2914)
+- [OCI image index specification](https://github.com/opencontainers/image-spec/blob/main/image-index.md)
+- [OCI image manifest specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
+- [OCI Distribution 1.1 referrers and fallback tag schema](https://github.com/opencontainers/distribution-spec/blob/main/spec.md)
+- [Apptainer OCI registry documentation](https://apptainer.org/docs/user/latest/registry.html)
+- [CVMFS nested catalogs](https://cvmfs.readthedocs.io/en/2.14/cpt-repo/#managing-nested-catalogs)
+- [CVMFS content hashes and hard-link constraints](https://cvmfs.readthedocs.io/en/2.14/cpt-details/#file-catalog)
