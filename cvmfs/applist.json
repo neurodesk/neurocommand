@@ -2368,6 +2368,14 @@
             ]
         },
         {
+            "application": "synthseg_8.2.0_20260730",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "synthstrip_7.4.1_20260514",
             "categories": [
                 "image segmentation",
