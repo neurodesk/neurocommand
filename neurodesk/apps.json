@@ -3314,18 +3314,6 @@
             "shape analysis"
         ]
     },
-    "sodiumgridding_ptpi": {
-        "apps": {
-            "sodiumgridding_ptpi 0.1.0": {
-                "version": "20260729",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
     "soopct": {
         "apps": {
             "soopct 0.0.0": {
@@ -3518,6 +3506,20 @@
             }
         },
         "categories": [
+            "structural imaging"
+        ]
+    },
+    "synthseg": {
+        "apps": {
+            "synthseg 8.2.0": {
+                "version": "20260730",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
             "structural imaging"
         ]
     },
