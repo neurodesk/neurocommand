@@ -2828,6 +2828,11 @@
             "pcntoolkit 0.35": {
                 "version": "20250628",
                 "exec": ""
+            },
+            "pcntoolkit 1.3.0": {
+                "version": "20260731",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
