@@ -494,6 +494,19 @@
             "structural imaging"
         ]
     },
+    "brainles-preprocessing": {
+        "apps": {
+            "brainles-preprocessing 0.6.10": {
+                "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "structural imaging"
+        ]
+    },
     "brainlesion": {
         "apps": {
             "brainlesion 1.0.0": {
