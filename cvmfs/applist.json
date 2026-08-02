@@ -2439,12 +2439,6 @@
             ]
         },
         {
-            "application": "vesselapp_0.3.1_20211216",
-            "categories": [
-                "image segmentation"
-            ]
-        },
-        {
             "application": "vesselboost_1.0.0_20240815",
             "categories": [
                 "image segmentation"
