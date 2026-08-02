@@ -3649,17 +3649,6 @@
             "workflows"
         ]
     },
-    "vesselapp": {
-        "apps": {
-            "vesselapp 0.3.1": {
-                "version": "20211216",
-                "exec": ""
-            }
-        },
-        "categories": [
-            "image segmentation"
-        ]
-    },
     "vesselboost": {
         "apps": {
             "vesselboost 1.0.0": {
