@@ -323,6 +323,7 @@ slicer_4.11.20200930_20201108 categories:image registration,image segmentation,s
 slicer_5.0.3_20221025 categories:image registration,image segmentation,structural imaging,visualization,
 slicer_5.10.0_20260226 categories:image registration,image segmentation,structural imaging,visualization,
 slicersalt_3.0.0_20210301 categories:shape analysis,
+sodiumgriddingptpi_0.1.10_20260803 categories:image reconstruction,
 soopct_0.0.0_20260611 categories:structural imaging,
 sovabids_0.3.1a0_20221202 categories:data organisation,
 spant_3.7.0_20260319 categories:spectroscopy,

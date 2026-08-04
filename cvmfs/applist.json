@@ -2250,6 +2250,12 @@
             ]
         },
         {
+            "application": "sodiumgriddingptpi_0.1.10_20260803",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "soopct_0.0.0_20260611",
             "categories": [
                 "structural imaging"
