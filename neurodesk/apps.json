@@ -3332,6 +3332,18 @@
             "shape analysis"
         ]
     },
+    "sodiumgriddingptpi": {
+        "apps": {
+            "sodiumgriddingptpi 0.1.10": {
+                "version": "20260803",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "soopct": {
         "apps": {
             "soopct 0.0.0": {
