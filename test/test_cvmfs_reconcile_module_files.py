@@ -24,10 +24,10 @@ def module_text(container_name):
     )
 
 
-def make_container(repo_root, container_name):
+def make_container(repo_root, container_name, commands="datalad\n"):
     container = repo_root / "containers" / container_name
     container.mkdir(parents=True)
-    (container / "commands.txt").write_text("datalad\n")
+    (container / "commands.txt").write_text(commands)
 
 
 def test_reconciles_current_public_modules_and_removes_stale_categories(tmp_path):
@@ -58,6 +58,8 @@ def test_reconciles_current_public_modules_and_removes_stale_categories(tmp_path
         text = module_file.read_text()
         assert latest_container in text
         assert old_container not in text
+        assert "-- neurodesk-exposed-commands" in text
+        assert 'extensions("datalad/1.3.1")' in text
 
     assert current_public.read_text() == canonical.read_text()
     assert not old_category_public.exists()
@@ -140,6 +142,72 @@ def test_reconciliation_sanitizes_lmod_cache_delimiter_in_help_text(tmp_path):
     assert "[LABEL ...] ]" in text
     assert "]]" not in text
     assert "]===])" in text
+
+
+def test_reconciliation_updates_exposed_commands_and_preserves_other_extensions(
+    tmp_path,
+):
+    repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
+    latest_container = "demo_1.0_20260512"
+    log_path = tmp_path / "log.txt"
+
+    make_container(
+        repo_root,
+        latest_container,
+        "zeta\nalpha\nalpha\nbad/name\nbad command\nbad,command\n",
+    )
+    log_path.write_text(f"{latest_container} categories:programming,\n")
+
+    canonical = repo_root / "containers" / "modules" / "demo" / "1.0.lua"
+    canonical.parent.mkdir(parents=True)
+    canonical.write_text(
+        module_text(latest_container) + 'extensions("python-package/2.0")\n'
+    )
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    reconcile_module_files.apply_changes(changes)
+
+    text = canonical.read_text()
+    assert text.count("-- neurodesk-exposed-commands") == 1
+    assert 'extensions("alpha/1.0, zeta/1.0")' in text
+    assert 'extensions("python-package/2.0")' in text
+
+    (repo_root / "containers" / latest_container / "commands.txt").write_text(
+        "beta\n"
+    )
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    reconcile_module_files.apply_changes(changes)
+
+    text = canonical.read_text()
+    assert text.count("-- neurodesk-exposed-commands") == 1
+    assert 'extensions("beta/1.0")' in text
+    assert "alpha/1.0" not in text
+    assert "zeta/1.0" not in text
+    assert 'extensions("python-package/2.0")' in text
+
+
+def test_reconciliation_removes_managed_extensions_for_empty_inventory(tmp_path):
+    repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
+    latest_container = "demo_1.0_20260512"
+    log_path = tmp_path / "log.txt"
+
+    make_container(repo_root, latest_container, "")
+    log_path.write_text(f"{latest_container} categories:programming,\n")
+
+    canonical = repo_root / "containers" / "modules" / "demo" / "1.0.lua"
+    canonical.parent.mkdir(parents=True)
+    canonical.write_text(
+        module_text(latest_container)
+        + "-- neurodesk-exposed-commands\n"
+        + 'extensions("old-command/1.0")\n'
+    )
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    reconcile_module_files.apply_changes(changes)
+
+    text = canonical.read_text()
+    assert "neurodesk-exposed-commands" not in text
+    assert "old-command/1.0" not in text
 
 
 def test_check_mode_exit_status_distinguishes_drift(tmp_path):

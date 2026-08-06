@@ -482,7 +482,7 @@ echo "create module files one directory up"
 modulePath=$_base/../modules/`echo $container | cut -d _ -f 1`
 echo $modulePath
 # e.g. ../modules/matlab
-mkdir $modulePath -p
+mkdir -p "$modulePath"
 
 moduleSoftwareName=`echo $container | cut -d _ -f 1`
 # e.g. matlab
@@ -496,6 +496,9 @@ bash "$_base/ts_sanitize_lua_help.sh" README.md >> ${modulePath}/${moduleName}.l
 echo "]===])" >> ${modulePath}/${moduleName}.lua
 
 echo "whatis(\"${container}\")" >> ${modulePath}/${moduleName}.lua
+if ! bash "$_base/ts_lmod_extensions.sh" "$_base/commands.txt" "$moduleName" >> "${modulePath}/${moduleName}.lua"; then
+   fail "Could not generate Lmod extension metadata for '${container}'."
+fi
 echo "prepend_path(\"PATH\", \"${_base}\")" >> ${modulePath}/${moduleName}.lua
 
 echo "create environment variables for module file"

@@ -162,3 +162,8 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
         "https://object-store.rc.nectar.org.au/v1/"
     ) in call_log
     assert (workdir / "demo_1.0_20260629.simg").is_dir()
+    module_file = tmp_path / "modules" / "demo" / "1.0.lua"
+    assert module_file.is_file()
+    module_text = module_file.read_text()
+    assert "-- neurodesk-exposed-commands" in module_text
+    assert 'extensions("demo/1.0")' in module_text

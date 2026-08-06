@@ -11,6 +11,12 @@ import sys
 from typing import Optional
 
 
+EXPOSED_COMMANDS_MARKER = "-- neurodesk-exposed-commands"
+EXPOSED_COMMANDS_BLOCK = re.compile(
+    rf"(?m)^{re.escape(EXPOSED_COMMANDS_MARKER)}\r?\nextensions\([^\r\n]*\)\r?\n?"
+)
+
+
 @dataclass(frozen=True)
 class ContainerEntry:
     image: str
@@ -97,6 +103,56 @@ def categories_by_key(entries: list[ContainerEntry]) -> dict[tuple[str, str], tu
     return {key: tuple(value) for key, value in categories.items()}
 
 
+def exposed_commands(commands_path: Path) -> tuple[str, ...]:
+    """Return sorted commands that Lmod can represent as name/version extensions."""
+    commands = {
+        command
+        for raw_command in commands_path.read_text().splitlines()
+        if (command := raw_command.rstrip("\r"))
+        and not any(character.isspace() for character in command)
+        and "," not in command
+        and "/" not in command
+    }
+    return tuple(sorted(commands))
+
+
+def lua_double_quoted(text: str) -> str:
+    return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def render_exposed_commands(commands_path: Path, version: str) -> str:
+    if any(character.isspace() for character in version) or "," in version or "/" in version:
+        raise ValueError(f"invalid Lmod extension version: {version}")
+
+    commands = exposed_commands(commands_path)
+    if not commands:
+        return ""
+
+    extension_list = ", ".join(f"{command}/{version}" for command in commands)
+    return "\n".join(
+        (EXPOSED_COMMANDS_MARKER, f"extensions({lua_double_quoted(extension_list)})")
+    )
+
+
+def update_exposed_commands(content: str, commands_path: Path, version: str) -> str:
+    block = render_exposed_commands(commands_path, version)
+    existing_block = EXPOSED_COMMANDS_BLOCK.search(content)
+
+    if existing_block:
+        replacement = f"{block}\n" if block else ""
+        return EXPOSED_COMMANDS_BLOCK.sub(replacement, content, count=1)
+
+    if not block:
+        return content
+
+    whatis_lines = list(re.finditer(r'(?m)^whatis\([^\r\n]*\)\r?$', content))
+    if whatis_lines:
+        insertion_point = whatis_lines[-1].end()
+        return content[:insertion_point] + f"\n{block}" + content[insertion_point:]
+
+    return f"{block}\n{content}"
+
+
 def update_module_content(
     content: str,
     *,
@@ -119,7 +175,8 @@ def update_module_content(
         f'whatis("{latest_name}")',
         content,
     )
-    return re.sub(container_pattern, latest_name, content)
+    content = re.sub(container_pattern, latest_name, content)
+    return update_exposed_commands(content, latest_dir / "commands.txt", version)
 
 
 def sanitize_help_text(text: str) -> str:
