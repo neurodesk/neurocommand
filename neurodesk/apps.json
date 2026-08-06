@@ -712,10 +712,16 @@
             "clearswi 1.0.0": {
                 "version": "20211018",
                 "exec": ""
+            },
+            "clearswi 1.6.1": {
+                "version": "20260806",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
-            "phase processing"
+            "phase processing",
+            "structural imaging"
         ]
     },
     "clinica": {
