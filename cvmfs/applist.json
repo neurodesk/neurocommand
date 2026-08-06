@@ -509,7 +509,15 @@
         {
             "application": "clearswi_1.0.0_20211018",
             "categories": [
-                "phase processing"
+                "phase processing",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "clearswi_1.6.1_20260806",
+            "categories": [
+                "phase processing",
+                "structural imaging"
             ]
         },
         {
