@@ -210,6 +210,36 @@ def test_reconciliation_removes_managed_extensions_for_empty_inventory(tmp_path)
     assert "old-command/1.0" not in text
 
 
+def test_reconciliation_uses_tcl_extensions_for_legacy_modulefiles(tmp_path):
+    repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
+    latest_container = "vesselboost_1.0.0_20240815"
+    log_path = tmp_path / "log.txt"
+
+    make_container(repo_root, latest_container, "boost.py\nprediction.py\n")
+    log_path.write_text(f"{latest_container} categories:quantitative imaging,\n")
+
+    canonical = repo_root / "containers" / "modules" / "vesselboost" / "1.0.0"
+    canonical.parent.mkdir(parents=True)
+    canonical.write_text(
+        "-- neurodesk-exposed-commands\n"
+        'extensions("old-command/1.0.0")\n'
+        "#%Module####################################################################\n"
+        f"module-whatis  {latest_container}.simg\n"
+        "prepend-path PATH /cvmfs/neurodesk.ardc.edu.au/containers/"
+        f"{latest_container}\n"
+    )
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    reconcile_module_files.apply_changes(changes)
+
+    text = canonical.read_text()
+    assert text.startswith("#%Module")
+    assert "# neurodesk-exposed-commands\n" in text
+    assert 'extensions "boost.py/1.0.0" "prediction.py/1.0.0"\n' in text
+    assert "-- neurodesk-exposed-commands" not in text
+    assert 'extensions("' not in text
+
+
 def test_check_mode_exit_status_distinguishes_drift(tmp_path):
     repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
     old_container = "datalad_1.3.1_20260227"

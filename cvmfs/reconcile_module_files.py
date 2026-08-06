@@ -11,9 +11,10 @@ import sys
 from typing import Optional
 
 
-EXPOSED_COMMANDS_MARKER = "-- neurodesk-exposed-commands"
+EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 EXPOSED_COMMANDS_BLOCK = re.compile(
-    rf"(?m)^{re.escape(EXPOSED_COMMANDS_MARKER)}\r?\nextensions\([^\r\n]*\)\r?\n?"
+    rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
+    r"extensions[^\r\n]*\r?\n?"
 )
 
 
@@ -120,7 +121,15 @@ def lua_double_quoted(text: str) -> str:
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def render_exposed_commands(commands_path: Path, version: str) -> str:
+def tcl_double_quoted(text: str) -> str:
+    escaped = text.replace("\\", "\\\\").replace('"', '\\"')
+    escaped = escaped.replace("$", "\\$").replace("[", "\\[").replace("]", "\\]")
+    return f'"{escaped}"'
+
+
+def render_exposed_commands(
+    commands_path: Path, version: str, *, is_lua: bool = True
+) -> str:
     if any(character.isspace() for character in version) or "," in version or "/" in version:
         raise ValueError(f"invalid Lmod extension version: {version}")
 
@@ -128,27 +137,47 @@ def render_exposed_commands(commands_path: Path, version: str) -> str:
     if not commands:
         return ""
 
-    extension_list = ", ".join(f"{command}/{version}" for command in commands)
-    return "\n".join(
-        (EXPOSED_COMMANDS_MARKER, f"extensions({lua_double_quoted(extension_list)})")
-    )
+    extensions = tuple(f"{command}/{version}" for command in commands)
+    if is_lua:
+        extension_list = ", ".join(extensions)
+        return "\n".join(
+            (
+                f"-- {EXPOSED_COMMANDS_MARKER}",
+                f"extensions({lua_double_quoted(extension_list)})",
+            )
+        )
+
+    extension_list = " ".join(tcl_double_quoted(extension) for extension in extensions)
+    return f"# {EXPOSED_COMMANDS_MARKER}\nextensions {extension_list}"
 
 
-def update_exposed_commands(content: str, commands_path: Path, version: str) -> str:
-    block = render_exposed_commands(commands_path, version)
+def update_exposed_commands(
+    content: str, commands_path: Path, version: str, *, is_lua: bool
+) -> str:
+    block = render_exposed_commands(commands_path, version, is_lua=is_lua)
     existing_block = EXPOSED_COMMANDS_BLOCK.search(content)
 
     if existing_block:
-        replacement = f"{block}\n" if block else ""
-        return EXPOSED_COMMANDS_BLOCK.sub(replacement, content, count=1)
+        content = EXPOSED_COMMANDS_BLOCK.sub("", content, count=1)
 
     if not block:
         return content
 
-    whatis_lines = list(re.finditer(r'(?m)^whatis\([^\r\n]*\)\r?$', content))
+    whatis_pattern = (
+        r'(?m)^whatis\([^\r\n]*\)\r?$'
+        if is_lua
+        else r"(?m)^module-whatis(?:[ \t]+[^\r\n]*)?\r?$"
+    )
+    whatis_lines = list(re.finditer(whatis_pattern, content))
     if whatis_lines:
         insertion_point = whatis_lines[-1].end()
         return content[:insertion_point] + f"\n{block}" + content[insertion_point:]
+
+    if not is_lua:
+        module_header = re.search(r"(?m)^#%Module[^\r\n]*\r?$", content)
+        if module_header:
+            insertion_point = module_header.end()
+            return content[:insertion_point] + f"\n{block}" + content[insertion_point:]
 
     return f"{block}\n{content}"
 
@@ -160,6 +189,7 @@ def update_module_content(
     version: str,
     latest_name: str,
     latest_dir: Path,
+    is_lua: bool,
 ) -> str:
     container_pattern = rf"{re.escape(tool)}_{re.escape(version)}_[0-9]+"
     latest_dir_text = str(latest_dir)
@@ -176,7 +206,9 @@ def update_module_content(
         content,
     )
     content = re.sub(container_pattern, latest_name, content)
-    return update_exposed_commands(content, latest_dir / "commands.txt", version)
+    return update_exposed_commands(
+        content, latest_dir / "commands.txt", version, is_lua=is_lua
+    )
 
 
 def sanitize_help_text(text: str) -> str:
@@ -258,6 +290,7 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
                 version=version,
                 latest_name=latest_name,
                 latest_dir=latest_dir,
+                is_lua=module_file.suffix == ".lua",
             )
             canonical_contents[module_file.name] = updated
             add_change(
@@ -283,6 +316,7 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
                 version=version,
                 latest_name=latest_name,
                 latest_dir=latest_dir,
+                is_lua=module_file.suffix == ".lua",
             )
             add_change(
                 changes,
