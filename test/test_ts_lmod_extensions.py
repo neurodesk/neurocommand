@@ -38,8 +38,10 @@ def test_renders_sorted_unique_lmod_extensions_and_skips_unrepresentable_names(
     assert result.returncode == 0
     assert result.stdout == (
         "-- neurodesk-exposed-commands\n"
-        'extensions("bet/6.0.7.18, flirt/6.0.7.18, '
+        'if type(extensions) == "function" then\n'
+        '    extensions("bet/6.0.7.18, flirt/6.0.7.18, '
         'quoted\\\"command/6.0.7.18")\n'
+        "end\n"
     )
     assert result.stderr.count("cannot be represented as an Lmod extension") == 3
 

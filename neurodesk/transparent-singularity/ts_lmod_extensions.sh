@@ -46,4 +46,6 @@ extension_list="${extension_list//\\/\\\\}"
 extension_list="${extension_list//\"/\\\"}"
 
 echo "-- neurodesk-exposed-commands"
-printf 'extensions("%s")\n' "$extension_list"
+echo 'if type(extensions) == "function" then'
+printf '    extensions("%s")\n' "$extension_list"
+echo "end"

@@ -14,7 +14,15 @@ from typing import Optional
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 EXPOSED_COMMANDS_BLOCK = re.compile(
     rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
+    r"(?:"
     r"extensions[^\r\n]*\r?\n?"
+    r'|if type\(extensions\) == "function" then\r?\n'
+    r"[ \t]+extensions\([^\r\n]*\)\r?\n"
+    r"end\r?\n?"
+    r"|if \{\[llength \[info commands extensions\]\] > 0\} \{\r?\n"
+    r"[ \t]+extensions[^\r\n]*\r?\n"
+    r"\}\r?\n?"
+    r")"
 )
 
 
@@ -143,12 +151,21 @@ def render_exposed_commands(
         return "\n".join(
             (
                 f"-- {EXPOSED_COMMANDS_MARKER}",
-                f"extensions({lua_double_quoted(extension_list)})",
+                'if type(extensions) == "function" then',
+                f"    extensions({lua_double_quoted(extension_list)})",
+                "end",
             )
         )
 
     extension_list = " ".join(tcl_double_quoted(extension) for extension in extensions)
-    return f"# {EXPOSED_COMMANDS_MARKER}\nextensions {extension_list}"
+    return "\n".join(
+        (
+            f"# {EXPOSED_COMMANDS_MARKER}",
+            "if {[llength [info commands extensions]] > 0} {",
+            f"    extensions {extension_list}",
+            "}",
+        )
+    )
 
 
 def update_exposed_commands(

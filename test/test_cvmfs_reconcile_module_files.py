@@ -161,7 +161,10 @@ def test_reconciliation_updates_exposed_commands_and_preserves_other_extensions(
     canonical = repo_root / "containers" / "modules" / "demo" / "1.0.lua"
     canonical.parent.mkdir(parents=True)
     canonical.write_text(
-        module_text(latest_container) + 'extensions("python-package/2.0")\n'
+        module_text(latest_container)
+        + "-- neurodesk-exposed-commands\n"
+        + 'extensions("old-command/1.0")\n'
+        + 'extensions("python-package/2.0")\n'
     )
 
     changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
@@ -169,7 +172,9 @@ def test_reconciliation_updates_exposed_commands_and_preserves_other_extensions(
 
     text = canonical.read_text()
     assert text.count("-- neurodesk-exposed-commands") == 1
+    assert 'if type(extensions) == "function" then' in text
     assert 'extensions("alpha/1.0, zeta/1.0")' in text
+    assert "old-command/1.0" not in text
     assert 'extensions("python-package/2.0")' in text
 
     (repo_root / "containers" / latest_container / "commands.txt").write_text(
@@ -235,6 +240,7 @@ def test_reconciliation_uses_tcl_extensions_for_legacy_modulefiles(tmp_path):
     text = canonical.read_text()
     assert text.startswith("#%Module")
     assert "# neurodesk-exposed-commands\n" in text
+    assert "if {[llength [info commands extensions]] > 0} {\n" in text
     assert 'extensions "boost.py/1.0.0" "prediction.py/1.0.0"\n' in text
     assert "-- neurodesk-exposed-commands" not in text
     assert 'extensions("' not in text
