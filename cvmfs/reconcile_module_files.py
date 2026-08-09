@@ -48,7 +48,7 @@ def parse_image_name(image: str) -> tuple[str, str, str]:
         name_and_version, builddate = stem.rsplit("_", 1)
         tool, version = name_and_version.rsplit("_", 1)
     except ValueError:
-        raise ValueError(f"invalid container image name in log.txt: {image}")
+        raise ValueError(f"invalid container image name in log.txt: {image}") from None
     if not tool or not version or not re.fullmatch(r"[0-9]{8}", builddate):
         raise ValueError(f"invalid container image name in log.txt: {image}")
     return tool, version, builddate
