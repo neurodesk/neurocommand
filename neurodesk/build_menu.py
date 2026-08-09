@@ -261,18 +261,16 @@ class NeurodeskApp:
             self_sh_file.write(f"{self.sh_prefix} ")
             if sh_exec:
                 self_sh_file.write(f"{sh_exec}")
-            elif self.deskenv == 'mate':
-                self_sh_file.write(
-                    f"{shlex.quote(str(fetch_and_run_sh))} "
-                    f"{shlex.quote(self.container_name)} {shlex.quote(self.container_version)} "
-                    f"{shlex.quote(self.exec)} \"$@\""
-                )
             else:
-                self_sh_file.write(
-                    f"{shlex.quote(str(fetch_and_run_sh))} "
-                    f"{shlex.quote(self.container_name)} {shlex.quote(self.container_version)} "
-                    f"{shlex.quote(self.exec)} \"$@\""
-                )
+                launcher_args = [
+                    shlex.quote(str(fetch_and_run_sh)),
+                    shlex.quote(self.container_name),
+                    shlex.quote(self.container_version),
+                ]
+                if self.exec:
+                    launcher_args.append(shlex.quote(self.exec))
+                launcher_args.append('"$@"')
+                self_sh_file.write(" ".join(launcher_args))
             self_sh_file.write('\n')
         writefile_with_mode(self.sh_path, _write_app_sh, mode=0o755)
 

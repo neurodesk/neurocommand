@@ -11,6 +11,22 @@ def app_log_data(app_data: dict) -> dict:
     return {key: app_data[key] for key in APP_LOG_KWARGS if key in app_data}
 
 
+def is_primary_container_app(menu_name: Text, app_name: Text) -> bool:
+    """Return whether an app entry represents the container itself.
+
+    GUI sub-apps conventionally use ``<label>-<container> <version>``. Concrete
+    container names may themselves contain hyphens, so a dash alone cannot
+    distinguish a sub-app from a primary entry.
+    """
+    if "-" not in app_name:
+        return True
+    container_and_version = app_name.rsplit(" ", 1)
+    return (
+        len(container_and_version) == 2
+        and container_and_version[0] == menu_name
+    )
+
+
 def add_app(
     name: Text,
     version: Text,
@@ -52,6 +68,6 @@ if __name__ == "__main__":
             category_list = ''
             for category in menu_data.get("categories") or []:
                 category_list = category_list + category + ','
-            # Add application, but only if it's not a sub-program of a main container - indicated by dash in program name
-            if not "-" in (app_name):
+            # Add the primary container entry, not its GUI sub-programs.
+            if is_primary_container_app(menu_name, app_name):
                 add_app(app_name, category=category_list, **app_log_data(app_data))
