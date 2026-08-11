@@ -1,5 +1,6 @@
 import configparser
 from pathlib import Path
+import shlex
 
 from neurodesk.build_menu import EXEC_MIMETYPES, NeurodeskApp
 
@@ -52,3 +53,34 @@ def test_wrapper_script_quotes_forwarded_args(tmp_path):
     app = make_app(tmp_path, "libreofficeWriterGUI-libreoffice 26.2.4", "lowriter")
     sh_content = Path(app.sh_path).read_text()
     assert '"$@"' in sh_content
+
+
+def test_wrapper_script_preserves_multiword_exec_arguments(tmp_path):
+    app = make_app(
+        tmp_path,
+        "cat12GUI-cat12 12.9",
+        "bash run_spm12.sh /opt/mcr/v93/",
+    )
+    command = Path(app.sh_path).read_text().splitlines()[1]
+
+    assert shlex.split(command)[-6:] == [
+        "cat12",
+        "12.9",
+        "bash",
+        "run_spm12.sh",
+        "/opt/mcr/v93/",
+        "$@",
+    ]
+
+
+def test_wrapper_script_preserves_named_variant_container(tmp_path):
+    app = make_app(tmp_path, "viewerGUI-tool_arm64 1.2.3", "viewer")
+    sh_content = Path(app.sh_path).read_text()
+    assert " tool_arm64 1.2.3 viewer" in sh_content
+
+
+def test_wrapper_script_omits_empty_exec_argument(tmp_path):
+    app = make_app(tmp_path, "tool_arm64 1.2.3", "")
+    command = Path(app.sh_path).read_text().splitlines()[1]
+    assert command.endswith('fetch_and_run.sh tool_arm64 1.2.3 "$@"')
+    assert "''" not in command

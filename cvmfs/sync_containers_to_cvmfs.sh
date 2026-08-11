@@ -346,59 +346,51 @@ do
 
 
         
-        # check if singularity image is already in object storage
-        if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${IMAGENAME_BUILDDATE}.simg"; then
-            echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg exists in nectar cloud"
-            # in case of problems:
-            # cvmfs_server check
-            # If you get bad whitelist error, check if the repository is signed: sudo /usr/bin/cvmfs_server resign neurodesk.ardc.edu.au
-            open_cvmfs_transaction neurodesk.ardc.edu.au
+        # Let transparent-singularity try every supported backend. A Nectar-only
+        # preflight would skip images that are available from S3 or a registry.
+        open_cvmfs_transaction neurodesk.ardc.edu.au
 
-            cd /cvmfs/neurodesk.ardc.edu.au/containers/
+        cd /cvmfs/neurodesk.ardc.edu.au/containers/
 
-            # A leftover directory from a previous failed run would make git clone
-            # fail and silently reuse a stale transparent-singularity checkout.
-            # The outer commands.txt check already skipped completed installs, so
-            # anything here is an incomplete install and safe to remove.
-            if [[ -e "$IMAGENAME_BUILDDATE" ]]; then
-                echo "[WARNING] Removing stale leftover directory from a previous failed run: $IMAGENAME_BUILDDATE"
-                sudo rm -rf "$IMAGENAME_BUILDDATE"
-            fi
+        # The outer commands.txt check already skipped completed installs, so
+        # anything here is an incomplete install and safe to remove.
+        if [[ -e "$IMAGENAME_BUILDDATE" ]]; then
+            echo "[WARNING] Removing stale leftover directory from a previous failed run: $IMAGENAME_BUILDDATE"
+            sudo rm -rf "$IMAGENAME_BUILDDATE"
+        fi
 
-            if ! git clone https://github.com/NeuroDesk/transparent-singularity "$IMAGENAME_BUILDDATE"; then
-                echo "[ERROR] Failed to clone transparent-singularity for $IMAGENAME_BUILDDATE. Aborting transaction."
-                abort_cvmfs_transaction neurodesk.ardc.edu.au
-                continue
-            fi
+        # Use the scripts from this exact neurocommand checkout. Cloning the
+        # separate transparent-singularity repository bypasses fixes tested here.
+        if ! mkdir -p "$IMAGENAME_BUILDDATE" || \
+           ! cp -a "$NEUROCOMMAND_LOCAL_REPO/neurodesk/transparent-singularity/." "$IMAGENAME_BUILDDATE/"; then
+            echo "[ERROR] Failed to stage transparent-singularity for $IMAGENAME_BUILDDATE. Aborting transaction."
+            abort_cvmfs_transaction neurodesk.ardc.edu.au
+            continue
+        fi
 
-            # check if $IMAGENAME_BUILDDATE variable is not empty:
-            if [[ -n "$IMAGENAME_BUILDDATE" ]]; then
-                cd $IMAGENAME_BUILDDATE
-                export SINGULARITY_BINDPATH=/cvmfs
-                echo $PATH
-                export PATH=$PATH:/usr/sbin/
-                # stdin is log.txt inside this loop; keep child processes from consuming it
-                ./run_transparent_singularity.sh $IMAGENAME_BUILDDATE --unpack true < /dev/null
-                retVal=$?
+        # check if $IMAGENAME_BUILDDATE variable is not empty:
+        if [[ -n "$IMAGENAME_BUILDDATE" ]]; then
+            cd "$IMAGENAME_BUILDDATE"
+            export SINGULARITY_BINDPATH=/cvmfs
+            echo "$PATH"
+            export PATH=$PATH:/usr/sbin/
+            # stdin is log.txt inside this loop; keep child processes from consuming it
+            ./run_transparent_singularity.sh "$IMAGENAME_BUILDDATE" --unpack true < /dev/null
+            retVal=$?
 
-                if [[ $retVal -eq 0 ]]; then
-                    ensure_nested_catalog_markers_for_container "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE" || retVal=$?
-                fi
-            else
-                echo "[ERROR] IMAGENAME_BUILDDATE is empty"
-                exit 2
-            fi
-
-            if [ $retVal -ne 0 ]; then
-                echo "Error in Transparent singularity. Check the log. Aborting!"
-                abort_cvmfs_transaction neurodesk.ardc.edu.au
-            else
-                publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
+            if [[ $retVal -eq 0 ]]; then
+                ensure_nested_catalog_markers_for_container "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE" || retVal=$?
             fi
         else
-            echo "[WARNING] ========================================================="
-            echo "[DEBUG] ${IMAGENAME_BUILDDATE}.simg does not exist in nectar cloud"
-            echo "[WARNING] ========================================================="
+            echo "[ERROR] IMAGENAME_BUILDDATE is empty"
+            exit 2
+        fi
+
+        if [ $retVal -ne 0 ]; then
+            echo "Error in Transparent singularity. Check the log. Aborting!"
+            abort_cvmfs_transaction neurodesk.ardc.edu.au
+        else
+            publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
         fi
     fi
 
