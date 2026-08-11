@@ -111,6 +111,42 @@ test "$(cat {shlex.quote(str(target))})" = final
     assert call_log.count("inspect:") == 2
 
 
+def test_named_arm64_rebuild_uses_full_image_name_and_last_build_date(tmp_path):
+    calls = tmp_path / "build.log"
+
+    script = f"""
+set -euo pipefail
+source {shlex.quote(str(SCRIPT))}
+IMAGE_HOME={shlex.quote(str(tmp_path))}
+
+url_exists() {{
+    return 1
+}}
+
+ensure_valid_local_image() {{
+    return 1
+}}
+
+build_singularity_image() {{
+    printf '%s\\n' "$*" > {shlex.quote(str(calls))}
+}}
+
+ensure_released() {{
+    return 0
+}}
+
+process_container_line "neurodesktop-lite_arm64_20260428_20260808 categories:programming,"
+"""
+
+    result = run_bash(script)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert calls.read_text().strip() == (
+        "neurodesktop-lite_arm64_20260428_20260808 "
+        "neurodesktop-lite_arm64_20260428 20260808"
+    )
+
+
 def test_rclone_copy_uses_retry_flags_and_retries_failures(tmp_path):
     image = tmp_path / "image.simg"
     image.write_text("image")

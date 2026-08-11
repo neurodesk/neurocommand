@@ -12,7 +12,7 @@ def run_command(cmd: List[str]) -> None:
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as exc:
-        raise SystemExit(f"[ERROR] Command failed ({' '.join(cmd)}): {exc}")
+        raise SystemExit(f"[ERROR] Command failed ({' '.join(cmd)}): {exc}") from exc
 
 
 def generate_log(log_path: Path) -> None:
@@ -102,11 +102,17 @@ def load_release_keys(releases_dir: Path) -> Set[str]:
     if not releases_dir.is_dir():
         raise SystemExit(f"[ERROR] Releases directory not found: {releases_dir}")
 
-    for release_path in sorted(releases_dir.glob("*/*.json")):
+    release_paths = sorted(releases_dir.glob("*/*.json"))
+    if not release_paths:
+        raise SystemExit(f"[ERROR] No release metadata found: {releases_dir}")
+
+    for release_path in release_paths:
         try:
             release = json.loads(release_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
-            raise SystemExit(f"[ERROR] Could not read release metadata {release_path}: {exc}")
+            raise SystemExit(
+                f"[ERROR] Could not read release metadata {release_path}: {exc}"
+            ) from exc
 
         if not isinstance(release, dict):
             raise SystemExit(f"[ERROR] Invalid release metadata {release_path}: expected an object")
@@ -130,10 +136,24 @@ def load_release_keys(releases_dir: Path) -> Set[str]:
                     f"[ERROR] Invalid release metadata {release_path}: "
                     f"app {app_name!r} has invalid build date {builddate!r}"
                 )
+            try:
+                datetime.strptime(builddate, "%Y%m%d")
+            except ValueError as exc:
+                raise SystemExit(
+                    f"[ERROR] Invalid release metadata {release_path}: "
+                    f"app {app_name!r} has invalid build date {builddate!r}"
+                ) from exc
 
             if "image" in app:
                 image = app["image"]
-                if not isinstance(image, str) or not image:
+                if (
+                    not isinstance(image, str)
+                    or not image
+                    or image != image.strip()
+                    or "/" in image
+                    or "\\" in image
+                    or image.lower().endswith(".simg")
+                ):
                     raise SystemExit(
                         f"[ERROR] Invalid release metadata {release_path}: "
                         f"app {app_name!r} has invalid image {image!r}"
@@ -152,7 +172,7 @@ def list_nectar_objects(remote_root: str) -> List[dict]:
             text=True,
         )
     except subprocess.CalledProcessError as exc:
-        raise SystemExit(f"[ERROR] Failed to list objects in {remote_root}: {exc}")
+        raise SystemExit(f"[ERROR] Failed to list objects in {remote_root}: {exc}") from exc
     return json.loads(lsjson)
 
 
@@ -283,7 +303,9 @@ def list_s3_objects(bucket: str) -> List[dict]:
         try:
             page_raw = subprocess.check_output(cmd, text=True)
         except subprocess.CalledProcessError as exc:
-            raise SystemExit(f"[ERROR] Failed listing AWS objects for bucket {bucket}: {exc}")
+            raise SystemExit(
+                f"[ERROR] Failed listing AWS objects for bucket {bucket}: {exc}"
+            ) from exc
 
         page = json.loads(page_raw)
         objects.extend(page.get("Contents", []))

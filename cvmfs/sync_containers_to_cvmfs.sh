@@ -350,7 +350,11 @@ do
         # preflight would skip images that are available from S3 or a registry.
         open_cvmfs_transaction neurodesk.ardc.edu.au
 
-        cd /cvmfs/neurodesk.ardc.edu.au/containers/
+        if ! cd /cvmfs/neurodesk.ardc.edu.au/containers/; then
+            echo "[ERROR] Cannot enter the CVMFS containers directory. Aborting transaction."
+            abort_cvmfs_transaction neurodesk.ardc.edu.au
+            continue
+        fi
 
         # The outer commands.txt check already skipped completed installs, so
         # anything here is an incomplete install and safe to remove.
@@ -370,7 +374,11 @@ do
 
         # check if $IMAGENAME_BUILDDATE variable is not empty:
         if [[ -n "$IMAGENAME_BUILDDATE" ]]; then
-            cd "$IMAGENAME_BUILDDATE"
+            if ! cd "$IMAGENAME_BUILDDATE"; then
+                echo "[ERROR] Cannot enter container directory: $IMAGENAME_BUILDDATE. Aborting transaction."
+                abort_cvmfs_transaction neurodesk.ardc.edu.au
+                continue
+            fi
             export SINGULARITY_BINDPATH=/cvmfs
             echo "$PATH"
             export PATH=$PATH:/usr/sbin/

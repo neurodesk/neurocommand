@@ -40,5 +40,13 @@ def test_stratum_sync_uses_tested_retrieval_scripts_without_nectar_gate():
     assert "object-store.rc.nectar.org.au" not in script
 
 
+def test_stratum_sync_guards_container_directory_changes():
+    script = SYNC_SCRIPT.read_text()
+
+    assert "if ! cd /cvmfs/neurodesk.ardc.edu.au/containers/; then" in script
+    assert 'if ! cd "$IMAGENAME_BUILDDATE"; then' in script
+    assert script.count("abort_cvmfs_transaction neurodesk.ardc.edu.au") >= 4
+
+
 def test_stratum_sync_script_is_valid_bash():
     subprocess.run(["bash", "-n", str(SYNC_SCRIPT)], check=True)

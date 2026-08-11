@@ -41,6 +41,14 @@ def test_release_metadata_protects_named_and_legacy_images(tmp_path):
     }
 
 
+def test_empty_release_metadata_directory_aborts_cleanup(tmp_path):
+    releases = tmp_path / "releases"
+    releases.mkdir()
+
+    with pytest.raises(SystemExit, match="No release metadata found"):
+        cleanup.load_release_keys(releases)
+
+
 @pytest.mark.parametrize(
     "release",
     [
@@ -48,7 +56,12 @@ def test_release_metadata_protects_named_and_legacy_images(tmp_path):
         {"apps": []},
         {"apps": {"demo 1.0": []}},
         {"apps": {"demo 1.0": {"version": "latest"}}},
+        {"apps": {"demo 1.0": {"version": "20260231"}}},
         {"apps": {"demo 1.0": {"version": "20260721", "image": ""}}},
+        {"apps": {"demo 1.0": {"version": "20260721", "image": "foo.simg"}}},
+        {"apps": {"demo 1.0": {"version": "20260721", "image": "dir/foo"}}},
+        {"apps": {"demo 1.0": {"version": "20260721", "image": "dir\\foo"}}},
+        {"apps": {"demo 1.0": {"version": "20260721", "image": " foo"}}},
     ],
 )
 def test_invalid_release_metadata_aborts_cleanup(tmp_path, release):

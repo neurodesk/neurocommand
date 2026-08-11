@@ -240,8 +240,8 @@ process_container_line() {
     echo "IMAGENAME_BUILDDATE: $image_builddate"
 
     local image_name build_date image_path nectar_url aws_url
-    image_name="$(cut -d'_' -f1,2 <<< "$image_builddate")"
-    build_date="$(cut -d'_' -f3 <<< "$image_builddate")"
+    image_name="${image_builddate%_*}"
+    build_date="${image_builddate##*_}"
     image_path="$IMAGE_HOME/${image_builddate}.simg"
     nectar_url="${NECTAR_BASE_URL}/${image_builddate}.simg"
     aws_url="${AWS_BASE_URL}/${image_builddate}.simg"
