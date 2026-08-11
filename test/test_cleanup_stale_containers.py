@@ -2,6 +2,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "cleanup_stale_containers.py"
@@ -37,3 +39,22 @@ def test_release_metadata_protects_named_and_legacy_images(tmp_path):
         "workshopdemo_arm64_1.0.0_20260721.simg",
         "amico_2.1.0_arm64_20260512.simg",
     }
+
+
+@pytest.mark.parametrize(
+    "release",
+    [
+        {},
+        {"apps": []},
+        {"apps": {"demo 1.0": []}},
+        {"apps": {"demo 1.0": {"version": "latest"}}},
+        {"apps": {"demo 1.0": {"version": "20260721", "image": ""}}},
+    ],
+)
+def test_invalid_release_metadata_aborts_cleanup(tmp_path, release):
+    release_path = tmp_path / "releases" / "demo" / "1.0.json"
+    release_path.parent.mkdir(parents=True)
+    release_path.write_text(json.dumps(release))
+
+    with pytest.raises(SystemExit, match="Invalid release metadata"):
+        cleanup.load_release_keys(tmp_path / "releases")

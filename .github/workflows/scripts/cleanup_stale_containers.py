@@ -102,18 +102,44 @@ def load_release_keys(releases_dir: Path) -> Set[str]:
     if not releases_dir.is_dir():
         raise SystemExit(f"[ERROR] Releases directory not found: {releases_dir}")
 
-    for release_path in releases_dir.glob("*/*.json"):
+    for release_path in sorted(releases_dir.glob("*/*.json")):
         try:
             release = json.loads(release_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             raise SystemExit(f"[ERROR] Could not read release metadata {release_path}: {exc}")
 
-        apps = release.get("apps", {})
-        for app in apps.values():
+        if not isinstance(release, dict):
+            raise SystemExit(f"[ERROR] Invalid release metadata {release_path}: expected an object")
+
+        apps = release.get("apps")
+        if not isinstance(apps, dict) or not apps:
+            raise SystemExit(
+                f"[ERROR] Invalid release metadata {release_path}: "
+                "'apps' must be a non-empty object"
+            )
+
+        for app_name, app in apps.items():
+            if not isinstance(app, dict):
+                raise SystemExit(
+                    f"[ERROR] Invalid release metadata {release_path}: "
+                    f"app {app_name!r} must be an object"
+                )
             builddate = app.get("version")
             if not isinstance(builddate, str) or not re.fullmatch(r"[0-9]{8}", builddate):
-                continue
-            image = app.get("image") or f"{release_path.parent.name}_{release_path.stem}"
+                raise SystemExit(
+                    f"[ERROR] Invalid release metadata {release_path}: "
+                    f"app {app_name!r} has invalid build date {builddate!r}"
+                )
+
+            if "image" in app:
+                image = app["image"]
+                if not isinstance(image, str) or not image:
+                    raise SystemExit(
+                        f"[ERROR] Invalid release metadata {release_path}: "
+                        f"app {app_name!r} has invalid image {image!r}"
+                    )
+            else:
+                image = f"{release_path.parent.name}_{release_path.stem}"
             expected_keys.add(f"{image}_{builddate}.simg")
 
     return expected_keys

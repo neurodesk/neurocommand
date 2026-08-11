@@ -32,5 +32,13 @@ def test_stratum_sync_publishes_log_and_applist_together():
     assert 'git -C "$repo_path" add "${generated_rel_paths[@]}"' in script
 
 
+def test_stratum_sync_uses_tested_retrieval_scripts_without_nectar_gate():
+    script = SYNC_SCRIPT.read_text()
+
+    assert 'cp -a "$NEUROCOMMAND_LOCAL_REPO/neurodesk/transparent-singularity/."' in script
+    assert "git clone https://github.com/NeuroDesk/transparent-singularity" not in script
+    assert "object-store.rc.nectar.org.au" not in script
+
+
 def test_stratum_sync_script_is_valid_bash():
     subprocess.run(["bash", "-n", str(SYNC_SCRIPT)], check=True)

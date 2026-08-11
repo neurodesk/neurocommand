@@ -268,7 +268,9 @@ class NeurodeskApp:
                     shlex.quote(self.container_version),
                 ]
                 if self.exec:
-                    launcher_args.append(shlex.quote(self.exec))
+                    launcher_args.extend(
+                        shlex.quote(argument) for argument in shlex.split(self.exec)
+                    )
                 launcher_args.append('"$@"')
                 self_sh_file.write(" ".join(launcher_args))
             self_sh_file.write('\n')
