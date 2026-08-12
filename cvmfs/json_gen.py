@@ -7,11 +7,15 @@ def visibility_flag(data, name, default=True):
     return data.get(name, default) is not False
 
 
-def app_log_id(app_name, app_data):
-    return f"{app_name.replace(' ', '_')}_{app_data['version']}"
+def app_log_app_id(app_name):
+    return app_name.replace(" ", "_")
 
 
-def hidden_applist_entries(apps_json_path):
+def log_entry_app_id(log_entry):
+    return log_entry.rsplit("_", 1)[0]
+
+
+def hidden_applist_app_ids(apps_json_path):
     if apps_json_path is None or not apps_json_path.exists():
         return set()
 
@@ -23,7 +27,7 @@ def hidden_applist_entries(apps_json_path):
         default_show_in_applist = visibility_flag(menu_data, "show_in_applist")
         for app_name, app_data in menu_data.get("apps", {}).items():
             if not visibility_flag(app_data, "show_in_applist", default_show_in_applist):
-                hidden.add(app_log_id(app_name, app_data))
+                hidden.add(app_log_app_id(app_name))
     return hidden
 
 
@@ -42,12 +46,15 @@ def default_apps_json_path():
 def process_text_to_json(log_path=Path("log.txt"), output_path=Path("applist.json"), apps_json_path=None):
     my_dict = {}
     val = []
-    hidden_entries = hidden_applist_entries(apps_json_path)
+    hidden_app_ids = hidden_applist_app_ids(apps_json_path)
 
     with log_path.open() as f:
         for line in f:
             line = line.split()
-            if not line or line[0] in hidden_entries:
+            if not line:
+                continue
+            app_id = log_entry_app_id(line[0])
+            if app_id in hidden_app_ids:
                 continue
             val.append({"application": line[0], "categories": ' '.join(line[1:]).replace("categories:","").rstrip(',').split(",")})
         my_dict['list'] = val

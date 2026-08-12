@@ -24,6 +24,46 @@ def test_checked_in_applist_matches_current_log(tmp_path):
     assert json.loads(APPLIST.read_text()) == json.loads(generated_applist.read_text())
 
 
+def test_hidden_app_remains_hidden_after_build_date_changes(tmp_path):
+    apps_json = tmp_path / "apps.json"
+    log = tmp_path / "log.txt"
+    applist = tmp_path / "applist.json"
+
+    apps_json.write_text(
+        json.dumps(
+            {
+                "neurodesktop-lite": {
+                    "show_in_applist": False,
+                    "apps": {
+                        "neurodesktop-lite 20260428": {
+                            "version": "20260813",
+                        }
+                    },
+                }
+            }
+        )
+    )
+    log.write_text(
+        "neurodesktop-lite_20260428_20260808 categories:programming,\n"
+        "visible-app_1.0_20260808 categories:visualization,\n"
+    )
+
+    json_gen.process_text_to_json(
+        log_path=log,
+        output_path=applist,
+        apps_json_path=apps_json,
+    )
+
+    assert json.loads(applist.read_text()) == {
+        "list": [
+            {
+                "application": "visible-app_1.0_20260808",
+                "categories": ["visualization"],
+            }
+        ]
+    }
+
+
 def test_stratum_sync_publishes_log_and_applist_together():
     script = SYNC_SCRIPT.read_text()
 
