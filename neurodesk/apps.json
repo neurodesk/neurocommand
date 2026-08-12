@@ -2559,7 +2559,7 @@
         "show_in_applist": false,
         "apps": {
             "neurodesktop-lite 20260428": {
-                "version": "20260808",
+                "version": "20260813",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2575,7 +2575,7 @@
         "show_in_applist": false,
         "apps": {
             "neurodesktop-lite_arm64 20260428": {
-                "version": "20260808",
+                "version": "20260813",
                 "exec": "",
                 "apptainer_args": []
             }
