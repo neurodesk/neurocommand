@@ -1,5 +1,7 @@
 import shlex
 import subprocess
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
@@ -145,6 +147,84 @@ process_container_line "neurodesktop-lite_arm64_20260428_20260808 categories:pro
         "neurodesktop-lite_arm64_20260428_20260808 "
         "neurodesktop-lite_arm64_20260428 20260808"
     )
+
+
+def test_transient_head_failure_does_not_trigger_large_recovery_download(tmp_path):
+    class TransientHeadHandler(BaseHTTPRequestHandler):
+        nectar_attempts = 0
+        missing_attempts = 0
+
+        def do_HEAD(self):
+            if self.path.startswith("/missing/"):
+                type(self).missing_attempts += 1
+                self.send_response(404)
+                self.end_headers()
+                return
+
+            if self.path.startswith("/nectar/"):
+                type(self).nectar_attempts += 1
+                if type(self).nectar_attempts == 1:
+                    self.send_response(503)
+                    self.end_headers()
+                    return
+
+            self.send_response(200)
+            self.end_headers()
+
+        def log_message(self, format, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), TransientHeadHandler)
+    server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    server_thread.start()
+    recovery_calls = tmp_path / "recovery.log"
+
+    try:
+        base_url = f"http://127.0.0.1:{server.server_port}"
+        script = f"""
+set -euo pipefail
+source {shlex.quote(str(SCRIPT))}
+IMAGE_HOME={shlex.quote(str(tmp_path))}
+NECTAR_BASE_URL={shlex.quote(base_url + "/nectar")}
+AWS_BASE_URL={shlex.quote(base_url + "/aws")}
+URL_CHECK_RETRIES=2
+URL_CHECK_RETRY_DELAY=0
+
+ensure_valid_local_image() {{
+    return 1
+}}
+
+download_image() {{
+    printf 'download:%s\n' "$1" >> {shlex.quote(str(recovery_calls))}
+    return 0
+}}
+
+build_singularity_image() {{
+    printf 'build:%s\n' "$*" >> {shlex.quote(str(recovery_calls))}
+    return 0
+}}
+
+ensure_released() {{
+    return 0
+}}
+
+if url_exists {shlex.quote(base_url + "/missing/image.simg")}; then
+    exit 91
+fi
+
+process_container_line "neurodesktop-lite_arm64_20260428_20260808 categories:programming,"
+"""
+
+        result = run_bash(script)
+    finally:
+        server.shutdown()
+        server.server_close()
+        server_thread.join()
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert TransientHeadHandler.missing_attempts == 1
+    assert TransientHeadHandler.nectar_attempts == 2
+    assert not recovery_calls.exists()
 
 
 def test_rclone_copy_uses_retry_flags_and_retries_failures(tmp_path):

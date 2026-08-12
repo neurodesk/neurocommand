@@ -51,7 +51,18 @@ url_exists_once() {
 }
 
 url_exists() {
-    url_exists_once "$1"
+    local url="$1"
+    local retry_count
+    retry_count=$((URL_CHECK_RETRIES > 0 ? URL_CHECK_RETRIES - 1 : 0))
+
+    # Let curl retry transient network and HTTP failures (for example 503),
+    # while still returning immediately for a genuine missing object (404).
+    curl --output /dev/null --silent --head --fail \
+        --connect-timeout "$CURL_CONNECT_TIMEOUT" \
+        --retry "$retry_count" \
+        --retry-delay "$URL_CHECK_RETRY_DELAY" \
+        --retry-connrefused \
+        "$url"
 }
 
 url_exists_with_retries() {
