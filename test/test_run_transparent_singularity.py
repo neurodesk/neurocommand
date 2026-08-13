@@ -162,6 +162,7 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
         "https://object-store.rc.nectar.org.au/v1/"
     ) in call_log
     assert (workdir / "demo_arm64_1.0_20260629.simg").is_dir()
+    assert "singularity exec demo_arm64_1.0_20260629.simg /bin/true" in call_log
     module_file = tmp_path / "modules" / "demo_arm64" / "1.0.lua"
     assert module_file.is_file()
     module_text = module_file.read_text()

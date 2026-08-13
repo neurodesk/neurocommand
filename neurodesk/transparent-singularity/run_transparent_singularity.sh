@@ -400,6 +400,13 @@ then
     mv temp $container
 fi
 
+# Unpacking is architecture-neutral, so it can succeed even when the host is
+# unable to execute the image. Fail here with an actionable QEMU/binfmt error
+# before attempting metadata and executable discovery.
+if ! singularity exec $singularity_opts "$container" /bin/true; then
+   fail "Container '${container}' unpacked but could not execute. Verify that QEMU and an enabled binfmt_misc handler with the F flag are installed for foreign-architecture images."
+fi
+
 rm -f README.md commands.txt commands_raw.txt env.txt
 
 echo "checking if there is a README.md file in the container"

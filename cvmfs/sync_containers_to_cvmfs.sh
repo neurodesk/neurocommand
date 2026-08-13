@@ -343,9 +343,14 @@ do
     else
         echo "$IMAGENAME_BUILDDATE is not yet on cvmfs."
 
+        # transparent-singularity executes commands inside the unpacked image
+        # to generate wrappers. Ensure a foreign-architecture image can run on
+        # this publisher before opening a transaction or downloading the SIF.
+        if ! "$NEUROCOMMAND_LOCAL_REPO/cvmfs/ensure_binfmt.sh" "$IMAGENAME_BUILDDATE"; then
+            echo "[ERROR] Cannot deploy $IMAGENAME_BUILDDATE without working QEMU/binfmt support."
+            continue
+        fi
 
-
-        
         # Let transparent-singularity try every supported backend. A Nectar-only
         # preflight would skip images that are available from S3 or a registry.
         open_cvmfs_transaction neurodesk.ardc.edu.au

@@ -10,6 +10,7 @@ APPS_JSON = ROOT / "neurodesk" / "apps.json"
 LOG = ROOT / "cvmfs" / "log.txt"
 APPLIST = ROOT / "cvmfs" / "applist.json"
 SYNC_SCRIPT = ROOT / "cvmfs" / "sync_containers_to_cvmfs.sh"
+BINFMT_SCRIPT = ROOT / "cvmfs" / "ensure_binfmt.sh"
 
 
 def test_checked_in_applist_matches_current_log(tmp_path):
@@ -86,6 +87,21 @@ def test_stratum_sync_guards_container_directory_changes():
     assert "if ! cd /cvmfs/neurodesk.ardc.edu.au/containers/; then" in script
     assert 'if ! cd "$IMAGENAME_BUILDDATE"; then' in script
     assert script.count("abort_cvmfs_transaction neurodesk.ardc.edu.au") >= 4
+
+
+def test_stratum_sync_checks_binfmt_before_opening_transaction():
+    script = SYNC_SCRIPT.read_text()
+
+    check = '"$NEUROCOMMAND_LOCAL_REPO/cvmfs/ensure_binfmt.sh" "$IMAGENAME_BUILDDATE"'
+    transaction = "open_cvmfs_transaction neurodesk.ardc.edu.au"
+    loop = script[script.index("while IFS= read -r LINE") :]
+
+    assert check in loop
+    assert loop.index(check) < loop.index(transaction)
+
+
+def test_binfmt_script_is_valid_bash():
+    subprocess.run(["bash", "-n", str(BINFMT_SCRIPT)], check=True)
 
 
 def test_stratum_sync_script_is_valid_bash():
