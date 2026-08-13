@@ -1696,6 +1696,14 @@
             ]
         },
         {
+            "application": "napari_0.8.0_20260813",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
+            ]
+        },
+        {
             "application": "nesvor_0.5.0_20260722",
             "categories": [
                 "fetal imaging",
