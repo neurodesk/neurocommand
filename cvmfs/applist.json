@@ -1824,6 +1824,13 @@
             ]
         },
         {
+            "application": "openmsk_0.1.11_20260814",
+            "categories": [
+                "image segmentation",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "openrefine_3.10.1_20260601",
             "categories": [
                 "data organisation"
