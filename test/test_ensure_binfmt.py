@@ -173,3 +173,38 @@ def test_container_installer_uses_pinned_image_and_arm64_name(tmp_path):
     assert call.startswith("run --privileged --rm docker.io/tonistiigi/binfmt:")
     assert "@sha256:" in call
     assert call.endswith("--install arm64")
+
+
+def test_container_installer_installs_podman_with_dnf_when_missing(tmp_path):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    calls = tmp_path / "calls.log"
+    dnf = bin_dir / "dnf"
+    dnf.write_text(
+        f"""#!/bin/bash
+printf 'dnf %s\\n' "$*" >> {calls}
+/bin/cat > {bin_dir / 'podman'} <<'EOF'
+#!/bin/bash
+printf 'podman %s\\n' "$*" >> {calls}
+EOF
+    /bin/chmod +x {bin_dir / 'podman'}
+"""
+    )
+    dnf.chmod(0o755)
+    env = os.environ.copy()
+
+    result = run_helper(
+        f"""
+        source {shlex.quote(str(SCRIPT))}
+        PATH={shlex.quote(str(bin_dir))}:/usr/sbin:/sbin
+        run_privileged() {{ "$@"; }}
+        install_binfmt_with_container_runtime aarch64
+        """,
+        env=env,
+    )
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    call_log = calls.read_text()
+    assert "dnf install -y podman" in call_log
+    assert "podman run --privileged --rm" in call_log
+    assert "--install arm64" in call_log

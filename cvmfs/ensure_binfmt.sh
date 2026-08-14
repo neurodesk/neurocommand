@@ -118,8 +118,16 @@ install_binfmt_with_container_runtime() {
         runtime="podman"
     elif command -v docker >/dev/null 2>&1; then
         runtime="docker"
+    elif command -v dnf >/dev/null 2>&1; then
+        echo "[INFO] Installing Podman for the binfmt installer fallback."
+        run_privileged dnf install -y podman || return 1
+        runtime="podman"
+    elif command -v yum >/dev/null 2>&1; then
+        echo "[INFO] Installing Podman for the binfmt installer fallback."
+        run_privileged yum install -y podman || return 1
+        runtime="podman"
     else
-        echo "[ERROR] Neither podman nor docker is available for the binfmt installer fallback." >&2
+        echo "[ERROR] Neither podman nor docker is available, and Podman cannot be installed with dnf/yum." >&2
         return 1
     fi
 

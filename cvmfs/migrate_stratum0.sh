@@ -2,7 +2,9 @@
 # New rocky linux 10 machine
 ssh rocky@203.101.224.225
 
-sudo yum install vim htop gcc git screen rsync apptainer
+# Podman is used by cvmfs/ensure_binfmt.sh to register QEMU handlers on
+# Rocky releases whose enabled repositories do not provide qemu-user-static.
+sudo yum install -y vim htop gcc git screen rsync apptainer podman
 
 # disable cron jobs on old machine and copy keys/cronjobs over:
 sudo vi /etc/cron.d/cvmfs_resign
