@@ -2532,22 +2532,22 @@
     "napari": {
         "apps": {
             "napari 0.8.0": {
-                "version": "20260813",
+                "version": "20260814",
                 "exec": "",
                 "apptainer_args": []
             },
-            "napari-napari 0.8.0": {
-                "version": "20260813",
+            "napari GUI-napari 0.8.0": {
+                "version": "20260814",
                 "exec": "napari",
                 "apptainer_args": []
             },
             "VoxTell-napari 0.8.0": {
-                "version": "20260813",
+                "version": "20260814",
                 "exec": "napari-voxtell",
                 "apptainer_args": []
             },
             "nnInteractive-napari 0.8.0": {
-                "version": "20260813",
+                "version": "20260814",
                 "exec": "napari-nninteractive",
                 "apptainer_args": []
             }
