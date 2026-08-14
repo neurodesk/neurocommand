@@ -2786,6 +2786,19 @@
             "image segmentation"
         ]
     },
+    "openmsk": {
+        "apps": {
+            "openmsk 0.1.11": {
+                "version": "20260814",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "quantitative imaging"
+        ]
+    },
     "openrefine": {
         "apps": {
             "openrefine 3.10.1": {
