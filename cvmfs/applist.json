@@ -943,6 +943,13 @@
             ]
         },
         {
+            "application": "freesurfer_5.3.0_20260817",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "freesurfer_7.1.1_20211216",
             "categories": [
                 "image segmentation",
