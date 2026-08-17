@@ -1357,6 +1357,16 @@
     },
     "freesurfer": {
         "apps": {
+            "freesurfer 5.3.0": {
+                "version": "20260817",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "freeviewGUI-freesurfer 5.3.0": {
+                "version": "20260817",
+                "exec": "freeview",
+                "apptainer_args": []
+            },
             "freesurfer 7.1.1": {
                 "version": "20211216",
                 "exec": ""
