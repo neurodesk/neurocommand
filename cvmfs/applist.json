@@ -1008,7 +1008,7 @@
             ]
         },
         {
-            "application": "freesurfer_8.2.0_20260601",
+            "application": "freesurfer_8.2.0_20260818",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -1164,6 +1164,14 @@
             "application": "gingerale_3.0.2_20250804",
             "categories": [
                 "statistics"
+            ]
+        },
+        {
+            "application": "gliomoda_0.0.4_20260818",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
             ]
         },
         {
