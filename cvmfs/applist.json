@@ -651,6 +651,14 @@
             ]
         },
         {
+            "application": "deep-quality-estimation_0.0.3_20260818",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "quality control"
+            ]
+        },
+        {
             "application": "deepdisco_20251008_20260611",
             "categories": [
                 "diffusion imaging",
@@ -695,6 +703,14 @@
             "application": "deepsif_0.0.1_20260629",
             "categories": [
                 "electrophysiology"
+            ]
+        },
+        {
+            "application": "deepwmh_1.0.1_20260818",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
             ]
         },
         {
@@ -943,7 +959,7 @@
             ]
         },
         {
-            "application": "freesurfer_5.3.0_20260817",
+            "application": "freesurfer_5.3.0_20260818",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -1441,6 +1457,14 @@
             "application": "mede_0.0.12_20260521",
             "categories": [
                 "data organisation"
+            ]
+        },
+        {
+            "application": "meganorm_0.2.0_20260818",
+            "categories": [
+                "electrophysiology",
+                "machine learning",
+                "statistics"
             ]
         },
         {
