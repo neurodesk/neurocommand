@@ -2995,6 +2995,20 @@
             "structural imaging"
         ]
     },
+    "petu": {
+        "apps": {
+            "petu 0.0.7": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
     "physio": {
         "apps": {
             "physio r2021a": {
