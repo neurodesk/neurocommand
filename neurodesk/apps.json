@@ -1444,12 +1444,12 @@
                 "apptainer_args": []
             },
             "freesurfer 8.2.0": {
-                "version": "20260601",
+                "version": "20260818",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.2.0": {
-                "version": "20260601",
+                "version": "20260818",
                 "exec": "freeview",
                 "apptainer_args": []
             }
@@ -1638,6 +1638,20 @@
         },
         "categories": [
             "statistics"
+        ]
+    },
+    "gliomoda": {
+        "apps": {
+            "gliomoda 0.0.4": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
         ]
     },
     "glmsingle": {
