@@ -1939,6 +1939,14 @@
             ]
         },
         {
+            "application": "petu_0.0.7_20260818",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "physio_r2021a_20260702",
             "categories": [
                 "functional imaging"
