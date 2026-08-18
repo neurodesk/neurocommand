@@ -930,6 +930,20 @@
             "data organisation"
         ]
     },
+    "deep-quality-estimation": {
+        "apps": {
+            "deep-quality-estimation 0.0.3": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "quality control"
+        ]
+    },
     "deepdisco": {
         "apps": {
             "deepdisco 20251008": {
@@ -1005,6 +1019,20 @@
         },
         "categories": [
             "electrophysiology"
+        ]
+    },
+    "deepwmh": {
+        "apps": {
+            "deepwmh 1.0.1": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
         ]
     },
     "dhcpstructuralpipeline": {
@@ -1358,12 +1386,12 @@
     "freesurfer": {
         "apps": {
             "freesurfer 5.3.0": {
-                "version": "20260817",
+                "version": "20260818",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 5.3.0": {
-                "version": "20260817",
+                "version": "20260818",
                 "exec": "freeview",
                 "apptainer_args": []
             },
@@ -2119,6 +2147,20 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "meganorm": {
+        "apps": {
+            "meganorm 0.2.0": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology",
+            "machine learning",
+            "statistics"
         ]
     },
     "megnet": {
