@@ -494,6 +494,20 @@
             "structural imaging"
         ]
     },
+    "brainles-aurora": {
+        "apps": {
+            "brainles-aurora 0.2.7": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
     "brainles-preprocessing": {
         "apps": {
             "brainles-preprocessing 0.6.10": {
@@ -510,7 +524,7 @@
     "brainlesion": {
         "apps": {
             "brainlesion 1.0.0": {
-                "version": "20260727",
+                "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1024,7 +1038,7 @@
     "deepwmh": {
         "apps": {
             "deepwmh 1.0.1": {
-                "version": "20260818",
+                "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1787,6 +1801,20 @@
         },
         "categories": [
             "electrophysiology"
+        ]
+    },
+    "hypermapp3r": {
+        "apps": {
+            "hypermapp3r 0.1.0": {
+                "version": "20260818",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
         ]
     },
     "ilastik": {
@@ -2957,6 +2985,11 @@
         "apps": {
             "panoptica 2.1.3": {
                 "version": "20260728",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "panoptica 2.1.6": {
+                "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
             }
