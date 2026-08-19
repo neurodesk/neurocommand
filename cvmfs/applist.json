@@ -405,7 +405,7 @@
             ]
         },
         {
-            "application": "brainles-preprocessing_0.6.10_20260727",
+            "application": "brainles-preprocessing_0.6.10_20260819",
             "categories": [
                 "image registration",
                 "structural imaging"
@@ -467,6 +467,14 @@
                 "image segmentation",
                 "structural imaging",
                 "visualization",
+                "workflows"
+            ]
+        },
+        {
+            "application": "brats_0.1.8_20260819",
+            "categories": [
+                "image segmentation",
+                "structural imaging",
                 "workflows"
             ]
         },
@@ -1619,6 +1627,12 @@
             ]
         },
         {
+            "application": "modsort_0.0.2_20260819",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "mricrogl_1.2.20211006_20220111",
             "categories": [
                 "visualization"
@@ -1962,7 +1976,7 @@
             ]
         },
         {
-            "application": "petu_0.0.7_20260818",
+            "application": "petu_0.0.7_20260819",
             "categories": [
                 "image segmentation",
                 "machine learning",
