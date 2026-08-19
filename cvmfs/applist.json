@@ -397,6 +397,14 @@
             ]
         },
         {
+            "application": "brainles-aurora_0.2.7_20260818",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "brainles-preprocessing_0.6.10_20260727",
             "categories": [
                 "image registration",
@@ -404,7 +412,7 @@
             ]
         },
         {
-            "application": "brainlesion_1.0.0_20260727",
+            "application": "brainlesion_1.0.0_20260819",
             "categories": [
                 "data organisation",
                 "image segmentation",
@@ -706,7 +714,7 @@
             ]
         },
         {
-            "application": "deepwmh_1.0.1_20260818",
+            "application": "deepwmh_1.0.1_20260819",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -1248,6 +1256,14 @@
             "application": "hnncore_0.3_20231112",
             "categories": [
                 "electrophysiology"
+            ]
+        },
+        {
+            "application": "hypermapp3r_0.1.0_20260818",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
             ]
         },
         {
@@ -1914,6 +1930,13 @@
         },
         {
             "application": "panoptica_2.1.3_20260728",
+            "categories": [
+                "image segmentation",
+                "quality control"
+            ]
+        },
+        {
+            "application": "panoptica_2.1.6_20260819",
             "categories": [
                 "image segmentation",
                 "quality control"
