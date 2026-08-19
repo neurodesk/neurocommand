@@ -511,7 +511,7 @@
     "brainles-preprocessing": {
         "apps": {
             "brainles-preprocessing 0.6.10": {
-                "version": "20260727",
+                "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -633,6 +633,20 @@
             "image segmentation",
             "structural imaging",
             "visualization",
+            "workflows"
+        ]
+    },
+    "brats": {
+        "apps": {
+            "brats 0.1.8": {
+                "version": "20260819",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging",
             "workflows"
         ]
     },
@@ -2428,6 +2442,23 @@
             "programming"
         ]
     },
+    "modsort": {
+        "apps": {
+            "modsort 0.0.2": {
+                "version": "20260819",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "modsort-modsort 0.0.2": {
+                "version": "20260819",
+                "exec": "modsort",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
     "mricrogl": {
         "apps": {
             "mricrogl 1.2.20211006": {
@@ -3031,7 +3062,7 @@
     "petu": {
         "apps": {
             "petu 0.0.7": {
-                "version": "20260818",
+                "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
             }
