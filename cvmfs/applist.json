@@ -397,7 +397,7 @@
             ]
         },
         {
-            "application": "brainles-aurora_0.2.7_20260818",
+            "application": "brainles-aurora_0.2.7_20260820",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -405,14 +405,14 @@
             ]
         },
         {
-            "application": "brainles-preprocessing_0.6.10_20260819",
+            "application": "brainles-preprocessing_0.6.10_20260820",
             "categories": [
                 "image registration",
                 "structural imaging"
             ]
         },
         {
-            "application": "brainlesion_1.0.0_20260819",
+            "application": "brainlesion_1.0.0_20260820",
             "categories": [
                 "data organisation",
                 "image segmentation",
@@ -667,7 +667,7 @@
             ]
         },
         {
-            "application": "deep-quality-estimation_0.0.3_20260818",
+            "application": "deep-quality-estimation_0.0.3_20260820",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -1976,7 +1976,7 @@
             ]
         },
         {
-            "application": "petu_0.0.7_20260819",
+            "application": "petu_0.0.7_20260820",
             "categories": [
                 "image segmentation",
                 "machine learning",
