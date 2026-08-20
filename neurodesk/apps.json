@@ -1671,7 +1671,7 @@
     "gliomoda": {
         "apps": {
             "gliomoda 0.0.4": {
-                "version": "20260818",
+                "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
             }
