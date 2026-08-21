@@ -639,7 +639,7 @@
     "brats": {
         "apps": {
             "brats 0.1.8": {
-                "version": "20260819",
+                "version": "20260821",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2445,12 +2445,12 @@
     "modsort": {
         "apps": {
             "modsort 0.0.2": {
-                "version": "20260819",
+                "version": "20260820",
                 "exec": "",
                 "apptainer_args": []
             },
             "modsort-modsort 0.0.2": {
-                "version": "20260819",
+                "version": "20260820",
                 "exec": "modsort",
                 "apptainer_args": []
             }
@@ -3842,8 +3842,14 @@
     "trackvis": {
         "apps": {
             "trackvis 0.6.1": {
-                "version": "20220303",
-                "exec": ""
+                "version": "20260821",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "trackvisGUI-trackvis 0.6.1": {
+                "version": "20260821",
+                "exec": "trackvis",
+                "apptainer_args": []
             }
         },
         "categories": [
