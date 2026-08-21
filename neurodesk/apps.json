@@ -3014,11 +3014,6 @@
     },
     "panoptica": {
         "apps": {
-            "panoptica 2.1.3": {
-                "version": "20260728",
-                "exec": "",
-                "apptainer_args": []
-            },
             "panoptica 2.1.6": {
                 "version": "20260819",
                 "exec": "",
