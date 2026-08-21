@@ -667,7 +667,7 @@
             ]
         },
         {
-            "application": "deep-quality-estimation_0.0.3_20260820",
+            "application": "deep-quality-estimation_0.0.3_20260821",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -1267,7 +1267,7 @@
             ]
         },
         {
-            "application": "hypermapp3r_0.1.0_20260818",
+            "application": "hypermapp3r_0.1.0_20260821",
             "categories": [
                 "image segmentation",
                 "machine learning",
