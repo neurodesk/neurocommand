@@ -961,7 +961,7 @@
     "deep-quality-estimation": {
         "apps": {
             "deep-quality-estimation 0.0.3": {
-                "version": "20260820",
+                "version": "20260821",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1820,7 +1820,7 @@
     "hypermapp3r": {
         "apps": {
             "hypermapp3r 0.1.0": {
-                "version": "20260818",
+                "version": "20260821",
                 "exec": "",
                 "apptainer_args": []
             }
