@@ -471,7 +471,7 @@
             ]
         },
         {
-            "application": "brats_0.1.8_20260819",
+            "application": "brats_0.1.8_20260821",
             "categories": [
                 "image segmentation",
                 "structural imaging",
@@ -1627,7 +1627,7 @@
             ]
         },
         {
-            "application": "modsort_0.0.2_20260819",
+            "application": "modsort_0.0.2_20260820",
             "categories": [
                 "data organisation"
             ]
@@ -2550,7 +2550,7 @@
             ]
         },
         {
-            "application": "trackvis_0.6.1_20220303",
+            "application": "trackvis_0.6.1_20260821",
             "categories": [
                 "diffusion imaging"
             ]
