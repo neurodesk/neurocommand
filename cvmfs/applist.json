@@ -1943,13 +1943,6 @@
             ]
         },
         {
-            "application": "panoptica_2.1.3_20260728",
-            "categories": [
-                "image segmentation",
-                "quality control"
-            ]
-        },
-        {
             "application": "panoptica_2.1.6_20260819",
             "categories": [
                 "image segmentation",
