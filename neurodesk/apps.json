@@ -497,7 +497,7 @@
     "brainles-aurora": {
         "apps": {
             "brainles-aurora 0.2.7": {
-                "version": "20260820",
+                "version": "20260822",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -639,7 +639,7 @@
     "brats": {
         "apps": {
             "brats 0.1.8": {
-                "version": "20260821",
+                "version": "20260822",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -961,7 +961,7 @@
     "deep-quality-estimation": {
         "apps": {
             "deep-quality-estimation 0.0.3": {
-                "version": "20260821",
+                "version": "20260822",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2445,12 +2445,12 @@
     "modsort": {
         "apps": {
             "modsort 0.0.2": {
-                "version": "20260820",
+                "version": "20260822",
                 "exec": "",
                 "apptainer_args": []
             },
             "modsort-modsort 0.0.2": {
-                "version": "20260820",
+                "version": "20260822",
                 "exec": "modsort",
                 "apptainer_args": []
             }
@@ -3057,7 +3057,7 @@
     "petu": {
         "apps": {
             "petu 0.0.7": {
-                "version": "20260820",
+                "version": "20260822",
                 "exec": "",
                 "apptainer_args": []
             }
