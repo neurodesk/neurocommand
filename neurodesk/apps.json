@@ -3018,6 +3018,11 @@
                 "version": "20260819",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "panoptica 2.1.7": {
+                "version": "20260822",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
