@@ -1950,6 +1950,13 @@
             ]
         },
         {
+            "application": "panoptica_2.1.7_20260822",
+            "categories": [
+                "image segmentation",
+                "quality control"
+            ]
+        },
+        {
             "application": "pcntoolkit_0.35_20250628",
             "categories": [
                 "statistics"
