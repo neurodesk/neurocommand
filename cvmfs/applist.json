@@ -397,7 +397,7 @@
             ]
         },
         {
-            "application": "brainles-aurora_0.2.7_20260822",
+            "application": "brainles-aurora_0.2.7_20260825",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -1183,7 +1183,7 @@
             ]
         },
         {
-            "application": "gliomoda_0.0.4_20260819",
+            "application": "gliomoda_0.0.4_20260824",
             "categories": [
                 "image segmentation",
                 "machine learning",
