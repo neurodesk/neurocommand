@@ -497,7 +497,7 @@
     "brainles-aurora": {
         "apps": {
             "brainles-aurora 0.2.7": {
-                "version": "20260822",
+                "version": "20260825",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1671,7 +1671,7 @@
     "gliomoda": {
         "apps": {
             "gliomoda 0.0.4": {
-                "version": "20260819",
+                "version": "20260824",
                 "exec": "",
                 "apptainer_args": []
             }
