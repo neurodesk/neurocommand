@@ -163,6 +163,27 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     ) in call_log
     assert (workdir / "demo_arm64_1.0_20260629.simg").is_dir()
     assert "singularity exec demo_arm64_1.0_20260629.simg /bin/true" in call_log
+    wrapper = workdir / "demo"
+    wrapper_text = wrapper.read_text()
+    assert "xauthority_opts=()" in wrapper_text
+    assert '--bind "$XAUTHORITY:$XAUTHORITY:ro"' in wrapper_text
+    assert '--env "XAUTHORITY=$XAUTHORITY"' in wrapper_text
+    assert '"${xauthority_opts[@]}"' in wrapper_text
+
+    xauthority = tmp_path / "Xauthority"
+    xauthority.touch()
+    wrapper_result = subprocess.run(
+        [str(wrapper), "argument"],
+        cwd=tmp_path,
+        env={**env, "XAUTHORITY": str(xauthority)},
+        capture_output=True,
+        text=True,
+    )
+    assert wrapper_result.returncode == 0, wrapper_result.stdout + wrapper_result.stderr
+    wrapper_call = calls.read_text().splitlines()[-1]
+    assert f"--bind {xauthority}:{xauthority}:ro" in wrapper_call
+    assert f"--env XAUTHORITY={xauthority}" in wrapper_call
+
     module_file = tmp_path / "modules" / "demo_arm64" / "1.0.lua"
     assert module_file.is_file()
     module_text = module_file.read_text()
