@@ -405,14 +405,14 @@
             ]
         },
         {
-            "application": "brainles-preprocessing_0.6.10_20260820",
+            "application": "brainles-preprocessing_0.6.10_20260825",
             "categories": [
                 "image registration",
                 "structural imaging"
             ]
         },
         {
-            "application": "brainlesion_1.0.0_20260820",
+            "application": "brainlesion_1.0.0_20260825",
             "categories": [
                 "data organisation",
                 "image segmentation",
