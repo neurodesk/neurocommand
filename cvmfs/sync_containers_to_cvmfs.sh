@@ -296,6 +296,17 @@ else
     echo "running" >> $LOCKFILE
 fi
 
+cleanup_lockfile() {
+    if [[ -f "$LOCKFILE" ]]; then
+        echo "[INFO] Deleting lockfile: $LOCKFILE"
+        sudo rm -f -- "$LOCKFILE"
+    fi
+}
+
+# Every exit after acquiring the lock must release it. In particular, a failed
+# reconciliation preflight must not disable all later cron runs.
+trap cleanup_lockfile EXIT
+
 # echo "Syncing object storages:"
 export RCLONE_VERBOSE=2
 # rclone copy  nectar:/neurodesk/ aws:/neurodesk
@@ -609,6 +620,9 @@ fi
 
 commit_generated_metadata_to_github_if_changed "$NEUROCOMMAND_LOCAL_REPO"
 
-echo "[INFO] Deleting lockfile: $LOCKFILE"
-sudo rm -rf "$LOCKFILE"
+if ! cleanup_lockfile; then
+    echo "[ERROR] Failed to delete lockfile: $LOCKFILE"
+    exit 2
+fi
+trap - EXIT
 mv ~/cronjob.log ~/cronjob_previous_run.log

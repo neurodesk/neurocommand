@@ -207,6 +207,36 @@ class WrapperReconciliationTests(unittest.TestCase):
         reconcile.apply_wrapper_plan(plan)
         self.assertIn(XAUTHORITY_BLOCK, wrapper.read_text())
 
+    def test_supports_generated_trailing_bind_slot_variant(self):
+        container = make_container(self.repo_root, ["spm12"])
+        content = legacy_wrapper(container, "spm12").replace(
+            "DISPLAY=$DISPLAY  $neurodesk_singularity_opts --pwd",
+            "DISPLAY=$DISPLAY $neurodesk_singularity_opts  --pwd",
+            1,
+        )
+        wrapper = write_wrapper(container, "spm12", content)
+
+        plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
+
+        self.assertEqual(plan.diagnostics, ())
+        self.assertEqual(len(plan.rewrites), 1)
+        reconcile.apply_wrapper_plan(plan)
+        self.assertIn(XAUTHORITY_BLOCK, wrapper.read_text())
+
+    def test_skips_absolute_commands_that_only_exist_inside_the_container(self):
+        container = make_container(
+            self.repo_root,
+            ["demo", "/fastsurfer/run_fastsurfer.sh", "/usr/local/bin/ExploreASL"],
+        )
+        wrapper = write_wrapper(container, "demo", legacy_wrapper(container, "demo"))
+
+        plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
+
+        self.assertEqual(plan.diagnostics, ())
+        self.assertEqual(len(plan.rewrites), 1)
+        reconcile.apply_wrapper_plan(plan)
+        self.assertEqual(wrapper.read_text(), fixed_wrapper(container, "demo"))
+
     def test_skips_fixed_disabled_missing_and_non_executable_targets(self):
         commands = ["fixed", "disabled", "missing", "metadata"]
         container = make_container(self.repo_root, commands)
@@ -239,7 +269,7 @@ class WrapperReconciliationTests(unittest.TestCase):
     def test_invalid_inventory_paths_block_every_planned_write(self):
         container = make_container(
             self.repo_root,
-            ["legacy", "../escape", "/absolute", "nested/name", "back\\slash", "bad name"],
+            ["legacy", "../escape", "nested/name", "back\\slash", "bad name"],
         )
         legacy = write_wrapper(
             container, "legacy", legacy_wrapper(container, "legacy")
@@ -249,7 +279,7 @@ class WrapperReconciliationTests(unittest.TestCase):
         plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
 
         self.assertEqual(len(plan.rewrites), 1)
-        self.assertEqual(len(plan.diagnostics), 5)
+        self.assertEqual(len(plan.diagnostics), 4)
         with self.assertRaises(ValueError):
             reconcile.apply_wrapper_plan(plan)
         self.assertEqual(legacy.read_bytes(), before)
@@ -307,6 +337,16 @@ class WrapperReconciliationTests(unittest.TestCase):
         self.assertIn("open_cvmfs_transaction neurodesk.ardc.edu.au", sync[sync.index(reconciler) :])
         self.assertIn("abort_cvmfs_transaction neurodesk.ardc.edu.au", sync[sync.index(reconciler) :])
         self.assertIn("publish_cvmfs_transaction neurodesk.ardc.edu.au", sync[sync.index(reconciler) :])
+
+    def test_sync_releases_its_lockfile_on_reconciliation_failure(self):
+        sync = (ROOT / "cvmfs" / "sync_containers_to_cvmfs.sh").read_text()
+        lock_acquired = 'echo "running" >> $LOCKFILE'
+        exit_trap = "trap cleanup_lockfile EXIT"
+        reconciler = "reconcile_wrapper_xauthority.py"
+
+        self.assertLess(sync.index(lock_acquired), sync.index(exit_trap))
+        self.assertLess(sync.index(exit_trap), sync.index(reconciler))
+        self.assertIn('sudo rm -f -- "$LOCKFILE"', sync)
 
 
 if __name__ == "__main__":

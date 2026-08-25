@@ -98,6 +98,10 @@ def _parse_commands(commands_path: Path) -> tuple[tuple[str, ...], tuple[Diagnos
     for line_number, raw_command in enumerate(text.splitlines(), start=1):
         if not raw_command:
             continue
+        # Some inventories also name executables by their absolute path inside
+        # the container. They do not correspond to top-level wrapper files.
+        if Path(raw_command).is_absolute():
+            continue
         if not _safe_command(raw_command):
             diagnostics.append(
                 Diagnostic(
@@ -203,6 +207,18 @@ def _legacy_wrapper_with_duplicate_display(container_dir: Path, command: str) ->
     return text.encode("utf-8")
 
 
+def _legacy_wrapper_with_trailing_bind_slot(container_dir: Path, command: str) -> bytes:
+    container_name = container_dir.name
+    text = (
+        "#!/usr/bin/env bash\n"
+        "export PWD=`pwd -P`\n"
+        "singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY "
+        "$neurodesk_singularity_opts  --pwd \"$PWD\" "
+        f"{container_dir}/{container_name}.simg {command} \"$@\"\n"
+    )
+    return text.encode("utf-8")
+
+
 def _legacy_wrapper_candidates(container_dir: Path, command: str) -> tuple[bytes, ...]:
     candidates = [
         _legacy_wrapper(container_dir, command, bind_option)
@@ -227,6 +243,7 @@ def _legacy_wrapper_candidates(container_dir: Path, command: str) -> tuple[bytes
         )
     )
     candidates.append(_legacy_wrapper_with_duplicate_display(container_dir, command))
+    candidates.append(_legacy_wrapper_with_trailing_bind_slot(container_dir, command))
     return tuple(dict.fromkeys(candidates))
 
 
