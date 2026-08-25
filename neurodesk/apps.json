@@ -2208,7 +2208,7 @@
     "meganorm": {
         "apps": {
             "meganorm 0.2.0": {
-                "version": "20260818",
+                "version": "20260824",
                 "exec": "",
                 "apptainer_args": []
             }
