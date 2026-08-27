@@ -1765,6 +1765,12 @@
             ]
         },
         {
+            "application": "musclemap_1.4.0_20260827",
+            "categories": [
+                "body"
+            ]
+        },
+        {
             "application": "napari_0.8.0_20260814",
             "categories": [
                 "image segmentation",
