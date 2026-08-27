@@ -2648,6 +2648,11 @@
                 "version": "20260415",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "musclemap 1.4.0": {
+                "version": "20260827",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
