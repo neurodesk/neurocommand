@@ -3637,6 +3637,11 @@
                 "version": "20260605",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "spinalcordtoolbox 7.3.3": {
+                "version": "20260828",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
