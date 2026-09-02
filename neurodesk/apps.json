@@ -1812,6 +1812,16 @@
             "hmri 0.6.1": {
                 "version": "20231107",
                 "exec": ""
+            },
+            "hmri 1.0.0": {
+                "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "hmriGUI-hmri 1.0.0": {
+                "version": "20260902",
+                "exec": "bash run_spm12.sh /opt/mcr/R2023b fmri",
+                "apptainer_args": []
             }
         },
         "categories": [
