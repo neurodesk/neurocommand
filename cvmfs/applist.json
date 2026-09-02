@@ -826,6 +826,13 @@
             ]
         },
         {
+            "application": "enigma-pd-wml_1.1.1_20260901",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "esilpd_0.0.1_20260629",
             "categories": [
                 "electrophysiology"
@@ -2526,7 +2533,7 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20260730",
+            "application": "synthseg_8.2.0_20260805",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -2563,6 +2570,14 @@
             "application": "topaz_0.2.5_20240313",
             "categories": [
                 "cryo EM"
+            ]
+        },
+        {
+            "application": "topofit_0.2_20260902",
+            "categories": [
+                "machine learning",
+                "shape analysis",
+                "structural imaging"
             ]
         },
         {
