@@ -1522,6 +1522,12 @@
             ]
         },
         {
+            "application": "metabody_1.0.3_20260902",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "mfcsc_1.0_20230306",
             "categories": [
                 "diffusion imaging",
