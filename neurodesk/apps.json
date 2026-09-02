@@ -2259,6 +2259,18 @@
             "workflows"
         ]
     },
+    "metabody": {
+        "apps": {
+            "metabody 1.0.3": {
+                "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
     "mfcsc": {
         "apps": {
             "mfcsc 1.0": {
