@@ -1221,6 +1221,19 @@
             "statistics"
         ]
     },
+    "enigma-pd-wml": {
+        "apps": {
+            "enigma-pd-wml 1.1.1": {
+                "version": "20260901",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
     "esilpd": {
         "apps": {
             "esilpd 0.0.1": {
@@ -3770,7 +3783,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20260730",
+                "version": "20260805",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3840,6 +3853,20 @@
         },
         "categories": [
             "cryo EM"
+        ]
+    },
+    "topofit": {
+        "apps": {
+            "topofit 0.2": {
+                "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning",
+            "shape analysis",
+            "structural imaging"
         ]
     },
     "totalsegmentator": {
