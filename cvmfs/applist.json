@@ -2581,6 +2581,14 @@
             ]
         },
         {
+            "application": "topofit_0.2.1_20260902",
+            "categories": [
+                "machine learning",
+                "shape analysis",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "totalsegmentator_2.5.0_20260323",
             "categories": [
                 "image segmentation"
