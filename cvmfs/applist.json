@@ -1268,6 +1268,13 @@
             ]
         },
         {
+            "application": "hmri_1.0.0_20260902",
+            "categories": [
+                "quantitative imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "hnncore_0.3_20231112",
             "categories": [
                 "electrophysiology"
