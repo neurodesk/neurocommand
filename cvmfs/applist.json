@@ -1535,6 +1535,12 @@
             ]
         },
         {
+            "application": "metabody_1.0.4_20260902",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "mfcsc_1.0_20230306",
             "categories": [
                 "diffusion imaging",
@@ -1919,7 +1925,7 @@
             ]
         },
         {
-            "application": "openmsk_0.1.11_20260814",
+            "application": "openmsk_0.1.11_20260902",
             "categories": [
                 "image segmentation",
                 "quantitative imaging"
@@ -2218,6 +2224,16 @@
         },
         {
             "application": "qsmxt_9.14.0_20260827",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "qsmxt_9.15.0_20260902",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -2546,7 +2562,7 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20260805",
+            "application": "synthseg_8.2.0_20260902",
             "categories": [
                 "image segmentation",
                 "machine learning",
