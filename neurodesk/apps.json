@@ -2275,6 +2275,11 @@
                 "version": "20260902",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "metabody 1.0.4": {
+                "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2954,7 +2959,7 @@
     "openmsk": {
         "apps": {
             "openmsk 0.1.11": {
-                "version": "20260814",
+                "version": "20260902",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3286,6 +3291,11 @@
             },
             "qsmxt 9.14.0": {
                 "version": "20260827",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qsmxt 9.15.0": {
+                "version": "20260902",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -3805,7 +3815,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20260805",
+                "version": "20260902",
                 "exec": "",
                 "apptainer_args": []
             }
