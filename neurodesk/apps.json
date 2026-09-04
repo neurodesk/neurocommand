@@ -2962,6 +2962,11 @@
                 "version": "20260902",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "openmsk 0.2.0": {
+                "version": "20260903",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3684,7 +3689,19 @@
                 "apptainer_args": []
             },
             "spinalcordtoolbox 7.3.3": {
-                "version": "20260828",
+                "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "spine"
+        ]
+    },
+    "spinalcordtoolbox_gpu": {
+        "apps": {
+            "spinalcordtoolbox_gpu 7.3.3": {
+                "version": "20260902",
                 "exec": "",
                 "apptainer_args": []
             }
