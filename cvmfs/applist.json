@@ -1932,6 +1932,13 @@
             ]
         },
         {
+            "application": "openmsk_0.2.0_20260903",
+            "categories": [
+                "image segmentation",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "openrefine_3.10.1_20260601",
             "categories": [
                 "data organisation"
@@ -2498,7 +2505,13 @@
             ]
         },
         {
-            "application": "spinalcordtoolbox_7.3.3_20260828",
+            "application": "spinalcordtoolbox_7.3.3_20260902",
+            "categories": [
+                "spine"
+            ]
+        },
+        {
+            "application": "spinalcordtoolbox_gpu_7.3.3_20260902",
             "categories": [
                 "spine"
             ]
