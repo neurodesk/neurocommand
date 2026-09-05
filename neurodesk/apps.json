@@ -3689,7 +3689,7 @@
                 "apptainer_args": []
             },
             "spinalcordtoolbox 7.3.3": {
-                "version": "20260902",
+                "version": "20260904",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3701,7 +3701,7 @@
     "spinalcordtoolbox_gpu": {
         "apps": {
             "spinalcordtoolbox_gpu 7.3.3": {
-                "version": "20260902",
+                "version": "20260904",
                 "exec": "",
                 "apptainer_args": []
             }
