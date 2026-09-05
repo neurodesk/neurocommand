@@ -2505,13 +2505,13 @@
             ]
         },
         {
-            "application": "spinalcordtoolbox_7.3.3_20260902",
+            "application": "spinalcordtoolbox_7.3.3_20260904",
             "categories": [
                 "spine"
             ]
         },
         {
-            "application": "spinalcordtoolbox_gpu_7.3.3_20260902",
+            "application": "spinalcordtoolbox_gpu_7.3.3_20260904",
             "categories": [
                 "spine"
             ]
