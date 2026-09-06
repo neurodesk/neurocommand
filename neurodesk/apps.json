@@ -3925,6 +3925,11 @@
                 "version": "20260904",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "topofit 0.5.1": {
+                "version": "20260905",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
