@@ -3304,6 +3304,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "qsmxt 9.16.0": {
+                "version": "20260907",
+                "exec": "",
+                "apptainer_args": []
+            },
             "qsmxt 9.8.0": {
                 "version": "20260721",
                 "exec": "",
