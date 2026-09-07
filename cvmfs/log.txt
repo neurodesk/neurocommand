@@ -322,6 +322,7 @@ qsmxt_9.0.0_20260626 categories:image reconstruction,phase processing,quantitati
 qsmxt_9.11.0_20260807 categories:image reconstruction,phase processing,quantitative imaging,structural imaging,workflows,
 qsmxt_9.14.0_20260827 categories:image reconstruction,phase processing,quantitative imaging,structural imaging,workflows,
 qsmxt_9.15.0_20260902 categories:image reconstruction,phase processing,quantitative imaging,structural imaging,workflows,
+qsmxt_9.16.0_20260907 categories:image reconstruction,phase processing,quantitative imaging,structural imaging,workflows,
 qsmxt_9.8.0_20260721 categories:image reconstruction,phase processing,quantitative imaging,structural imaging,workflows,
 quickshear_1.1.0_20240606 categories:data organisation,
 quickshear_1.2.0_20260629 categories:data organisation,
