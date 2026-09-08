@@ -2964,7 +2964,7 @@
                 "apptainer_args": []
             },
             "openmsk 0.2.0": {
-                "version": "20260903",
+                "version": "20260908",
                 "exec": "",
                 "apptainer_args": []
             }
