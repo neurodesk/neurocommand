@@ -1932,7 +1932,7 @@
             ]
         },
         {
-            "application": "openmsk_0.2.0_20260903",
+            "application": "openmsk_0.2.0_20260908",
             "categories": [
                 "image segmentation",
                 "quantitative imaging"
