@@ -131,7 +131,7 @@
         {
             "application": "ashs_2.0.0_20210105",
             "categories": [
-                "hippocampus"
+                "image segmentation"
             ]
         },
         {
@@ -854,7 +854,8 @@
         {
             "application": "fastcsr_1.0_20231213",
             "categories": [
-                "image segmentation"
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
@@ -864,9 +865,16 @@
             ]
         },
         {
+            "application": "fastsurfer_2.5.4_20260909",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "fatsegnet_1.0.gpu_20201212",
             "categories": [
-                "body"
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
@@ -1297,35 +1305,30 @@
         {
             "application": "itksnap_3.8.0_20201208",
             "categories": [
-                "image segmentation",
                 "visualization"
             ]
         },
         {
             "application": "itksnap_4.0.1_20230609",
             "categories": [
-                "image segmentation",
                 "visualization"
             ]
         },
         {
             "application": "itksnap_4.0.2_20240117",
             "categories": [
-                "image segmentation",
                 "visualization"
             ]
         },
         {
             "application": "itksnap_4.2.2_20250805",
             "categories": [
-                "image segmentation",
                 "visualization"
             ]
         },
         {
             "application": "itksnap_4.4.0_20260117",
             "categories": [
-                "image segmentation",
                 "visualization"
             ]
         },
@@ -1445,40 +1448,35 @@
             "application": "matlab_2022a_20231207",
             "categories": [
                 "machine learning",
-                "programming",
-                "visualization"
+                "programming"
             ]
         },
         {
             "application": "matlab_2022b_20250124",
             "categories": [
                 "machine learning",
-                "programming",
-                "visualization"
+                "programming"
             ]
         },
         {
             "application": "matlab_2023b_20250121",
             "categories": [
                 "machine learning",
-                "programming",
-                "visualization"
+                "programming"
             ]
         },
         {
             "application": "matlab_2024b_20250117",
             "categories": [
                 "machine learning",
-                "programming",
-                "visualization"
+                "programming"
             ]
         },
         {
             "application": "matlab_2025b_20260406",
             "categories": [
                 "machine learning",
-                "programming",
-                "visualization"
+                "programming"
             ]
         },
         {
@@ -1544,6 +1542,7 @@
             "application": "mfcsc_1.0_20230306",
             "categories": [
                 "diffusion imaging",
+                "electrophysiology",
                 "functional imaging"
             ]
         },
@@ -1551,6 +1550,7 @@
             "application": "mfcsc_1.1_20230321",
             "categories": [
                 "diffusion imaging",
+                "electrophysiology",
                 "functional imaging"
             ]
         },
@@ -1565,8 +1565,7 @@
             "categories": [
                 "diffusion imaging",
                 "functional imaging",
-                "structural imaging",
-                "workflows"
+                "structural imaging"
             ]
         },
         {
@@ -1667,6 +1666,8 @@
         {
             "application": "mricron_1.0.20190902_20220311",
             "categories": [
+                "data organisation",
+                "structural imaging",
                 "visualization"
             ]
         },
@@ -1815,7 +1816,8 @@
         {
             "application": "networkcorrespondancetoolkit_0.3.3_20250826",
             "categories": [
-                "functional imaging"
+                "data organisation",
+                "image registration"
             ]
         },
         {
@@ -2044,6 +2046,7 @@
         {
             "application": "qmrlab_2.4.2_20240828",
             "categories": [
+                "image reconstruction",
                 "quantitative imaging"
             ]
         },
@@ -2412,34 +2415,29 @@
         {
             "application": "slicer_4.11.20200930_20201108",
             "categories": [
-                "image registration",
                 "image segmentation",
-                "structural imaging",
                 "visualization"
             ]
         },
         {
             "application": "slicer_5.0.3_20221025",
             "categories": [
-                "image registration",
                 "image segmentation",
-                "structural imaging",
                 "visualization"
             ]
         },
         {
             "application": "slicer_5.10.0_20260226",
             "categories": [
-                "image registration",
                 "image segmentation",
-                "structural imaging",
                 "visualization"
             ]
         },
         {
             "application": "slicersalt_3.0.0_20210301",
             "categories": [
-                "shape analysis"
+                "quantitative imaging",
+                "structural imaging"
             ]
         },
         {
@@ -2457,7 +2455,8 @@
         {
             "application": "sovabids_0.3.1a0_20221202",
             "categories": [
-                "data organisation"
+                "bids apps",
+                "electrophysiology"
             ]
         },
         {
@@ -2621,7 +2620,8 @@
         {
             "application": "topaz_0.2.5_20240313",
             "categories": [
-                "cryo EM"
+                "cryo EM",
+                "machine learning"
             ]
         },
         {
@@ -2722,6 +2722,7 @@
         {
             "application": "vesselvio_1.1.2_20230428",
             "categories": [
+                "quantitative imaging",
                 "visualization"
             ]
         },
