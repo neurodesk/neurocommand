@@ -162,7 +162,7 @@
             }
         },
         "categories": [
-            "hippocampus"
+            "image segmentation"
         ]
     },
     "aslprep": {
@@ -1279,13 +1279,19 @@
             }
         },
         "categories": [
-            "image segmentation"
+            "image segmentation",
+            "machine learning"
         ]
     },
     "fastsurfer": {
         "apps": {
             "fastsurfer 2.4.2": {
                 "version": "20260115",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fastsurfer 2.5.4": {
+                "version": "20260909",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1302,7 +1308,8 @@
             }
         },
         "categories": [
-            "body"
+            "image segmentation",
+            "machine learning"
         ]
     },
     "fetalsegmentation": {
@@ -1919,7 +1926,6 @@
             }
         },
         "categories": [
-            "image segmentation",
             "visualization"
         ]
     },
@@ -2190,8 +2196,7 @@
         },
         "categories": [
             "machine learning",
-            "programming",
-            "visualization"
+            "programming"
         ]
     },
     "matlabruntime": {
@@ -2299,6 +2304,7 @@
         },
         "categories": [
             "diffusion imaging",
+            "electrophysiology",
             "functional imaging"
         ]
     },
@@ -2335,8 +2341,7 @@
         "categories": [
             "diffusion imaging",
             "functional imaging",
-            "structural imaging",
-            "workflows"
+            "structural imaging"
         ]
     },
     "mimosa": {
@@ -2526,6 +2531,8 @@
             }
         },
         "categories": [
+            "data organisation",
+            "structural imaging",
             "visualization"
         ]
     },
@@ -2750,7 +2757,8 @@
             }
         },
         "categories": [
-            "functional imaging"
+            "data organisation",
+            "image registration"
         ]
     },
     "neurodesktop-lite": {
@@ -3173,6 +3181,7 @@
             }
         },
         "categories": [
+            "image reconstruction",
             "quantitative imaging"
         ]
     },
@@ -3589,9 +3598,7 @@
             }
         },
         "categories": [
-            "image registration",
             "image segmentation",
-            "structural imaging",
             "visualization"
         ]
     },
@@ -3607,7 +3614,8 @@
             }
         },
         "categories": [
-            "shape analysis"
+            "quantitative imaging",
+            "structural imaging"
         ]
     },
     "sodiumgriddingptpi": {
@@ -3642,7 +3650,8 @@
             }
         },
         "categories": [
-            "data organisation"
+            "bids apps",
+            "electrophysiology"
         ]
     },
     "spant": {
@@ -3906,7 +3915,8 @@
             }
         },
         "categories": [
-            "cryo EM"
+            "cryo EM",
+            "machine learning"
         ]
     },
     "topofit": {
@@ -4039,6 +4049,7 @@
             }
         },
         "categories": [
+            "quantitative imaging",
             "visualization"
         ]
     },
