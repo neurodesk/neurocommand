@@ -1234,6 +1234,18 @@
             "structural imaging"
         ]
     },
+    "epirecon": {
+        "apps": {
+            "epirecon 0.0.4": {
+                "version": "20260908",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "esilpd": {
         "apps": {
             "esilpd 0.0.1": {
