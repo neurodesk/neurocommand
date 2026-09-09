@@ -833,6 +833,12 @@
             ]
         },
         {
+            "application": "epirecon_0.0.4_20260908",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "esilpd_0.0.1_20260629",
             "categories": [
                 "electrophysiology"
