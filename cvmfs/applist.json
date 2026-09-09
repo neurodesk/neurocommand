@@ -730,6 +730,12 @@
             ]
         },
         {
+            "application": "delphi_0.0.2.post1_20260909",
+            "categories": [
+                "machine learning"
+            ]
+        },
+        {
             "application": "dhcpstructuralpipeline_1.1_20260722",
             "categories": [
                 "image segmentation",
@@ -865,7 +871,7 @@
             ]
         },
         {
-            "application": "fastsurfer_2.4.2_20260115",
+            "application": "fastsurfer_2.4.2_20260909",
             "categories": [
                 "structural imaging"
             ]
