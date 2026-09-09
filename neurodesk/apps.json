@@ -1063,6 +1063,18 @@
             "structural imaging"
         ]
     },
+    "delphi": {
+        "apps": {
+            "delphi 0.0.2.post1": {
+                "version": "20260909",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning"
+        ]
+    },
     "dhcpstructuralpipeline": {
         "apps": {
             "dhcpstructuralpipeline 1.1": {
@@ -1298,7 +1310,7 @@
     "fastsurfer": {
         "apps": {
             "fastsurfer 2.4.2": {
-                "version": "20260115",
+                "version": "20260909",
                 "exec": "",
                 "apptainer_args": []
             },
