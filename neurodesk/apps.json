@@ -1,4 +1,28 @@
 {
+    "afib1": {
+        "apps": {
+            "afib1 1.6.0.post1": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "afib1_arm64": {
+        "apps": {
+            "afib1_arm64 1.6.0.post1": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "afni": {
         "apps": {
             "afni 21.2.00": {
@@ -101,6 +125,23 @@
             "amico 2.1.0": {
                 "version": "20250628",
                 "exec": ""
+            },
+            "amico 2.1.1": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "amico_arm64": {
+        "apps": {
+            "amico_arm64 2.1.1": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -176,6 +217,30 @@
         },
         "categories": [
             "programming"
+        ]
+    },
+    "arfiproc": {
+        "apps": {
+            "arfiproc 1.0.0.post1": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "arfiproc_arm64": {
+        "apps": {
+            "arfiproc_arm64 1.0.0.post1": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "ashs": {
@@ -606,7 +671,7 @@
     "brainsuite": {
         "apps": {
             "brainsuite 23a": {
-                "version": "20260611",
+                "version": "20260910",
                 "exec": "",
                 "apptainer_args": []
             }
