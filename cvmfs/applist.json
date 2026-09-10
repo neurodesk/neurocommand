@@ -67,6 +67,15 @@
             ]
         },
         {
+            "application": "aidamri_3.0_20260910",
+            "categories": [
+                "diffusion imaging",
+                "functional imaging",
+                "rodent imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "amico_2.1.0_20250628",
             "categories": [
                 "diffusion imaging"
@@ -2272,6 +2281,16 @@
         },
         {
             "application": "qsmxt_9.16.0_20260907",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "qsmxt_9.17.0_20260910",
             "categories": [
                 "image reconstruction",
                 "phase processing",
