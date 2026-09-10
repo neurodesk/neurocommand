@@ -1315,7 +1315,7 @@
                 "apptainer_args": []
             },
             "fastsurfer 2.5.4": {
-                "version": "20260909",
+                "version": "20260910",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2307,6 +2307,11 @@
             },
             "metabody 1.0.4": {
                 "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "metabody 1.0.5": {
+                "version": "20260910",
                 "exec": "",
                 "apptainer_args": []
             }
