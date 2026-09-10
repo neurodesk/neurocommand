@@ -82,6 +82,11 @@
                 "version": "20260608",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "aidamri 3.0": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -146,6 +151,25 @@
         "apps": {
             "apptainer 1.4.4": {
                 "version": "20251030",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "apptainer 1.5.3": {
+                "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming"
+        ]
+    },
+    "apptainer_arm64": {
+        "show_in_menu": false,
+        "show_in_applist": false,
+        "apps": {
+            "apptainer_arm64 1.5.3": {
+                "version": "20260910",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3344,6 +3368,11 @@
             },
             "qsmxt 9.16.0": {
                 "version": "20260907",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qsmxt 9.17.0": {
+                "version": "20260910",
                 "exec": "",
                 "apptainer_args": []
             },
