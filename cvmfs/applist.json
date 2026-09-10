@@ -877,7 +877,7 @@
             ]
         },
         {
-            "application": "fastsurfer_2.5.4_20260909",
+            "application": "fastsurfer_2.5.4_20260910",
             "categories": [
                 "structural imaging"
             ]
@@ -1546,6 +1546,12 @@
         },
         {
             "application": "metabody_1.0.4_20260902",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "metabody_1.0.5_20260910",
             "categories": [
                 "functional imaging"
             ]
