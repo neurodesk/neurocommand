@@ -1,6 +1,18 @@
 {
     "list": [
         {
+            "application": "afib1_1.6.0.post1_20260910",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "afib1_arm64_1.6.0.post1_20260910",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "afni_21.2.00_20210714",
             "categories": [
                 "functional imaging"
@@ -82,6 +94,18 @@
             ]
         },
         {
+            "application": "amico_2.1.1_20260910",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "amico_arm64_2.1.1_20260910",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "ants_2.3.1_20211204",
             "categories": [
                 "image registration",
@@ -135,6 +159,18 @@
                 "image registration",
                 "image segmentation",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "arfiproc_1.0.0.post1_20260910",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "arfiproc_arm64_1.0.0.post1_20260910",
+            "categories": [
+                "image reconstruction"
             ]
         },
         {
@@ -450,7 +486,7 @@
             ]
         },
         {
-            "application": "brainsuite_23a_20260611",
+            "application": "brainsuite_23a_20260910",
             "categories": [
                 "bids apps",
                 "diffusion imaging",
