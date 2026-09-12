@@ -236,6 +236,25 @@
             ]
         },
         {
+            "application": "aslprep_26.0.3_20260911",
+            "categories": [
+                "quantitative imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "b0map_1.0.0.post1_20260911",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "b0map_arm64_1.0.0.post1_20260911",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "bart_0.7.00_20210302",
             "categories": [
                 "image reconstruction"
@@ -286,6 +305,12 @@
         },
         {
             "application": "bidsappmrtrix3connectome_0.5.3_20260629",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsappmrtrix3connectome_0.6.0_20260911",
             "categories": [
                 "bids apps"
             ]
@@ -694,7 +719,19 @@
             ]
         },
         {
+            "application": "datalad_1.1.5_20260911",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_1.3.1_20260512",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
             ]
@@ -1249,6 +1286,18 @@
             ]
         },
         {
+            "application": "gimp_2.10.36_20260911",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
+            "application": "gimp_arm64_2.10.36_20260911",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
             "application": "gingerale_3.0.2_20250804",
             "categories": [
                 "statistics"
@@ -1492,6 +1541,13 @@
             "application": "lqt_0.1.0_20260603",
             "categories": [
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "lstai_1.1.0_20260911",
+            "categories": [
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
@@ -2036,6 +2092,12 @@
         },
         {
             "application": "palmettobug_0.0.3_20250424",
+            "categories": [
+                "molecular biology"
+            ]
+        },
+        {
+            "application": "palmettobug_0.2.11_20260911",
             "categories": [
                 "molecular biology"
             ]
