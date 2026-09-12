@@ -1066,6 +1066,11 @@
                 "version": "20260512",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "datalad 1.6.2": {
+                "version": "20260911",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1075,6 +1080,11 @@
     "datalad_arm64": {
         "apps": {
             "datalad_arm64 1.1.5": {
+                "version": "20260911",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "datalad_arm64 1.6.2": {
                 "version": "20260911",
                 "exec": "",
                 "apptainer_args": []
