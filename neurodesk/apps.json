@@ -334,6 +334,11 @@
             "bart 0.9.00": {
                 "version": "20240723",
                 "exec": ""
+            },
+            "bart 1.0.00": {
+                "version": "20260911",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -390,6 +395,11 @@
         "apps": {
             "bidsappbrainsuite 21a": {
                 "version": "20260703",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bidsappbrainsuite 23a": {
+                "version": "20260911",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1201,18 +1211,6 @@
             "image segmentation",
             "machine learning",
             "structural imaging"
-        ]
-    },
-    "delphi": {
-        "apps": {
-            "delphi 0.0.2.post1": {
-                "version": "20260909",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "machine learning"
         ]
     },
     "dhcpstructuralpipeline": {
@@ -4274,6 +4272,23 @@
             "vina 1.2.3": {
                 "version": "20230221",
                 "exec": ""
+            },
+            "vina 1.2.5": {
+                "version": "20260911",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular biology"
+        ]
+    },
+    "vina_arm64": {
+        "apps": {
+            "vina_arm64 1.2.5": {
+                "version": "20260911",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
