@@ -743,7 +743,19 @@
             ]
         },
         {
+            "application": "datalad_1.6.2_20260911",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.6.2_20260911",
             "categories": [
                 "data organisation"
             ]
