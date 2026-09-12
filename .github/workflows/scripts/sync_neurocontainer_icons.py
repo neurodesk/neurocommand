@@ -70,6 +70,11 @@ def _load_app_icon_names(apps_json_path: Path) -> dict[str, set[str]]:
                     icon_names.add(app_name.split()[0])
         app_icon_names[menu_name] = icon_names
 
+    for menu_name, icon_names in list(app_icon_names.items()):
+        if menu_name.endswith("_arm64"):
+            recipe_name = menu_name.removesuffix("_arm64")
+            app_icon_names.setdefault(recipe_name, set()).update(icon_names)
+
     return app_icon_names
 
 

@@ -103,6 +103,42 @@ def test_sync_writes_visible_app_alias_icons_from_recipe_icon(tmp_path):
     assert not (icons_dir / "hiddenGUI-brainvisa.png").exists()
 
 
+def test_sync_reuses_recipe_icon_for_arm64_menu_entry(tmp_path):
+    neurocontainers_path = tmp_path / "neurocontainers"
+    icons_dir = tmp_path / "icons"
+    apps_json_path = tmp_path / "apps.json"
+
+    write_recipe(neurocontainers_path, "alpha", PNG_DATA_URI)
+    apps_json_path.write_text(
+        json.dumps(
+            {
+                "alpha": {"apps": {"alpha 1.0": {}}},
+                "alpha_arm64": {
+                    "apps": {
+                        "alpha_arm64 1.0": {},
+                        "viewerGUI-alpha_arm64 1.0": {"exec": "viewer"},
+                    }
+                },
+            }
+        )
+    )
+
+    result = sync_neurocontainer_icons.sync_icons(
+        neurocontainers_path=neurocontainers_path,
+        icons_dir=icons_dir,
+        apps_json_path=apps_json_path,
+    )
+
+    expected_icons = [
+        icons_dir / "alpha.png",
+        icons_dir / "alpha_arm64.png",
+        icons_dir / "viewerGUI-alpha_arm64.png",
+    ]
+    assert result.changed_icons == expected_icons
+    for icon_path in expected_icons:
+        assert icon_path.read_bytes() == PNG_BYTES
+
+
 def test_sync_converts_matching_recipe_svg_icon(tmp_path):
     neurocontainers_path = tmp_path / "neurocontainers"
     icons_dir = tmp_path / "icons"
