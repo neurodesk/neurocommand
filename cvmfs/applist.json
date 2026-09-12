@@ -267,6 +267,12 @@
             ]
         },
         {
+            "application": "bart_1.0.00_20260911",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "batchheudiconv_1.0.0_20250628",
             "categories": [
                 "data organisation",
@@ -293,6 +299,12 @@
         },
         {
             "application": "bidsappbrainsuite_21a_20260703",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsappbrainsuite_23a_20260911",
             "categories": [
                 "bids apps"
             ]
@@ -809,12 +821,6 @@
                 "image segmentation",
                 "machine learning",
                 "structural imaging"
-            ]
-        },
-        {
-            "application": "delphi_0.0.2.post1_20260909",
-            "categories": [
-                "machine learning"
             ]
         },
         {
@@ -2863,6 +2869,18 @@
         },
         {
             "application": "vina_1.2.3_20230221",
+            "categories": [
+                "molecular biology"
+            ]
+        },
+        {
+            "application": "vina_1.2.5_20260911",
+            "categories": [
+                "molecular biology"
+            ]
+        },
+        {
+            "application": "vina_arm64_1.2.5_20260911",
             "categories": [
                 "molecular biology"
             ]
