@@ -2,6 +2,8 @@ import importlib.util
 from pathlib import Path
 import sys
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "cvmfs" / "reconcile_module_files.py"
@@ -219,6 +221,63 @@ def test_reconciliation_removes_managed_extensions_for_empty_inventory(tmp_path)
     text = canonical.read_text()
     assert "neurodesk-exposed-commands" not in text
     assert "old-command/1.0" not in text
+
+
+@pytest.mark.parametrize(
+    "filename, legacy_block, preserved",
+    [
+        (
+            "2.1.3.lua",
+            '-- neurodesk-exposed-commands\nextensions("panopticacli/2.1.3")\n',
+            'whatis("Panoptica")\nextensions("unrelated/1.0")\n'
+            '-- neurodesk-exposed-commands\nwhatis("Commands: existing")\n',
+        ),
+        (
+            "2.1.3.lua",
+            '-- neurodesk-exposed-commands\nif type(extensions) == "function" then\n'
+            '    extensions("panopticacli/2.1.3")\nend\n',
+            'whatis("Panoptica")\nprepend_path("PATH", "/retired/container")\n',
+        ),
+        (
+            "2.1.3",
+            '# neurodesk-exposed-commands\nextensions "panopticacli/2.1.3"\n',
+            '#%Module\nmodule-whatis "Panoptica"\nextensions "unrelated/1.0"\n'
+            '# neurodesk-exposed-commands\nmodule-whatis "Commands: existing"\n',
+        ),
+        (
+            "2.1.3",
+            '# neurodesk-exposed-commands\n'
+            'if {[llength [info commands extensions]] > 0} {\n'
+            '    extensions "panopticacli/2.1.3"\n}\n',
+            '#%Module\nmodule-whatis "Panoptica"\nprepend-path PATH /retired/container\n',
+        ),
+    ],
+)
+@pytest.mark.parametrize("listed_without_inventory", [False, True])
+def test_cleans_legacy_extensions_outside_active_containers(
+    tmp_path, filename, legacy_block, preserved, listed_without_inventory
+):
+    repo_root = tmp_path / "cvmfs"
+    log_path = tmp_path / "log.txt"
+    log_path.write_text(
+        "panoptica_2.1.3_20260728 categories:image segmentation,quality control,\n"
+        if listed_without_inventory else ""
+    )
+    paths = [
+        repo_root / "containers/modules/panoptica" / filename,
+        repo_root / "neurodesk-modules/image_segmentation/panoptica" / filename,
+        repo_root / "neurodesk-modules/quality_control/panoptica" / filename,
+    ]
+    for path in paths:
+        path.parent.mkdir(parents=True)
+        path.write_text(preserved + legacy_block)
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    assert {change.path for change in changes} == set(paths)
+    reconcile_module_files.apply_changes(changes)
+    for path in paths:
+        assert path.read_text() == preserved
+    assert reconcile_module_files.plan_module_reconciliation(repo_root, log_path) == []
 
 
 def test_reconciliation_uses_tcl_whatis_for_legacy_modulefiles(tmp_path):

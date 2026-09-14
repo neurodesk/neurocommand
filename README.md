@@ -29,4 +29,6 @@ Discovery metadata excludes hidden files and shared-library names ending in
 `.so`, `.so.*`, `.dylib`, or `.dll`, even when the inventory marks them executable.
 The CVMFS sync replaces previously generated command extensions with `whatis`
 metadata in existing modulefiles without rebuilding container images.
+For versions outside the active container list, sync removes obsolete generated
+extension blocks while preserving the modulefiles and other metadata.
 Command inventories and wrappers are preserved.

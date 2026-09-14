@@ -15,8 +15,9 @@ EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 EXPOSED_COMMANDS_BLOCK = re.compile(
     rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
     r"(?:"
-    r'whatis\("Commands: [^\r\n]*\)\r?\n?'
+    r'(?P<whatis>whatis\("Commands: [^\r\n]*\)\r?\n?'
     r'|module-whatis "Commands: [^\r\n]*\r?\n?'
+    r")"
     r"|extensions[^\r\n]*\r?\n?"
     r'|if type\(extensions\) == "function" then\r?\n'
     r"[ \t]+extensions\([^\r\n]*\)\r?\n"
@@ -336,6 +337,25 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
                     content,
                     f"sync public {category}/{tool}/{filename} from canonical module",
                 )
+
+    # Retired versions and containers without inventories are skipped above.
+    for root, pattern in (
+        (canonical_modules_root, "*/*"),
+        (public_modules_root, "*/*/*"),
+    ):
+        for module_file in root.glob(pattern):
+            if module_file in changes or not module_file.is_file():
+                continue
+            content = module_file.read_text()
+            cleaned = EXPOSED_COMMANDS_BLOCK.sub(
+                lambda match: match[0] if match["whatis"] else "", content
+            )
+            add_change(
+                changes,
+                module_file,
+                cleaned,
+                "remove obsolete generated command extensions",
+            )
 
     return [changes[path] for path in sorted(changes)]
 
