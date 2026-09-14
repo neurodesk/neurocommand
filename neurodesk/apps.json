@@ -1,28 +1,4 @@
 {
-    "afib1": {
-        "apps": {
-            "afib1 1.6.0.post1": {
-                "version": "20260910",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
-    "afib1_arm64": {
-        "apps": {
-            "afib1_arm64 1.6.0.post1": {
-                "version": "20260910",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
     "afni": {
         "apps": {
             "afni 21.2.00": {
@@ -219,30 +195,6 @@
             "programming"
         ]
     },
-    "arfiproc": {
-        "apps": {
-            "arfiproc 1.0.0.post1": {
-                "version": "20260910",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
-    "arfiproc_arm64": {
-        "apps": {
-            "arfiproc_arm64 1.0.0.post1": {
-                "version": "20260910",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
     "ashs": {
         "apps": {
             "ashs 2.0.0": {
@@ -299,30 +251,6 @@
         "categories": [
             "quantitative imaging",
             "workflows"
-        ]
-    },
-    "b0map": {
-        "apps": {
-            "b0map 1.0.0.post1": {
-                "version": "20260911",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
-    "b0map_arm64": {
-        "apps": {
-            "b0map_arm64 1.0.0.post1": {
-                "version": "20260911",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
         ]
     },
     "bart": {
@@ -443,6 +371,11 @@
                 "version": "20260630",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "bidsapppymvpa 4.0.4": {
+                "version": "20260912",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -512,6 +445,24 @@
         "apps": {
             "bidsmanager 1.2.3": {
                 "version": "20260707",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bidsmanager 1.2.6.1": {
+                "version": "20260912",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "data organisation"
+        ]
+    },
+    "bidsmanager_arm64": {
+        "apps": {
+            "bidsmanager_arm64 1.2.6.1": {
+                "version": "20260912",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -596,6 +547,16 @@
                 "version": "20260304",
                 "exec": "blender",
                 "apptainer_args": []
+            },
+            "blender 5.2.1": {
+                "version": "20260912",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "blenderGUI-blender 5.2.1": {
+                "version": "20260912",
+                "exec": "blender",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -675,6 +636,11 @@
             "brainlifecli 1.7.0": {
                 "version": "20241003",
                 "exec": ""
+            },
+            "brainlifecli 1.8.2": {
+                "version": "20260913",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -759,6 +725,21 @@
                 "version": "20260701",
                 "exec": "anatomist",
                 "apptainer_args": []
+            },
+            "brainvisa 6.0.40": {
+                "version": "20260913",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "brainvisaGUI-brainvisa 6.0.40": {
+                "version": "20260913",
+                "exec": "brainvisa",
+                "apptainer_args": []
+            },
+            "anatomistGUI-brainvisa 6.0.40": {
+                "version": "20260913",
+                "exec": "anatomist",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -771,6 +752,11 @@
     },
     "brats": {
         "apps": {
+            "brats 0.1.11": {
+                "version": "20260914",
+                "exec": "",
+                "apptainer_args": []
+            },
             "brats 0.1.8": {
                 "version": "20260822",
                 "exec": "",
@@ -794,6 +780,11 @@
                 "version": "20260601",
                 "exec": "brkraw gui",
                 "apptainer_args": []
+            },
+            "brkraw 0.5.7": {
+                "version": "20260914",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -804,6 +795,11 @@
         "apps": {
             "cartool 5.06.04": {
                 "version": "20260605",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "cartool 5.06.05": {
+                "version": "20260914",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -876,6 +872,11 @@
             },
             "clearswi 1.6.1": {
                 "version": "20260806",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "clearswi 1.7.0": {
+                "version": "20260914",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3095,7 +3096,7 @@
                 "apptainer_args": []
             },
             "niimath 1.0.20260703": {
-                "version": "20260706",
+                "version": "20260909",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3554,6 +3555,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "qsmxt 9.19.1": {
+                "version": "20260914",
+                "exec": "",
+                "apptainer_args": []
+            },
             "qsmxt 9.8.0": {
                 "version": "20260721",
                 "exec": "",
@@ -4005,21 +4011,6 @@
             "structural imaging"
         ]
     },
-    "spmpython": {
-        "apps": {
-            "spmpython 25.1.2.post1": {
-                "version": "20250905",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "functional imaging",
-            "image registration",
-            "image segmentation",
-            "structural imaging"
-        ]
-    },
     "startrack": {
         "apps": {
             "startrack 20250920": {
@@ -4260,6 +4251,11 @@
             },
             "vesselboost 2.0.23": {
                 "version": "20260415",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vesselboost 2.0.64": {
+                "version": "20260909",
                 "exec": "",
                 "apptainer_args": []
             },
