@@ -188,4 +188,5 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     assert module_file.is_file()
     module_text = module_file.read_text()
     assert "-- neurodesk-exposed-commands" in module_text
-    assert 'extensions("demo/1.0")' in module_text
+    assert 'whatis("Commands: demo")' in module_text
+    assert "extensions(" not in module_text

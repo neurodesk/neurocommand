@@ -7,16 +7,26 @@ _Information on **Neurocommand** is available at [neurodesk.org/docs/neurocomman
 
 ## Find the container that provides a command
 
-Neurocommand publishes each container's exposed commands as [Lmod extensions](https://lmod.readthedocs.io/en/latest/330_extensions.html). Search for a command across all available containers with:
+Search executable names with:
 
 ```bash
-module spider bet
+ml keyword bet
 ```
 
-The first search lists the available extension versions. Ask for one exact version to see the module that provides it:
+Neurocommand includes each container's exposed commands in its `whatis` metadata.
+Lmod's [keyword search](https://lmod.readthedocs.io/en/latest/010_user.html)
+returns matching modules, such as `fsl/6.0.7.18`, which you can load directly:
 
 ```bash
-module spider bet/6.0.7.18
+ml fsl/6.0.7.18
 ```
 
-The result identifies the container module to load, for example `fsl/6.0.7.18`. The extension version is the providing container's version; it does not necessarily report the executable's own internal version.
+Use a module version returned by your search. Keyword searches also match module
+help and other `whatis` descriptions, so results can include other matches.
+`ml av bet` searches module names and does not search this command metadata.
+
+Discovery metadata excludes hidden files and shared-library names ending in
+`.so`, `.so.*`, `.dylib`, or `.dll`, even when the inventory marks them executable.
+The CVMFS sync replaces previously generated command extensions with `whatis`
+metadata in existing modulefiles without rebuilding container images.
+Command inventories and wrappers are preserved.

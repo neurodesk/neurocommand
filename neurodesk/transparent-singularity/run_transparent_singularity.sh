@@ -507,8 +507,8 @@ bash "$_base/ts_sanitize_lua_help.sh" README.md >> ${modulePath}/${moduleName}.l
 echo "]===])" >> ${modulePath}/${moduleName}.lua
 
 echo "whatis(\"${container}\")" >> ${modulePath}/${moduleName}.lua
-if ! bash "$_base/ts_lmod_extensions.sh" "$_base/commands.txt" "$moduleName" >> "${modulePath}/${moduleName}.lua"; then
-   fail "Could not generate Lmod extension metadata for '${container}'."
+if ! bash "$_base/ts_command_metadata.sh" "$_base/commands.txt" >> "${modulePath}/${moduleName}.lua"; then
+   fail "Could not generate command metadata for '${container}'."
 fi
 echo "prepend_path(\"PATH\", \"${_base}\")" >> ${modulePath}/${moduleName}.lua
 

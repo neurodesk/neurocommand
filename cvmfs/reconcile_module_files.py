@@ -15,7 +15,9 @@ EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 EXPOSED_COMMANDS_BLOCK = re.compile(
     rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
     r"(?:"
-    r"extensions[^\r\n]*\r?\n?"
+    r'whatis\("Commands: [^\r\n]*\)\r?\n?'
+    r'|module-whatis "Commands: [^\r\n]*\r?\n?'
+    r"|extensions[^\r\n]*\r?\n?"
     r'|if type\(extensions\) == "function" then\r?\n'
     r"[ \t]+extensions\([^\r\n]*\)\r?\n"
     r"end\r?\n?"
@@ -118,13 +120,16 @@ def categories_by_key(entries: list[ContainerEntry]) -> dict[tuple[str, str], tu
 
 
 def exposed_commands(commands_path: Path) -> tuple[str, ...]:
-    """Return sorted commands that Lmod can represent as name/version extensions."""
+    """Return discoverable commands, excluding hidden files and shared libraries."""
+    # Keep this filter in sync with ts_command_metadata.sh.
+    library_suffix = re.compile(r"\.(?:so(?:\..*)?|dylib|dll)$", re.IGNORECASE)
     commands = {
         command
         for raw_command in commands_path.read_text().splitlines()
         if (command := raw_command.rstrip("\r"))
+        and not command.startswith(".")
+        and not library_suffix.search(command)
         and not any(character.isspace() for character in command)
-        and "," not in command
         and "/" not in command
     }
     return tuple(sorted(commands))
@@ -140,47 +145,22 @@ def tcl_double_quoted(text: str) -> str:
     return f'"{escaped}"'
 
 
-def render_exposed_commands(
-    commands_path: Path, version: str, *, is_lua: bool = True
-) -> str:
-    if any(character.isspace() for character in version) or "," in version or "/" in version:
-        raise ValueError(f"invalid Lmod extension version: {version}")
-
+def render_exposed_commands(commands_path: Path, *, is_lua: bool = True) -> str:
     commands = exposed_commands(commands_path)
     if not commands:
         return ""
 
-    extensions = tuple(f"{command}/{version}" for command in commands)
+    description = "Commands: " + ", ".join(commands)
     if is_lua:
-        extension_list = ", ".join(extensions)
-        return "\n".join(
-            (
-                f"-- {EXPOSED_COMMANDS_MARKER}",
-                'if type(extensions) == "function" then',
-                f"    extensions({lua_double_quoted(extension_list)})",
-                "end",
-            )
-        )
-
-    extension_list = " ".join(tcl_double_quoted(extension) for extension in extensions)
-    return "\n".join(
-        (
-            f"# {EXPOSED_COMMANDS_MARKER}",
-            "if {[llength [info commands extensions]] > 0} {",
-            f"    extensions {extension_list}",
-            "}",
-        )
-    )
+        return f"-- {EXPOSED_COMMANDS_MARKER}\nwhatis({lua_double_quoted(description)})"
+    return f"# {EXPOSED_COMMANDS_MARKER}\nmodule-whatis {tcl_double_quoted(description)}"
 
 
 def update_exposed_commands(
-    content: str, commands_path: Path, version: str, *, is_lua: bool
+    content: str, commands_path: Path, *, is_lua: bool
 ) -> str:
-    block = render_exposed_commands(commands_path, version, is_lua=is_lua)
-    existing_block = EXPOSED_COMMANDS_BLOCK.search(content)
-
-    if existing_block:
-        content = EXPOSED_COMMANDS_BLOCK.sub("", content, count=1)
+    block = render_exposed_commands(commands_path, is_lua=is_lua)
+    content = EXPOSED_COMMANDS_BLOCK.sub("", content)
 
     if not block:
         return content
@@ -229,7 +209,7 @@ def update_module_content(
     )
     content = re.sub(container_pattern, latest_name, content)
     return update_exposed_commands(
-        content, latest_dir / "commands.txt", version, is_lua=is_lua
+        content, latest_dir / "commands.txt", is_lua=is_lua
     )
 
 

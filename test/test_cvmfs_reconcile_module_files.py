@@ -65,7 +65,7 @@ def test_reconciles_current_public_modules_and_removes_stale_categories(tmp_path
         assert latest_container in text
         assert old_container not in text
         assert "-- neurodesk-exposed-commands" in text
-        assert 'extensions("datalad/1.3.1")' in text
+        assert 'whatis("Commands: datalad")' in text
 
     assert current_public.read_text() == canonical.read_text()
     assert not old_category_public.exists()
@@ -178,8 +178,8 @@ def test_reconciliation_updates_exposed_commands_and_preserves_other_extensions(
 
     text = canonical.read_text()
     assert text.count("-- neurodesk-exposed-commands") == 1
-    assert 'if type(extensions) == "function" then' in text
-    assert 'extensions("alpha/1.0, zeta/1.0")' in text
+    assert 'if type(extensions) == "function" then' not in text
+    assert 'whatis("Commands: alpha, bad,command, zeta")' in text
     assert "old-command/1.0" not in text
     assert 'extensions("python-package/2.0")' in text
 
@@ -191,9 +191,9 @@ def test_reconciliation_updates_exposed_commands_and_preserves_other_extensions(
 
     text = canonical.read_text()
     assert text.count("-- neurodesk-exposed-commands") == 1
-    assert 'extensions("beta/1.0")' in text
-    assert "alpha/1.0" not in text
-    assert "zeta/1.0" not in text
+    assert 'whatis("Commands: beta")' in text
+    assert "alpha" not in text
+    assert "zeta" not in text
     assert 'extensions("python-package/2.0")' in text
 
 
@@ -221,7 +221,7 @@ def test_reconciliation_removes_managed_extensions_for_empty_inventory(tmp_path)
     assert "old-command/1.0" not in text
 
 
-def test_reconciliation_uses_tcl_extensions_for_legacy_modulefiles(tmp_path):
+def test_reconciliation_uses_tcl_whatis_for_legacy_modulefiles(tmp_path):
     repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
     latest_container = "vesselboost_1.0.0_20240815"
     log_path = tmp_path / "log.txt"
@@ -246,8 +246,8 @@ def test_reconciliation_uses_tcl_extensions_for_legacy_modulefiles(tmp_path):
     text = canonical.read_text()
     assert text.startswith("#%Module")
     assert "# neurodesk-exposed-commands\n" in text
-    assert "if {[llength [info commands extensions]] > 0} {\n" in text
-    assert 'extensions "boost.py/1.0.0" "prediction.py/1.0.0"\n' in text
+    assert "extensions" not in text
+    assert 'module-whatis "Commands: boost.py, prediction.py"\n' in text
     assert "-- neurodesk-exposed-commands" not in text
     assert 'extensions("' not in text
 
