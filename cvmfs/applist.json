@@ -2028,6 +2028,12 @@
             ]
         },
         {
+            "application": "niimath_arm64_1.0.20260703_20260909",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "niistat_1.0.20191216_20260629",
             "categories": [
                 "statistics"
