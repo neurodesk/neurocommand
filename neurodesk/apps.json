@@ -3104,6 +3104,18 @@
             "data organisation"
         ]
     },
+    "niimath_arm64": {
+        "apps": {
+            "niimath_arm64 1.0.20260703": {
+                "version": "20260909",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
     "niistat": {
         "apps": {
             "niistat 1.0.20191216": {
