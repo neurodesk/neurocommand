@@ -1,18 +1,6 @@
 {
     "list": [
         {
-            "application": "afib1_1.6.0.post1_20260910",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
-            "application": "afib1_arm64_1.6.0.post1_20260910",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
             "application": "afni_21.2.00_20210714",
             "categories": [
                 "functional imaging"
@@ -162,18 +150,6 @@
             ]
         },
         {
-            "application": "arfiproc_1.0.0.post1_20260910",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
-            "application": "arfiproc_arm64_1.0.0.post1_20260910",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
             "application": "ashs_2.0.0_20210105",
             "categories": [
                 "image segmentation"
@@ -240,18 +216,6 @@
             "categories": [
                 "quantitative imaging",
                 "workflows"
-            ]
-        },
-        {
-            "application": "b0map_1.0.0.post1_20260911",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
-            "application": "b0map_arm64_1.0.0.post1_20260911",
-            "categories": [
-                "image reconstruction"
             ]
         },
         {
@@ -329,6 +293,12 @@
         },
         {
             "application": "bidsapppymvpa_2.0.2_20260630",
+            "categories": [
+                "bids apps"
+            ]
+        },
+        {
+            "application": "bidsapppymvpa_4.0.4_20260912",
             "categories": [
                 "bids apps"
             ]
@@ -417,6 +387,20 @@
             ]
         },
         {
+            "application": "bidsmanager_1.2.6.1_20260912",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsmanager_arm64_1.2.6.1_20260912",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidsme_1.9.3_20250812",
             "categories": [
                 "data organisation"
@@ -466,6 +450,12 @@
             ]
         },
         {
+            "application": "blender_5.2.1_20260912",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
             "application": "braid_1.0.0_20260722",
             "categories": [
                 "diffusion imaging",
@@ -505,6 +495,12 @@
         },
         {
             "application": "brainlifecli_1.7.0_20241003",
+            "categories": [
+                "workflows"
+            ]
+        },
+        {
+            "application": "brainlifecli_1.8.2_20260913",
             "categories": [
                 "workflows"
             ]
@@ -553,6 +549,24 @@
             ]
         },
         {
+            "application": "brainvisa_6.0.40_20260913",
+            "categories": [
+                "image registration",
+                "image segmentation",
+                "structural imaging",
+                "visualization",
+                "workflows"
+            ]
+        },
+        {
+            "application": "brats_0.1.11_20260914",
+            "categories": [
+                "image segmentation",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "brats_0.1.8_20260822",
             "categories": [
                 "image segmentation",
@@ -567,7 +581,20 @@
             ]
         },
         {
+            "application": "brkraw_0.5.7_20260914",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "cartool_5.06.04_20260605",
+            "categories": [
+                "electrophysiology",
+                "visualization"
+            ]
+        },
+        {
+            "application": "cartool_5.06.05_20260914",
             "categories": [
                 "electrophysiology",
                 "visualization"
@@ -620,6 +647,13 @@
         },
         {
             "application": "clearswi_1.6.1_20260806",
+            "categories": [
+                "phase processing",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "clearswi_1.7.0_20260914",
             "categories": [
                 "phase processing",
                 "structural imaging"
@@ -2022,7 +2056,7 @@
             ]
         },
         {
-            "application": "niimath_1.0.20260703_20260706",
+            "application": "niimath_1.0.20260703_20260909",
             "categories": [
                 "data organisation"
             ]
@@ -2422,6 +2456,16 @@
             ]
         },
         {
+            "application": "qsmxt_9.19.1_20260914",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "qsmxt_9.8.0_20260721",
             "categories": [
                 "image reconstruction",
@@ -2707,15 +2751,6 @@
             ]
         },
         {
-            "application": "spmpython_25.1.2.post1_20250905",
-            "categories": [
-                "functional imaging",
-                "image registration",
-                "image segmentation",
-                "structural imaging"
-            ]
-        },
-        {
             "application": "startrack_20250920_20260611",
             "categories": [
                 "diffusion imaging"
@@ -2868,6 +2903,12 @@
         },
         {
             "application": "vesselboost_2.0.23_20260415",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "vesselboost_2.0.64_20260909",
             "categories": [
                 "image segmentation"
             ]
