@@ -474,9 +474,26 @@
     },
     "bidsme": {
         "apps": {
+            "bidsme 1.11.0": {
+                "version": "20260915",
+                "exec": "",
+                "apptainer_args": []
+            },
             "bidsme 1.9.3": {
                 "version": "20250812",
                 "exec": ""
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "bidsme_arm64": {
+        "apps": {
+            "bidsme_arm64 1.11.0": {
+                "version": "20260915",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -500,6 +517,23 @@
             "bidstools 1.0.4": {
                 "version": "20240221",
                 "exec": ""
+            },
+            "bidstools 1.2.0": {
+                "version": "20260915",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "bidstools_arm64": {
+        "apps": {
+            "bidstools_arm64 1.2.0": {
+                "version": "20260915",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -563,6 +597,18 @@
             "visualization"
         ]
     },
+    "blochsiegertb1mapping": {
+        "apps": {
+            "blochsiegertb1mapping 1.1.0": {
+                "version": "20260915",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "braid": {
         "apps": {
             "braid 1.0.0": {
@@ -580,6 +626,11 @@
         "apps": {
             "brainager 2.1.0": {
                 "version": "20251220",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "brainager 2.3.0": {
+                "version": "20260915",
                 "exec": "",
                 "apptainer_args": []
             }
