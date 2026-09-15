@@ -401,7 +401,19 @@
             ]
         },
         {
+            "application": "bidsme_1.11.0_20260915",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidsme_1.9.3_20250812",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsme_arm64_1.11.0_20260915",
             "categories": [
                 "data organisation"
             ]
@@ -426,6 +438,18 @@
         },
         {
             "application": "bidstools_1.0.4_20240221",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidstools_1.2.0_20260915",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidstools_arm64_1.2.0_20260915",
             "categories": [
                 "data organisation"
             ]
@@ -456,6 +480,12 @@
             ]
         },
         {
+            "application": "blochsiegertb1mapping_1.1.0_20260915",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "braid_1.0.0_20260722",
             "categories": [
                 "diffusion imaging",
@@ -464,6 +494,12 @@
         },
         {
             "application": "brainager_2.1.0_20251220",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "brainager_2.3.0_20260915",
             "categories": [
                 "structural imaging"
             ]
