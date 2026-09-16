@@ -12,6 +12,16 @@ from typing import Optional
 
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
+MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
+MANUAL_MODULE_END = "-- neurodesk-manual-module-end"
+DEFAULT_MANUAL_MODULE_DIR = (
+    Path(__file__).resolve().parents[1]
+    / "neurodesk/transparent-singularity/manual_module_files"
+)
+LEGACY_MANUAL_HEADERS = {
+    "freesurfer": "-- Append custom paths",
+    "matlab": "-- Append custom license paths so that a license can be stored outside the container",
+}
 EXPOSED_COMMANDS_BLOCK = re.compile(
     rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
     r"(?:"
@@ -157,6 +167,16 @@ def render_exposed_commands(commands_path: Path, *, is_lua: bool = True) -> str:
     return f"# {EXPOSED_COMMANDS_MARKER}\nmodule-whatis {tcl_double_quoted(description)}"
 
 
+def mask_lua_help(content: str) -> str:
+    """Hide README text while preserving positions for executable Lua matches."""
+    return re.sub(
+        r"help\(\[===\[.*?\]===\]\)",
+        lambda match: re.sub(r"[^\r\n]", " ", match[0]),
+        content,
+        flags=re.DOTALL,
+    )
+
+
 def update_exposed_commands(
     content: str, commands_path: Path, *, is_lua: bool
 ) -> str:
@@ -171,7 +191,18 @@ def update_exposed_commands(
         if is_lua
         else r"(?m)^module-whatis(?:[ \t]+[^\r\n]*)?\r?$"
     )
-    whatis_lines = list(re.finditer(whatis_pattern, content))
+    search_content = content
+    if is_lua:
+        search_content = mask_lua_help(content)
+        manual_start = re.search(
+            r"(?m)^(?:"
+            + "|".join(re.escape(header) for header in (MANUAL_MODULE_BEGIN, *LEGACY_MANUAL_HEADERS.values()))
+            + r")\r?$",
+            search_content,
+        )
+        if manual_start:
+            search_content = search_content[:manual_start.start()]
+    whatis_lines = list(re.finditer(whatis_pattern, search_content))
     if whatis_lines:
         insertion_point = whatis_lines[-1].end()
         return content[:insertion_point] + f"\n{block}" + content[insertion_point:]
@@ -264,7 +295,44 @@ def add_delete(changes: dict[Path, PlannedChange], path: Path, reason: str) -> N
         changes[path] = PlannedChange(path=path, content=None, reason=reason)
 
 
-def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedChange]:
+def update_manual_module(content: str, *, tool: str, version: str, snippet: str) -> str:
+    executable_content = mask_lua_help(content)
+    starts = list(re.finditer(rf"(?m)^{re.escape(MANUAL_MODULE_BEGIN)}\r?$", executable_content))
+    ends = list(re.finditer(rf"(?m)^{re.escape(MANUAL_MODULE_END)}\r?$", executable_content))
+    if starts or ends:
+        if len(starts) != 1 or len(ends) != 1 or starts[0].start() >= ends[0].start():
+            raise ValueError(f"malformed manual module markers in {tool}/{version}")
+        end = ends[0].end()
+        if content[end:end + 1] == "\n":
+            end += 1
+        content = content[:starts[0].start()] + content[end:]
+    elif tool in LEGACY_MANUAL_HEADERS:
+        header = re.search(
+            rf"(?m)^{re.escape(LEGACY_MANUAL_HEADERS[tool])}\r?$", executable_content
+        )
+        if header:
+            content = content[:header.start()]
+
+    if not snippet:
+        return content
+    if content and not content.endswith("\n"):
+        content += "\n"
+    rendered = snippet.replace("toolVersion", version).rstrip("\n")
+    return f"{content}{MANUAL_MODULE_BEGIN}\n{rendered}\n{MANUAL_MODULE_END}\n"
+
+
+def plan_module_reconciliation(
+    repo_root: Path,
+    log_path: Path,
+    manual_module_dir: Path = DEFAULT_MANUAL_MODULE_DIR,
+) -> list[PlannedChange]:
+    if not manual_module_dir.is_dir():
+        raise ValueError(f"manual module directory does not exist: {manual_module_dir}")
+    snippets = {
+        path.name: path.read_text()
+        for path in manual_module_dir.iterdir()
+        if path.is_file()
+    }
     entries = parse_log(log_path)
     latest_by_key = latest_existing_kept_entries(repo_root, entries)
     categories = categories_by_key(entries)
@@ -357,6 +425,30 @@ def plan_module_reconciliation(repo_root: Path, log_path: Path) -> list[PlannedC
                 "remove obsolete generated command extensions",
             )
 
+    lua_modules = set(canonical_modules_root.glob("*/*.lua"))
+    lua_modules.update(public_modules_root.glob("*/*/*.lua"))
+    lua_modules.update(path for path in changes if path.suffix == ".lua")
+    for module_file in sorted(lua_modules):
+        planned = changes.get(module_file)
+        if planned is not None and planned.content is None:
+            continue
+        if planned is None and not module_file.is_file():
+            continue
+        content = planned.content if planned is not None else module_file.read_text()
+        tool = module_file.parent.name
+        updated = update_manual_module(
+            content,
+            tool=tool,
+            version=module_file.stem,
+            snippet=snippets.get(tool, ""),
+        )
+        if updated != content:
+            changes[module_file] = PlannedChange(
+                path=module_file,
+                content=updated,
+                reason=f"refresh manual module snippet for {tool}/{module_file.stem}",
+            )
+
     return [changes[path] for path in sorted(changes)]
 
 
@@ -386,6 +478,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to cvmfs/log.txt.",
     )
     parser.add_argument(
+        "--manual-module-dir",
+        type=Path,
+        default=DEFAULT_MANUAL_MODULE_DIR,
+        help="Directory containing current per-tool Lua module snippets.",
+    )
+    parser.add_argument(
         "--check",
         action="store_true",
         help="Only report whether changes are needed. Exits 1 when changes are needed.",
@@ -395,7 +493,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    changes = plan_module_reconciliation(args.repo_root, args.log)
+    try:
+        changes = plan_module_reconciliation(args.repo_root, args.log, args.manual_module_dir)
+    except (OSError, ValueError) as error:
+        print(f"[ERROR] {error}", file=sys.stderr)
+        return 2
 
     for change in changes:
         print(f"[INFO] {change.reason}: {change.path}")

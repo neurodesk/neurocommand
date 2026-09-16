@@ -532,8 +532,12 @@ done < $_base/env.txt
 
 #check if there is a manual module file for this container and add it to the end
 if [[ -e manual_module_files/${moduleSoftwareName} ]]; then
-   echo "addming manual module file"
-   cat manual_module_files/${moduleSoftwareName} | sed "s/toolVersion/${moduleName}/g" >> ${modulePath}/${moduleName}.lua
+   echo "adding manual module file"
+   {
+      echo "-- neurodesk-manual-module-begin"
+      printf '%s\n' "$(sed "s/toolVersion/${moduleName}/g" "manual_module_files/${moduleSoftwareName}")"
+      echo "-- neurodesk-manual-module-end"
+   } >> "${modulePath}/${moduleName}.lua"
 fi
 
 echo "rm ${modulePath}/${moduleName}" >> ts_uninstall.sh
