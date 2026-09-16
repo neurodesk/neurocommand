@@ -139,6 +139,55 @@ def test_sync_reuses_recipe_icon_for_arm64_menu_entry(tmp_path):
         assert icon_path.read_bytes() == PNG_BYTES
 
 
+def test_sync_reuses_recipe_icon_for_named_variant_menu_entries(tmp_path):
+    neurocontainers_path = tmp_path / "neurocontainers"
+    icons_dir = tmp_path / "icons"
+    apps_json_path = tmp_path / "apps.json"
+
+    recipe_path = neurocontainers_path / "recipes" / "alpha"
+    recipe_path.mkdir(parents=True)
+    (recipe_path / "build.yaml").write_text(
+        "name: alpha\n"
+        "build_default: false\n"
+        "variants:\n"
+        "  lite:\n"
+        "    architecture: x86_64\n"
+        "    options:\n"
+        "      lite: true\n"
+        "  gpu:\n"
+        "    options:\n"
+        "      gpu: true\n"
+        "variables:\n"
+        "  not_a_variant: 1\n"
+        f"icon: {PNG_DATA_URI}\n"
+    )
+    apps_json_path.write_text(
+        json.dumps(
+            {
+                "alpha_lite": {"apps": {"alpha_lite 1.0": {}}},
+                "alpha_gpu_arm64": {"apps": {"alpha_gpu_arm64 1.0": {}}},
+                "alpha_options": {"apps": {"alpha_options 1.0": {}}},
+            }
+        )
+    )
+
+    result = sync_neurocontainer_icons.sync_icons(
+        neurocontainers_path=neurocontainers_path,
+        icons_dir=icons_dir,
+        apps_json_path=apps_json_path,
+    )
+
+    expected_icons = [
+        icons_dir / "alpha_gpu_arm64.png",
+        icons_dir / "alpha_lite.png",
+    ]
+    assert result.matched_recipes == 1
+    assert result.changed_icons == expected_icons
+    for icon_path in expected_icons:
+        assert icon_path.read_bytes() == PNG_BYTES
+    assert not (icons_dir / "alpha_options.png").exists()
+
+
 def test_sync_converts_matching_recipe_svg_icon(tmp_path):
     neurocontainers_path = tmp_path / "neurocontainers"
     icons_dir = tmp_path / "icons"

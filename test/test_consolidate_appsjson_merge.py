@@ -2,6 +2,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import subprocess
 import sys
 from urllib.error import HTTPError
 
@@ -126,3 +127,39 @@ def test_merge_pull_request_does_not_retry_permission_errors(monkeypatch):
 
     assert status.startswith("failed (HTTP 403")
     assert len(calls) == 1
+
+
+def _git(repo, *args):
+    subprocess.run(
+        ["git", "-c", "user.name=test", "-c", "user.email=test@example.invalid", *args],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+    )
+
+
+def _commit_test_file(repo, branch, assertion):
+    (repo / "test_sample.py").write_text(f"def test_sample():\n    assert {assertion}\n")
+    _git(repo, "add", "test_sample.py")
+    _git(repo, "commit", "-m", branch)
+    _git(repo, "branch", branch)
+
+
+def test_run_unit_tests_on_ref_reports_failures_only(tmp_path, monkeypatch):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    _commit_test_file(repo, "passing", "1 == 1")
+    _commit_test_file(repo, "failing", "1 == 2")
+    monkeypatch.chdir(repo)
+
+    assert consolidate_appsjson_queue.run_unit_tests_on_ref("passing") is None
+
+    failure = consolidate_appsjson_queue.run_unit_tests_on_ref("failing")
+    assert "FAILED test_sample.py::test_sample" in failure
+    assert "1 failed" in failure
+
+    worktrees = subprocess.run(
+        ["git", "worktree", "list"], cwd=repo, check=True, capture_output=True, text=True
+    ).stdout
+    assert len(worktrees.splitlines()) == 1
