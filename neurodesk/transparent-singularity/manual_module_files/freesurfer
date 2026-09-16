@@ -1,5 +1,5 @@
 -- Append custom paths
-local additional_bind_paths = "/tmp:/scratch"
+local additional_bind_paths = "/tmp,/scratch"
 
 if os.getenv("SINGULARITY_BINDPATH") then
     prepend_path("SINGULARITY_BINDPATH", additional_bind_paths, ",")
