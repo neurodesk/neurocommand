@@ -41,7 +41,7 @@ def test_unit_test_workflow_installs_distutils_provider():
 
 def test_icon_sync_workflows_install_svg_converter():
     assert "python -m pip install cairosvg" in SYNC_ICONS_WORKFLOW.read_text()
-    assert "python -m pip install cairosvg" in APPSJSON_QUEUE_WORKFLOW.read_text()
+    assert "python -m pip install pytest setuptools cairosvg" in APPSJSON_QUEUE_WORKFLOW.read_text()
 
 
 def test_appsjson_queue_does_not_run_on_pr_close_events():

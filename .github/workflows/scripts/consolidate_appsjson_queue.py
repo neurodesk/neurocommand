@@ -12,6 +12,9 @@ Rules implemented:
   consolidated PR directly via the REST API. Auto-merge cannot be used here:
   the repository disallows it, and with no required status checks GitHub
   rejects enabling auto-merge on an already-mergeable PR anyway.
+- Before merging, run the unit tests against the consolidated branch and skip
+  the merge when they fail. The consolidated branch is pushed with
+  GITHUB_TOKEN, so the regular test workflow never runs on it.
 - Close source PRs (apps.json plus synced icons only) once their changes are
   in main — either merged in this run or already contained in the base.
 """
@@ -25,6 +28,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -39,6 +43,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sync_neurocontainer_icons import sync_icons  # noqa: E402
 
 DIFF_COMMENT_MARKER = "<!-- appsjson-consolidation-diff -->"
+UNIT_TEST_COMMENT_MARKER = "<!-- appsjson-consolidation-unit-tests -->"
+UNIT_TEST_COMMAND = [sys.executable, "-m", "pytest", "-q"]
+MAX_UNIT_TEST_OUTPUT_LINES = 80
 MAX_PR_BODY_DIFF_CHARS = 15_000
 MAX_PR_COMMENT_DIFF_CHARS = 55_000
 
@@ -514,16 +521,33 @@ def post_consolidated_diff_comment(
     else:
         lines.append("- No net changes.")
 
-    comment_body = "\n".join(lines)
+    return upsert_marker_comment(
+        api_url=api_url,
+        repo=repo,
+        token=token,
+        pr_number=consolidated_pr_number,
+        marker=DIFF_COMMENT_MARKER,
+        comment_body="\n".join(lines),
+    )
 
+
+def upsert_marker_comment(
+    api_url: str,
+    repo: str,
+    token: str,
+    pr_number: int,
+    marker: str,
+    comment_body: str,
+) -> str:
+    """Create or update the single PR comment identified by ``marker``."""
     existing_comments = github_paginated_get(
         api_url,
-        f"/repos/{repo}/issues/{consolidated_pr_number}/comments",
+        f"/repos/{repo}/issues/{pr_number}/comments",
         token,
     )
     for comment in reversed(existing_comments):
         body = comment.get("body") or ""
-        if DIFF_COMMENT_MARKER in body:
+        if marker in body:
             if body == comment_body:
                 return "unchanged"
             comment_id = comment.get("id")
@@ -541,11 +565,52 @@ def post_consolidated_diff_comment(
     github_request(
         "POST",
         api_url,
-        f"/repos/{repo}/issues/{consolidated_pr_number}/comments",
+        f"/repos/{repo}/issues/{pr_number}/comments",
         token,
         payload={"body": comment_body},
     )
     return "created"
+
+
+def run_unit_tests_on_ref(ref: str) -> Optional[str]:
+    """Run the unit tests on a detached worktree of ``ref``.
+
+    Returns None when they pass, otherwise the tail of the pytest output.
+    """
+    with tempfile.TemporaryDirectory(prefix="appsjson-unit-tests-") as tmp:
+        worktree = Path(tmp) / "worktree"
+        run_git(["worktree", "add", "--detach", str(worktree), ref])
+        try:
+            result = subprocess.run(
+                UNIT_TEST_COMMAND,
+                cwd=worktree,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
+        finally:
+            run_git(["worktree", "remove", "--force", str(worktree)])
+
+    print(result.stdout)
+    if result.returncode == 0:
+        return None
+    return "\n".join(result.stdout.splitlines()[-MAX_UNIT_TEST_OUTPUT_LINES:])
+
+
+def unit_test_failure_comment(ref: str, output: str) -> str:
+    return "\n".join(
+        [
+            UNIT_TEST_COMMENT_MARKER,
+            "### Merge blocked: unit tests failed",
+            "",
+            f"The queue did not merge this PR because `pytest` failed on `{ref}`. "
+            "The next scheduled run retries the merge.",
+            "",
+            "```",
+            output,
+            "```",
+        ]
+    )
 
 
 def close_consolidated_source_prs(
@@ -843,7 +908,33 @@ def main() -> int:
         )
 
     merge_status: Optional[str] = None
+    unit_test_failure: Optional[str] = None
     if args.merge_consolidated and consolidated_pr_number is not None:
+        consolidated_ref = f"refs/remotes/origin/{args.consolidated_branch}"
+        run_git([
+            "fetch",
+            "--no-tags",
+            "origin",
+            f"+refs/heads/{args.consolidated_branch}:{consolidated_ref}",
+        ])
+        unit_test_failure = run_unit_tests_on_ref(consolidated_ref)
+
+    if unit_test_failure is not None:
+        merge_status = "blocked (unit tests failed)"
+        upsert_marker_comment(
+            api_url=args.api_url,
+            repo=args.repo,
+            token=token,
+            pr_number=consolidated_pr_number,
+            marker=UNIT_TEST_COMMENT_MARKER,
+            comment_body=unit_test_failure_comment(args.consolidated_branch, unit_test_failure),
+        )
+        print(
+            f"ERROR: Unit tests failed on {args.consolidated_branch}; "
+            f"not merging consolidated PR #{consolidated_pr_number}",
+            file=sys.stderr,
+        )
+    elif args.merge_consolidated and consolidated_pr_number is not None:
         merge_status = merge_pull_request(
             api_url=args.api_url,
             repo=args.repo,
@@ -889,7 +980,7 @@ def main() -> int:
     if args.merge_consolidated:
         print(f"- Consolidated PR merge: {merge_status or 'n/a'}")
 
-    return 0
+    return 1 if unit_test_failure is not None else 0
 
 
 if __name__ == "__main__":

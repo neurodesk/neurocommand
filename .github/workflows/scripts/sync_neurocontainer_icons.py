@@ -47,6 +47,32 @@ def _parse_top_level_scalar(text: str, key: str) -> str | None:
     return value
 
 
+def _parse_variant_names(text: str) -> list[str]:
+    """Return the keys of the top-level ``variants:`` mapping in a build.yaml."""
+    lines = iter(text.splitlines())
+    for line in lines:
+        if re.match(r"^variants:\s*(#.*)?$", line):
+            break
+    else:
+        return []
+
+    names = []
+    key_indent = None
+    for line in lines:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent == 0:
+            break
+        if key_indent is None:
+            key_indent = indent
+        if indent == key_indent:
+            match = re.match(r"^\s*([A-Za-z0-9_.-]+):", line)
+            if match:
+                names.append(match.group(1))
+    return names
+
+
 def _visibility_flag(data: dict, name: str, default: bool = True) -> bool:
     return data.get(name, default) is not False
 
@@ -146,11 +172,14 @@ def collect_recipe_icons(
         declared_name = _parse_top_level_scalar(text, "name")
         recipe_name = build_file.parent.name
 
-        if recipe_name in app_icon_names:
-            icon_names = app_icon_names[recipe_name]
-        elif declared_name in app_icon_names:
-            icon_names = app_icon_names[declared_name]
-        else:
+        variants = _parse_variant_names(text)
+        icon_names = set()
+        for base_name in {recipe_name, declared_name} - {None}:
+            # Named variants publish as <recipe>_<variant> and share the recipe icon.
+            menu_names = [base_name, *(f"{base_name}_{variant}" for variant in variants)]
+            for menu_name in menu_names:
+                icon_names.update(app_icon_names.get(menu_name, ()))
+        if not icon_names:
             continue
 
         result.matched_recipes += 1
