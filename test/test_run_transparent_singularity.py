@@ -17,6 +17,9 @@ def write_executable(path, text):
 def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     workdir = tmp_path / "transparent-singularity"
     shutil.copytree(TRANSPARENT_SINGULARITY, workdir)
+    (workdir / "manual_module_files/demo_arm64").write_text(
+        'setenv("CUSTOM_VERSION", "toolVersion")'
+    )
 
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
@@ -190,3 +193,6 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     assert "-- neurodesk-exposed-commands" in module_text
     assert 'whatis("Commands: demo")' in module_text
     assert "extensions(" not in module_text
+    assert 'setenv("CUSTOM_VERSION", "1.0")\n' in module_text
+    assert "-- neurodesk-manual-module-begin\n" in module_text
+    assert "-- neurodesk-manual-module-end\n" in module_text

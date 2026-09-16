@@ -340,3 +340,143 @@ def test_check_mode_exit_status_distinguishes_drift(tmp_path):
         )
         == 0
     )
+
+
+def test_existing_freesurfer_module_gets_corrected_bind_paths(tmp_path):
+    container = "freesurfer_8.2.0_20260818"
+    make_container(tmp_path, container, "freeview\n")
+    log = tmp_path / "log.txt"
+    log.write_text(f"{container} categories:structural imaging,\n")
+    module = tmp_path / "containers/modules/freesurfer/8.2.0.lua"
+    module.parent.mkdir(parents=True)
+    snippet = (ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer").read_text()
+    module.write_text(module_text(container) + snippet.replace("/tmp,/scratch", "/tmp:/scratch"))
+
+    changes = reconcile_module_files.plan_module_reconciliation(tmp_path, log)
+    reconcile_module_files.apply_changes(changes)
+
+    assert 'local additional_bind_paths = "/tmp,/scratch"' in module.read_text()
+    assert "/tmp:/scratch" not in module.read_text()
+
+
+@pytest.mark.parametrize("active", [True, False])
+def test_manual_snippet_changes_reach_existing_modules(tmp_path, active):
+    repo_root = tmp_path / "cvmfs"
+    snippets = tmp_path / "manual_module_files"
+    snippets.mkdir()
+    source = ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer"
+    current = source.read_text()
+    (snippets / "freesurfer").write_text(current)
+    container = "freesurfer_8.2.0_20260818"
+    make_container(repo_root, container, "freeview\n")
+    log = tmp_path / "log.txt"
+    log.write_text(
+        f"{container} categories:structural imaging,image segmentation,\n" if active else ""
+    )
+    paths = [
+        repo_root / "containers/modules/freesurfer/8.2.0.lua",
+        repo_root / "neurodesk-modules/structural_imaging/freesurfer/8.2.0.lua",
+        repo_root / "neurodesk-modules/image_segmentation/freesurfer/8.2.0.lua",
+    ]
+    for path in paths:
+        path.parent.mkdir(parents=True)
+        path.write_text(module_text(container) + current.replace("/tmp,/scratch", "/tmp:/scratch"))
+    args = ["--repo-root", str(repo_root), "--log", str(log),
+            "--manual-module-dir", str(snippets)]
+
+    before = [path.read_text() for path in paths]
+    assert reconcile_module_files.main(args + ["--check"]) == 1
+    assert [path.read_text() for path in paths] == before
+    assert reconcile_module_files.main(args) == 0
+    for path in paths:
+        assert 'local additional_bind_paths = "/tmp,/scratch"' in path.read_text()
+        assert "/tmp:/scratch" not in path.read_text()
+        assert path.read_text().count("local additional_bind_paths") == 1
+    assert reconcile_module_files.main(args + ["--check"]) == 0
+
+    (snippets / "freesurfer").write_text(
+        'whatis("Custom description")\nsetenv("SNIPPET_VERSION", "toolVersion")\n'
+    )
+    assert reconcile_module_files.main(args + ["--check"]) == 1
+    assert reconcile_module_files.main(args) == 0
+    for path in paths:
+        assert 'setenv("SNIPPET_VERSION", "8.2.0")' in path.read_text()
+        assert "additional_bind_paths" not in path.read_text()
+        assert 'setenv("DATALAD_HOME"' in path.read_text()
+        if active:
+            assert 'whatis("Commands: freeview")' in path.read_text()
+    assert reconcile_module_files.main(args + ["--check"]) == 0
+    (snippets / "freesurfer").unlink()
+    assert reconcile_module_files.main(args + ["--check"]) == 1
+    assert reconcile_module_files.main(args) == 0
+    for path in paths:
+        assert "SNIPPET_VERSION" not in path.read_text()
+        assert 'setenv("DATALAD_HOME"' in path.read_text()
+    assert reconcile_module_files.main(args + ["--check"]) == 0
+
+
+def test_new_snippet_updates_orphan_public_lua_but_not_tcl(tmp_path):
+    snippets = tmp_path / "snippets"
+    snippets.mkdir()
+    log = tmp_path / "log.txt"
+    log.write_text("")
+    directory = tmp_path / "neurodesk-modules/programming/demo"
+    directory.mkdir(parents=True)
+    lua = directory / "1.0.lua"
+    lua.write_text('whatis("demo")\n')
+    tcl = directory / "1.0"
+    tcl.write_text('#%Module\nmodule-whatis "demo"\n')
+    (snippets / "demo").write_text('setenv("CUSTOM_VERSION", "toolVersion")')
+    args = ["--repo-root", str(tmp_path), "--log", str(log),
+            "--manual-module-dir", str(snippets)]
+
+    assert reconcile_module_files.main(args) == 0
+    assert 'setenv("CUSTOM_VERSION", "1.0")\n' in lua.read_text()
+    assert tcl.read_text() == '#%Module\nmodule-whatis "demo"\n'
+    assert reconcile_module_files.main(args + ["--check"]) == 0
+
+
+def test_matlab_legacy_migration_preserves_help_and_license_mapping(tmp_path):
+    snippet = (ROOT / "neurodesk/transparent-singularity/manual_module_files/matlab").read_text()
+    help_text = 'help([===[\n' + snippet + ']===])\n'
+    module = tmp_path / "containers/modules/matlab/2025b.lua"
+    module.parent.mkdir(parents=True)
+    module.write_text(help_text + 'whatis("MATLAB")\n' + snippet.replace("toolVersion", "2025b"))
+    log = tmp_path / "log.txt"
+    log.write_text("")
+
+    changes = reconcile_module_files.plan_module_reconciliation(tmp_path, log)
+    reconcile_module_files.apply_changes(changes)
+
+    content = module.read_text()
+    assert content.startswith(help_text + 'whatis("MATLAB")\n')
+    assert content.count('local additional_bind_paths') == 2
+    assert 'os.getenv("HOME") .. ":/opt/matlab/R2025b/licenses"' in content
+    assert reconcile_module_files.plan_module_reconciliation(tmp_path, log) == []
+
+
+@pytest.mark.parametrize("failure", ["missing-source", "unclosed-block", "duplicate-block"])
+def test_invalid_snippet_inputs_do_not_partially_write_modules(tmp_path, failure):
+    snippets = tmp_path / "snippets"
+    snippets.mkdir()
+    (snippets / "demo").write_text('setenv("CUSTOM", "new")\n')
+    log = tmp_path / "log.txt"
+    log.write_text("")
+    directory = tmp_path / "containers/modules/demo"
+    directory.mkdir(parents=True)
+    good = directory / "1.0.lua"
+    bad = directory / "2.0.lua"
+    good.write_text('whatis("unchanged until validation succeeds")\n')
+    block = '-- neurodesk-manual-module-begin\nsetenv("CUSTOM", "old")\n'
+    bad.write_text(
+        (block + '-- neurodesk-manual-module-end\n') * 2
+        if failure == "duplicate-block" else block
+    )
+    if failure == "missing-source":
+        snippets = tmp_path / "absent"
+    before = [good.read_text(), bad.read_text()]
+    args = ["--repo-root", str(tmp_path), "--log", str(log),
+            "--manual-module-dir", str(snippets)]
+
+    assert reconcile_module_files.main(args) == 2
+    assert [good.read_text(), bad.read_text()] == before
