@@ -591,6 +591,16 @@
                 "version": "20260912",
                 "exec": "blender",
                 "apptainer_args": []
+            },
+            "blender 5.2.2": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "blenderGUI-blender 5.2.2": {
+                "version": "20260916",
+                "exec": "blender",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -659,6 +669,11 @@
                 "version": "20260825",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "brainles-preprocessing 0.8.0": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -670,6 +685,11 @@
         "apps": {
             "brainlesion 1.0.0": {
                 "version": "20260825",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "brainlesion 1.1.0": {
+                "version": "20260916",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -903,6 +923,18 @@
             "structural imaging"
         ]
     },
+    "cbsb0stats": {
+        "apps": {
+            "cbsb0stats 1.4.0": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
     "civet": {
         "apps": {
             "civet 2.1.1": {
@@ -941,6 +973,11 @@
         "apps": {
             "clinica 0.10.0": {
                 "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "clinica 0.11.3": {
+                "version": "20260916",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3255,6 +3292,30 @@
             "quantitative imaging"
         ]
     },
+    "openreconacsrss": {
+        "apps": {
+            "openreconacsrss 0.1.0": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "openreconslicegrappa": {
+        "apps": {
+            "openreconslicegrappa 0.1.0": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "openrefine": {
         "apps": {
             "openrefine 3.10.1": {
@@ -3999,6 +4060,11 @@
                 "version": "20260904",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "spinalcordtoolbox 7.3.4": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4009,6 +4075,23 @@
         "apps": {
             "spinalcordtoolbox_gpu 7.3.3": {
                 "version": "20260904",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "spinalcordtoolbox_gpu 7.3.4": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "spine"
+        ]
+    },
+    "spinalcordtoolbox_lite": {
+        "apps": {
+            "spinalcordtoolbox_lite 7.3.4": {
+                "version": "20260916",
                 "exec": "",
                 "apptainer_args": []
             }
