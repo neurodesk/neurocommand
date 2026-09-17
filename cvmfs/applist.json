@@ -1,6 +1,18 @@
 {
     "list": [
         {
+            "application": "acsrss_0.1.1_20260916",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "acsrss_0.1.2_20260916",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "afni_21.2.00_20210714",
             "categories": [
                 "functional imaging"
@@ -2549,6 +2561,16 @@
             ]
         },
         {
+            "application": "qsmxt_9.21.0_20260916",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "qsmxt_9.8.0_20260721",
             "categories": [
                 "image reconstruction",
@@ -2696,6 +2718,12 @@
             "application": "sigviewer_0.6.4_20220315",
             "categories": [
                 "electrophysiology"
+            ]
+        },
+        {
+            "application": "slicegrappa_0.1.1_20260916",
+            "categories": [
+                "image reconstruction"
             ]
         },
         {
@@ -2880,6 +2908,14 @@
         },
         {
             "application": "synthseg_8.2.0_20260902",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "synthseg_8.2.1_20260916",
             "categories": [
                 "image segmentation",
                 "machine learning",
