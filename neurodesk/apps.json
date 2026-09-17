@@ -1,4 +1,21 @@
 {
+    "acsrss": {
+        "apps": {
+            "acsrss 0.1.1": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "acsrss 0.1.2": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "afni": {
         "apps": {
             "afni 21.2.00": {
@@ -3672,6 +3689,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "qsmxt 9.21.0": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            },
             "qsmxt 9.8.0": {
                 "version": "20260721",
                 "exec": "",
@@ -3920,6 +3942,18 @@
         },
         "categories": [
             "electrophysiology"
+        ]
+    },
+    "slicegrappa": {
+        "apps": {
+            "slicegrappa 0.1.1": {
+                "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "slicer": {
@@ -4208,6 +4242,11 @@
         "apps": {
             "synthseg 8.2.0": {
                 "version": "20260902",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "synthseg 8.2.1": {
+                "version": "20260916",
                 "exec": "",
                 "apptainer_args": []
             }
