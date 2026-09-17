@@ -1024,6 +1024,11 @@
                 "version": "20260722",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "clinicadl 2.0.0": {
+                "version": "20260917",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
