@@ -3104,6 +3104,11 @@
                 "version": "20260813",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "neurodesktop-lite 20260428.1.0": {
+                "version": "20260918",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3118,6 +3123,11 @@
         "apps": {
             "neurodesktop-lite_arm64 20260428": {
                 "version": "20260813",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "neurodesktop-lite_arm64 20260428.1.0": {
+                "version": "20260918",
                 "exec": "",
                 "apptainer_args": []
             }
