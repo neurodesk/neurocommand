@@ -481,7 +481,19 @@
             ]
         },
         {
+            "application": "bidstools_1.3.0_20260919",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidstools_arm64_1.2.0_20260915",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidstools_arm64_1.3.0_20260919",
             "categories": [
                 "data organisation"
             ]
@@ -892,6 +904,12 @@
             ]
         },
         {
+            "application": "datalad_1.6.3_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -904,13 +922,43 @@
             ]
         },
         {
+            "application": "datalad_arm64_1.6.3_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "dcm2bids_3.2.0_20260527",
             "categories": [
                 "data organisation"
             ]
         },
         {
+            "application": "dcm2bids_3.3.1_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "dcm2bids_arm64_3.3.1_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "dcm2niix_v1.0.20240202_20260512",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "dcm2niix_v1.0.20260724_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "dcm2niix_arm64_v1.0.20260724_20260920",
             "categories": [
                 "data organisation"
             ]
@@ -2588,6 +2636,16 @@
         },
         {
             "application": "qsmxt_9.21.0_20260916",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "qsmxt_9.21.1_20260920",
             "categories": [
                 "image reconstruction",
                 "phase processing",
