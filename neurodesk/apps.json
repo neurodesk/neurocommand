@@ -1181,8 +1181,25 @@
     },
     "dafne": {
         "apps": {
+            "dafne 1.10.0": {
+                "version": "20260920",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dafne 1.8a4": {
                 "version": "20260619",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "dafne_arm64": {
+        "apps": {
+            "dafne_arm64 1.10.0": {
+                "version": "20260920",
                 "exec": "",
                 "apptainer_args": []
             }
