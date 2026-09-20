@@ -880,7 +880,19 @@
             ]
         },
         {
+            "application": "dafne_1.10.0_20260920",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
             "application": "dafne_1.8a4_20260619",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "dafne_arm64_1.10.0_20260920",
             "categories": [
                 "image segmentation"
             ]
