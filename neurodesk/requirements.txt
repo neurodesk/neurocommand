@@ -5,8 +5,8 @@ iniconfig==1.0.1
 isort==5.5.3
 lazy-object-proxy==1.4.3
 mccabe==0.6.1
-packaging==20.4
-pluggy==0.13.1
+packaging==22
+pluggy==1.5
 py==1.10.0
 pylint==2.6.0
 pyparsing==2.4.7
