@@ -419,6 +419,13 @@
             ]
         },
         {
+            "application": "bidsmanager_1.4.0_20260921",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidsmanager_arm64_1.2.6.1_20260912",
             "categories": [
                 "bids apps",
@@ -427,6 +434,13 @@
         },
         {
             "application": "bidsmanager_arm64_1.3.0_20260917",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsmanager_arm64_1.4.0_20260921",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -997,6 +1011,13 @@
             ]
         },
         {
+            "application": "deepdisco_20251008.1.0_20260921",
+            "categories": [
+                "diffusion imaging",
+                "machine learning"
+            ]
+        },
+        {
             "application": "deepisles_1.1_20260715",
             "categories": [
                 "image segmentation",
@@ -1067,7 +1088,21 @@
             ]
         },
         {
+            "application": "dicompare_0.15.2_20260921",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
             "application": "dicompare_0.5.4_20260506",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
+            "application": "dicompare_arm64_0.15.2_20260921",
             "categories": [
                 "data organisation",
                 "quality control"
