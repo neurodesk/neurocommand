@@ -479,6 +479,11 @@
                 "version": "20260917",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "bidsmanager 1.4.0": {
+                "version": "20260921",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -495,6 +500,11 @@
             },
             "bidsmanager_arm64 1.3.0": {
                 "version": "20260917",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bidsmanager_arm64 1.4.0": {
+                "version": "20260921",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1345,6 +1355,16 @@
                 "version": "20260611",
                 "exec": "deepdisco",
                 "apptainer_args": []
+            },
+            "deepdisco 20251008.1.0": {
+                "version": "20260921",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "DeepDisco-deepdisco 20251008.1.0": {
+                "version": "20260921",
+                "exec": "deepdisco",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1451,8 +1471,26 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "dicompare 0.15.2": {
+                "version": "20260921",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "quality control"
+        ]
+    },
+    "dicompare_arm64": {
+        "apps": {
+            "dicompare_arm64 0.15.2": {
+                "version": "20260921",
                 "exec": "",
                 "apptainer_args": []
             }
