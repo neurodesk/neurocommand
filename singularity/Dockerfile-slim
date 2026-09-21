@@ -1,10 +1,10 @@
-FROM python:3.9.1-slim-buster
+FROM python:3.12-slim-bookworm
 
 RUN mkdir -p /neurocommand
 COPY neurodesk/requirements.txt /neurocommand/
 WORKDIR /neurocommand
 
-RUN pip install -r requirements.txt
+# Python 3.12 removed distutils, which neurodesk/build_menu.py imports; setuptools restores it.
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /neurocommand
-# RUN python -m neurodesk --cli
+RUN python -c "import distutils.dir_util"

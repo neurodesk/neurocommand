@@ -1,0 +1,3 @@
+-r ../neurodesk/requirements.txt
+cairosvg==2.9.1
+pytest==9.0.3
