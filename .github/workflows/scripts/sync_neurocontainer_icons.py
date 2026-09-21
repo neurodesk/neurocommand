@@ -117,7 +117,7 @@ def _svg_to_png(svg_content: bytes, source: Path) -> bytes:
     except ImportError as error:
         raise RuntimeError(
             "SVG recipe icons require cairosvg. Install it with "
-            "`python -m pip install cairosvg`."
+            "`python -m pip install -r test/requirements.txt`."
         ) from error
 
     try:

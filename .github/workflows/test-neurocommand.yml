@@ -26,9 +26,17 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install test dependencies
-        run: python -m pip install pytest setuptools cairosvg
+        run: python -m pip install -r test/requirements.txt
       - name: Run unit tests
         run: python -m pytest -q
+
+  slim_image:
+    name: build slim image
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - name: Build slim image
+        run: docker build -f singularity/Dockerfile-slim .
 
   test_neurocommand:
     name: test (CVMFS=${{ matrix.cvmfs }})
