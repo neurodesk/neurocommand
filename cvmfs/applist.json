@@ -67,6 +67,12 @@
             ]
         },
         {
+            "application": "afni_26.2.0_20260921",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "aidamri_1.1_20210708",
             "categories": [
                 "diffusion imaging",
