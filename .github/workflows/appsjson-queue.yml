@@ -47,7 +47,7 @@ jobs:
       with:
         python-version: "3.12"
     - name: Install icon conversion and unit test dependencies
-      run: python -m pip install pytest setuptools cairosvg
+      run: python -m pip install -r test/requirements.txt
     - name: Consolidate pending apps.json updates
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

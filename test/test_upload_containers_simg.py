@@ -11,6 +11,20 @@ WORKFLOW = ROOT / ".github" / "workflows" / "update-neurocontainers.yml"
 TEST_WORKFLOW = ROOT / ".github" / "workflows" / "test-neurocommand.yml"
 APPSJSON_QUEUE_WORKFLOW = ROOT / ".github" / "workflows" / "appsjson-queue.yml"
 SYNC_ICONS_WORKFLOW = ROOT / ".github" / "workflows" / "sync-icons.yml"
+SYNC_MENU_CATEGORIES_WORKFLOW = ROOT / ".github" / "workflows" / "sync-menu-categories.yml"
+RUNTIME_REQUIREMENTS = ROOT / "neurodesk" / "requirements.txt"
+TOOLCHAIN_REQUIREMENTS = ROOT / "test" / "requirements.txt"
+
+
+def requirement_names(path):
+    names = set()
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if line.startswith("-r "):
+            names |= requirement_names(path.parent / line[3:].strip())
+        elif line and not line.startswith("#"):
+            names.add(line.split("==")[0].lower())
+    return names
 
 
 def run_bash(script):
@@ -33,15 +47,32 @@ def test_update_neurocontainers_has_explicit_timeouts():
     assert "timeout-minutes: 330" in workflow
 
 
-def test_unit_test_workflow_installs_distutils_provider():
-    workflow = TEST_WORKFLOW.read_text()
-    assert "python-version: \"3.12\"" in workflow
-    assert "python -m pip install pytest setuptools cairosvg" in workflow
+def test_workflows_install_the_pinned_toolchain_on_python_3_12():
+    for workflow in (
+        TEST_WORKFLOW,
+        APPSJSON_QUEUE_WORKFLOW,
+        SYNC_ICONS_WORKFLOW,
+        SYNC_MENU_CATEGORIES_WORKFLOW,
+    ):
+        text = workflow.read_text()
+        assert "python-version: \"3.12\"" in text, workflow
+        assert "python -m pip install -r test/requirements.txt" in text, workflow
 
 
-def test_icon_sync_workflows_install_svg_converter():
-    assert "python -m pip install cairosvg" in SYNC_ICONS_WORKFLOW.read_text()
-    assert "python -m pip install pytest setuptools cairosvg" in APPSJSON_QUEUE_WORKFLOW.read_text()
+def test_runtime_requirements_carry_the_distutils_provider():
+    assert requirement_names(RUNTIME_REQUIREMENTS) == {"setuptools"}
+
+
+def test_toolchain_requirements_extend_the_runtime_set_with_ci_tools():
+    runtime = requirement_names(RUNTIME_REQUIREMENTS)
+    toolchain = requirement_names(TOOLCHAIN_REQUIREMENTS)
+
+    assert runtime < toolchain
+    assert toolchain - runtime == {"cairosvg", "pytest"}
+
+
+def test_unit_test_workflow_builds_the_slim_image():
+    assert "docker build -f singularity/Dockerfile-slim ." in TEST_WORKFLOW.read_text()
 
 
 def test_appsjson_queue_does_not_run_on_pr_close_events():
