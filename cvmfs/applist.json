@@ -793,6 +793,12 @@
             ]
         },
         {
+            "application": "clinicadl_2.1.0_20260920",
+            "categories": [
+                "workflows"
+            ]
+        },
+        {
             "application": "code_230315_20230315",
             "categories": [
                 "programming"
