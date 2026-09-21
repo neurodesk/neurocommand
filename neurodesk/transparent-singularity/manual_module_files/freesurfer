@@ -1,5 +1,12 @@
 -- Append custom paths
-local additional_bind_paths = "/tmp,/scratch"
+-- /scratch is bound only when the host actually provides it: Apptainer aborts
+-- container creation when a bind source is missing, which breaks every machine
+-- without a /scratch (neurodesktop, Neurodesk Play, local installs).
+local additional_bind_paths = "/tmp"
+
+if isDir("/scratch") then
+    additional_bind_paths = additional_bind_paths .. ",/scratch"
+end
 
 if os.getenv("SINGULARITY_BINDPATH") then
     prepend_path("SINGULARITY_BINDPATH", additional_bind_paths, ",")
