@@ -7,6 +7,12 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "cvmfs" / "reconcile_module_files.py"
+FREESURFER_SNIPPET = ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer"
+# A superseded snippet, used to check that stale on-disk modules get refreshed.
+STALE_FREESURFER_SNIPPET = (
+    "-- Append custom paths\n"
+    'local additional_bind_paths = "/tmp:/scratch"\n'
+)
 
 spec = importlib.util.spec_from_file_location("reconcile_module_files", SCRIPT)
 reconcile_module_files = importlib.util.module_from_spec(spec)
@@ -349,13 +355,13 @@ def test_existing_freesurfer_module_gets_corrected_bind_paths(tmp_path):
     log.write_text(f"{container} categories:structural imaging,\n")
     module = tmp_path / "containers/modules/freesurfer/8.2.0.lua"
     module.parent.mkdir(parents=True)
-    snippet = (ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer").read_text()
-    module.write_text(module_text(container) + snippet.replace("/tmp,/scratch", "/tmp:/scratch"))
+    snippet = FREESURFER_SNIPPET.read_text()
+    module.write_text(module_text(container) + STALE_FREESURFER_SNIPPET)
 
     changes = reconcile_module_files.plan_module_reconciliation(tmp_path, log)
     reconcile_module_files.apply_changes(changes)
 
-    assert 'local additional_bind_paths = "/tmp,/scratch"' in module.read_text()
+    assert snippet.rstrip("\n") in module.read_text()
     assert "/tmp:/scratch" not in module.read_text()
 
 
@@ -364,7 +370,7 @@ def test_manual_snippet_changes_reach_existing_modules(tmp_path, active):
     repo_root = tmp_path / "cvmfs"
     snippets = tmp_path / "manual_module_files"
     snippets.mkdir()
-    source = ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer"
+    source = FREESURFER_SNIPPET
     current = source.read_text()
     (snippets / "freesurfer").write_text(current)
     container = "freesurfer_8.2.0_20260818"
@@ -380,7 +386,7 @@ def test_manual_snippet_changes_reach_existing_modules(tmp_path, active):
     ]
     for path in paths:
         path.parent.mkdir(parents=True)
-        path.write_text(module_text(container) + current.replace("/tmp,/scratch", "/tmp:/scratch"))
+        path.write_text(module_text(container) + STALE_FREESURFER_SNIPPET)
     args = ["--repo-root", str(repo_root), "--log", str(log),
             "--manual-module-dir", str(snippets)]
 
@@ -389,7 +395,7 @@ def test_manual_snippet_changes_reach_existing_modules(tmp_path, active):
     assert [path.read_text() for path in paths] == before
     assert reconcile_module_files.main(args) == 0
     for path in paths:
-        assert 'local additional_bind_paths = "/tmp,/scratch"' in path.read_text()
+        assert current.rstrip("\n") in path.read_text()
         assert "/tmp:/scratch" not in path.read_text()
         assert path.read_text().count("local additional_bind_paths") == 1
     assert reconcile_module_files.main(args + ["--check"]) == 0
