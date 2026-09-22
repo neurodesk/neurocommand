@@ -1,15 +1,22 @@
 #!/bin/bash
+set -euo pipefail
+
+# Use the notebook's Python interpreter when supplied by the calling cell.
+PYTHON="${NEURODESK_COLAB_PYTHON:-python3}"
+export LD_PRELOAD=""
+export DEBIAN_FRONTEND=noninteractive
+cd /content
 
 # install CVMFS packages for ubuntu:
-sudo apt-get install lsb-release
-wget https://cvmrepo.web.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb
+sudo apt-get install -y lsb-release
+curl -fsSL https://cvmrepo.web.cern.ch/cvmrepo/apt/cvmfs-release-latest_all.deb -o cvmfs-release-latest_all.deb
 
 echo "[DEBUG]: adding cfms repo"
 sudo dpkg -i cvmfs-release-latest_all.deb >> /dev/null
 echo "[DEBUG]: apt-get update"
-sudo apt-get update --allow-unauthenticated >> /dev/null
+sudo apt-get update >> /dev/null
 echo "[DEBUG]: apt-get install cvmfs"
-sudo apt-get install cvmfs tree --allow-unauthenticated >> /dev/null
+sudo apt-get install -y cvmfs tree >> /dev/null
 
 # install apptainer for ubuntu:
 sudo apt update
@@ -20,16 +27,38 @@ sudo apt install -y apptainer-suid
 
 sudo apptainer config fakeroot --add root
 
-echo 'unshare -r apptainer "$@"' > /usr/bin/singularity_test
-chmod +x /usr/bin/singularity_test
-mv /usr/bin/singularity /usr/bin/singularity_backup
-mv /usr/bin/singularity_test /usr/bin/singularity
+# Keep the original launcher when setup is run more than once.
+if [ ! -e /usr/bin/singularity_backup ]; then
+    sudo mv /usr/bin/singularity /usr/bin/singularity_backup
+fi
+printf '#!/bin/sh\nexec unshare -r apptainer "$@"\n' | sudo tee /usr/bin/singularity >/dev/null
+sudo chmod +x /usr/bin/singularity
 
-#install datalad and lmod
-sudo apt install -y datalad lmod
+# DataLad is unavailable in some Colab apt repositories. Do not let it
+# prevent installation of Lmod, which loads all Neurodesk modules.
+sudo apt-get install -y lmod git
 
-#install pip packages
-pip install jupyterlmod==4.0.3 pandas nilearn matplotlib nipype osfclient ipyniivue==2.0.0
+# Preserve Colab's pinned dependencies and NumPy compatibility. pip will
+# select a compatible nilearn instead of upgrading these shared packages.
+"$PYTHON" - <<'PYCONSTRAINTS'
+from importlib.metadata import requires
+from pathlib import Path
+from packaging.requirements import Requirement
+
+constraints = ["numpy<2.3"]
+for spec in requires("google-colab") or []:
+    requirement = Requirement(spec)
+    if requirement.name in {"pandas", "requests"}:
+        constraints.append(str(requirement))
+Path("/content/neurodesk-colab-constraints.txt").write_text("\n".join(constraints) + "\n")
+PYCONSTRAINTS
+"$PYTHON" -m pip install -c /content/neurodesk-colab-constraints.txt \
+    jupyterlmod==4.0.3 pandas nilearn matplotlib nipype osfclient ipyniivue==2.0.0 \
+    datalad datalad-installer
+# Colab cannot answer the installer's interactive privilege prompt.
+datalad-installer --sudo ok git-annex -m datalad/packages
+datalad --version
+git annex version
 
 #setup cvmfs
 mkdir -p /etc/cvmfs/keys/ardc.edu.au/
@@ -50,12 +79,36 @@ echo "CVMFS_QUOTA_LIMIT=5000" | sudo tee -a  /etc/cvmfs/default.local
 cvmfs_config setup
 
 # Disabling autofs is needed, otherwise autofs is not fast enough to mount CVMFS and it will complain about it with "too many symbolic errors"
-sudo cvmfs_config umount
-sudo service autofs stop
-sudo mkdir /cvmfs/neurodesk.ardc.edu.au
-sudo mount -t cvmfs neurodesk.ardc.edu.au /cvmfs/neurodesk.ardc.edu.au
+# Colab has no systemd; stopping an absent autofs service is harmless.
+sudo service autofs stop || true
+sudo mkdir -p /cvmfs/neurodesk.ardc.edu.au
+if ! mountpoint -q /cvmfs/neurodesk.ardc.edu.au; then
+    sudo mount -t cvmfs neurodesk.ardc.edu.au /cvmfs/neurodesk.ardc.edu.au
+fi
 
-cvmfs_config chksetup
 ls /cvmfs/neurodesk.ardc.edu.au/
 cvmfs_config stat -v neurodesk.ardc.edu.au
 cvmfs_talk -i neurodesk.ardc.edu.au host info
+
+# A child shell cannot set the parent notebook kernel's environment. Write
+# the values as JSON so the notebook only needs to import them after setup.
+"$PYTHON" - <<'PYENV'
+import json
+from pathlib import Path
+
+module_root = Path("/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules")
+module_paths = sorted(str(path) for path in module_root.iterdir() if path.is_dir())
+if not module_paths:
+    raise RuntimeError("CVMFS mounted but no Neurodesk module directories were found")
+lmod_cmd = Path("/usr/share/lmod/lmod/libexec/lmod")
+if not lmod_cmd.is_file():
+    raise RuntimeError("Lmod installation failed")
+environment = {
+    "LD_PRELOAD": "",
+    "APPTAINER_BINDPATH": "/content",
+    "LMOD_CMD": str(lmod_cmd),
+    "MODULEPATH": ":".join(module_paths),
+}
+Path("/content/neurodesk-colab-env.json").write_text(json.dumps(environment, indent=2) + "\n")
+print("Neurodesk setup complete. Environment saved to /content/neurodesk-colab-env.json")
+PYENV
