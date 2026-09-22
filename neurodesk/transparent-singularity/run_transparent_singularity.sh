@@ -448,6 +448,12 @@ while read executable; do \
    echo $executable > $_base/${executable}; \
    echo "#!/usr/bin/env bash" > $executable
    echo "export PWD=\`pwd -P\`" >> $executable
+   cat >> "$executable" <<'EOF'
+if [ -f /proc/driver/nvidia/version ] && [ -z "${APPTAINER_NV+set}" ] && [ -z "${SINGULARITY_NV+set}" ]; then
+  export APPTAINER_NV=1
+  export SINGULARITY_NV=1
+fi
+EOF
    echo 'xauthority_opts=()' >> $executable
    echo 'if [[ -n "${XAUTHORITY:-}" && -f "$XAUTHORITY" ]]; then' >> $executable
    echo '  xauthority_opts=(--bind "$XAUTHORITY:$XAUTHORITY:ro" --env "XAUTHORITY=$XAUTHORITY")' >> $executable
