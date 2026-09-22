@@ -2,6 +2,7 @@ import importlib.util
 import os
 from pathlib import Path
 import stat
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -38,7 +39,7 @@ def fixed_wrapper(container_dir, command, bind_option=""):
     legacy = legacy_wrapper(container_dir, command, bind_option)
     return legacy.replace(
         "export PWD=`pwd -P`\n",
-        "export PWD=`pwd -P`\n" + XAUTHORITY_BLOCK,
+        "export PWD=`pwd -P`\n" + reconcile.NVIDIA_BLOCK.decode() + XAUTHORITY_BLOCK,
         1,
     ).replace(
         "--env DISPLAY=$DISPLAY ",
@@ -80,6 +81,53 @@ def make_container(repo_root, commands):
     container.mkdir(parents=True)
     (container / "commands.txt").write_text("".join(f"{name}\n" for name in commands))
     return container
+
+
+def assert_gpu_environment(wrapper):
+    # Override only the driver-file check; execute the wrapper and a child
+    # runtime process to verify exports without requiring NVIDIA hardware.
+    shell = '''
+function [() {
+    if [[ "$1" == -f && "$2" == /proc/driver/nvidia/version ]]; then
+        return "$DRIVER_STATUS"
+    fi
+    builtin [ "$@"
+}
+source "$1" "argument with spaces"
+'''
+    with tempfile.TemporaryDirectory() as directory:
+        runtime = Path(directory) / "singularity"
+        runtime.write_text(
+            '#!/usr/bin/env bash\n'
+            'printf "%s|%s\\n" "${APPTAINER_NV-unset}" "${SINGULARITY_NV-unset}"\n'
+            'printf "%s\\n" "${@: -1}"\n'
+        )
+        runtime.chmod(0o755)
+        base_env = {
+            key: value for key, value in os.environ.items()
+            if key not in {"APPTAINER_NV", "SINGULARITY_NV", "BASH_ENV"}
+        }
+        base_env["PATH"] = f"{directory}:{os.environ['PATH']}"
+        overrides = [{}, {"APPTAINER_NV": "0", "SINGULARITY_NV": "1"}]
+        for name in ("APPTAINER_NV", "SINGULARITY_NV"):
+            overrides.extend({name: value} for value in ("0", "1", "false", ""))
+        for driver_present in (False, True):
+            for override in overrides:
+                expected = override or (
+                    {"APPTAINER_NV": "1", "SINGULARITY_NV": "1"}
+                    if driver_present else {}
+                )
+                result = subprocess.run(
+                    ["bash", "-c", shell, "test-wrapper", str(wrapper)],
+                    env={**base_env, **override, "DRIVER_STATUS": "0" if driver_present else "1"},
+                    capture_output=True,
+                    text=True,
+                )
+                assert result.returncode == 0, result.stderr
+                assert result.stdout.splitlines() == [
+                    f"{expected.get('APPTAINER_NV', 'unset')}|{expected.get('SINGULARITY_NV', 'unset')}",
+                    "argument with spaces",
+                ], (driver_present, override, result.stdout)
 
 
 class WrapperReconciliationTests(unittest.TestCase):
@@ -146,6 +194,7 @@ class WrapperReconciliationTests(unittest.TestCase):
                     reconcile.apply_wrapper_plan(plan)
                     wrapper_text = wrapper.read_text()
                     self.assertIn(XAUTHORITY_BLOCK, wrapper_text)
+                    self.assertIn(reconcile.NVIDIA_BLOCK.decode(), wrapper_text)
                     self.assertIn(
                         '--env DISPLAY=$DISPLAY "${xauthority_opts[@]}" ',
                         wrapper_text,
@@ -186,6 +235,7 @@ class WrapperReconciliationTests(unittest.TestCase):
 
                     wrapper_text = wrapper.read_text()
                     self.assertIn(XAUTHORITY_BLOCK, wrapper_text)
+                    self.assertIn(reconcile.NVIDIA_BLOCK.decode(), wrapper_text)
                     self.assertIn(
                         'singularity --silent exec "${xauthority_opts[@]}" ',
                         wrapper_text,
@@ -249,6 +299,35 @@ class WrapperReconciliationTests(unittest.TestCase):
         self.assertTrue(plan.is_clean)
         self.assertEqual(plan.rewrites, ())
         self.assertEqual(plan.diagnostics, ())
+
+    def test_upgrades_xauthority_only_wrappers_and_converges(self):
+        container = make_container(self.repo_root, ["demo"])
+        for legacy in reconcile._legacy_wrapper_candidates(container, "demo"):
+            with self.subTest(legacy=legacy):
+                wrapper = write_wrapper(
+                    container, "demo", reconcile._xauthority_wrapper(legacy).decode()
+                )
+                plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
+                self.assertEqual(plan.diagnostics, ())
+                self.assertEqual(reconcile.apply_wrapper_plan(plan), 1)
+                self.assertEqual(wrapper.read_bytes().count(reconcile.NVIDIA_BLOCK), 1)
+                self.assertTrue(reconcile.plan_wrapper_reconciliation(self.repo_root).is_clean)
+
+    def test_reconciled_wrapper_gpu_defaults_and_overrides(self):
+        container = make_container(self.repo_root, ["demo"])
+        wrapper = write_wrapper(container, "demo", legacy_wrapper(container, "demo"))
+        reconcile.apply_wrapper_plan(reconcile.plan_wrapper_reconciliation(self.repo_root))
+        assert_gpu_environment(wrapper)
+
+    def test_partial_gpu_edit_blocks_reconciliation(self):
+        container = make_container(self.repo_root, ["demo"])
+        content = fixed_wrapper(container, "demo").replace("  export SINGULARITY_NV=1\n", "")
+        wrapper = write_wrapper(container, "demo", content)
+        plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
+        self.assertEqual(len(plan.diagnostics), 1)
+        with self.assertRaises(ValueError):
+            reconcile.apply_wrapper_plan(plan)
+        self.assertEqual(wrapper.read_text(), content)
 
     def test_unknown_executable_blocks_every_planned_write(self):
         container = make_container(self.repo_root, ["legacy", "custom"])

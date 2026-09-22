@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add XAUTHORITY forwarding to pre-fix generated CVMFS wrappers."""
+"""Reconcile XAUTHORITY forwarding and NVIDIA defaults in generated CVMFS wrappers."""
 
 from __future__ import annotations
 
@@ -12,6 +12,13 @@ import stat
 import sys
 
 
+NVIDIA_BLOCK = (
+    b'if [ -f /proc/driver/nvidia/version ] && [ -z "${APPTAINER_NV+set}" ] '
+    b'&& [ -z "${SINGULARITY_NV+set}" ]; then\n'
+    b"  export APPTAINER_NV=1\n"
+    b"  export SINGULARITY_NV=1\n"
+    b"fi\n"
+)
 XAUTHORITY_BLOCK = (
     b"xauthority_opts=()\n"
     b'if [[ -n "${XAUTHORITY:-}" && -f "$XAUTHORITY" ]]; then\n'
@@ -20,7 +27,7 @@ XAUTHORITY_BLOCK = (
     b"fi\n"
 )
 XAUTHORITY_ARGUMENT = b'"${xauthority_opts[@]}" '
-XAUTHORITY_MARKERS = (b"xauthority_opts", b"XAUTHORITY")
+WRAPPER_SETUP_MARKERS = (b"xauthority_opts", b"XAUTHORITY", b"APPTAINER_NV", b"SINGULARITY_NV")
 DISABLED_NOTICE = b"This container was disabled due to a known bug or vulnerability."
 DISABLED_PULL_HINT = b"apptainer pull docker://vnmd/"
 GENERATED_BIND_OPTIONS = (
@@ -247,7 +254,7 @@ def _legacy_wrapper_candidates(container_dir: Path, command: str) -> tuple[bytes
     return tuple(dict.fromkeys(candidates))
 
 
-def _fixed_wrapper(legacy: bytes) -> bytes:
+def _xauthority_wrapper(legacy: bytes) -> bytes:
     pwd_line = b"export PWD=`pwd -P`\n"
     display_argument = b"--env DISPLAY=$DISPLAY "
     replacement = legacy.replace(pwd_line, pwd_line + XAUTHORITY_BLOCK, 1)
@@ -264,6 +271,11 @@ def _fixed_wrapper(legacy: bytes) -> bytes:
     )
 
 
+def _fixed_wrapper(legacy: bytes) -> bytes:
+    pwd_line = b"export PWD=`pwd -P`\n"
+    return _xauthority_wrapper(legacy).replace(pwd_line, pwd_line + NVIDIA_BLOCK, 1)
+
+
 def _classify_wrapper(
     container_dir: Path, command: str, content: bytes
 ) -> tuple[WrapperState, bytes | None]:
@@ -275,7 +287,7 @@ def _classify_wrapper(
         return WrapperState.DISABLED, None
 
     for legacy in _legacy_wrapper_candidates(container_dir, command):
-        if content == legacy:
+        if content in (legacy, _xauthority_wrapper(legacy)):
             return WrapperState.LEGACY, _fixed_wrapper(legacy)
         if content == _fixed_wrapper(legacy):
             return WrapperState.FIXED, None
@@ -368,8 +380,8 @@ def plan_wrapper_reconciliation(repo_root: Path) -> ReconciliationPlan:
                 )
             elif state is WrapperState.UNKNOWN:
                 detail = (
-                    "wrapper has a partial XAUTHORITY edit"
-                    if any(marker in snapshot.content for marker in XAUTHORITY_MARKERS)
+                    "wrapper has an unrecognized XAUTHORITY or NVIDIA setup edit"
+                    if any(marker in snapshot.content for marker in WRAPPER_SETUP_MARKERS)
                     else "executable does not match a generated wrapper"
                 )
                 diagnostics.append(Diagnostic(wrapper_path, detail))
@@ -429,7 +441,7 @@ def apply_wrapper_plan(plan: ReconciliationPlan) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Add XAUTHORITY forwarding to pre-fix generated CVMFS wrappers."
+        description="Reconcile XAUTHORITY forwarding and NVIDIA defaults in generated CVMFS wrappers."
     )
     parser.add_argument(
         "--repo-root",
@@ -447,7 +459,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _report(plan: ReconciliationPlan) -> None:
     for rewrite in plan.rewrites:
-        print(f"[INFO] add XAUTHORITY forwarding: {rewrite.path}")
+        print(f"[INFO] update XAUTHORITY forwarding and NVIDIA defaults: {rewrite.path}")
     for diagnostic in plan.diagnostics:
         print(f"[ERROR] {diagnostic.message}: {diagnostic.path}", file=sys.stderr)
 

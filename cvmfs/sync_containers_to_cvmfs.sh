@@ -558,15 +558,15 @@ EOF
 fi
 
 # Existing commands.txt files make completed containers immutable to the normal
-# install loop above. Reconcile wrappers generated before XAUTHORITY forwarding
-# was added without downloading or unpacking their container images again.
+# install loop above. Reconcile XAUTHORITY forwarding and NVIDIA defaults
+# without downloading or unpacking their container images again.
 WRAPPER_RECONCILE_STATUS=0
 python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_wrapper_xauthority.py" \
     --repo-root /cvmfs/neurodesk.ardc.edu.au \
     --check || WRAPPER_RECONCILE_STATUS=$?
 
 if [[ $WRAPPER_RECONCILE_STATUS -eq 1 ]]; then
-    echo "[INFO] Reconciling pre-XAUTHORITY container wrappers."
+    echo "[INFO] Reconciling container wrapper XAUTHORITY forwarding and NVIDIA defaults."
     open_cvmfs_transaction neurodesk.ardc.edu.au
 
     if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_wrapper_xauthority.py" \
@@ -574,7 +574,7 @@ if [[ $WRAPPER_RECONCILE_STATUS -eq 1 ]]; then
        python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_wrapper_xauthority.py" \
         --repo-root /cvmfs/neurodesk.ardc.edu.au \
         --check; then
-        if ! publish_cvmfs_transaction neurodesk.ardc.edu.au "reconciled pre-XAUTHORITY container wrappers"; then
+        if ! publish_cvmfs_transaction neurodesk.ardc.edu.au "reconciled container wrapper XAUTHORITY forwarding and NVIDIA defaults"; then
             echo "[ERROR] Failed to publish reconciled container wrappers. Aborting CVMFS transaction."
             abort_cvmfs_transaction neurodesk.ardc.edu.au
             exit 2
@@ -585,7 +585,7 @@ if [[ $WRAPPER_RECONCILE_STATUS -eq 1 ]]; then
         exit 2
     fi
 elif [[ $WRAPPER_RECONCILE_STATUS -eq 0 ]]; then
-    echo "[INFO] Container wrappers already forward XAUTHORITY."
+    echo "[INFO] Container wrapper XAUTHORITY forwarding and NVIDIA defaults are up to date."
 else
     echo "[ERROR] Wrapper reconciliation preflight failed."
     exit 2

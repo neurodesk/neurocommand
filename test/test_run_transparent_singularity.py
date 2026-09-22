@@ -4,6 +4,8 @@ import subprocess
 import textwrap
 from pathlib import Path
 
+from test.test_cvmfs_reconcile_wrapper_xauthority import assert_gpu_environment, reconcile
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TRANSPARENT_SINGULARITY = ROOT / "neurodesk" / "transparent-singularity"
@@ -168,6 +170,8 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     assert "singularity exec demo_arm64_1.0_20260629.simg /bin/true" in call_log
     wrapper = workdir / "demo"
     wrapper_text = wrapper.read_text()
+    assert reconcile.NVIDIA_BLOCK.decode() in wrapper_text
+    assert_gpu_environment(wrapper)
     assert "xauthority_opts=()" in wrapper_text
     assert '--bind "$XAUTHORITY:$XAUTHORITY:ro"' in wrapper_text
     assert '--env "XAUTHORITY=$XAUTHORITY"' in wrapper_text
