@@ -2714,6 +2714,16 @@
             ]
         },
         {
+            "application": "qsmxt_9.22.0_20260923",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "qsmxt_9.8.0_20260721",
             "categories": [
                 "image reconstruction",
