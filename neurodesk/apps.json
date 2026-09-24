@@ -1081,7 +1081,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20260629",
+                "version": "20260924",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1254,6 +1254,11 @@
                 "version": "20260920",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "datalad 1.6.4": {
+                "version": "20260924",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1274,6 +1279,11 @@
             },
             "datalad_arm64 1.6.3": {
                 "version": "20260920",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "datalad_arm64 1.6.4": {
+                "version": "20260924",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1399,6 +1409,11 @@
         "apps": {
             "deeplabcut 2.3.11": {
                 "version": "20260722",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "deeplabcut 3.0.2": {
+                "version": "20260924",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1549,6 +1564,16 @@
             "dsistudioGUI-dsistudio 2024.06.12": {
                 "version": "20241010",
                 "exec": "dsi_studio"
+            },
+            "dsistudio 2026.7.25": {
+                "version": "20260924",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dsistudioGUI-dsistudio 2026.7.25": {
+                "version": "20260924",
+                "exec": "dsi_studio",
+                "apptainer_args": []
             },
             "dsistudio chen.2024.04.19": {
                 "version": "20240426",
