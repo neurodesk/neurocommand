@@ -825,7 +825,7 @@
             ]
         },
         {
-            "application": "code_240320_20260629",
+            "application": "code_240320_20260924",
             "categories": [
                 "programming"
             ]
@@ -948,6 +948,12 @@
             ]
         },
         {
+            "application": "datalad_1.6.4_20260924",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -961,6 +967,12 @@
         },
         {
             "application": "datalad_arm64_1.6.3_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.6.4_20260924",
             "categories": [
                 "data organisation"
             ]
@@ -1032,6 +1044,12 @@
         },
         {
             "application": "deeplabcut_2.3.11_20260722",
+            "categories": [
+                "machine learning"
+            ]
+        },
+        {
+            "application": "deeplabcut_3.0.2_20260924",
             "categories": [
                 "machine learning"
             ]
@@ -1134,6 +1152,12 @@
         },
         {
             "application": "dsistudio_2024.06.12_20241010",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "dsistudio_2026.7.25_20260924",
             "categories": [
                 "diffusion imaging"
             ]
