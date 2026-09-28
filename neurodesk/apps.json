@@ -2633,6 +2633,20 @@
             "machine learning"
         ]
     },
+    "maestro": {
+        "apps": {
+            "maestro 20260803": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
     "matlab": {
         "apps": {
             "matlab 2022a": {
