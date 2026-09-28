@@ -494,6 +494,11 @@
                 "version": "20260921",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "bidsmanager 1.4.1": {
+                "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -515,6 +520,11 @@
             },
             "bidsmanager_arm64 1.4.0": {
                 "version": "20260921",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bidsmanager_arm64 1.4.1": {
+                "version": "20260927",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -890,6 +900,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "brats 0.1.12": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
+            },
             "brats 0.1.8": {
                 "version": "20260822",
                 "exec": "",
@@ -1081,7 +1096,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20260924",
+                "version": "20260928",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1215,6 +1230,11 @@
                 "version": "20260619",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "dafne 2.1.1a0": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1225,6 +1245,11 @@
         "apps": {
             "dafne_arm64 1.10.0": {
                 "version": "20260920",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dafne_arm64 2.1.1a0": {
+                "version": "20260928",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1566,12 +1591,12 @@
                 "exec": "dsi_studio"
             },
             "dsistudio 2026.7.25": {
-                "version": "20260924",
+                "version": "20260928",
                 "exec": "",
                 "apptainer_args": []
             },
             "dsistudioGUI-dsistudio 2026.7.25": {
-                "version": "20260924",
+                "version": "20260928",
                 "exec": "dsi_studio",
                 "apptainer_args": []
             },
@@ -1637,6 +1662,11 @@
             "elastix 5.1.0": {
                 "version": "20230407",
                 "exec": ""
+            },
+            "elastix 5.3.1": {
+                "version": "20260925",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2042,6 +2072,16 @@
                 "exec": "fsleyes",
                 "apptainer_args": []
             },
+            "fsl 6.0.7.23": {
+                "version": "20260925",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fsleyesGUI-fsl 6.0.7.23": {
+                "version": "20260925",
+                "exec": "fsleyes",
+                "apptainer_args": []
+            },
             "fsl 6.0.7.4": {
                 "version": "20231005",
                 "exec": ""
@@ -2071,6 +2111,11 @@
         "apps": {
             "fsqc 2.1.4": {
                 "version": "20251126",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fsqc 2.1.7": {
+                "version": "20260925",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2156,6 +2201,11 @@
             "gingerale 3.0.2": {
                 "version": "20250804",
                 "exec": ""
+            },
+            "gingerale 4.0.0": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2206,6 +2256,33 @@
                 "version": "20260514",
                 "exec": "globusconnectpersonal -gui",
                 "apptainer_args": []
+            },
+            "globus 3.3.1": {
+                "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "globusGUI-globus 3.3.1": {
+                "version": "20260927",
+                "exec": "globusconnectpersonal -gui",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "globus_arm64": {
+        "apps": {
+            "globus_arm64 3.3.1": {
+                "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "globusGUI-globus_arm64 3.3.1": {
+                "version": "20260927",
+                "exec": "globusconnectpersonal -gui",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2229,6 +2306,11 @@
             "halfpipe 1.2.3": {
                 "version": "20250623",
                 "exec": ""
+            },
+            "halfpipe 1.3.2": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2270,6 +2352,23 @@
             "heudiconv 1.3.1": {
                 "version": "20241105",
                 "exec": ""
+            },
+            "heudiconv 1.5.1": {
+                "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "heudiconv_arm64": {
+        "apps": {
+            "heudiconv_arm64 1.5.1": {
+                "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2344,6 +2443,16 @@
             "ilastikGUI-ilastik 1.4.0": {
                 "version": "20230720",
                 "exec": "run_ilastik.sh"
+            },
+            "ilastik 1.4.2": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "ilastikGUI-ilastik 1.4.2": {
+                "version": "20260928",
+                "exec": "run_ilastik.sh",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2421,6 +2530,11 @@
                 "version": "20260608",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "jidt 1.6.1": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2442,6 +2556,21 @@
                 "version": "20240321",
                 "exec": "julia"
             },
+            "julia 1.13.1": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vscodeGUI-julia 1.13.1": {
+                "version": "20260928",
+                "exec": "code",
+                "apptainer_args": []
+            },
+            "REPLGUI-julia 1.13.1": {
+                "version": "20260928",
+                "exec": "julia",
+                "apptainer_args": []
+            },
             "julia 1.4.1": {
                 "version": "20210105",
                 "exec": ""
@@ -2457,6 +2586,28 @@
             "REPLGUI-julia 1.9.4": {
                 "version": "20240405",
                 "exec": "julia"
+            }
+        },
+        "categories": [
+            "programming"
+        ]
+    },
+    "julia_arm64": {
+        "apps": {
+            "julia_arm64 1.13.1": {
+                "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vscodeGUI-julia_arm64 1.13.1": {
+                "version": "20260928",
+                "exec": "code",
+                "apptainer_args": []
+            },
+            "REPLGUI-julia_arm64 1.13.1": {
+                "version": "20260928",
+                "exec": "julia",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2755,7 +2906,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20260722",
+                "version": "20260926",
                 "exec": "",
                 "apptainer_args": []
             }
