@@ -847,7 +847,7 @@
             ]
         },
         {
-            "application": "code_240320_20260928",
+            "application": "code_240320_20260929",
             "categories": [
                 "programming"
             ]
@@ -1904,6 +1904,12 @@
             ]
         },
         {
+            "application": "laynii_2.10.0_20260929",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "laynii_2.2.1_20220701",
             "categories": [
                 "functional imaging"
@@ -1942,6 +1948,13 @@
         },
         {
             "application": "lipsia_3.1.1_20260527",
+            "categories": [
+                "functional imaging",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "lipsia_4.1.1_20260929",
             "categories": [
                 "functional imaging",
                 "machine learning"
