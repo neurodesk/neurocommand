@@ -1096,7 +1096,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20260928",
+                "version": "20260929",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2638,6 +2638,11 @@
     },
     "laynii": {
         "apps": {
+            "laynii 2.10.0": {
+                "version": "20260929",
+                "exec": "",
+                "apptainer_args": []
+            },
             "laynii 2.2.1": {
                 "version": "20220701",
                 "exec": ""
@@ -2745,6 +2750,11 @@
         "apps": {
             "lipsia 3.1.1": {
                 "version": "20260527",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "lipsia 4.1.1": {
+                "version": "20260929",
                 "exec": "",
                 "apptainer_args": []
             }
