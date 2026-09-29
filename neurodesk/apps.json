@@ -1235,6 +1235,11 @@
                 "version": "20260928",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "dafne 2.1.1a2": {
+                "version": "20260929",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1250,6 +1255,11 @@
             },
             "dafne_arm64 2.1.1a0": {
                 "version": "20260928",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dafne_arm64 2.1.1a2": {
+                "version": "20260929",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1387,6 +1397,19 @@
             "image segmentation",
             "machine learning",
             "quality control"
+        ]
+    },
+    "deepcombat": {
+        "apps": {
+            "deepcombat 0.0.0.9000": {
+                "version": "20260929",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning",
+            "statistics"
         ]
     },
     "deepdisco": {
@@ -2844,6 +2867,11 @@
             },
             "matlab 2025b": {
                 "version": "20260406",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "matlab 2026b": {
+                "version": "20260929",
                 "exec": "",
                 "apptainer_args": []
             }
