@@ -946,6 +946,12 @@
             ]
         },
         {
+            "application": "dafne_2.1.1a2_20260929",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
             "application": "dafne_arm64_1.10.0_20260920",
             "categories": [
                 "image segmentation"
@@ -953,6 +959,12 @@
         },
         {
             "application": "dafne_arm64_2.1.1a0_20260928",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "dafne_arm64_2.1.1a2_20260929",
             "categories": [
                 "image segmentation"
             ]
@@ -1053,6 +1065,13 @@
                 "image segmentation",
                 "machine learning",
                 "quality control"
+            ]
+        },
+        {
+            "application": "deepcombat_0.0.0.9000_20260929",
+            "categories": [
+                "machine learning",
+                "statistics"
             ]
         },
         {
@@ -2018,6 +2037,13 @@
         },
         {
             "application": "matlab_2025b_20260406",
+            "categories": [
+                "machine learning",
+                "programming"
+            ]
+        },
+        {
+            "application": "matlab_2026b_20260929",
             "categories": [
                 "machine learning",
                 "programming"
