@@ -128,6 +128,20 @@
             "structural imaging"
         ]
     },
+    "alpaca": {
+        "apps": {
+            "alpaca 1.1.4": {
+                "version": "20260929",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
     "amico": {
         "apps": {
             "amico 2.1.0": {
