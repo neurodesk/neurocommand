@@ -1938,6 +1938,11 @@
                 "version": "20260413",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "fmriprep 25.2.6": {
+                "version": "20260930",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2935,6 +2940,11 @@
                 "version": "20260824",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "meganorm 0.2.1": {
+                "version": "20261001",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3108,6 +3118,16 @@
             },
             "MipViewGUI-mipview 0.1.4": {
                 "version": "20260407",
+                "exec": "mipview",
+                "apptainer_args": []
+            },
+            "mipview 0.6.2": {
+                "version": "20261001",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "MipViewGUI-mipview 0.6.2": {
+                "version": "20261001",
                 "exec": "mipview",
                 "apptainer_args": []
             }
