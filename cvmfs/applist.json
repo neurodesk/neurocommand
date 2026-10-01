@@ -1443,6 +1443,13 @@
             ]
         },
         {
+            "application": "fmriprep_25.2.6_20260930",
+            "categories": [
+                "functional imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "freesurfer_5.3.0_20260818",
             "categories": [
                 "image segmentation",
@@ -2090,6 +2097,14 @@
             ]
         },
         {
+            "application": "meganorm_0.2.1_20261001",
+            "categories": [
+                "electrophysiology",
+                "machine learning",
+                "statistics"
+            ]
+        },
+        {
             "application": "megnet_1.0.1_20260608",
             "categories": [
                 "electrophysiology"
@@ -2188,6 +2203,12 @@
         },
         {
             "application": "mipview_0.1.4_20260407",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
+            "application": "mipview_0.6.2_20261001",
             "categories": [
                 "visualization"
             ]
