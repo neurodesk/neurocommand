@@ -100,6 +100,14 @@
             ]
         },
         {
+            "application": "alpaca_1.1.4_20260929",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "amico_2.1.0_20250628",
             "categories": [
                 "diffusion imaging"
