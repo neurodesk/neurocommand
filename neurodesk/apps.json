@@ -299,6 +299,20 @@
             "workflows"
         ]
     },
+    "b0mapromeo": {
+        "apps": {
+            "b0mapromeo 1.0.0": {
+                "version": "20261002",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction",
+            "phase processing",
+            "quantitative imaging"
+        ]
+    },
     "bart": {
         "apps": {
             "bart 0.7.00": {
