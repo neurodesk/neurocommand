@@ -1110,7 +1110,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20260929",
+                "version": "20261001",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3222,6 +3222,11 @@
         "apps": {
             "mneextended 1.1.0": {
                 "version": "20260727",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "mneextended 1.2.0": {
+                "version": "20261002",
                 "exec": "",
                 "apptainer_args": []
             }
