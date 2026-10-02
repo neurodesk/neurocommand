@@ -1008,6 +1008,12 @@
             ]
         },
         {
+            "application": "datalad_1.6.5_20261001",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -1027,6 +1033,12 @@
         },
         {
             "application": "datalad_arm64_1.6.4_20260924",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.6.5_20261001",
             "categories": [
                 "data organisation"
             ]
@@ -1506,6 +1518,13 @@
             ]
         },
         {
+            "application": "frisgo_2.10.0_20261002",
+            "categories": [
+                "functional imaging",
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "fsl_6.0.3_20200905",
             "categories": [
                 "diffusion imaging",
@@ -1642,7 +1661,7 @@
             ]
         },
         {
-            "application": "fsqc_2.1.7_20260925",
+            "application": "fsqc_2.1.7_20261002",
             "categories": [
                 "quality control"
             ]
@@ -2553,6 +2572,12 @@
         },
         {
             "application": "openreconacsrss_0.1.0_20260916",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "openreconi2iexample_1.0.89_20261002",
             "categories": [
                 "image reconstruction"
             ]
