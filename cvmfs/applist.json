@@ -251,6 +251,14 @@
             ]
         },
         {
+            "application": "b0mapromeo_1.0.0_20261002",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "bart_0.7.00_20210302",
             "categories": [
                 "image reconstruction"
