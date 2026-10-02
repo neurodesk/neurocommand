@@ -2174,11 +2174,6 @@
     },
     "fsqc": {
         "apps": {
-            "fsqc 2.1.4": {
-                "version": "20251126",
-                "exec": "",
-                "apptainer_args": []
-            },
             "fsqc 2.1.7": {
                 "version": "20261002",
                 "exec": "",
