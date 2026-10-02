@@ -1308,6 +1308,11 @@
                 "version": "20260924",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "datalad 1.6.5": {
+                "version": "20261001",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1333,6 +1338,11 @@
             },
             "datalad_arm64 1.6.4": {
                 "version": "20260924",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "datalad_arm64 1.6.5": {
+                "version": "20261001",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2026,6 +2036,19 @@
             "structural imaging"
         ]
     },
+    "frisgo": {
+        "apps": {
+            "frisgo 2.10.0": {
+                "version": "20261002",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "image reconstruction"
+        ]
+    },
     "fsl": {
         "apps": {
             "fsl 6.0.3": {
@@ -2157,7 +2180,7 @@
                 "apptainer_args": []
             },
             "fsqc 2.1.7": {
-                "version": "20260925",
+                "version": "20261002",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3729,6 +3752,18 @@
         "apps": {
             "openreconacsrss 0.1.0": {
                 "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "openreconi2iexample": {
+        "apps": {
+            "openreconi2iexample 1.0.89": {
+                "version": "20261002",
                 "exec": "",
                 "apptainer_args": []
             }
