@@ -48,7 +48,7 @@ def installation(tmp_path):
         """,
     )
     env = {
-        **os.environ,
+        **{key: value for key, value in os.environ.items() if key != "BASH_ENV"},
         "PATH": f"{bin_dir}:{os.environ['PATH']}",
         "CALLS": str(calls),
         "CVMFS_DISABLE": "1",
@@ -161,12 +161,16 @@ def deploy(install, env, containers):
     return deployed
 
 
-def test_refetch_adds_tcl_module_to_lua_only_install(installation, tmp_path):
+@pytest.mark.parametrize("tcl_state", ["missing", "relocated"])
+def test_refetch_repairs_tcl_module(installation, tmp_path, tcl_state):
     install, env, calls = installation
     containers = tmp_path / "containers"
     deployed = deploy(install, env, containers)
     tcl_module = containers / "modules/demo/1.0"
-    tcl_module.unlink()
+    if tcl_state == "missing":
+        tcl_module.unlink()
+    else:
+        tcl_module.write_text(tcl_module.read_text().replace(str(deployed), "/old/location"))
     calls.write_text("")
 
     result = fetch(install, env, containers)
