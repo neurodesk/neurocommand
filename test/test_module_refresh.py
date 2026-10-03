@@ -201,10 +201,12 @@ python3 -c 'import json,os; print(json.dumps({{k:os.environ[k] for k in ["SINGUL
     assert {k: v for k, v in unloaded.items() if v} == {k: v for k, v in binds.items() if v}
 
 
-def test_normal_fetch_existing_image_regenerates_without_network(tmp_path):
+def test_normal_fetch_existing_image_without_inventories_inspects_without_network(tmp_path):
     neurodesk = tmp_path / "neurodesk with spaces"
     shutil.copytree(ROOT / "neurodesk", neurodesk)
     directory, image = installed(neurodesk)
+    (directory / "commands.txt").unlink()
+    (directory / "env.txt").unlink()
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     calls = tmp_path / "network-calls"

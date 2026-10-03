@@ -216,9 +216,10 @@ else
    container_runtime="singularity"
 fi
 
-if [[ ! -e "$container" ]]; then
 echo "checking if $container exists in the cvmfs cache ..."
-if  [[ -z "$CVMFS_DISABLE" ]] && [[ -d "/cvmfs/neurodesk.ardc.edu.au/containers/${containerName}_${containerVersion}_${containerDate}/${containerName}_${containerVersion}_${containerDate}.simg" ]]; then
+if [[ -e "$container" ]]; then
+   storage="local"
+elif [[ -z "$CVMFS_DISABLE" ]] && [[ -d "/cvmfs/neurodesk.ardc.edu.au/containers/${containerName}_${containerVersion}_${containerDate}/${containerName}_${containerVersion}_${containerDate}.simg" ]]; then
    echo "$container exists in cvmfs"
    storage="cvmfs"
    container_pull="ln -s /cvmfs/neurodesk.ardc.edu.au/containers/${containerName}_${containerVersion}_${containerDate}/${containerName}_${containerVersion}_${containerDate}.simg $container"
@@ -383,9 +384,6 @@ if [ -z "$storage" ]; then
       fi
    fi
 fi
-
-fi
-
 
 echo "deploying in $_base"
 # echo "checking if container needs to be downloaded"
