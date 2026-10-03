@@ -122,15 +122,6 @@ def test_refetch_repairs_moved_installation(installation, tmp_path, image_kind):
     assert before == (wrapper.stat().st_mtime_ns, module.stat().st_mtime_ns)
     assert calls.read_text().splitlines() == [f"exec {moved_image} ls"]
 
-    tcl_module = moved / "modules/demo/1.0"
-    tcl_module.unlink()
-    calls.write_text("")
-    repaired = fetch(install, env, moved)
-    assert repaired.returncode == 0, repaired.stdout + repaired.stderr
-    assert f'prepend-path PATH "{moved / IMAGE}"' in tcl_module.read_text()
-    assert "ts_binaryFinder.sh" in calls.read_text()
-    assert "unexpected network call" not in calls.read_text()
-
 
 @pytest.mark.parametrize("fail_discovery", [False, True])
 def test_refetch_restores_missing_module(installation, tmp_path, fail_discovery):
@@ -154,3 +145,55 @@ def test_refetch_restores_missing_module(installation, tmp_path, fail_discovery)
         assert f'prepend_path("PATH", "{deployed}")' in module.read_text()
         assert (deployed / "demo").is_file()
     assert "unexpected network call" not in calls.read_text()
+
+
+def deploy(install, env, containers):
+    deployed = containers / IMAGE
+    shutil.copytree(install / "transparent-singularity", deployed)
+    (deployed / f"{IMAGE}.simg").write_text("existing SIF")
+    generated = subprocess.run(
+        ["bash", str(deployed / "run_transparent_singularity.sh"), f"{IMAGE}.simg"],
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert generated.returncode == 0, generated.stdout + generated.stderr
+    return deployed
+
+
+@pytest.mark.parametrize("tcl_state", ["missing", "relocated"])
+def test_refetch_repairs_tcl_module(installation, tmp_path, tcl_state):
+    install, env, calls = installation
+    containers = tmp_path / "containers"
+    deployed = deploy(install, env, containers)
+    tcl_module = containers / "modules/demo/1.0"
+    if tcl_state == "missing":
+        tcl_module.unlink()
+    else:
+        tcl_module.write_text(tcl_module.read_text().replace(str(deployed), "/old/location"))
+    calls.write_text("")
+
+    result = fetch(install, env, containers)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert f'prepend-path PATH "{deployed}"' in tcl_module.read_text()
+    assert calls.read_text().splitlines() == [f"exec {deployed / IMAGE}.simg ls"]
+
+
+def test_refetch_of_broken_image_keeps_installation(installation, tmp_path):
+    install, env, calls = installation
+    containers = tmp_path / "containers"
+    deployed = deploy(install, env, containers)
+    moved = tmp_path / "moved"
+    containers.rename(moved)
+    deployed = moved / IMAGE
+    broken_singularity = tmp_path / "broken-bin" / "singularity"
+    broken_singularity.parent.mkdir()
+    write_executable(broken_singularity, '#!/bin/bash\necho "$*" >> "$CALLS"\nexit 1\n')
+    before = {path: path.read_bytes() for path in (deployed / "demo", deployed / "commands.txt", deployed / "env.txt")}
+
+    result = fetch(install, {**env, "PATH": f"{broken_singularity.parent}:{env['PATH']}"}, moved)
+
+    assert result.returncode == 2
+    assert "the container is incomplete" in result.stdout
+    assert {path: path.read_bytes() for path in before} == before

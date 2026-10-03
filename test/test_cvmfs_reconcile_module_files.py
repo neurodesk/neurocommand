@@ -517,3 +517,31 @@ setenv OLD old
     assert (repo / "neurodesk-modules/research/matlab/2024.2").read_text() == content
     assert metadata.read_text() == before_metadata
     assert reconcile_module_files.plan_module_reconciliation(repo, log) == []
+
+
+def test_matlab_legacy_tcl_migration_replaces_unmarked_license_block(tmp_path):
+    module = tmp_path / "containers/modules/matlab/2022a"
+    module.parent.mkdir(parents=True)
+    module.write_text("""#%Module####################################################################
+module-whatis  matlab_2022a_20231207.simg
+prepend-path PATH /cvmfs/neurodesk.ardc.edu.au/containers/matlab_2022a_20231207
+# Append custom license paths so that a license can be stored outside the container
+if { [info exists env(HOME)] } {
+    set additional_bind_paths "$env(HOME):/opt/matlab/R2022a/licenses"
+}
+if { [info exists env(SINGULARITY_BINDPATH)] } {
+    append-path -delim "," SINGULARITY_BINDPATH $additional_bind_paths
+}
+""")
+    log = tmp_path / "log.txt"
+    log.write_text("")
+
+    changes = reconcile_module_files.plan_module_reconciliation(tmp_path, log)
+    reconcile_module_files.apply_changes(changes)
+
+    content = module.read_text()
+    assert content.startswith("#%Module###")
+    assert "prepend-path PATH /cvmfs/neurodesk.ardc.edu.au/containers/matlab_2022a_20231207\n" in content
+    assert "append-path" not in content
+    assert content.count('"$env(HOME):/opt/matlab/R2022a/licenses"') == 1
+    assert reconcile_module_files.plan_module_reconciliation(tmp_path, log) == []

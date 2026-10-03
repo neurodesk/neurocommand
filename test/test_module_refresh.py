@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from test.test_run_transparent_singularity import TRANSPARENT_SINGULARITY, write_executable
+from test.test_cvmfs_reconcile_module_files import reconcile_module_files
 from test.test_cvmfs_reconcile_wrapper_xauthority import reconcile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -201,10 +202,12 @@ python3 -c 'import json,os; print(json.dumps({{k:os.environ[k] for k in ["SINGUL
     assert {k: v for k, v in unloaded.items() if v} == {k: v for k, v in binds.items() if v}
 
 
-def test_normal_fetch_existing_image_regenerates_without_network(tmp_path):
+def test_normal_fetch_existing_image_without_inventories_inspects_without_network(tmp_path):
     neurodesk = tmp_path / "neurodesk with spaces"
     shutil.copytree(ROOT / "neurodesk", neurodesk)
     directory, image = installed(neurodesk)
+    (directory / "commands.txt").unlink()
+    (directory / "env.txt").unlink()
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     calls = tmp_path / "network-calls"
@@ -248,6 +251,18 @@ def test_refresh_keeps_module_uninstall_cleanup_idempotent(tmp_path):
     assert result.returncode == 0, result.stderr
     assert not (directory.parent / "modules/demo/1.0").exists()
     assert not (directory.parent / "modules/demo/1.0.lua").exists()
+
+
+@pytest.mark.parametrize("tool", ["freesurfer", "matlab"])
+def test_rendered_manual_snippets_are_stable_under_cvmfs_reconciliation(tmp_path, tool):
+    directory, image = installed(tmp_path, tool, "7.4")
+    assert refresh(directory, image).returncode == 0
+    snippets = TRANSPARENT_SINGULARITY / "manual_module_files"
+    for module, snippet, is_lua in (("7.4.lua", snippets / tool, True), ("7.4", snippets / "tcl" / tool, False)):
+        content = (directory.parent / "modules" / tool / module).read_text()
+        assert reconcile_module_files.update_manual_module(
+            content, tool=tool, version="7.4", snippet=snippet.read_text(), is_lua=is_lua
+        ) == content
 
 
 def test_legacy_wrapper_does_not_pass_unsupported_env_options(tmp_path):

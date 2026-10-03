@@ -13,14 +13,13 @@ from typing import Optional
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
-MANUAL_MODULE_END = "-- neurodesk-manual-module-end"
 DEFAULT_MANUAL_MODULE_DIR = (
     Path(__file__).resolve().parents[1]
     / "neurodesk/transparent-singularity/manual_module_files"
 )
 LEGACY_MANUAL_HEADERS = {
-    "freesurfer": "-- Append custom paths",
-    "matlab": "-- Append custom license paths so that a license can be stored outside the container",
+    "freesurfer": "Append custom paths",
+    "matlab": "Append custom license paths so that a license can be stored outside the container",
 }
 EXPOSED_COMMANDS_BLOCK = re.compile(
     rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
@@ -196,7 +195,7 @@ def update_exposed_commands(
         search_content = mask_lua_help(content)
         manual_start = re.search(
             r"(?m)^(?:"
-            + "|".join(re.escape(header) for header in (MANUAL_MODULE_BEGIN, *LEGACY_MANUAL_HEADERS.values()))
+            + "|".join(re.escape(header) for header in (MANUAL_MODULE_BEGIN, *(f"-- {header}" for header in LEGACY_MANUAL_HEADERS.values())))
             + r")\r?$",
             search_content,
         )
@@ -302,8 +301,9 @@ def add_delete(changes: dict[Path, PlannedChange], path: Path, reason: str) -> N
 
 
 def update_manual_module(content: str, *, tool: str, version: str, snippet: str, is_lua: bool = True) -> str:
-    begin = MANUAL_MODULE_BEGIN if is_lua else "# neurodesk-manual-module-begin"
-    end_marker = MANUAL_MODULE_END if is_lua else "# neurodesk-manual-module-end"
+    comment = "--" if is_lua else "#"
+    begin = f"{comment} neurodesk-manual-module-begin"
+    end_marker = f"{comment} neurodesk-manual-module-end"
     executable_content = mask_lua_help(content) if is_lua else content
     starts = list(re.finditer(rf"(?m)^{re.escape(begin)}\r?$", executable_content))
     ends = list(re.finditer(rf"(?m)^{re.escape(end_marker)}\r?$", executable_content))
@@ -314,9 +314,10 @@ def update_manual_module(content: str, *, tool: str, version: str, snippet: str,
         if content[end:end + 1] == "\n":
             end += 1
         content = content[:starts[0].start()] + content[end:]
-    elif is_lua and tool in LEGACY_MANUAL_HEADERS:
+    elif tool in LEGACY_MANUAL_HEADERS:
         header = re.search(
-            rf"(?m)^{re.escape(LEGACY_MANUAL_HEADERS[tool])}\r?$", executable_content
+            rf"(?m)^{re.escape(f'{comment} {LEGACY_MANUAL_HEADERS[tool]}')}\r?$",
+            executable_content,
         )
         if header:
             content = content[:header.start()]
