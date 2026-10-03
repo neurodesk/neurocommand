@@ -129,8 +129,7 @@ for format in lua tcl; do
     if [[ -f "$snippet" ]]; then
         {
             printf '%s neurodesk-manual-module-begin\n' "$marker"
-            sed "s/toolVersion/$version/g" "$snippet"
-            echo
+            printf '%s\n' "$(sed "s/toolVersion/$version/g" "$snippet")"
             printf '%s neurodesk-manual-module-end\n' "$marker"
         } >> "$target"
     fi
