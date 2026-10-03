@@ -38,6 +38,8 @@ Command inventories and wrappers are preserved.
 Neurocommand generates Lua modulefiles for Lmod and extensionless Tcl modulefiles
 for Environment Modules. Initialize your host's `module` command before using
 `fetch_and_run.sh`. Container commands require Apptainer or Singularity.
+On CVMFS, module reconciliation generates the Tcl modulefile for each kept
+container that has only a Lua modulefile.
 
 For Environment Modules, search command metadata with `module keyword bet`,
 then load a result with `module load fsl/6.0.7.18`.

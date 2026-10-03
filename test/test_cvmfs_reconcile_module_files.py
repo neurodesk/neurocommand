@@ -545,3 +545,52 @@ if { [info exists env(SINGULARITY_BINDPATH)] } {
     assert "append-path" not in content
     assert content.count('"$env(HOME):/opt/matlab/R2022a/licenses"') == 1
     assert reconcile_module_files.plan_module_reconciliation(tmp_path, log) == []
+
+
+@pytest.mark.parametrize("tool", ["demo", "freesurfer"])
+def test_missing_tcl_module_is_generated_like_the_renderer(tmp_path, tool):
+    import shutil
+    import subprocess
+
+    repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
+    container_name = f"{tool}_1.0_20260629"
+    container = repo_root / "containers" / container_name
+    shutil.copytree(ROOT / "neurodesk/transparent-singularity", container)
+    (container / f"{container_name}.simg").mkdir()
+    (container / "commands.txt").write_text(f"{tool}\n.hidden\nlib.so\n")
+    (container / "env.txt").write_text(
+        'DEPLOY_ENV_TEST_VALUE=BASEPATH/a=b "quoted" $d [e] {f} \\ tail\nIGNORED=1\n'
+    )
+    (container / "README.md").write_text('Help "quoted" $d [boom] \\ { unmatched\n\n')
+    subprocess.run(
+        ["bash", str(container / "ts_render_artifacts.sh"), f"{container_name}.simg"],
+        check=True, capture_output=True,
+    )
+    canonical = repo_root / "containers/modules" / tool / "1.0"
+    rendered = canonical.read_text()
+    canonical.unlink()
+    log_path = tmp_path / "log.txt"
+    log_path.write_text(f"{container_name} categories:image segmentation,\n")
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+    reconcile_module_files.apply_changes(changes)
+
+    public = repo_root / "neurodesk-modules/image_segmentation" / tool / "1.0"
+    assert canonical.read_text() == rendered
+    assert public.read_text() == rendered
+    assert reconcile_module_files.plan_module_reconciliation(repo_root, log_path) == []
+
+
+def test_tcl_module_is_not_generated_without_env_inventory(tmp_path):
+    repo_root = tmp_path / "cvmfs" / "neurodesk.ardc.edu.au"
+    container_name = "datalad_1.3.1_20260512"
+    make_container(repo_root, container_name)
+    canonical = repo_root / "containers/modules/datalad/1.3.1.lua"
+    canonical.parent.mkdir(parents=True)
+    canonical.write_text(module_text(container_name))
+    log_path = tmp_path / "log.txt"
+    log_path.write_text(f"{container_name} categories:data organisation,\n")
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
+
+    assert not any(change.path.suffix != ".lua" for change in changes)
