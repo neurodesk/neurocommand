@@ -290,6 +290,12 @@
             ]
         },
         {
+            "application": "bcbtoolkit_5.3.0_20261002",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "bidsappaa_0.2.0_20230613",
             "categories": [
                 "bids apps"
@@ -834,6 +840,12 @@
         },
         {
             "application": "clinica_0.11.3_20260916",
+            "categories": [
+                "workflows"
+            ]
+        },
+        {
+            "application": "clinica_0.12.0_20261003",
             "categories": [
                 "workflows"
             ]
@@ -2297,6 +2309,12 @@
             ]
         },
         {
+            "application": "mricrogl_1.2.20220720_20261003",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
             "application": "mricron_1.0.20190902_20220311",
             "categories": [
                 "data organisation",
@@ -2333,6 +2351,12 @@
         },
         {
             "application": "mritools_3.3.0_20220224",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
+            "application": "mritools_4.9.0_20261003",
             "categories": [
                 "phase processing"
             ]
@@ -2439,6 +2463,14 @@
             ]
         },
         {
+            "application": "napari_0.9.2_20261002",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
+            ]
+        },
+        {
             "application": "nesvor_0.5.0_20260722",
             "categories": [
                 "fetal imaging",
@@ -2483,6 +2515,18 @@
         },
         {
             "application": "niftyreg_1.4.0_20220317",
+            "categories": [
+                "image registration"
+            ]
+        },
+        {
+            "application": "niftyreg_2.1.2_20261003",
+            "categories": [
+                "image registration"
+            ]
+        },
+        {
+            "application": "niftyreg_arm64_2.1.2_20261003",
             "categories": [
                 "image registration"
             ]
