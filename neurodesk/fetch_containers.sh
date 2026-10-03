@@ -82,7 +82,7 @@ elif [[ -e "$CONTAINER_FILE_NAME" ]]; then
 
     container_dir=$(readlink -f "$CONTAINER_DIR")
     if grep -Fqx "prepend_path(\"PATH\", \"${container_dir}\")" "${MODS_PATH}/${MOD_NAME}/${MOD_VERS}.lua" 2>/dev/null \
-        && [[ -f "${MODS_PATH}/${MOD_NAME}/${MOD_VERS}" ]]; then
+        && grep -Fqx "prepend-path PATH \"${container_dir}\"" "${MODS_PATH}/${MOD_NAME}/${MOD_VERS}" 2>/dev/null; then
         echo "[INFO] fetch_containers.sh: Wrappers and modulefiles for ${IMG_NAME} are up to date."
         exit 0
     fi
