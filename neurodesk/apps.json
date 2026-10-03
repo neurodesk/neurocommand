@@ -351,6 +351,11 @@
                 "version": "20260610",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "bcbtoolkit 5.3.0": {
+                "version": "20261002",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1083,6 +1088,11 @@
             },
             "clinica 0.11.3": {
                 "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "clinica 0.12.0": {
+                "version": "20261003",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3271,6 +3281,16 @@
             "mricroglGUI-mricrogl 1.2.20211006": {
                 "version": "20220111",
                 "exec": "MRIcroGL"
+            },
+            "mricrogl 1.2.20220720": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "mricroglGUI-mricrogl 1.2.20220720": {
+                "version": "20261003",
+                "exec": "MRIcroGL",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3321,6 +3341,11 @@
             "mritools 3.3.0": {
                 "version": "20220224",
                 "exec": ""
+            },
+            "mritools 4.9.0": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3485,6 +3510,26 @@
                 "version": "20260814",
                 "exec": "napari-nninteractive",
                 "apptainer_args": []
+            },
+            "napari 0.9.2": {
+                "version": "20261002",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "napari GUI-napari 0.9.2": {
+                "version": "20261002",
+                "exec": "napari",
+                "apptainer_args": []
+            },
+            "VoxTell-napari 0.9.2": {
+                "version": "20261002",
+                "exec": "napari-voxtell",
+                "apptainer_args": []
+            },
+            "nnInteractive-napari 0.9.2": {
+                "version": "20261002",
+                "exec": "napari-nninteractive",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3529,7 +3574,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20260917",
+                "version": "20261003",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3550,7 +3595,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20260917",
+                "version": "20261003",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3616,6 +3661,23 @@
             "niftyreg 1.4.0": {
                 "version": "20220317",
                 "exec": ""
+            },
+            "niftyreg 2.1.2": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration"
+        ]
+    },
+    "niftyreg_arm64": {
+        "apps": {
+            "niftyreg_arm64 2.1.2": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
