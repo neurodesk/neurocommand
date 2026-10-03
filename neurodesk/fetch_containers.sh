@@ -86,7 +86,15 @@ if [ -e "${CONTAINER_FILE_NAME}" ]; then
         read -n 1 -s -r -p "Press any key to exit..."
         exit 2
     else 
-        echo "[INFO] fetch_containers.sh: Container ${IMG_NAME} seems to be fully downloaded and executable."        
+        echo "[INFO] fetch_containers.sh: Container ${IMG_NAME} seems to be fully downloaded and executable."
+    fi
+
+    container_dir=$(readlink -f "${CONTAINER_PATH}/${IMG_NAME}")
+    module_file="${MODS_PATH}/${MOD_NAME}/${MOD_VERS}.lua"
+    if ! grep -Fqx "prepend_path(\"PATH\", \"${container_dir}\")" "$module_file" 2>/dev/null; then
+        echo "[INFO] fetch_containers.sh: refreshing wrappers and module paths for ${IMG_NAME}"
+        "${container_dir}/run_transparent_singularity.sh" --container "${IMG_NAME}.simg" \
+            --unpack false --singularity-opts "${neurodesk_singularity_opts}" || exit $?
     fi
 else
     echo "[INFO] fetch_containers.sh: copying transparent singularity files from ${neurodesk_installdir} to ${CONTAINER_PATH}/${IMG_NAME} ..."

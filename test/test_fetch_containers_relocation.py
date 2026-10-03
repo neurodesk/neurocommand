@@ -123,15 +123,25 @@ def test_refetch_repairs_moved_installation(installation, tmp_path, image_kind):
     assert calls.read_text().splitlines() == [f"exec {moved_image} ls"]
 
 
-def test_refetch_reports_failed_regeneration(installation, tmp_path):
+@pytest.mark.parametrize("fail_discovery", [False, True])
+def test_refetch_restores_missing_module(installation, tmp_path, fail_discovery):
     install, env, calls = installation
     containers = tmp_path / "containers"
     deployed = containers / IMAGE
     deployed.mkdir(parents=True)
     (deployed / f"{IMAGE}.simg").write_text("existing SIF")
 
-    result = fetch(install, {**env, "FAIL_DISCOVERY": "1"}, containers)
+    result = fetch(
+        install, {**env, "FAIL_DISCOVERY": "1" if fail_discovery else "0"}, containers
+    )
 
-    assert result.returncode != 0
-    assert "Could not inspect executables" in result.stderr
-    assert not (containers / "modules/demo/1.0.lua").exists()
+    module = containers / "modules/demo/1.0.lua"
+    if fail_discovery:
+        assert result.returncode != 0
+        assert "Could not inspect executables" in result.stderr
+        assert not module.exists()
+    else:
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert f'prepend_path("PATH", "{deployed}")' in module.read_text()
+        assert (deployed / "demo").is_file()
+    assert "unexpected network call" not in calls.read_text()
