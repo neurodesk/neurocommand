@@ -166,7 +166,8 @@ def tcl_render_quoted(text: str) -> str:
 
 
 def inventory_lines(path: Path) -> list[str]:
-    lines = path.read_text().split("\n")
+    with path.open(newline="") as inventory:
+        lines = inventory.read().split("\n")
     if lines[-1] == "":
         lines.pop()
     return lines
@@ -176,7 +177,10 @@ def render_tcl_module(container_dir: Path) -> str:
     """Render the Tcl modulefile ts_render_artifacts.sh writes, minus manual snippets."""
     container = f"{container_dir.name}.simg"
     readme = container_dir / "README.md"
-    help_text = readme.read_text(errors="replace").rstrip("\n") if readme.is_file() else ""
+    help_text = ""
+    if readme.is_file():
+        with readme.open(errors="replace", newline="") as source:
+            help_text = source.read().rstrip("\n")
     lines = [
         "#%Module1.0",
         f"proc ModulesHelp {{ }} {{ puts stderr {tcl_render_quoted(help_text)} }}",

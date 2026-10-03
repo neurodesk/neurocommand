@@ -548,7 +548,8 @@ if { [info exists env(SINGULARITY_BINDPATH)] } {
 
 
 @pytest.mark.parametrize("tool", ["demo", "freesurfer"])
-def test_missing_tcl_module_is_generated_like_the_renderer(tmp_path, tool):
+@pytest.mark.parametrize("carriage_return", ["", "\r"])
+def test_missing_tcl_module_is_generated_like_the_renderer(tmp_path, tool, carriage_return):
     import shutil
     import subprocess
 
@@ -559,9 +560,11 @@ def test_missing_tcl_module_is_generated_like_the_renderer(tmp_path, tool):
     (container / f"{container_name}.simg").mkdir()
     (container / "commands.txt").write_text(f"{tool}\n.hidden\nlib.so\n")
     (container / "env.txt").write_text(
-        'DEPLOY_ENV_TEST_VALUE=BASEPATH/a=b "quoted" $d [e] {f} \\ tail\nIGNORED=1\n'
+        f'DEPLOY_ENV_TEST_VALUE=BASEPATH/a=b "quoted" $d [e] {{f}} \\ tail{carriage_return}\nIGNORED=1\n'
     )
-    (container / "README.md").write_text('Help "quoted" $d [boom] \\ { unmatched\n\n')
+    (container / "README.md").write_text(
+        f'Help "quoted" $d [boom] \\ {{ unmatched{carriage_return}more help\n\n'
+    )
     subprocess.run(
         ["bash", str(container / "ts_render_artifacts.sh"), f"{container_name}.simg"],
         check=True, capture_output=True,
