@@ -13,14 +13,13 @@ from typing import Optional
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
-MANUAL_MODULE_END = "-- neurodesk-manual-module-end"
 DEFAULT_MANUAL_MODULE_DIR = (
     Path(__file__).resolve().parents[1]
     / "neurodesk/transparent-singularity/manual_module_files"
 )
 LEGACY_MANUAL_HEADERS = {
-    "freesurfer": "-- Append custom paths",
-    "matlab": "-- Append custom license paths so that a license can be stored outside the container",
+    "freesurfer": "Append custom paths",
+    "matlab": "Append custom license paths so that a license can be stored outside the container",
 }
 EXPOSED_COMMANDS_BLOCK = re.compile(
     rf"(?m)^(?:--|#) {re.escape(EXPOSED_COMMANDS_MARKER)}\r?\n"
@@ -196,7 +195,7 @@ def update_exposed_commands(
         search_content = mask_lua_help(content)
         manual_start = re.search(
             r"(?m)^(?:"
-            + "|".join(re.escape(header) for header in (MANUAL_MODULE_BEGIN, *LEGACY_MANUAL_HEADERS.values()))
+            + "|".join(re.escape(header) for header in (MANUAL_MODULE_BEGIN, *(f"-- {header}" for header in LEGACY_MANUAL_HEADERS.values())))
             + r")\r?$",
             search_content,
         )
@@ -239,7 +238,13 @@ def update_module_content(
         f'whatis("{latest_name}")',
         content,
     )
-    content = re.sub(container_pattern, latest_name, content)
+    if not is_lua:
+        content = re.sub(
+            rf'(?m)^prepend-path PATH "(?:\\.|[^"\\])*{container_pattern}"$',
+            lambda match: f"prepend-path PATH {tcl_double_quoted(latest_dir_text)}",
+            content,
+        )
+    content = re.sub(container_pattern, lambda match: latest_name, content)
     return update_exposed_commands(
         content, latest_dir / "commands.txt", is_lua=is_lua
     )
@@ -295,10 +300,13 @@ def add_delete(changes: dict[Path, PlannedChange], path: Path, reason: str) -> N
         changes[path] = PlannedChange(path=path, content=None, reason=reason)
 
 
-def update_manual_module(content: str, *, tool: str, version: str, snippet: str) -> str:
-    executable_content = mask_lua_help(content)
-    starts = list(re.finditer(rf"(?m)^{re.escape(MANUAL_MODULE_BEGIN)}\r?$", executable_content))
-    ends = list(re.finditer(rf"(?m)^{re.escape(MANUAL_MODULE_END)}\r?$", executable_content))
+def update_manual_module(content: str, *, tool: str, version: str, snippet: str, is_lua: bool = True) -> str:
+    comment = "--" if is_lua else "#"
+    begin = f"{comment} neurodesk-manual-module-begin"
+    end_marker = f"{comment} neurodesk-manual-module-end"
+    executable_content = mask_lua_help(content) if is_lua else content
+    starts = list(re.finditer(rf"(?m)^{re.escape(begin)}\r?$", executable_content))
+    ends = list(re.finditer(rf"(?m)^{re.escape(end_marker)}\r?$", executable_content))
     if starts or ends:
         if len(starts) != 1 or len(ends) != 1 or starts[0].start() >= ends[0].start():
             raise ValueError(f"malformed manual module markers in {tool}/{version}")
@@ -308,7 +316,8 @@ def update_manual_module(content: str, *, tool: str, version: str, snippet: str)
         content = content[:starts[0].start()] + content[end:]
     elif tool in LEGACY_MANUAL_HEADERS:
         header = re.search(
-            rf"(?m)^{re.escape(LEGACY_MANUAL_HEADERS[tool])}\r?$", executable_content
+            rf"(?m)^{re.escape(f'{comment} {LEGACY_MANUAL_HEADERS[tool]}')}\r?$",
+            executable_content,
         )
         if header:
             content = content[:header.start()]
@@ -318,7 +327,7 @@ def update_manual_module(content: str, *, tool: str, version: str, snippet: str)
     if content and not content.endswith("\n"):
         content += "\n"
     rendered = snippet.replace("toolVersion", version).rstrip("\n")
-    return f"{content}{MANUAL_MODULE_BEGIN}\n{rendered}\n{MANUAL_MODULE_END}\n"
+    return f"{content}{begin}\n{rendered}\n{end_marker}\n"
 
 
 def plan_module_reconciliation(
@@ -333,6 +342,12 @@ def plan_module_reconciliation(
         for path in manual_module_dir.iterdir()
         if path.is_file()
     }
+    tcl_dir = manual_module_dir / "tcl"
+    tcl_snippets = {
+        path.name: path.read_text()
+        for path in tcl_dir.iterdir()
+        if path.is_file()
+    } if tcl_dir.is_dir() else {}
     entries = parse_log(log_path)
     latest_by_key = latest_existing_kept_entries(repo_root, entries)
     categories = categories_by_key(entries)
@@ -412,7 +427,7 @@ def plan_module_reconciliation(
         (public_modules_root, "*/*/*"),
     ):
         for module_file in root.glob(pattern):
-            if module_file in changes or not module_file.is_file():
+            if module_file in changes or not module_file.is_file() or module_file.name.startswith("."):
                 continue
             content = module_file.read_text()
             cleaned = EXPOSED_COMMANDS_BLOCK.sub(
@@ -425,10 +440,12 @@ def plan_module_reconciliation(
                 "remove obsolete generated command extensions",
             )
 
-    lua_modules = set(canonical_modules_root.glob("*/*.lua"))
-    lua_modules.update(public_modules_root.glob("*/*/*.lua"))
-    lua_modules.update(path for path in changes if path.suffix == ".lua")
-    for module_file in sorted(lua_modules):
+    module_files = set(canonical_modules_root.glob("*/*"))
+    module_files.update(public_modules_root.glob("*/*/*"))
+    module_files.update(changes)
+    for module_file in sorted(module_files):
+        if module_file.name.startswith(".") or module_file.is_symlink():
+            continue
         planned = changes.get(module_file)
         if planned is not None and planned.content is None:
             continue
@@ -439,8 +456,9 @@ def plan_module_reconciliation(
         updated = update_manual_module(
             content,
             tool=tool,
-            version=module_file.stem,
-            snippet=snippets.get(tool, ""),
+            version=module_file.stem if module_file.suffix == ".lua" else module_file.name,
+            snippet=(snippets if module_file.suffix == ".lua" else tcl_snippets).get(tool, ""),
+            is_lua=module_file.suffix == ".lua",
         )
         if updated != content:
             changes[module_file] = PlannedChange(
@@ -481,7 +499,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--manual-module-dir",
         type=Path,
         default=DEFAULT_MANUAL_MODULE_DIR,
-        help="Directory containing current per-tool Lua module snippets.",
+        help="Directory containing current Lua snippets and a tcl subdirectory.",
     )
     parser.add_argument(
         "--check",
