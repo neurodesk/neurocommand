@@ -1,0 +1,16 @@
+if {[info exists env(HOME)]} {
+    set additional_bind_paths "$env(HOME):/opt/matlab/RtoolVersion/licenses"
+} else {
+    set additional_bind_paths "/tmp:/opt/matlab/RtoolVersion/licenses"
+}
+set has_singularity [info exists env(SINGULARITY_BINDPATH)]
+set has_apptainer [info exists env(APPTAINER_BINDPATH)]
+if {$has_singularity} {
+    prepend-path --delim , SINGULARITY_BINDPATH $additional_bind_paths
+}
+if {$has_apptainer} {
+    prepend-path --delim , APPTAINER_BINDPATH $additional_bind_paths
+}
+if {!$has_singularity && !$has_apptainer} {
+    setenv SINGULARITY_BINDPATH $additional_bind_paths
+}

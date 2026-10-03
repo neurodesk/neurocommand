@@ -92,7 +92,7 @@ if [[ "$CVMFS_DISABLE" == "false" ]]; then
 else
     MODS_PATH="${LOCAL_CONTAINERS_PATH}/modules"
 fi
-module use ${MODS_PATH}
+module use "$MODS_PATH" || exit 2
 
 fetch_container() {
     # Resolve builddate from apps.json if not provided
@@ -110,23 +110,28 @@ fetch_container() {
     # Download the container
     export CONTAINER_PATH="${LOCAL_CONTAINERS_PATH}"
     # shellcheck disable=SC1091
-    source "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE"
-    module use ${MODS_PATH}
+    bash "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE" || exit 2
+    module use "$MODS_PATH" || exit 2
 }
+
+module_avail_opts=()
+if [[ -n ${LMOD_CMD:-} || -n ${LMOD_VERSION:-} ]]; then
+    module_avail_opts=(--ignore-cache)
+fi
 
 # Check if the module is available. Ignore stale module caches so newly added
 # local modulefiles are visible before deciding to download the container.
 if [[ "$EXPLICIT_MOD_DATE" == "true" ]]; then
     echo "[INFO] fetch_and_run.sh line $LINENO: Explicit builddate requested; ensuring ${MOD_NAME}_${MOD_VERS}_${MOD_DATE} is installed."
     fetch_container
-elif ! module --ignore-cache avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD_NAME}/${MOD_VERS}"; then
+elif ! module "${module_avail_opts[@]}" avail "${MOD_NAME}/${MOD_VERS}" 2>&1 | grep -q "${MOD_NAME}/${MOD_VERS}"; then
     echo "[WARNING] fetch_and_run.sh line $LINENO: Module ${MOD_NAME}/${MOD_VERS} not found. Attempting to download container."
     fetch_container
 fi
 
 # Load the module - this prepends the container directory to PATH
 echo "[INFO] fetch_and_run.sh line $LINENO: Loading module ${MOD_NAME}/${MOD_VERS}"
-module load "${MOD_NAME}/${MOD_VERS}"
+module load "${MOD_NAME}/${MOD_VERS}" || exit 2
 
 # Extract the container directory from PATH (it was just prepended by module load)
 CONTAINER_DIR=$(echo "$PATH" | tr ':' '\n' | head -1)
@@ -154,7 +159,7 @@ if [ $# -eq 0 ]; then
         export SINGULARITYENV_PS1="${MOD_NAME}-${MOD_VERS}:\w$ "
         # shellcheck disable=SC2154
         echo "[INFO] fetch_and_run.sh line $LINENO: output README.md of the container"
-        singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY ${neurodesk_singularity_opts} ${CONTAINER_FILE_NAME} cat /README.md
+        singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}" cat /README.md
 
         singularity --silent shell ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}"
         if [ $? -eq 0 ]; then
@@ -177,14 +182,14 @@ if [ $# -eq 0 ]; then
             fi
 
             # shellcheck disable=SC1091
-            source "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE"
+            bash "${_base}"/fetch_containers.sh "$MOD_NAME" "$MOD_VERS" "$MOD_DATE" || exit 2
             module use "${LOCAL_CONTAINERS_PATH}/modules"
-            module load "${MOD_NAME}/${MOD_VERS}"
+            module load "${MOD_NAME}/${MOD_VERS}" || exit 2
             CONTAINER_DIR=$(echo "$PATH" | tr ':' '\n' | head -1)
             CONTAINER_DIR_NAME=$(basename "$CONTAINER_DIR")
             CONTAINER_FILE_NAME="${CONTAINER_DIR}/${CONTAINER_DIR_NAME}.simg"
-            singularity --silent exec ${neurodesk_singularity_opts} ${CONTAINER_FILE_NAME} cat /README.md
-            singularity --silent shell ${neurodesk_singularity_opts} ${CONTAINER_FILE_NAME}
+            singularity --silent exec ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}" cat /README.md
+            singularity --silent shell ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}"
             if [ $? -eq 0 ]; then
                 echo "[INFO] fetch_and_run.sh line $LINENO: Container ran OK"
             else

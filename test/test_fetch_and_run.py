@@ -1,3 +1,4 @@
+import os
 import shlex
 import subprocess
 from pathlib import Path
@@ -12,6 +13,7 @@ def run_bash(script):
     return subprocess.run(
         ["bash", "-c", script],
         cwd=ROOT,
+        env={k: v for k, v in os.environ.items() if k != "BASH_ENV"},
         capture_output=True,
         text=True,
     )
@@ -35,6 +37,8 @@ container_bin={shlex.quote(str(container_bin))}
 local_containers={shlex.quote(str(local_containers))}
 export calls container_bin local_containers
 export NEURODESKTOP_LOCAL_CONTAINERS="$local_containers"
+export CVMFS_DISABLE=true
+export LMOD_VERSION=stub
 
 module() {{
     printf '%s\\n' "$*" >> "$calls"
@@ -112,6 +116,8 @@ new_container={shlex.quote(str(new_container))}
 local_containers={shlex.quote(str(local_containers))}
 export calls fetch_marker old_container new_container local_containers
 export NEURODESKTOP_LOCAL_CONTAINERS="$local_containers"
+export CVMFS_DISABLE=true
+export LMOD_VERSION=stub
 
 module() {{
     printf '%s\\n' "$*" >> "$calls"
@@ -183,3 +189,45 @@ def test_fetch_containers_honors_neurodesktop_local_containers_override():
         "CONTAINER_PATH=${NEURODESKTOP_LOCAL_CONTAINERS:-${PATH_PREFIX}/containers}"
         in FETCH_CONTAINERS.read_text()
     )
+
+
+def test_environment_modules_availability_and_failed_load_stop_command(tmp_path):
+    marker = tmp_path / "command-ran"
+    script = f'''
+export CVMFS_DISABLE=true
+unset LMOD_CMD LMOD_VERSION
+module() {{
+    case "$1" in
+        use) return 0 ;;
+        avail) echo demo/1.0; return 0 ;;
+        load) return 19 ;;
+        *) return 42 ;;
+    esac
+}}
+export -f module
+bash {shlex.quote(str(SCRIPT))} demo 1.0 touch {shlex.quote(str(marker))}
+'''
+    result = run_bash(script)
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert not marker.exists()
+
+
+def test_failed_fetch_stops_before_load_or_command(tmp_path):
+    directory = tmp_path / "neurodesk"
+    directory.mkdir()
+    (directory / "fetch_and_run.sh").write_text(SCRIPT.read_text())
+    (directory / "configparser.sh").write_text("return 0\n")
+    (directory / "fetch_containers.sh").write_text("exit 23\n")
+    marker = tmp_path / "loaded"
+    script = f'''
+export CVMFS_DISABLE=true
+module() {{
+    if [[ $1 == load ]]; then touch {shlex.quote(str(marker))}; fi
+    return 0
+}}
+export -f module
+bash {shlex.quote(str(directory / "fetch_and_run.sh"))} demo 1.0 20260629 true
+'''
+    result = run_bash(script)
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert not marker.exists()

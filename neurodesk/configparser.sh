@@ -20,7 +20,7 @@ if [ -f "$filename" ]; then
         then
             declare "neurodesk_${key}=$value"
         fi
-    done < $filename
+    done < "$filename"
 
     neurodesk_appmenudir="$(dirname "${neurodesk_appmenu}")"
     neurodesk_appmenufile="$(basename "${neurodesk_appmenu}")"

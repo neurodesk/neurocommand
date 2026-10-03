@@ -10,7 +10,7 @@ function path_remove {
            PATH=${PATH/%":$1"/} # delete any instance in the at the end
 }
 
-path_remove $pathToRemove
+path_remove "$pathToRemove"
 
 echo "path after"
 echo $PATH

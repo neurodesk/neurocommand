@@ -30,6 +30,26 @@ jobs:
       - name: Run unit tests
         run: python -m pytest -q
 
+  module_engines:
+    name: module integration (${{ matrix.package }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [lmod, environment-modules]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+      - name: Install module engine and test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.package }}
+          python -m pip install -r test/requirements.txt
+      - name: Exercise generated modulefiles
+        run: python -m pytest -q test/test_module_refresh.py
+
   slim_image:
     name: build slim image
     runs-on: ubuntu-24.04

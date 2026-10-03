@@ -40,6 +40,17 @@ if [[ -z "$command_list" ]]; then
     exit 0
 fi
 
+if [[ ${2:-lua} == tcl ]]; then
+    command_list="${command_list//\\/\\\\}"
+    command_list="${command_list//\"/\\\"}"
+    command_list="${command_list//\$/\\\$}"
+    command_list="${command_list//\[/\\[}"
+    command_list="${command_list//\]/\\]}"
+    echo "# neurodesk-exposed-commands"
+    printf 'module-whatis "Commands: %s"\n' "$command_list"
+    exit 0
+fi
+
 # Escape the two characters that are special inside a Lua double-quoted string.
 command_list="${command_list//\\/\\\\}"
 command_list="${command_list//\"/\\\"}"

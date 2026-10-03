@@ -486,3 +486,34 @@ def test_invalid_snippet_inputs_do_not_partially_write_modules(tmp_path, failure
 
     assert reconcile_module_files.main(args) == 2
     assert [good.read_text(), bad.read_text()] == before
+
+
+def test_tcl_reconciliation_updates_path_commands_and_dotted_manual_version(tmp_path):
+    repo = tmp_path / "repo with spaces"
+    name = "matlab_2024.2_20260629"
+    make_container(repo, name, "newcommand\n")
+    log = tmp_path / "log.txt"
+    log.write_text(f"{name} categories:research,\n")
+    module = repo / "containers/modules/matlab/2024.2"
+    module.parent.mkdir(parents=True)
+    module.write_text('''#%Module1.0
+module-whatis "matlab_2024.2_20260101"
+prepend-path PATH "/old/containers/matlab_2024.2_20260101"
+# neurodesk-manual-module-begin
+setenv OLD old
+# neurodesk-manual-module-end
+''')
+    metadata = module.parent / ".version"
+    metadata.write_text('#%Module1.0\nset ModulesVersion "2024.2"\n')
+    before_metadata = metadata.read_text()
+    changes = reconcile_module_files.plan_module_reconciliation(repo, log)
+    reconcile_module_files.apply_changes(changes)
+    content = module.read_text()
+    assert f'prepend-path PATH "{repo / "containers" / name}"' in content
+    assert 'module-whatis "Commands: newcommand"' in content
+    assert 'R2024.2/licenses' in content
+    assert 'setenv OLD' not in content
+    assert content.count('# neurodesk-manual-module-begin') == 1
+    assert (repo / "neurodesk-modules/research/matlab/2024.2").read_text() == content
+    assert metadata.read_text() == before_metadata
+    assert reconcile_module_files.plan_module_reconciliation(repo, log) == []

@@ -276,6 +276,30 @@ def _fixed_wrapper(legacy: bytes) -> bytes:
     return _xauthority_wrapper(legacy).replace(pwd_line, pwd_line + NVIDIA_BLOCK, 1)
 
 
+def _inventory_wrapper(container_dir: Path, command: str, *, legacy: bool = False) -> bytes:
+    def quote(value: str) -> str:
+        return "'" + value.replace("'", "'\\'" + "'") + "'"
+
+    setup = (
+        b"#!/usr/bin/env bash\nexport PWD=`pwd -P`\n"
+        + NVIDIA_BLOCK + XAUTHORITY_BLOCK
+        + b'tmp_opts=()\n'
+        + b'for customtmp in TMP TMPDIR TEMP TEMPDIR; do\n'
+        + b'  if [[ -n "${!customtmp}" ]]; then\n'
+        + b'    tmp_opts=(--bind "${!customtmp}:/tmp")\n'
+        + b'  fi\ndone\n'
+    )
+    gui_options = "" if legacy else '--env DISPLAY="$DISPLAY" "${xauthority_opts[@]}" '
+    invocation = (
+        "singularity --silent exec --cleanenv " + gui_options
+        + '"${tmp_opts[@]}" '
+        + '$neurodesk_singularity_opts --pwd "$PWD" '
+        + quote(str(container_dir / f"{container_dir.name}.simg"))
+        + " " + quote(command) + ' "$@"\n'
+    )
+    return setup + invocation.encode("utf-8")
+
+
 def _classify_wrapper(
     container_dir: Path, command: str, content: bytes
 ) -> tuple[WrapperState, bytes | None]:
@@ -285,6 +309,9 @@ def _classify_wrapper(
         and DISABLED_PULL_HINT in content
     ):
         return WrapperState.DISABLED, None
+
+    if content in (_inventory_wrapper(container_dir, command), _inventory_wrapper(container_dir, command, legacy=True)):
+        return WrapperState.FIXED, None
 
     for legacy in _legacy_wrapper_candidates(container_dir, command):
         if content in (legacy, _xauthority_wrapper(legacy)):

@@ -82,12 +82,12 @@ run_container_pull_with_fallback() {
 
 export SINGULARITY_BINDPATH=$SINGULARITY_BINDPATH,$PWD
 
-_script="$(readlink -f ${BASH_SOURCE[0]})" ## who am i? ##
-_base="$(dirname $_script)" ## Delete last component from $_script ##
+_script="$(readlink -f "${BASH_SOURCE[0]}")"
+_base="$(dirname "$_script")"
 
 # echo "making sure this is not running in a symlinked directory (singularity bug)"
 # echo "path: $_base"
-cd $_base
+cd "$_base" || fail "Could not enter installation directory."
 _base=`pwd -P`
 # echo "corrected path: $_base"
 
@@ -116,6 +116,10 @@ while [[ $# -gt 0 ]]
       singularity_opts="$2"
       shift # past argument
       shift # past value
+      ;;
+      --refresh)
+      refresh=true
+      shift
       ;;
       --default)
       DEFAULT=YES
@@ -190,6 +194,12 @@ if [[ -z "$containerName" ]] || [[ -z "$containerVersion" ]] || [[ ! "$container
 fi
 
 
+if [[ ${refresh:-false} == true ]]; then
+   [[ ${unpack:-false} != true ]] || fail "--refresh cannot be combined with --unpack true."
+   bash "$_base/ts_render_artifacts.sh" "$container" || fail "Could not refresh artifacts for '${container}'."
+   exit 0
+fi
+
 # echo "checking for singularity ..."
 qq=`which  singularity`
 if [[  ${#qq} -lt 1 ]]; then
@@ -206,6 +216,7 @@ else
    container_runtime="singularity"
 fi
 
+if [[ ! -e "$container" ]]; then
 echo "checking if $container exists in the cvmfs cache ..."
 if  [[ -z "$CVMFS_DISABLE" ]] && [[ -d "/cvmfs/neurodesk.ardc.edu.au/containers/${containerName}_${containerVersion}_${containerDate}/${containerName}_${containerVersion}_${containerDate}.simg" ]]; then
    echo "$container exists in cvmfs"
@@ -373,6 +384,8 @@ if [ -z "$storage" ]; then
    fi
 fi
 
+fi
+
 
 echo "deploying in $_base"
 # echo "checking if container needs to be downloaded"
@@ -393,11 +406,11 @@ fi
 if [[ ${unpack:-} = "true" ]]
 then
    echo "unpacking singularity file to sandbox directory:"
-   if ! singularity build --sandbox temp $container; then
+   if ! singularity build --sandbox temp "$container"; then
       fail "Failed to unpack container '${container}'."
    fi
-    rm -rf $container
-    mv temp $container
+    rm -rf "$container"
+    mv temp "$container"
 fi
 
 # Unpacking is architecture-neutral, so it can succeed even when the host is
@@ -410,15 +423,15 @@ fi
 rm -f README.md commands.txt commands_raw.txt env.txt
 
 echo "checking if there is a README.md file in the container"
-echo "executing: singularity exec $singularity_opts --pwd $_base $container cat /README.md"
-if ! singularity exec $singularity_opts --pwd $_base $container cat /README.md > README.md; then
+echo "executing: singularity exec $singularity_opts --pwd "$_base" "$container" cat /README.md"
+if ! singularity exec $singularity_opts --pwd "$_base" "$container" cat /README.md > README.md; then
    echo "[WARN] run_transparent_singularity.sh: Could not read /README.md from container '${container}'. Continuing with empty module help." >&2
    : > README.md
 fi
 
 echo "checking which executables exist inside container"
-echo "executing: singularity exec $singularity_opts --pwd $_base $container $_base/ts_binaryFinder.sh"
-if ! singularity exec $singularity_opts --pwd $_base $container $_base/ts_binaryFinder.sh; then
+echo "executing: singularity exec $singularity_opts --pwd "$_base" "$container" "$_base/ts_binaryFinder.sh""
+if ! singularity exec $singularity_opts --pwd "$_base" "$container" "$_base/ts_binaryFinder.sh"; then
    fail "Could not inspect executables in container '${container}'. Not creating wrapper or module files."
 fi
 
@@ -430,120 +443,12 @@ if [[ ! -f "$_base/env.txt" ]]; then
    fail "ts_binaryFinder.sh did not create env.txt for '${container}'. Not creating wrapper or module files."
 fi
 
-echo "create singularity executable for each regular executable in commands.txt"
-# $@ parses command line options.
-#test   executable="fslmaths"
-
-# The --env option requires singularity > 3.6 or apptainer. Test here:
-required_version="3.6"
-if which apptainer >/dev/null 2>&1; then
-    echo "Apptainer is installed."
-    singularity_version=3.6
-else
-    echo "Apptainer is not installed. Testing for singularity version."
-    singularity_version=$(singularity version | cut -d'-' -f1)
-fi
-
-while read executable; do \
-   echo $executable > $_base/${executable}; \
-   echo "#!/usr/bin/env bash" > $executable
-   echo "export PWD=\`pwd -P\`" >> $executable
-   cat >> "$executable" <<'EOF'
-if [ -f /proc/driver/nvidia/version ] && [ -z "${APPTAINER_NV+set}" ] && [ -z "${SINGULARITY_NV+set}" ]; then
-  export APPTAINER_NV=1
-  export SINGULARITY_NV=1
-fi
-EOF
-   echo 'xauthority_opts=()' >> $executable
-   echo 'if [[ -n "${XAUTHORITY:-}" && -f "$XAUTHORITY" ]]; then' >> $executable
-   echo '  xauthority_opts=(--bind "$XAUTHORITY:$XAUTHORITY:ro" --env "XAUTHORITY=$XAUTHORITY")' >> $executable
-   echo 'fi' >> $executable
-
-   # neurodesk_singularity_opts is a global variable that can be set in neurodesk for example --nv for gpu support
-   # --silent is required to suppress bind mound warnings (e.g. for /etc/localtime)
-   # --cleanenv is required to prevent environment variables on the host to affect the containers (e.g. Julia and R packages), but to work 
-   # correctly with GUIs, the DISPLAY variable needs to be set as well. This only works in singularity >= 3.6.0
-   # --bind is needed to handle non-default temp directories (Github issue #11)
-   for customtmp in TMP TMPDIR TEMP TEMPDIR; do
-      eval tmpvar=\$$customtmp
-      if [[ -n $tmpvar ]]; then
-         bindtmpdir="--bind \$$customtmp:/tmp"
-      fi
-   done
-   if printf '%s\n' "$required_version" "$singularity_version" | sort -V | head -n1 | grep -q "$required_version"; then
-      echo "singularity --silent exec --cleanenv --env DISPLAY=\$DISPLAY \"\${xauthority_opts[@]}\" $bindtmpdir \$neurodesk_singularity_opts --pwd \"\$PWD\" $_base/$container $executable \"\$@\"" >> $executable
-   else
-      echo "Singularity version is older than $required_version. GUIs will not work correctly!"
-      echo "singularity --silent exec --cleanenv $bindtmpdir \$neurodesk_singularity_opts --pwd \"\$PWD\" $_base/$container $executable \"\$@\"" >> $executable
+wrapper_compat=modern
+if ! command -v apptainer >/dev/null 2>&1; then
+   singularity_version=$(singularity version | cut -d'-' -f1)
+   if [[ $(printf '%s\n' 3.6 "$singularity_version" | sort -V | head -n1) != 3.6 ]]; then
+      wrapper_compat=legacy
+      echo "[WARN] Singularity older than 3.6 cannot forward DISPLAY via --env." >&2
    fi
-
-   chmod a+x $executable
-done < $_base/commands.txt
-
-echo "creating activate script that runs deactivate first in case it is already there"
-echo "#!/usr/bin/env bash" > activate_${container}.sh
-echo "source deactivate_${container}.sh $_base" >> activate_${container}.sh
-echo -e "export PWD=\`pwd -P\`" >> activate_${container}.sh
-echo -e 'export PATH="$PWD:$PATH"' >> activate_${container}.sh
-echo -e 'echo "# Container in $PWD" >> ~/.bashrc' >> activate_${container}.sh
-echo -e 'echo "export PATH="$PWD:\$PATH"" >> ~/.bashrc' >> activate_${container}.sh
-chmod a+x activate_${container}.sh
-
-echo "deactivate script"
-echo  pathToRemove=$_base | cat - ts_deactivate_ > temp && mv temp deactivate_${container}.sh
-chmod a+x deactivate_${container}.sh
-
-
-# e.g. export container=matlab_2024b_20250117
-echo "create module files one directory up"
-modulePath="$_base/../modules/${containerName}"
-echo $modulePath
-# e.g. ../modules/matlab
-mkdir -p "$modulePath"
-
-moduleSoftwareName="${containerName}"
-# e.g. matlab
-
-moduleName="${containerVersion}"
-# e.g. 2024b
-
-echo "-- -*- lua -*-" > ${modulePath}/${moduleName}.lua
-echo "help([===[" >> ${modulePath}/${moduleName}.lua 
-bash "$_base/ts_sanitize_lua_help.sh" README.md >> ${modulePath}/${moduleName}.lua
-echo "]===])" >> ${modulePath}/${moduleName}.lua
-
-echo "whatis(\"${container}\")" >> ${modulePath}/${moduleName}.lua
-if ! bash "$_base/ts_command_metadata.sh" "$_base/commands.txt" >> "${modulePath}/${moduleName}.lua"; then
-   fail "Could not generate command metadata for '${container}'."
 fi
-echo "prepend_path(\"PATH\", \"${_base}\")" >> ${modulePath}/${moduleName}.lua
-
-echo "create environment variables for module file"
-while read envvariable; do \
-   # envvariable="DEPLOY_ENV_SPMMCRCMD=BASEPATH/opt/spm12/run_spm12.sh BASEPATH/opt/mcr/v97/ script"
-   value=${envvariable#*=}
-   # echo $value #BASEPATH/opt/spm12/run_spm12.sh BASEPATH/opt/mcr/v97/ script"
-
-   value_with_basepath="${value//BASEPATH/${_base}/${container}}"
-   # echo $value_with_basepath
-
-   completeVariableName=${envvariable%=*}
-   # echo $completeVariableName
-
-   variableName=${completeVariableName#*DEPLOY_ENV_}
-   # echo $variableName
-
-   echo "setenv(\"${variableName}\", \"${value_with_basepath}\")" >> ${modulePath}/${moduleName}.lua
-done < $_base/env.txt
-
-#check if there is a manual module file for this container and add it to the end
-if [[ -e manual_module_files/${moduleSoftwareName} ]]; then
-   echo "adding manual module file"
-   {
-      echo "-- neurodesk-manual-module-begin"
-      printf '%s\n' "$(sed "s/toolVersion/${moduleName}/g" "manual_module_files/${moduleSoftwareName}")"
-      echo "-- neurodesk-manual-module-end"
-   } >> "${modulePath}/${moduleName}.lua"
-fi
-
-echo "rm ${modulePath}/${moduleName}" >> ts_uninstall.sh
+bash "$_base/ts_render_artifacts.sh" "$container" "$wrapper_compat" || fail "Could not generate artifacts for '${container}'."
