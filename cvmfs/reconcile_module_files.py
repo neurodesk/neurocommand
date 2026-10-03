@@ -155,6 +155,52 @@ def tcl_double_quoted(text: str) -> str:
     return f'"{escaped}"'
 
 
+def tcl_render_quoted(text: str) -> str:
+    """Quote like ts_render_artifacts.sh's tcl_quote."""
+    for raw, escaped in (
+        ("\\", "\\\\"), ('"', '\\"'), ("$", "\\$"), ("[", "\\["), ("]", "\\]"),
+        ("{", "\\{"), ("}", "\\}"), ("\n", "\\n"), ("\r", "\\r"),
+    ):
+        text = text.replace(raw, escaped)
+    return f'"{text}"'
+
+
+def inventory_lines(path: Path) -> list[str]:
+    with path.open(newline="") as inventory:
+        lines = inventory.read().split("\n")
+    if lines[-1] == "":
+        lines.pop()
+    return lines
+
+
+def render_tcl_module(container_dir: Path) -> str:
+    """Render the Tcl modulefile ts_render_artifacts.sh writes, minus manual snippets."""
+    container = f"{container_dir.name}.simg"
+    readme = container_dir / "README.md"
+    help_text = ""
+    if readme.is_file():
+        with readme.open(errors="replace", newline="") as source:
+            help_text = source.read().rstrip("\n")
+    lines = [
+        "#%Module1.0",
+        f"proc ModulesHelp {{ }} {{ puts stderr {tcl_render_quoted(help_text)} }}",
+        f"module-whatis {tcl_render_quoted(container)}",
+    ]
+    commands = render_exposed_commands(container_dir / "commands.txt", is_lua=False)
+    if commands:
+        lines.append(commands)
+    lines.append(f"prepend-path PATH {tcl_render_quoted(str(container_dir))}")
+    for record in inventory_lines(container_dir / "env.txt"):
+        if not record.startswith("DEPLOY_ENV_") or "=" not in record:
+            continue
+        variable, value = record.split("=", 1)
+        value = value.replace("BASEPATH", f"{container_dir}/{container}")
+        lines.append(
+            f"setenv {tcl_render_quoted(variable.removeprefix('DEPLOY_ENV_'))} {tcl_render_quoted(value)}"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def render_exposed_commands(commands_path: Path, *, is_lua: bool = True) -> str:
     commands = exposed_commands(commands_path)
     if not commands:
@@ -384,6 +430,21 @@ def plan_module_reconciliation(
                 module_file,
                 updated,
                 f"point canonical {tool}/{version} at {latest_name}",
+            )
+
+        # Containers deployed before Tcl support only have Lua modulefiles.
+        tcl_module = canonical_modules_root / tool / version
+        if (
+            version not in canonical_contents
+            and f"{version}.lua" in canonical_contents
+            and (latest_dir / "env.txt").is_file()
+        ):
+            canonical_contents[version] = render_tcl_module(latest_dir)
+            add_change(
+                changes,
+                tcl_module,
+                canonical_contents[version],
+                f"generate canonical Tcl {tool}/{version} from {latest_name} inventories",
             )
 
         for module_file in existing_public_module_candidates(public_modules_root, tool, version):
