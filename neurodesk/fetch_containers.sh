@@ -66,6 +66,13 @@ else
         module use "$MODS_PATH" || exit 2
     fi
     mkdir -p "$CONTAINER_DIR" "$MODS_PATH" || exit 2
+    container_dir=$(readlink -f "$CONTAINER_DIR")
+    if [[ -e "$CONTAINER_FILE_NAME" ]] &&
+        grep -Fqx "prepend_path(\"PATH\", \"${container_dir}\")" "$MODS_PATH/$MOD_NAME/$MOD_VERS.lua" 2>/dev/null &&
+        grep -Fqx "prepend-path PATH \"${container_dir}\"" "$MODS_PATH/$MOD_NAME/$MOD_VERS" 2>/dev/null; then
+        singularity exec ${neurodesk_singularity_opts} "$CONTAINER_FILE_NAME" ls || exit 2
+        exit 0
+    fi
 fi
 
 helper_dir="${_base}/transparent-singularity"

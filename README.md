@@ -71,6 +71,8 @@ in your shell's `MODULEPATH` need updating with `module unuse` and `module use`.
 The refresh command repairs this container's generated files. It does not rewrite
 other installation settings in `config.ini`.
 
-A normal fetch of an existing image also regenerates these files after inspecting
-the container. Use `--refresh` for an offline update. Wrappers refreshed offline
+A normal fetch repairs missing or relocated modulefiles after inspecting the
+container. If both module formats already point at the current installation, it
+checks image execution without regenerating files. Use `--refresh` to regenerate
+artifacts offline. Wrappers refreshed offline
 use the `--env` interface supported by Singularity 3.6 and later and Apptainer.
