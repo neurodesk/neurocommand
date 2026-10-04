@@ -287,6 +287,11 @@ def _write_rewrite(rewrite: PlannedRewrite) -> None:
 
 
 def apply_wrapper_plan(plan: ReconciliationPlan) -> int:
+    """Apply the plan with exclusive access to the deployment files.
+
+    Snapshot checks are not atomic with writes. Failures leave earlier writes applied.
+    Return the number of rewritten wrappers and helpers.
+    """
     if plan.diagnostics:
         raise ValueError("wrapper reconciliation plan contains errors")
 
@@ -296,11 +301,14 @@ def apply_wrapper_plan(plan: ReconciliationPlan) -> int:
         current = _read_regular_file(path) if path.exists() or path.is_symlink() else None
         if current != before:
             raise RuntimeError(f"Helper changed since planning: {path}")
-    for path, _, content in plan.helpers:
+    for path, before, content in plan.helpers:
+        current = _read_regular_file(path) if path.exists() or path.is_symlink() else None
+        if current != before:
+            raise RuntimeError(f"Helper changed since planning: {path}")
         write_artifact(path, content, path.suffix == ".sh")
     for rewrite in plan.rewrites:
         _write_rewrite(rewrite)
-    return len(plan.rewrites)
+    return len(plan.rewrites) + len(plan.helpers)
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -343,7 +351,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         if plan.rewrites or plan.helpers:
             print(
-                f"[INFO] Wrapper reconciliation would change {len(plan.rewrites)} file(s)."
+                f"[INFO] Wrapper reconciliation would change {len(plan.rewrites) + len(plan.helpers)} file(s)."
             )
             return 1
         print("[INFO] Wrapper reconciliation is already up to date.")

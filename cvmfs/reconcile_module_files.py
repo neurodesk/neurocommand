@@ -473,6 +473,7 @@ def plan_module_reconciliation(
         tcl_module = canonical_modules_root / tool / version
         if (
             version not in canonical_contents
+            and not tcl_module.is_symlink()
             and f"{version}.lua" in canonical_contents
             and (latest_dir / "env.txt").is_file()
         ):
@@ -602,6 +603,10 @@ def verify_change(change: PlannedChange) -> None:
 
 
 def apply_changes(changes: list[PlannedChange]) -> None:
+    """Apply the plan with exclusive access to the deployment files.
+
+    Snapshot checks are not atomic with writes. Failures leave earlier writes applied.
+    """
     for change in changes:
         verify_change(change)
     for applied, change in enumerate(changes):

@@ -110,7 +110,7 @@ print('NEURODESK_IMAGE_' + '/'.join(sys.argv[1:]).encode().hex().upper())
 PY
 )
     image=${!key:-}
-    if [[ -z $image || ! -e $image ]]; then
+    if [[ ( $isolated == true || -n $builddate || -v $key ) && ( -z $image || ! -e $image ) ]]; then
         echo "[ERROR] Module $name/$version has no valid image identity. Refresh its generated modulefile." >&2
         exit 2
     fi

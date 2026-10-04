@@ -1,6 +1,7 @@
 """Frozen recognition of historical generated wrappers. Never edit templates."""
 from pathlib import Path
 from enum import Enum
+import shlex
 
 NVIDIA_BLOCK = (
     b'if [ -f /proc/driver/nvidia/version ] && [ -z "${APPTAINER_NV+set}" ] '
@@ -155,6 +156,15 @@ def _inventory_wrapper(container_dir: Path, command: str, *, legacy: bool = Fals
     )
     return setup + invocation.encode("utf-8")
 
+def _v2_wrapper(container_dir: Path, command: str, *, legacy: bool = False) -> bytes:
+    prefix = 'NEURODESK_CONTAINER_LEGACY_ENV=1 ' if legacy else ''
+    return ('''#!/usr/bin/env bash
+# neurodesk-artifact-v2
+_neurodesk_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+source "$_neurodesk_dir/container_runtime.sh" || exit 2
+''' + prefix + 'neurodesk_container exec "$_neurodesk_dir/"' + shlex.quote(container_dir.name + '.simg') + ' ' + shlex.quote(command) + ' "$@"\n').encode()
+
+
 def _classify_wrapper(
     container_dir: Path, command: str, content: bytes
 ) -> tuple[WrapperState, bytes | None]:
@@ -164,6 +174,9 @@ def _classify_wrapper(
         and DISABLED_PULL_HINT in content
     ):
         return WrapperState.DISABLED, None
+
+    if content in (_v2_wrapper(container_dir, command), _v2_wrapper(container_dir, command, legacy=True)):
+        return WrapperState.FIXED, None
 
     if content in (_inventory_wrapper(container_dir, command), _inventory_wrapper(container_dir, command, legacy=True)):
         return WrapperState.FIXED, None
@@ -182,7 +195,6 @@ def classify_relocated_wrapper(container_dir: Path, command: str, content: bytes
     state, replacement = _classify_wrapper(container_dir, command, content)
     if state is not WrapperState.UNKNOWN:
         return state, replacement
-    import shlex
     try:
         words = shlex.split(content.decode().splitlines()[-1])
         image = Path(words[-3])

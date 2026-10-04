@@ -99,7 +99,15 @@ def read_container_inventory(directory: Path, image_basename: str | None = None)
 
 
 def lua(value: str) -> str:
-    return json.dumps(value, ensure_ascii=False)
+    escaped = []
+    for character in value:
+        if character in ('"', '\\'):
+            escaped.append('\\' + character)
+        elif ord(character) < 32 or ord(character) == 127:
+            escaped.append(f'\\{ord(character):03d}')
+        else:
+            escaped.append(character)
+    return '"' + ''.join(escaped) + '"'
 
 
 def tcl(value: str) -> str:
@@ -112,7 +120,8 @@ def render_wrapper(image_basename: str, command: str, *, legacy: bool = False) -
     prefix = 'NEURODESK_CONTAINER_LEGACY_ENV=1 ' if legacy else ''
     return ('''#!/usr/bin/env bash
 # neurodesk-artifact-v2
-_neurodesk_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+_neurodesk_wrapper=$(readlink -f -- "${BASH_SOURCE[0]}") || exit 2
+_neurodesk_dir=$(cd "$(dirname "$_neurodesk_wrapper")" && pwd -P) || exit 2
 source "$_neurodesk_dir/container_runtime.sh" || exit 2
 ''' + prefix + 'neurodesk_container exec "$_neurodesk_dir/"' + shlex.quote(image_basename) + ' ' + shlex.quote(command) + ' "$@"\n').encode()
 
@@ -188,14 +197,17 @@ def managed_module_content(content: str, spec: ContainerSpec, *, format: str, co
 
 
 def legacy_module_content(spec: ContainerSpec, directory: Path, *, format: str) -> str:
+    def historical_lua(value: str) -> str:
+        return json.dumps(value, ensure_ascii=False)
+
     commands = sorted(c for c in spec.commands if not c.startswith('.') and not re.search(r'\.(so(?:\..*)?|dll|dylib)$', c, re.I))
     if format == 'lua':
-        lines = ['-- -*- lua -*-', 'help([===[', spec.help_text.replace(']]', '] ]'), ']===])', f'whatis({lua(spec.image_basename)})']
+        lines = ['-- -*- lua -*-', 'help([===[', spec.help_text.replace(']]', '] ]'), ']===])', f'whatis({historical_lua(spec.image_basename)})']
         if commands:
-            lines += ['-- neurodesk-exposed-commands', f'whatis({lua("Commands: " + ", ".join(commands))})']
-        lines += [f'prepend_path("PATH", {lua(str(directory))})']
+            lines += ['-- neurodesk-exposed-commands', f'whatis({historical_lua("Commands: " + ", ".join(commands))})']
+        lines += [f'prepend_path("PATH", {historical_lua(str(directory))})']
         for key, value in spec.deploy_env:
-            lines += [f'setenv({lua(key)}, {lua(value.replace("BASEPATH", str(directory / spec.image_basename)))})']
+            lines += [f'setenv({historical_lua(key)}, {historical_lua(value.replace("BASEPATH", str(directory / spec.image_basename)))})']
         snippet, marker = spec.manual_lua, '--'
     else:
         lines = ['#%Module1.0', f'proc ModulesHelp {{ }} {{ puts stderr {tcl(spec.help_text)} }}', f'module-whatis {tcl(spec.image_basename)}']

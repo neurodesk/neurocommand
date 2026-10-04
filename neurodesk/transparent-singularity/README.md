@@ -55,3 +55,15 @@ preserved and reported; refreshed generated metadata can advance without
 mistaking a catalog update for an administrator edit. Activation scripts now
 modify the current shell only. Persistent activation is an explicit command in
 your own shell startup file, for example `source /new/path/activate_IMAGE.sh`.
+
+### Reconciliation and concurrent writers
+
+Run the modulefile and wrapper reconcilers with exclusive access to their target
+files, or coordinate all writers to prevent overlapping edits. Both reconcilers
+check the complete plan before writing and recheck each target before its write.
+Those snapshot checks detect changes made before the recheck; they are not an
+atomic compare-and-swap with the subsequent replacement or deletion. An edit
+between the final check and the write can still be lost. If a later check fails,
+earlier successful writes remain applied; rerun reconciliation after resolving
+the competing edit. The deployment lockfile does not establish this prerequisite
+for every writer.

@@ -36,16 +36,9 @@ def legacy_wrapper(container_dir, command, bind_option=""):
 
 
 def fixed_wrapper(container_dir, command, bind_option=""):
-    legacy = legacy_wrapper(container_dir, command, bind_option)
-    return legacy.replace(
-        "export PWD=`pwd -P`\n",
-        "export PWD=`pwd -P`\n" + reconcile.NVIDIA_BLOCK.decode() + XAUTHORITY_BLOCK,
-        1,
-    ).replace(
-        "--env DISPLAY=$DISPLAY ",
-        'neurodesk_container exec',
-        1,
-    )
+    return reconcile._fixed_wrapper(
+        legacy_wrapper(container_dir, command, bind_option).encode()
+    ).decode()
 
 
 def legacy_wrapper_without_display(container_dir, command, bind_option=""):
@@ -147,7 +140,7 @@ class WrapperReconciliationTests(unittest.TestCase):
 
         self.assertEqual(len(plan.rewrites), 1)
         self.assertEqual(plan.diagnostics, ())
-        self.assertEqual(reconcile.apply_wrapper_plan(plan), 1)
+        self.assertEqual(reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers))
         self.assertEqual(wrapper.read_text(), reconcile.render_wrapper(container.name + ".simg", "demo").decode())
 
         after = wrapper.stat()
@@ -312,7 +305,7 @@ class WrapperReconciliationTests(unittest.TestCase):
                 )
                 plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
                 self.assertEqual(plan.diagnostics, ())
-                self.assertEqual(reconcile.apply_wrapper_plan(plan), 1)
+                self.assertEqual(reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers))
                 self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
                 self.assertTrue(reconcile.plan_wrapper_reconciliation(self.repo_root).is_clean)
 
@@ -324,6 +317,7 @@ class WrapperReconciliationTests(unittest.TestCase):
 
     def test_partial_gpu_edit_blocks_reconciliation(self):
         container = make_container(self.repo_root, ["demo"])
+        self.assertIs(reconcile._classify_wrapper(container, "demo", fixed_wrapper(container, "demo").encode())[0], reconcile.WrapperState.LEGACY)
         content = fixed_wrapper(container, "demo").replace("  export SINGULARITY_NV=1\n", "")
         wrapper = write_wrapper(container, "demo", content)
         plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
