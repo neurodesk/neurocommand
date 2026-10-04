@@ -1984,6 +1984,13 @@
             ]
         },
         {
+            "application": "kul-vbg_0.61.0_23112021_beta_20261004",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "lashis_1.0_20210105",
             "categories": [
                 "hippocampus",
