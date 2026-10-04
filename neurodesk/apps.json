@@ -2877,6 +2877,20 @@
             "machine learning"
         ]
     },
+    "loftcbf": {
+        "apps": {
+            "loftcbf 3.0.0": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "arterial spin labelling",
+            "quality control",
+            "quantitative imaging"
+        ]
+    },
     "lqt": {
         "apps": {
             "lqt 0.1.0": {
@@ -3274,7 +3288,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261002",
+                "version": "20261003",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4106,7 +4120,7 @@
     "pyem": {
         "apps": {
             "pyem 0.69.0": {
-                "version": "20261003",
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4296,6 +4310,26 @@
             "phase processing",
             "quantitative imaging",
             "structural imaging",
+            "workflows"
+        ]
+    },
+    "quantiphyse": {
+        "apps": {
+            "quantiphyse 0.9.10": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "quantiphyseGUI-quantiphyse 0.9.10": {
+                "version": "20261004",
+                "exec": "quantiphyse",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "arterial spin labelling",
+            "quantitative imaging",
+            "visualization",
             "workflows"
         ]
     },
@@ -4533,6 +4567,30 @@
         },
         "categories": [
             "electrophysiology"
+        ]
+    },
+    "skan": {
+        "apps": {
+            "skan 0.13.1": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "shape analysis"
+        ]
+    },
+    "skan_arm64": {
+        "apps": {
+            "skan_arm64 0.13.1": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "shape analysis"
         ]
     },
     "slicegrappa": {
@@ -4790,6 +4848,18 @@
         },
         "categories": [
             "diffusion imaging"
+        ]
+    },
+    "stir": {
+        "apps": {
+            "stir 6.4.0": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "surfice": {
