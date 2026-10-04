@@ -3630,7 +3630,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261003",
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3651,7 +3651,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261003",
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             }
