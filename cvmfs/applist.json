@@ -878,6 +878,13 @@
             ]
         },
         {
+            "application": "cmtk_3.4.0_20261003",
+            "categories": [
+                "image registration",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "code_230315_20230315",
             "categories": [
                 "programming"
@@ -1324,6 +1331,12 @@
             "application": "epirecon_0.0.4_20260908",
             "categories": [
                 "image reconstruction"
+            ]
+        },
+        {
+            "application": "epu-group-afis_0.3.0_20261003",
+            "categories": [
+                "cryo EM"
             ]
         },
         {
@@ -2779,6 +2792,12 @@
             "application": "pydeface_2.0.2_20260417",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "pyem_0.69.0_20261003",
+            "categories": [
+                "cryo EM"
             ]
         },
         {
