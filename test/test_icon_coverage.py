@@ -37,6 +37,7 @@ DIRECTORY_NAMES = [
     "Molecular Biology",
     "Statistics",
     "Fetal Imaging",
+    "Arterial Spin Labelling",
 ]
 
 
