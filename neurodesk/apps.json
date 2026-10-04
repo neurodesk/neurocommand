@@ -1124,6 +1124,19 @@
             "workflows"
         ]
     },
+    "cmtk": {
+        "apps": {
+            "cmtk 3.4.0": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "structural imaging"
+        ]
+    },
     "code": {
         "apps": {
             "vscodeGUI-code 230315": {
@@ -1781,6 +1794,18 @@
         },
         "categories": [
             "image reconstruction"
+        ]
+    },
+    "epu-group-afis": {
+        "apps": {
+            "epu-group-afis 0.3.0": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "esilpd": {
@@ -4076,6 +4101,18 @@
         },
         "categories": [
             "image segmentation"
+        ]
+    },
+    "pyem": {
+        "apps": {
+            "pyem 0.69.0": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "qmrlab": {
