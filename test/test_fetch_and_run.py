@@ -1,4 +1,5 @@
 import os
+import shutil
 import shlex
 import subprocess
 from pathlib import Path
@@ -28,6 +29,7 @@ def test_fetch_and_run_module_availability_ignores_cache(tmp_path):
     container_bin = tmp_path / "demo_1.0"
     local_containers = tmp_path / "neurodesktop-containers"
     container_bin.mkdir()
+    (container_bin / "demo.simg").touch()
     (local_containers / "modules").mkdir(parents=True)
 
     script = f"""
@@ -60,6 +62,7 @@ module() {{
         load)
             if [[ "$2" == "demo/1.0" ]]; then
                 export PATH="$container_bin:$PATH"
+                export NEURODESK_IMAGE_64656D6F2F312E30="$container_bin/demo.simg"
                 return 0
             fi
             ;;
@@ -82,6 +85,9 @@ grep -qx -- '--ignore-cache avail demo/1.0' "$calls"
 def test_fetch_and_run_explicit_builddate_enforces_dated_container(tmp_path):
     isolated_neurodesk = tmp_path / "neurodesk"
     isolated_neurodesk.mkdir()
+    shutil.copytree(ROOT / "neurodesk/transparent-singularity", isolated_neurodesk / "transparent-singularity")
+    for name in ["apps.json", "bundles.json"]:
+        shutil.copy2(ROOT / "neurodesk" / name, isolated_neurodesk / name)
     isolated_script = isolated_neurodesk / "fetch_and_run.sh"
     isolated_script.write_text(SCRIPT.read_text())
     isolated_script.chmod(0o755)
@@ -135,8 +141,10 @@ module() {{
             if [[ "$2" == "demo/1.0" ]]; then
                 if [[ -f "$fetch_marker" ]]; then
                     export PATH="$new_container:$PATH"
+                    export NEURODESK_IMAGE_64656D6F2F312E30="$new_container/$(basename "$new_container").simg"
                 else
                     export PATH="$old_container:$PATH"
+                    export NEURODESK_IMAGE_64656D6F2F312E30="$old_container/$(basename "$old_container").simg"
                 fi
                 return 0
             fi
@@ -215,6 +223,9 @@ bash {shlex.quote(str(SCRIPT))} demo 1.0 touch {shlex.quote(str(marker))}
 def test_failed_fetch_stops_before_load_or_command(tmp_path):
     directory = tmp_path / "neurodesk"
     directory.mkdir()
+    shutil.copytree(ROOT / "neurodesk/transparent-singularity", directory / "transparent-singularity")
+    for name in ["apps.json", "bundles.json"]:
+        shutil.copy2(ROOT / "neurodesk" / name, directory / name)
     (directory / "fetch_and_run.sh").write_text(SCRIPT.read_text())
     (directory / "configparser.sh").write_text("return 0\n")
     (directory / "fetch_containers.sh").write_text("exit 23\n")
@@ -231,3 +242,21 @@ bash {shlex.quote(str(directory / "fetch_and_run.sh"))} demo 1.0 20260629 true
     result = run_bash(script)
     assert result.returncode == 2, result.stdout + result.stderr
     assert not marker.exists()
+
+
+def test_missing_exact_version_does_not_accept_available_prefix(tmp_path):
+    install = tmp_path / 'install'
+    install.mkdir()
+    shutil.copy2(SCRIPT, install / SCRIPT.name)
+    shutil.copy2(ROOT / 'neurodesk/configparser.sh', install / 'configparser.sh')
+    shutil.copytree(ROOT / 'neurodesk/transparent-singularity', install / 'transparent-singularity')
+    (install / 'config.ini').write_text('')
+    (install / 'apps.json').write_text('{"first":{"apps":{"first 1.0":{"version":"20260629"}}}}')
+    (install / 'bundles.json').write_text('{"schema_version":1,"bundles":[]}')
+    (install / 'fetch_containers.sh').write_text('echo EXACT_MISSING >&2; exit 91\n')
+    result = run_bash(f"""module() {{ case \"$1\" in avail|--ignore-cache) echo first/1.01;; *) return 0;; esac; }}
+export -f module
+CVMFS_DISABLE=true bash {shlex.quote(str(install / SCRIPT.name))} first 1.0 true
+""")
+    assert result.returncode == 2
+    assert 'EXACT_MISSING' in result.stderr

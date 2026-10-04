@@ -17,7 +17,7 @@ def write_executable(path, text):
 
 
 def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
-    workdir = tmp_path / "transparent-singularity"
+    workdir = tmp_path / "demo_arm64_1.0_20260629"
     shutil.copytree(TRANSPARENT_SINGULARITY, workdir)
     (workdir / "manual_module_files/demo_arm64").write_text(
         'setenv("CUSTOM_VERSION", "toolVersion")'
@@ -32,11 +32,13 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
         bin_dir / "apptainer",
         f"""
         #!/usr/bin/env bash
+        if [[ "$1" == --silent ]]; then shift; fi
         echo "apptainer $*" >> {calls}
         if [[ "$1" = "pull" ]]; then
             exit 42
         fi
-        exit 0
+        singularity "$@"
+        exit $?
         """,
     )
     write_executable(
@@ -105,6 +107,7 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
         bin_dir / "singularity",
         f"""
         #!/usr/bin/env bash
+        if [[ "$1" == --silent ]]; then shift; fi
         echo "singularity $*" >> {calls}
 
         if [[ "$1" = "version" ]]; then
@@ -170,12 +173,8 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     assert "singularity exec demo_arm64_1.0_20260629.simg /bin/true" in call_log
     wrapper = workdir / "demo"
     wrapper_text = wrapper.read_text()
-    assert reconcile.NVIDIA_BLOCK.decode() in wrapper_text
+    assert "container_runtime.sh" in wrapper_text
     assert_gpu_environment(wrapper)
-    assert "xauthority_opts=()" in wrapper_text
-    assert '--bind "$XAUTHORITY:$XAUTHORITY:ro"' in wrapper_text
-    assert '--env "XAUTHORITY=$XAUTHORITY"' in wrapper_text
-    assert '"${xauthority_opts[@]}"' in wrapper_text
 
     xauthority = tmp_path / "Xauthority"
     xauthority.touch()
@@ -200,3 +199,30 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
     assert 'setenv("CUSTOM_VERSION", "1.0")\n' in module_text
     assert "-- neurodesk-manual-module-begin\n" in module_text
     assert "-- neurodesk-manual-module-end\n" in module_text
+
+
+def test_cached_cvmfs_image_handles_spaces_without_download(tmp_path):
+    workdir = tmp_path / 'demo_1.0_20260629'
+    shutil.copytree(TRANSPARENT_SINGULARITY, workdir)
+    cache = tmp_path / "cache root with 'quote'"
+    cached_image = cache / 'containers/demo_1.0_20260629/demo_1.0_20260629.simg'
+    cached_image.parent.mkdir(parents=True)
+    cached_image.touch()
+    runtime = tmp_path / 'runtime'
+    write_executable(runtime, '''#!/bin/bash
+if [[ $1 == --silent ]]; then shift; fi
+case $1 in
+  version) echo 1.5.4;;
+  pull|build) echo unexpected-download >&2; exit 91;;
+  exec)
+    if [[ ${*: -1} == *ts_binaryFinder.sh ]]; then
+      printf 'demo\\n' > commands.txt
+      : > env.txt
+    fi;;
+esac
+''')
+    result = subprocess.run(['bash', str(workdir / 'run_transparent_singularity.sh'), '--container', cached_image.name], cwd=workdir, env={**os.environ, 'NEURODESK_CVMFS_ROOT': str(cache), 'CVMFS_DISABLE': 'false', 'NEURODESK_CONTAINER_RUNTIME': str(runtime)}, capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (workdir / cached_image.name).is_symlink()
+    assert (workdir / cached_image.name).resolve() == cached_image
+    assert 'unexpected-download' not in result.stderr

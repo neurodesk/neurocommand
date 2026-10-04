@@ -23,3 +23,47 @@ For an installed Neurocommand tree, prefer `fetch_containers.sh NAME VERSION DAT
 Both generated modulefiles expose command metadata and `DEPLOY_ENV_` variables.
 Manual Lua snippets remain in `manual_module_files/`; Tcl snippets live in
 `manual_module_files/tcl/`. Freesurfer and MATLAB have snippets in both formats.
+
+### Runtime policy and portable deployments
+
+Generated wrappers use the adjacent `container_runtime.sh`. Set
+`NEURODESK_CONTAINER_RUNTIME` to an executable name or path to choose a runtime.
+Otherwise Neurodesk prefers Apptainer, then Singularity. An invalid explicit
+choice fails. `NEURODESK_CONTAINER_LOG_LEVEL` accepts `quiet` (default), `normal`,
+or `debug` for all runtime operations.
+
+`NEURODESK_GPU=auto` preserves explicitly set `APPTAINER_NV` and `SINGULARITY_NV`,
+including zero or empty values. With neither set, an NVIDIA driver enables GPU
+support. `on` enables both namespaces; `off` clears them in the child process,
+removes legacy `--nv`, and passes `--no-nv`. The parent environment is unchanged.
+DISPLAY, a valid XAUTHORITY file, native binds, custom temporary directories and
+command arguments remain available. `neurodesk_singularity_opts` retains its
+legacy whitespace splitting; embedded shell quoting is not interpreted.
+
+Wrappers resolve their image beside themselves. Lua and Tcl modulefiles derive
+paths from their canonical or category publication location. Move or mount the
+complete tree, then `module use /new/root/containers/modules`, or use a category
+under `/new/root/neurodesk-modules`. `NEURODESK_CVMFS_ROOT` configures external
+CVMFS discovery, default `/cvmfs/neurodesk.ardc.edu.au`; local and copied module
+trees retain their own root. Loading and running an existing deployment never
+regenerates files or downloads an image.
+
+Offline `--refresh` reads saved inventories and requires no runtime. Recognized
+historical wrappers migrate; custom, disabled, symlink and non-executable targets
+remain intact. Generated modulefiles carry a content checksum. Custom edits are
+preserved and reported; refreshed generated metadata can advance without
+mistaking a catalog update for an administrator edit. Activation scripts now
+modify the current shell only. Persistent activation is an explicit command in
+your own shell startup file, for example `source /new/path/activate_IMAGE.sh`.
+
+### Reconciliation and concurrent writers
+
+Run the modulefile and wrapper reconcilers with exclusive access to their target
+files, or coordinate all writers to prevent overlapping edits. Both reconcilers
+check the complete plan before writing and recheck each target before its write.
+Those snapshot checks detect changes made before the recheck; they are not an
+atomic compare-and-swap with the subsequent replacement or deletion. An edit
+between the final check and the write can still be lost. If a later check fails,
+earlier successful writes remain applied; rerun reconciliation after resolving
+the competing edit. The deployment lockfile does not establish this prerequisite
+for every writer.

@@ -10,7 +10,7 @@ MOD_NAME=$1
 MOD_VERS=$2
 MOD_DATE=$3
 
-if [[ -z "$MOD_NAME" ]] || [[ -z "$MOD_VERS" ]] || [[ ! "$MOD_DATE" =~ ^[0-9]{8}$ ]]; then
+if [[ ! "$MOD_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9_.+-]*$ ]] || [[ ! "$MOD_VERS" =~ ^[A-Za-z0-9][A-Za-z0-9_.+-]*$ ]] || [[ ! "$MOD_DATE" =~ ^[0-9]{8}$ ]]; then
     echo "[ERROR] fetch_containers.sh: Usage: fetch_containers.sh [name] [version] [YYYYMMDD build date]" >&2
     echo "[ERROR] fetch_containers.sh: Refusing to create a container path with invalid build date '${MOD_DATE:-<empty>}'." >&2
     exit 2
@@ -23,6 +23,7 @@ echo "[INFO] fetch_containers.sh: SINGULARITY_BINDPATH : $SINGULARITY_BINDPATH"
 
 _script="$(readlink -f "${BASH_SOURCE[0]}")"
 _base="$(dirname "$_script")"
+source "${_base}/transparent-singularity/container_runtime.sh"
 source "${_base}/configparser.sh" "${_base}/config.ini"
 
 # if $neurodesk_installdir is empty then this it's not installed and running in developer mode:
@@ -65,12 +66,7 @@ if [[ "$refresh" == true ]]; then
     fi
 elif [[ -e "$CONTAINER_FILE_NAME" ]]; then
     echo "[INFO] fetch_containers.sh: Container ${IMG_NAME} is there. Checking that it is fully downloaded and executable:"
-    if ! command -v singularity >/dev/null 2>&1; then
-        echo "[ERROR] fetch_containers.sh: This script requires singularity/apptainer on your path. EXITING" >&2
-        read -n 1 -s -r -p "Press any key to exit..."
-        exit 2
-    fi
-    if ! singularity exec ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}" ls; then
+    if ! neurodesk_runtime exec ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}" ls; then
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         echo "the container is incomplete and needs to be re-downloaded. You could try:"
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
@@ -80,9 +76,7 @@ elif [[ -e "$CONTAINER_FILE_NAME" ]]; then
         exit 2
     fi
 
-    container_dir=$(readlink -f "$CONTAINER_DIR")
-    if grep -Fqx "prepend_path(\"PATH\", \"${container_dir}\")" "${MODS_PATH}/${MOD_NAME}/${MOD_VERS}.lua" 2>/dev/null \
-        && grep -Fqx "prepend-path PATH \"${container_dir}\"" "${MODS_PATH}/${MOD_NAME}/${MOD_VERS}" 2>/dev/null; then
+    if [[ $has_inventories == true ]] && python3 "$_base/transparent-singularity/artifact_renderer.py" --check-container "$CONTAINER_DIR"; then
         echo "[INFO] fetch_containers.sh: Wrappers and modulefiles for ${IMG_NAME} are up to date."
         exit 0
     fi
@@ -101,6 +95,7 @@ if [[ "$refresh" != true ]]; then
 fi
 
 helper_dir="${_base}/transparent-singularity"
+cp "$helper_dir"/*.py "$CONTAINER_DIR/" || exit 2
 cp "$helper_dir"/*.sh "$CONTAINER_DIR/" || exit 2
 cp "$helper_dir"/ts_* "$CONTAINER_DIR/" || exit 2
 mkdir -p "$CONTAINER_DIR/manual_module_files" || exit 2

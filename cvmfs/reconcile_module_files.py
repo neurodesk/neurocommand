@@ -4,12 +4,17 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+import os
+import stat
+from dataclasses import dataclass, replace
 from pathlib import Path
 import re
 import sys
 from typing import Optional
 
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity"))
+from artifact_renderer import read_container_inventory, render_module, managed_module_content, write_artifact
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
@@ -48,10 +53,45 @@ class ContainerEntry:
 
 
 @dataclass(frozen=True)
+class FileSnapshot:
+    device: int
+    inode: int
+    mode: int
+    uid: int
+    gid: int
+    size: int
+    mtime_ns: int
+    ctime_ns: int
+    content: bytes
+
+
+def read_snapshot(path: Path) -> FileSnapshot | None:
+    try:
+        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except FileNotFoundError:
+        return None
+    with os.fdopen(descriptor, "rb") as source:
+        before = os.fstat(source.fileno())
+        if not stat.S_ISREG(before.st_mode):
+            raise ValueError(f"Module target is not a regular file: {path}")
+        content = source.read()
+        after = os.fstat(source.fileno())
+    stable_fields = ("st_dev", "st_ino", "st_mode", "st_uid", "st_gid", "st_size",
+                     "st_mtime_ns", "st_ctime_ns")
+    if (any(getattr(before, field) != getattr(after, field) for field in stable_fields)
+            or len(content) != after.st_size):
+        raise ValueError(f"Module changed while reading: {path}")
+    return FileSnapshot(after.st_dev, after.st_ino, after.st_mode, after.st_uid,
+                        after.st_gid, after.st_size, after.st_mtime_ns,
+                        after.st_ctime_ns, content)
+
+
+@dataclass(frozen=True)
 class PlannedChange:
     path: Path
     content: Optional[str]
     reason: str
+    before: FileSnapshot | None
 
 
 def parse_image_name(image: str) -> tuple[str, str, str]:
@@ -174,31 +214,7 @@ def inventory_lines(path: Path) -> list[str]:
 
 
 def render_tcl_module(container_dir: Path) -> str:
-    """Render the Tcl modulefile ts_render_artifacts.sh writes, minus manual snippets."""
-    container = f"{container_dir.name}.simg"
-    readme = container_dir / "README.md"
-    help_text = ""
-    if readme.is_file():
-        with readme.open(errors="replace", newline="") as source:
-            help_text = source.read().rstrip("\n")
-    lines = [
-        "#%Module1.0",
-        f"proc ModulesHelp {{ }} {{ puts stderr {tcl_render_quoted(help_text)} }}",
-        f"module-whatis {tcl_render_quoted(container)}",
-    ]
-    commands = render_exposed_commands(container_dir / "commands.txt", is_lua=False)
-    if commands:
-        lines.append(commands)
-    lines.append(f"prepend-path PATH {tcl_render_quoted(str(container_dir))}")
-    for record in inventory_lines(container_dir / "env.txt"):
-        if not record.startswith("DEPLOY_ENV_") or "=" not in record:
-            continue
-        variable, value = record.split("=", 1)
-        value = value.replace("BASEPATH", f"{container_dir}/{container}")
-        lines.append(
-            f"setenv {tcl_render_quoted(variable.removeprefix('DEPLOY_ENV_'))} {tcl_render_quoted(value)}"
-        )
-    return "\n".join(lines) + "\n"
+    return render_module(read_container_inventory(container_dir), format="tcl").decode()
 
 
 def render_exposed_commands(commands_path: Path, *, is_lua: bool = True) -> str:
@@ -270,6 +286,12 @@ def update_module_content(
     latest_dir: Path,
     is_lua: bool,
 ) -> str:
+    if (latest_dir / "env.txt").is_file():
+        updated = managed_module_content(content, read_container_inventory(latest_dir), format="lua" if is_lua else "tcl", containers_root=latest_dir.parent)
+        if updated is None:
+            print(f"[WARN] Preserving customized module {tool}/{version}", file=sys.stderr)
+            return content
+        return updated.decode()
     container_pattern = rf"{re.escape(tool)}_{re.escape(version)}_[0-9]+"
     latest_dir_text = str(latest_dir)
 
@@ -336,14 +358,17 @@ def add_change(
     content: str,
     reason: str,
 ) -> None:
-    if path.exists() and path.read_text() == content:
+    before = changes[path].before if path in changes else read_snapshot(path)
+    if before is not None and before.content == content.encode():
+        changes.pop(path, None)
         return
-    changes[path] = PlannedChange(path=path, content=content, reason=reason)
+    changes[path] = PlannedChange(path=path, content=content, reason=reason, before=before)
 
 
 def add_delete(changes: dict[Path, PlannedChange], path: Path, reason: str) -> None:
-    if path.exists():
-        changes[path] = PlannedChange(path=path, content=None, reason=reason)
+    before = changes[path].before if path in changes else read_snapshot(path)
+    if before is not None:
+        changes[path] = PlannedChange(path=path, content=None, reason=reason, before=before)
 
 
 def update_manual_module(content: str, *, tool: str, version: str, snippet: str, is_lua: bool = True) -> str:
@@ -401,6 +426,16 @@ def plan_module_reconciliation(
     canonical_modules_root = containers_root / "modules"
     public_modules_root = repo_root / "neurodesk-modules"
     changes: dict[Path, PlannedChange] = {}
+    protected: set[Path] = set()
+    snapshots: dict[Path, FileSnapshot] = {}
+
+    def read_module(path: Path) -> str:
+        if path not in snapshots:
+            snapshot = read_snapshot(path)
+            if snapshot is None:
+                raise FileNotFoundError(f"Module disappeared while planning: {path}")
+            snapshots[path] = snapshot
+        return snapshots[path].content.decode()
 
     for (tool, version), entry in sorted(latest_by_key.items()):
         latest_name = entry.image
@@ -413,11 +448,13 @@ def plan_module_reconciliation(
             canonical_modules_root / tool / version,
         )
         for module_file in canonical_candidates:
-            if not module_file.is_file():
+            if not module_file.is_file() or module_file.is_symlink():
                 continue
 
+            if (latest_dir / "env.txt").is_file() and managed_module_content(read_module(module_file), read_container_inventory(latest_dir), format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
+                protected.add(module_file)
             updated = update_module_content(
-                module_file.read_text(),
+                read_module(module_file),
                 tool=tool,
                 version=version,
                 latest_name=latest_name,
@@ -436,6 +473,7 @@ def plan_module_reconciliation(
         tcl_module = canonical_modules_root / tool / version
         if (
             version not in canonical_contents
+            and not tcl_module.is_symlink()
             and f"{version}.lua" in canonical_contents
             and (latest_dir / "env.txt").is_file()
         ):
@@ -448,8 +486,13 @@ def plan_module_reconciliation(
             )
 
         for module_file in existing_public_module_candidates(public_modules_root, tool, version):
+            if module_file.is_symlink():
+                continue
             module_category = public_module_category(public_modules_root, module_file)
             if module_category not in expected_public_categories:
+                if "neurodesk-bundle-v1" in read_module(module_file) or ((latest_dir / "env.txt").is_file() and managed_module_content(read_module(module_file), read_container_inventory(latest_dir), format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None):
+                    protected.add(module_file)
+                    continue
                 add_delete(
                     changes,
                     module_file,
@@ -457,8 +500,10 @@ def plan_module_reconciliation(
                 )
                 continue
 
+            if (latest_dir / "env.txt").is_file() and managed_module_content(read_module(module_file), read_container_inventory(latest_dir), format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
+                protected.add(module_file)
             updated = update_module_content(
-                module_file.read_text(),
+                read_module(module_file),
                 tool=tool,
                 version=version,
                 latest_name=latest_name,
@@ -475,6 +520,8 @@ def plan_module_reconciliation(
         for category in categories.get((tool, version), ()):
             for filename, content in canonical_contents.items():
                 target = public_modules_root / category / tool / filename
+                if target in protected or target.is_symlink():
+                    continue
                 add_change(
                     changes,
                     target,
@@ -488,9 +535,11 @@ def plan_module_reconciliation(
         (public_modules_root, "*/*/*"),
     ):
         for module_file in root.glob(pattern):
-            if module_file in changes or not module_file.is_file() or module_file.name.startswith("."):
+            if module_file in changes or module_file in protected or module_file.is_symlink() or not module_file.is_file() or module_file.name.startswith("."):
                 continue
-            content = module_file.read_text()
+            content = read_module(module_file)
+            if "neurodesk-bundle-v1" in content:
+                continue
             cleaned = EXPOSED_COMMANDS_BLOCK.sub(
                 lambda match: match[0] if match["whatis"] else "", content
             )
@@ -505,15 +554,26 @@ def plan_module_reconciliation(
     module_files.update(public_modules_root.glob("*/*/*"))
     module_files.update(changes)
     for module_file in sorted(module_files):
-        if module_file.name.startswith(".") or module_file.is_symlink():
+        if module_file in protected or module_file.name.startswith(".") or module_file.is_symlink():
             continue
         planned = changes.get(module_file)
         if planned is not None and planned.content is None:
             continue
         if planned is None and not module_file.is_file():
             continue
-        content = planned.content if planned is not None else module_file.read_text()
+        content = planned.content if planned is not None else read_module(module_file)
+        if "neurodesk-bundle-v1" in content:
+            continue
         tool = module_file.parent.name
+        if "neurodesk-artifact-v2" in content and content.startswith(("-- -*- lua -*-", "#%Module1.0")):
+            entry = latest_by_key.get((tool, module_file.stem if module_file.suffix == ".lua" else module_file.name))
+            if entry is not None:
+                spec = read_container_inventory(containers_root / entry.image)
+                spec = replace(spec, manual_lua=snippets.get(tool, ""), manual_tcl=tcl_snippets.get(tool, ""))
+                updated = render_module(spec, format="lua" if module_file.suffix == ".lua" else "tcl").decode()
+                if updated != content:
+                    add_change(changes, module_file, updated, "refresh generated manual module snippets")
+                continue
         updated = update_manual_module(
             content,
             tool=tool,
@@ -522,22 +582,45 @@ def plan_module_reconciliation(
             is_lua=module_file.suffix == ".lua",
         )
         if updated != content:
-            changes[module_file] = PlannedChange(
+            add_change(
+                changes,
                 path=module_file,
                 content=updated,
                 reason=f"refresh manual module snippet for {tool}/{module_file.stem}",
             )
 
-    return [changes[path] for path in sorted(changes)]
+    return [replace(changes[path], before=snapshots.get(path, changes[path].before))
+            for path in sorted(changes)]
+
+
+def verify_change(change: PlannedChange) -> None:
+    try:
+        current = read_snapshot(change.path)
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"Module changed since planning: {change.path}: {error}") from error
+    if current != change.before:
+        raise RuntimeError(f"Module changed since planning: {change.path}")
 
 
 def apply_changes(changes: list[PlannedChange]) -> None:
+    """Apply the plan with exclusive access to the deployment files.
+
+    Snapshot checks are not atomic with writes. Failures leave earlier writes applied.
+    """
     for change in changes:
-        if change.content is None:
-            change.path.unlink(missing_ok=True)
-        else:
-            change.path.parent.mkdir(parents=True, exist_ok=True)
-            change.path.write_text(change.content)
+        verify_change(change)
+    for applied, change in enumerate(changes):
+        try:
+            verify_change(change)
+            if change.content is None:
+                change.path.unlink()
+            else:
+                write_artifact(change.path, change.content.encode())
+        except (OSError, ValueError, RuntimeError) as error:
+            raise RuntimeError(
+                f"Module reconciliation stopped after {applied} applied change(s) "
+                f"at {change.path}: {error}"
+            ) from error
 
 
 def build_parser() -> argparse.ArgumentParser:

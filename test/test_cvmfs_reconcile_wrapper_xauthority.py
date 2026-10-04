@@ -36,16 +36,9 @@ def legacy_wrapper(container_dir, command, bind_option=""):
 
 
 def fixed_wrapper(container_dir, command, bind_option=""):
-    legacy = legacy_wrapper(container_dir, command, bind_option)
-    return legacy.replace(
-        "export PWD=`pwd -P`\n",
-        "export PWD=`pwd -P`\n" + reconcile.NVIDIA_BLOCK.decode() + XAUTHORITY_BLOCK,
-        1,
-    ).replace(
-        "--env DISPLAY=$DISPLAY ",
-        '--env DISPLAY=$DISPLAY "${xauthority_opts[@]}" ',
-        1,
-    )
+    return reconcile._fixed_wrapper(
+        legacy_wrapper(container_dir, command, bind_option).encode()
+    ).decode()
 
 
 def legacy_wrapper_without_display(container_dir, command, bind_option=""):
@@ -79,6 +72,7 @@ def write_wrapper(container_dir, command, content, mode=0o755):
 def make_container(repo_root, commands):
     container = repo_root / "containers" / "demo_1.0_20260101"
     container.mkdir(parents=True)
+    (container / (container.name + ".simg")).touch()
     (container / "commands.txt").write_text("".join(f"{name}\n" for name in commands))
     return container
 
@@ -107,6 +101,7 @@ source "$1" "argument with spaces"
             key: value for key, value in os.environ.items()
             if key not in {"APPTAINER_NV", "SINGULARITY_NV", "BASH_ENV"}
         }
+        base_env["NEURODESK_CONTAINER_RUNTIME"] = "singularity"
         base_env["PATH"] = f"{directory}:{os.environ['PATH']}"
         overrides = [{}, {"APPTAINER_NV": "0", "SINGULARITY_NV": "1"}]
         for name in ("APPTAINER_NV", "SINGULARITY_NV"):
@@ -145,11 +140,11 @@ class WrapperReconciliationTests(unittest.TestCase):
 
         self.assertEqual(len(plan.rewrites), 1)
         self.assertEqual(plan.diagnostics, ())
-        self.assertEqual(reconcile.apply_wrapper_plan(plan), 1)
-        self.assertEqual(wrapper.read_text(), fixed_wrapper(container, "demo"))
+        self.assertEqual(reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers))
+        self.assertEqual(wrapper.read_text(), reconcile.render_wrapper(container.name + ".simg", "demo").decode())
 
         after = wrapper.stat()
-        self.assertEqual(after.st_ino, before.st_ino)
+        self.assertNotEqual(after.st_ino, before.st_ino)
         self.assertEqual(stat.S_IMODE(after.st_mode), stat.S_IMODE(before.st_mode))
         self.assertEqual(after.st_uid, before.st_uid)
         self.assertEqual(after.st_gid, before.st_gid)
@@ -193,10 +188,10 @@ class WrapperReconciliationTests(unittest.TestCase):
                     self.assertEqual(len(plan.rewrites), 1)
                     reconcile.apply_wrapper_plan(plan)
                     wrapper_text = wrapper.read_text()
-                    self.assertIn(XAUTHORITY_BLOCK, wrapper_text)
-                    self.assertIn(reconcile.NVIDIA_BLOCK.decode(), wrapper_text)
+                    self.assertIn("container_runtime.sh", wrapper_text)
+                    self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
                     self.assertIn(
-                        '--env DISPLAY=$DISPLAY "${xauthority_opts[@]}" ',
+                        'neurodesk_container exec',
                         wrapper_text,
                     )
 
@@ -234,10 +229,10 @@ class WrapperReconciliationTests(unittest.TestCase):
                     reconcile.apply_wrapper_plan(plan)
 
                     wrapper_text = wrapper.read_text()
-                    self.assertIn(XAUTHORITY_BLOCK, wrapper_text)
-                    self.assertIn(reconcile.NVIDIA_BLOCK.decode(), wrapper_text)
+                    self.assertIn("container_runtime.sh", wrapper_text)
+                    self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
                     self.assertIn(
-                        'singularity --silent exec "${xauthority_opts[@]}" ',
+                        'neurodesk_container exec',
                         wrapper_text,
                     )
 
@@ -255,7 +250,7 @@ class WrapperReconciliationTests(unittest.TestCase):
         self.assertEqual(plan.diagnostics, ())
         self.assertEqual(len(plan.rewrites), 1)
         reconcile.apply_wrapper_plan(plan)
-        self.assertIn(XAUTHORITY_BLOCK, wrapper.read_text())
+        self.assertIn("container_runtime.sh", wrapper.read_text())
 
     def test_supports_generated_trailing_bind_slot_variant(self):
         container = make_container(self.repo_root, ["spm12"])
@@ -271,7 +266,7 @@ class WrapperReconciliationTests(unittest.TestCase):
         self.assertEqual(plan.diagnostics, ())
         self.assertEqual(len(plan.rewrites), 1)
         reconcile.apply_wrapper_plan(plan)
-        self.assertIn(XAUTHORITY_BLOCK, wrapper.read_text())
+        self.assertIn("container_runtime.sh", wrapper.read_text())
 
     def test_skips_absolute_commands_that_only_exist_inside_the_container(self):
         container = make_container(
@@ -285,19 +280,20 @@ class WrapperReconciliationTests(unittest.TestCase):
         self.assertEqual(plan.diagnostics, ())
         self.assertEqual(len(plan.rewrites), 1)
         reconcile.apply_wrapper_plan(plan)
-        self.assertEqual(wrapper.read_text(), fixed_wrapper(container, "demo"))
+        self.assertEqual(wrapper.read_text(), reconcile.render_wrapper(container.name + ".simg", "demo").decode())
 
     def test_skips_fixed_disabled_missing_and_non_executable_targets(self):
         commands = ["fixed", "disabled", "missing", "metadata"]
         container = make_container(self.repo_root, commands)
-        write_wrapper(container, "fixed", fixed_wrapper(container, "fixed"))
+        write_wrapper(container, "fixed", reconcile.render_wrapper(container.name + ".simg", "fixed").decode())
         write_wrapper(container, "disabled", disabled_wrapper(container))
         write_wrapper(container, "metadata", "not a wrapper\n", mode=0o644)
 
         plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
 
-        self.assertTrue(plan.is_clean)
         self.assertEqual(plan.rewrites, ())
+        reconcile.apply_wrapper_plan(plan)
+        self.assertTrue(reconcile.plan_wrapper_reconciliation(self.repo_root).is_clean)
         self.assertEqual(plan.diagnostics, ())
 
     def test_upgrades_xauthority_only_wrappers_and_converges(self):
@@ -309,8 +305,8 @@ class WrapperReconciliationTests(unittest.TestCase):
                 )
                 plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
                 self.assertEqual(plan.diagnostics, ())
-                self.assertEqual(reconcile.apply_wrapper_plan(plan), 1)
-                self.assertEqual(wrapper.read_bytes().count(reconcile.NVIDIA_BLOCK), 1)
+                self.assertEqual(reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers))
+                self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
                 self.assertTrue(reconcile.plan_wrapper_reconciliation(self.repo_root).is_clean)
 
     def test_reconciled_wrapper_gpu_defaults_and_overrides(self):
@@ -321,6 +317,7 @@ class WrapperReconciliationTests(unittest.TestCase):
 
     def test_partial_gpu_edit_blocks_reconciliation(self):
         container = make_container(self.repo_root, ["demo"])
+        self.assertIs(reconcile._classify_wrapper(container, "demo", fixed_wrapper(container, "demo").encode())[0], reconcile.WrapperState.LEGACY)
         content = fixed_wrapper(container, "demo").replace("  export SINGULARITY_NV=1\n", "")
         wrapper = write_wrapper(container, "demo", content)
         plan = reconcile.plan_wrapper_reconciliation(self.repo_root)

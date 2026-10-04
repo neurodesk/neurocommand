@@ -85,7 +85,8 @@ def test_neurocommand_image_test_asserts_configured_container_root():
     workflow = TEST_WORKFLOW.read_text()
     assert 'container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"' in workflow
     assert "bash local/fetch_containers.sh niimath 1.0.0 20250617 niimath" in workflow
-    assert 'test -f "${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"' in workflow
+    assert 'image="${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"' in workflow
+    assert 'test -f "$image"' in workflow
     assert 'test -f "${container_root}/niimath_1.0.0_20250617/niimath"' in workflow
 
 
