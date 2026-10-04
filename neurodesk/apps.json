@@ -295,6 +295,7 @@
             }
         },
         "categories": [
+            "arterial spin labelling",
             "quantitative imaging",
             "workflows"
         ]
@@ -1803,6 +1804,7 @@
             }
         },
         "categories": [
+            "arterial spin labelling",
             "workflows"
         ]
     },
@@ -2189,6 +2191,7 @@
             }
         },
         "categories": [
+            "arterial spin labelling",
             "diffusion imaging",
             "functional imaging",
             "image registration",
@@ -2411,6 +2414,7 @@
             }
         },
         "categories": [
+            "arterial spin labelling",
             "functional imaging",
             "workflows"
         ]
@@ -3762,6 +3766,19 @@
         },
         "categories": [
             "workflows"
+        ]
+    },
+    "nobrainer": {
+        "apps": {
+            "nobrainer 1.2.1": {
+                "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
         ]
     },
     "noddi": {
