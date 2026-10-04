@@ -3288,7 +3288,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261003",
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             }
