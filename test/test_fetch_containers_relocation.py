@@ -33,6 +33,7 @@ def installation(tmp_path):
         bin_dir / "singularity",
         """
         #!/bin/bash
+        if [[ "$1" = --silent ]]; then shift; fi
         echo "$*" >> "$CALLS"
         if [[ "$1" = version ]]; then
             echo 3.10.0
@@ -52,6 +53,7 @@ def installation(tmp_path):
         "PATH": f"{bin_dir}:{os.environ['PATH']}",
         "CALLS": str(calls),
         "CVMFS_DISABLE": "1",
+        "NEURODESK_CONTAINER_RUNTIME": "singularity",
     }
     return install, env, calls
 
@@ -100,8 +102,8 @@ def test_refetch_repairs_moved_installation(installation, tmp_path, image_kind):
     module = moved / "modules/demo/1.0.lua"
     assert str(old) not in wrapper.read_text()
     assert str(old) not in module.read_text()
-    assert f'prepend_path("PATH", "{moved / IMAGE}")' in module.read_text()
-    assert f'setenv("DEMO", "{moved / IMAGE}/{IMAGE}.simg/opt/demo")' in module.read_text()
+    assert 'prepend_path("PATH", container_dir)' in module.read_text()
+    assert 'setenv("DEMO", "" .. image .. "/opt/demo")' in module.read_text()
     subprocess.run([str(wrapper), "argument"], env=env, check=True)
     call_log = calls.read_text()
     assert f"{moved / IMAGE}/{IMAGE}.simg demo argument" in call_log
@@ -142,7 +144,7 @@ def test_refetch_restores_missing_module(installation, tmp_path, fail_discovery)
         assert not module.exists()
     else:
         assert result.returncode == 0, result.stdout + result.stderr
-        assert f'prepend_path("PATH", "{deployed}")' in module.read_text()
+        assert 'prepend_path("PATH", container_dir)' in module.read_text()
         assert (deployed / "demo").is_file()
     assert "unexpected network call" not in calls.read_text()
 
@@ -176,7 +178,7 @@ def test_refetch_repairs_tcl_module(installation, tmp_path, tcl_state):
     result = fetch(install, env, containers)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert f'prepend-path PATH "{deployed}"' in tcl_module.read_text()
+    assert "prepend-path PATH $container_dir" in tcl_module.read_text()
     assert calls.read_text().splitlines() == [f"exec {deployed / IMAGE}.simg ls"]
 
 

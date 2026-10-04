@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "bundles": [
+    {
+      "name": "bidstools",
+      "version": "2026.10",
+      "description": "BIDS tools using independent containers. Includes bidscoin and dcm2niix; standalone bru2nii is not currently published.",
+      "categories": ["bids apps", "data organisation"],
+      "dependencies": [
+        {"name": "bidscoin", "version": "4.6.2"},
+        {"name": "dcm2niix", "version": "v1.0.20260724"}
+      ]
+    }
+  ]
+}

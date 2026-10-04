@@ -59,13 +59,13 @@ def test_refresh_relocates_offline_and_preserves_wrapper_arguments(tmp_path):
     assert all(p.read_bytes() == content for p, content in before.items())
     state, _ = reconcile._classify_wrapper(directory, "demo", (directory / "demo").read_bytes())
     assert state is reconcile.WrapperState.FIXED
-    edited = (directory / "demo").read_bytes().replace(b'export APPTAINER_NV=1', b'export APPTAINER_NV=0')
+    edited = (directory / "demo").read_bytes().replace(b'neurodesk_container exec', b'neurodesk_container shell')
     assert reconcile._classify_wrapper(directory, "demo", edited)[0] is reconcile.WrapperState.UNKNOWN
     argv = tmp_path / "argv.json"
     write_executable(poison / "singularity", '#!/usr/bin/env python3\nimport json,os,sys\nopen(os.environ["ARGV"],"w").write(json.dumps(sys.argv[1:]))\n')
     xauth = tmp_path / "auth with spaces"
     xauth.touch()
-    result = subprocess.run([str(directory / "demo"), "argument with spaces", "$literal"], env={**env, "ARGV": str(argv), "XAUTHORITY": str(xauth), "TMPDIR": str(tmp_path / "temp space")}, capture_output=True, text=True)
+    result = subprocess.run([str(directory / "demo"), "argument with spaces", "$literal"], env={**env, "NEURODESK_CONTAINER_RUNTIME": "singularity", "ARGV": str(argv), "XAUTHORITY": str(xauth), "TMPDIR": str(tmp_path / "temp space")}, capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     actual = json.loads(argv.read_text())
     assert actual[-4:] == [str(directory / image), "demo", "argument with spaces", "$literal"]
@@ -112,7 +112,7 @@ def test_fetch_refresh_uses_current_helpers_after_whole_install_moves(tmp_path):
         write_executable(poison / command, "#!/bin/bash\nexit 99\n")
     result = subprocess.run(["bash", str(moved / "fetch_containers.sh"), "demo", "1.0", "20260629", "--refresh"], env=clean_env(PATH=f"{poison}:{os.environ['PATH']}"), capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert str(directory) in (moved / "containers/modules/demo/1.0.lua").read_text()
+    assert "neurodesk-artifact-v2" in (moved / "containers/modules/demo/1.0.lua").read_text()
     assert (directory / "manual_module_files/tcl/matlab").is_file()
 
 
@@ -225,7 +225,7 @@ for arg in "$@"; do
 done
 exit 0
 ''')
-    env = clean_env(PATH=f"{bin_dir}:{os.environ['PATH']}", NEURODESKTOP_LOCAL_CONTAINERS=str(neurodesk / "containers"))
+    env = clean_env(PATH=f"{bin_dir}:{os.environ['PATH']}", NEURODESKTOP_LOCAL_CONTAINERS=str(neurodesk / "containers"), NEURODESK_CONTAINER_RUNTIME="singularity")
     script = f'''module() {{ return 0; }}
 export -f module
 bash {shlex.quote(str(neurodesk / "fetch_containers.sh"))} demo 1.0 20260629 ignored-legacy-command
@@ -283,7 +283,7 @@ done
     xauthority.touch()
     result = subprocess.run(
         [str(directory / "demo")],
-        env=clean_env(PATH=f"{bin_dir}:{os.environ['PATH']}", XAUTHORITY=str(xauthority)),
+        env=clean_env(PATH=f"{bin_dir}:{os.environ['PATH']}", XAUTHORITY=str(xauthority), NEURODESK_CONTAINER_RUNTIME="singularity"),
         capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stderr

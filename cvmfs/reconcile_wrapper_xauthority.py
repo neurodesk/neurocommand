@@ -5,52 +5,21 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
-from enum import Enum
 import os
 from pathlib import Path
 import stat
+import tempfile
 import sys
 
-
-NVIDIA_BLOCK = (
-    b'if [ -f /proc/driver/nvidia/version ] && [ -z "${APPTAINER_NV+set}" ] '
-    b'&& [ -z "${SINGULARITY_NV+set}" ]; then\n'
-    b"  export APPTAINER_NV=1\n"
-    b"  export SINGULARITY_NV=1\n"
-    b"fi\n"
-)
-XAUTHORITY_BLOCK = (
-    b"xauthority_opts=()\n"
-    b'if [[ -n "${XAUTHORITY:-}" && -f "$XAUTHORITY" ]]; then\n'
-    b'  xauthority_opts=(--bind "$XAUTHORITY:$XAUTHORITY:ro" '
-    b'--env "XAUTHORITY=$XAUTHORITY")\n'
-    b"fi\n"
-)
-XAUTHORITY_ARGUMENT = b'"${xauthority_opts[@]}" '
-WRAPPER_SETUP_MARKERS = (b"xauthority_opts", b"XAUTHORITY", b"APPTAINER_NV", b"SINGULARITY_NV")
-DISABLED_NOTICE = b"This container was disabled due to a known bug or vulnerability."
-DISABLED_PULL_HINT = b"apptainer pull docker://vnmd/"
-GENERATED_BIND_OPTIONS = (
-    "",
-    "--bind $TMP:/tmp",
-    "--bind $TMPDIR:/tmp",
-    "--bind $TEMP:/tmp",
-    "--bind $TEMPDIR:/tmp",
-)
-
-
-class WrapperState(Enum):
-    LEGACY = "legacy"
-    FIXED = "fixed"
-    DISABLED = "disabled"
-    UNKNOWN = "unknown"
-
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity"))
+from artifact_renderer import render_wrapper, write_artifact
+from wrapper_legacy import classify_relocated_wrapper
+from wrapper_legacy import (DISABLED_NOTICE, DISABLED_PULL_HINT, GENERATED_BIND_OPTIONS, NVIDIA_BLOCK, WRAPPER_SETUP_MARKERS, WrapperState, XAUTHORITY_ARGUMENT, XAUTHORITY_BLOCK, _fixed_wrapper, _inventory_wrapper, _legacy_wrapper, _legacy_wrapper_candidates, _legacy_wrapper_with_duplicate_display, _legacy_wrapper_with_trailing_bind_slot, _legacy_wrapper_without_display, _xauthority_wrapper)
 
 @dataclass(frozen=True)
 class Diagnostic:
     path: Path
     message: str
-
 
 @dataclass(frozen=True)
 class FileSnapshot:
@@ -63,23 +32,21 @@ class FileSnapshot:
     mtime_ns: int
     content: bytes
 
-
 @dataclass(frozen=True)
 class PlannedRewrite:
     path: Path
     before: FileSnapshot
     replacement: bytes
 
-
 @dataclass(frozen=True)
 class ReconciliationPlan:
     rewrites: tuple[PlannedRewrite, ...]
     diagnostics: tuple[Diagnostic, ...]
+    helpers: tuple[tuple[Path, FileSnapshot | None, bytes], ...] = ()
 
     @property
     def is_clean(self) -> bool:
-        return not self.rewrites and not self.diagnostics
-
+        return not self.rewrites and not self.diagnostics and not self.helpers
 
 def _safe_command(raw_command: str) -> bool:
     return bool(raw_command) and not (
@@ -90,7 +57,6 @@ def _safe_command(raw_command: str) -> bool:
         or any(character.isspace() for character in raw_command)
         or "\x00" in raw_command
     )
-
 
 def _parse_commands(commands_path: Path) -> tuple[tuple[str, ...], tuple[Diagnostic, ...]]:
     try:
@@ -123,7 +89,6 @@ def _parse_commands(commands_path: Path) -> tuple[tuple[str, ...], tuple[Diagnos
 
     return tuple(commands), tuple(diagnostics)
 
-
 def _read_from_descriptor(descriptor: int) -> bytes:
     os.lseek(descriptor, 0, os.SEEK_SET)
     chunks: list[bytes] = []
@@ -132,7 +97,6 @@ def _read_from_descriptor(descriptor: int) -> bytes:
         if not chunk:
             return b"".join(chunks)
         chunks.append(chunk)
-
 
 def _snapshot_from_descriptor(descriptor: int) -> FileSnapshot:
     before = os.fstat(descriptor)
@@ -161,13 +125,11 @@ def _snapshot_from_descriptor(descriptor: int) -> FileSnapshot:
         content=content,
     )
 
-
 def _open_no_follow(path: Path, flags: int) -> int:
     return os.open(
         path,
         flags | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_CLOEXEC", 0),
     )
-
 
 def _read_regular_file(path: Path) -> FileSnapshot:
     descriptor = _open_no_follow(path, os.O_RDONLY)
@@ -176,155 +138,19 @@ def _read_regular_file(path: Path) -> FileSnapshot:
     finally:
         os.close(descriptor)
 
-
-def _legacy_wrapper(container_dir: Path, command: str, bind_option: str) -> bytes:
-    container_name = container_dir.name
-    text = (
-        "#!/usr/bin/env bash\n"
-        "export PWD=`pwd -P`\n"
-        "singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY "
-        f"{bind_option} $neurodesk_singularity_opts --pwd \"$PWD\" "
-        f"{container_dir}/{container_name}.simg {command} \"$@\"\n"
-    )
-    return text.encode("utf-8")
-
-
-def _legacy_wrapper_without_display(
-    container_dir: Path, command: str, bind_option: str
-) -> bytes:
-    container_name = container_dir.name
-    text = (
-        "#!/usr/bin/env bash\n"
-        "export PWD=`pwd -P`\n"
-        f"singularity --silent exec {bind_option} $neurodesk_singularity_opts "
-        f"--pwd \"$PWD\" {container_dir}/{container_name}.simg {command} \"$@\"\n"
-    )
-    return text.encode("utf-8")
-
-
-def _legacy_wrapper_with_duplicate_display(container_dir: Path, command: str) -> bytes:
-    container_name = container_dir.name
-    text = (
-        "#!/usr/bin/env bash\n"
-        "export PWD=`pwd -P`\n"
-        "singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY "
-        "--env DISPLAY=$DISPLAY $neurodesk_singularity_opts --pwd \"$PWD\" "
-        f"{container_dir}/{container_name}.simg {command} \"$@\"\n"
-    )
-    return text.encode("utf-8")
-
-
-def _legacy_wrapper_with_trailing_bind_slot(container_dir: Path, command: str) -> bytes:
-    container_name = container_dir.name
-    text = (
-        "#!/usr/bin/env bash\n"
-        "export PWD=`pwd -P`\n"
-        "singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY "
-        "$neurodesk_singularity_opts  --pwd \"$PWD\" "
-        f"{container_dir}/{container_name}.simg {command} \"$@\"\n"
-    )
-    return text.encode("utf-8")
-
-
-def _legacy_wrapper_candidates(container_dir: Path, command: str) -> tuple[bytes, ...]:
-    candidates = [
-        _legacy_wrapper(container_dir, command, bind_option)
-        for bind_option in GENERATED_BIND_OPTIONS
-    ]
-    candidates.extend(
-        _legacy_wrapper_without_display(container_dir, command, bind_option)
-        for bind_option in GENERATED_BIND_OPTIONS
-    )
-
-    # Wrappers generated before temporary-directory binding was introduced do
-    # not contain the empty bind-variable slot (and therefore have one space at
-    # the insertion point instead of two).
-    candidates.append(
-        _legacy_wrapper(container_dir, command, "").replace(
-            b"DISPLAY=$DISPLAY  ", b"DISPLAY=$DISPLAY ", 1
-        )
-    )
-    candidates.append(
-        _legacy_wrapper_without_display(container_dir, command, "").replace(
-            b"singularity --silent exec  ", b"singularity --silent exec ", 1
-        )
-    )
-    candidates.append(_legacy_wrapper_with_duplicate_display(container_dir, command))
-    candidates.append(_legacy_wrapper_with_trailing_bind_slot(container_dir, command))
-    return tuple(dict.fromkeys(candidates))
-
-
-def _xauthority_wrapper(legacy: bytes) -> bytes:
-    pwd_line = b"export PWD=`pwd -P`\n"
-    display_argument = b"--env DISPLAY=$DISPLAY "
-    replacement = legacy.replace(pwd_line, pwd_line + XAUTHORITY_BLOCK, 1)
-    if display_argument in replacement:
-        return replacement.replace(
-            display_argument,
-            display_argument + XAUTHORITY_ARGUMENT,
-            1,
-        )
-    return replacement.replace(
-        b"singularity --silent exec ",
-        b"singularity --silent exec " + XAUTHORITY_ARGUMENT,
-        1,
-    )
-
-
-def _fixed_wrapper(legacy: bytes) -> bytes:
-    pwd_line = b"export PWD=`pwd -P`\n"
-    return _xauthority_wrapper(legacy).replace(pwd_line, pwd_line + NVIDIA_BLOCK, 1)
-
-
-def _inventory_wrapper(container_dir: Path, command: str, *, legacy: bool = False) -> bytes:
-    def quote(value: str) -> str:
-        return "'" + value.replace("'", "'\\'" + "'") + "'"
-
-    setup = (
-        b"#!/usr/bin/env bash\nexport PWD=`pwd -P`\n"
-        + NVIDIA_BLOCK + XAUTHORITY_BLOCK
-        + b'tmp_opts=()\n'
-        + b'for customtmp in TMP TMPDIR TEMP TEMPDIR; do\n'
-        + b'  if [[ -n "${!customtmp}" ]]; then\n'
-        + b'    tmp_opts=(--bind "${!customtmp}:/tmp")\n'
-        + b'  fi\ndone\n'
-    )
-    gui_options = "" if legacy else '--env DISPLAY="$DISPLAY" "${xauthority_opts[@]}" '
-    invocation = (
-        "singularity --silent exec --cleanenv " + gui_options
-        + '"${tmp_opts[@]}" '
-        + '$neurodesk_singularity_opts --pwd "$PWD" '
-        + quote(str(container_dir / f"{container_dir.name}.simg"))
-        + " " + quote(command) + ' "$@"\n'
-    )
-    return setup + invocation.encode("utf-8")
-
-
 def _classify_wrapper(
     container_dir: Path, command: str, content: bytes
 ) -> tuple[WrapperState, bytes | None]:
-    if (
-        content.startswith(b"#!/usr/bin/env bash\n")
-        and DISABLED_NOTICE in content
-        and DISABLED_PULL_HINT in content
-    ):
-        return WrapperState.DISABLED, None
-
-    if content in (_inventory_wrapper(container_dir, command), _inventory_wrapper(container_dir, command, legacy=True)):
+    if content in (render_wrapper(container_dir.name + ".simg", command), render_wrapper(container_dir.name + ".simg", command, legacy=True)):
         return WrapperState.FIXED, None
-
-    for legacy in _legacy_wrapper_candidates(container_dir, command):
-        if content in (legacy, _xauthority_wrapper(legacy)):
-            return WrapperState.LEGACY, _fixed_wrapper(legacy)
-        if content == _fixed_wrapper(legacy):
-            return WrapperState.FIXED, None
-
-    return WrapperState.UNKNOWN, None
+    state, _ = classify_relocated_wrapper(container_dir, command, content)
+    if state in {WrapperState.LEGACY, WrapperState.FIXED}:
+        return WrapperState.LEGACY, render_wrapper(container_dir.name + ".simg", command)
+    return state, None
 
 
 def _same_snapshot(left: FileSnapshot, right: FileSnapshot) -> bool:
     return left == right
-
 
 def _container_directories(containers_root: Path) -> tuple[Path, ...]:
     directories: list[Path] = []
@@ -337,12 +163,13 @@ def _container_directories(containers_root: Path) -> tuple[Path, ...]:
             directories.append(path)
     return tuple(sorted(directories))
 
-
 def plan_wrapper_reconciliation(repo_root: Path) -> ReconciliationPlan:
     repo_root = repo_root.absolute()
     containers_root = repo_root / "containers"
     rewrites: list[PlannedRewrite] = []
     diagnostics: list[Diagnostic] = []
+    helpers = []
+    helper_dir = Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity"
 
     try:
         container_dirs = _container_directories(containers_root)
@@ -370,6 +197,7 @@ def plan_wrapper_reconciliation(repo_root: Path) -> ReconciliationPlan:
         commands, command_diagnostics = _parse_commands(commands_path)
         diagnostics.extend(command_diagnostics)
 
+        generated = False
         for command in commands:
             wrapper_path = container_dir / command
             try:
@@ -395,6 +223,7 @@ def plan_wrapper_reconciliation(repo_root: Path) -> ReconciliationPlan:
             state, replacement = _classify_wrapper(
                 container_dir, command, snapshot.content
             )
+            generated = generated or state in {WrapperState.LEGACY, WrapperState.FIXED}
             if state is WrapperState.LEGACY:
                 if replacement is None:
                     raise AssertionError("legacy wrapper has no replacement")
@@ -413,11 +242,22 @@ def plan_wrapper_reconciliation(repo_root: Path) -> ReconciliationPlan:
                 )
                 diagnostics.append(Diagnostic(wrapper_path, detail))
 
+        if generated:
+            for name in ("container_runtime.sh", "artifact_renderer.py", "wrapper_legacy.py", "ts_render_artifacts.sh", "run_transparent_singularity.sh"):
+                path = container_dir / name
+                expected = (helper_dir / name).read_bytes()
+                try:
+                    before = _read_regular_file(path) if path.exists() or path.is_symlink() else None
+                    if before is None or before.content != expected:
+                        helpers.append((path, before, expected))
+                except (OSError, RuntimeError) as error:
+                    diagnostics.append(Diagnostic(path, f"cannot stage deployment helper: {error}"))
+
     return ReconciliationPlan(
         rewrites=tuple(sorted(rewrites, key=lambda rewrite: rewrite.path)),
         diagnostics=tuple(sorted(diagnostics, key=lambda item: (item.path, item.message))),
+        helpers=tuple(helpers),
     )
-
 
 def _verify_rewrite(rewrite: PlannedRewrite) -> None:
     try:
@@ -427,32 +267,23 @@ def _verify_rewrite(rewrite: PlannedRewrite) -> None:
     if not _same_snapshot(current, rewrite.before):
         raise RuntimeError(f"wrapper changed since planning: {rewrite.path}")
 
-
 def _write_rewrite(rewrite: PlannedRewrite) -> None:
+    temporary = None
     try:
-        descriptor = _open_no_follow(rewrite.path, os.O_RDWR)
-    except OSError as error:
-        raise RuntimeError(f"cannot open wrapper for writing: {rewrite.path}: {error}") from error
-
-    try:
-        current = _snapshot_from_descriptor(descriptor)
-        if not _same_snapshot(current, rewrite.before):
-            raise RuntimeError(f"wrapper changed since planning: {rewrite.path}")
-
-        os.lseek(descriptor, 0, os.SEEK_SET)
-        view = memoryview(rewrite.replacement)
-        written = 0
-        while written < len(view):
-            bytes_written = os.write(descriptor, view[written:])
-            if bytes_written == 0:
-                raise RuntimeError(f"short write while updating wrapper: {rewrite.path}")
-            written += bytes_written
-        os.ftruncate(descriptor, len(rewrite.replacement))
-        os.fsync(descriptor)
-    except OSError as error:
-        raise RuntimeError(f"cannot update wrapper: {rewrite.path}: {error}") from error
+        with tempfile.NamedTemporaryFile(dir=rewrite.path.parent, delete=False) as staged:
+            temporary = Path(staged.name)
+            staged.write(rewrite.replacement)
+            staged.flush()
+            os.fsync(staged.fileno())
+        os.chmod(temporary, stat.S_IMODE(rewrite.before.mode))
+        current = temporary.stat()
+        if (current.st_uid, current.st_gid) != (rewrite.before.uid, rewrite.before.gid):
+            os.chown(temporary, rewrite.before.uid, rewrite.before.gid)
+        _verify_rewrite(rewrite)
+        os.replace(temporary, rewrite.path)
     finally:
-        os.close(descriptor)
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def apply_wrapper_plan(plan: ReconciliationPlan) -> int:
@@ -461,10 +292,15 @@ def apply_wrapper_plan(plan: ReconciliationPlan) -> int:
 
     for rewrite in plan.rewrites:
         _verify_rewrite(rewrite)
+    for path, before, _ in plan.helpers:
+        current = _read_regular_file(path) if path.exists() or path.is_symlink() else None
+        if current != before:
+            raise RuntimeError(f"Helper changed since planning: {path}")
+    for path, _, content in plan.helpers:
+        write_artifact(path, content, path.suffix == ".sh")
     for rewrite in plan.rewrites:
         _write_rewrite(rewrite)
     return len(plan.rewrites)
-
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -483,13 +319,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     return parser
 
-
 def _report(plan: ReconciliationPlan) -> None:
+    for path, _, _ in plan.helpers:
+        print(f"[INFO] stage deployment helper: {path}")
     for rewrite in plan.rewrites:
         print(f"[INFO] update XAUTHORITY forwarding and NVIDIA defaults: {rewrite.path}")
     for diagnostic in plan.diagnostics:
         print(f"[ERROR] {diagnostic.message}: {diagnostic.path}", file=sys.stderr)
-
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
@@ -505,7 +341,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.check:
-        if plan.rewrites:
+        if plan.rewrites or plan.helpers:
             print(
                 f"[INFO] Wrapper reconciliation would change {len(plan.rewrites)} file(s)."
             )
@@ -521,7 +357,6 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"[INFO] Wrapper reconciliation changed {changed} file(s).")
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

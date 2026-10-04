@@ -13,6 +13,9 @@ import shlex
 import logging
 import distutils.dir_util
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "transparent-singularity"))
+from artifact_renderer import load_bundles, bundle_menu_entries, publish_bundles
+
 APP_MENU_KWARGS = {"version", "exec", "terminal", "apptainer_args"}
 
 # MIME types claimed by document-editing executables, keyed by the app's exec
@@ -328,6 +331,13 @@ def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_pref
     # Read applications file
     with open(appsjson, "r") as json_file:
         menu_entries = json.load(json_file)
+    manifest = appsjson.parent / "bundles.json"
+    if manifest.is_file():
+        bundles = load_bundles(manifest, menu_entries)
+        for name, bundle_group in bundle_menu_entries(bundles).items():
+            group = menu_entries.setdefault(name, {"apps": {}, "categories": []})
+            group["apps"].update(bundle_group["apps"])
+            group["categories"] = list(dict.fromkeys(group.get("categories", []) + bundle_group["categories"]))
 
     for menu_name, menu_data in menu_entries.items():
         default_show_in_menu = visibility_flag(menu_data, "show_in_menu")
@@ -400,6 +410,7 @@ def build_menu(installdir, deskenv, sh_prefix):
     copyfile_with_mode(Path('neurodesk/configparser.sh'), installdir/'configparser.sh', mode=0o755)
     copyfile_with_mode(Path('config.ini'), installdir/'config.ini')
     copyfile_with_mode(Path('neurodesk/apps.json'), installdir/'apps.json')
+    copyfile_with_mode(Path('neurodesk/bundles.json'), installdir/'bundles.json')
     distutils.dir_util.copy_tree('neurodesk/transparent-singularity', str(installdir/'transparent-singularity'))
 
     if not climode:
@@ -437,6 +448,8 @@ def build_menu(installdir, deskenv, sh_prefix):
 
     appsjson = Path('neurodesk/apps.json').resolve(strict=True)
     (installdir/'icons').mkdir(exist_ok=True)
+    bundles = load_bundles(Path('neurodesk/bundles.json'), json.loads(appsjson.read_text()))
+    publish_bundles(bundles, installdir/'containers/modules')
     apps_from_json(climode, deskenv, installdir, appsjson, sh_prefix)
 
     # Neurodesk help app

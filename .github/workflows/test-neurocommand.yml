@@ -91,7 +91,15 @@ jobs:
               bash build.sh --cli
               bash containers.sh all
               bash local/fetch_containers.sh niimath 1.0.0 20250617 niimath
-              test -f "${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"
+              image="${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"
+              # CVMFS images are sandbox directories, deployed as symlinks.
+              if [ "${{ matrix.cvmfs }}" = "enabled" ]; then
+                test -L "$image"
+                test -d "$image"
+              else
+                test -f "$image"
+              fi
               test -f "${container_root}/niimath_1.0.0_20250617/niimath"
+              "${container_root}/niimath_1.0.0_20250617/niimath" --version
               echo "[test] OK"
             '

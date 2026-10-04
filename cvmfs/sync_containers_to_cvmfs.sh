@@ -462,6 +462,27 @@ else
     exit 2
 fi
 
+# Bundles reuse already-published independent containers and have no image.
+bundle_args=(--manifest "$NEUROCOMMAND_LOCAL_REPO/neurodesk/bundles.json"
+    --catalog "$NEUROCOMMAND_LOCAL_REPO/neurodesk/apps.json"
+    --module-root /cvmfs/neurodesk.ardc.edu.au/containers/modules
+    --public-root /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules --require-installed)
+if python3 "$NEUROCOMMAND_LOCAL_REPO/neurodesk/transparent-singularity/artifact_renderer.py" "${bundle_args[@]}" --check; then
+    BUNDLE_STATUS=0
+else
+    BUNDLE_STATUS=$?
+fi
+if [[ $BUNDLE_STATUS -eq 1 ]]; then
+    open_cvmfs_transaction neurodesk.ardc.edu.au
+    if ! python3 "$NEUROCOMMAND_LOCAL_REPO/neurodesk/transparent-singularity/artifact_renderer.py" "${bundle_args[@]}" ||
+        ! publish_cvmfs_transaction neurodesk.ardc.edu.au "published versioned tool bundles"; then
+        abort_cvmfs_transaction neurodesk.ardc.edu.au
+        exit 2
+    fi
+elif [[ $BUNDLE_STATUS -ne 0 ]]; then
+    exit 2
+fi
+
 # disable unpacked container versions that no longer exist in log.txt:
 CONTAINERS_ROOT="/cvmfs/neurodesk.ardc.edu.au/containers"
 STALE_IMAGES=()

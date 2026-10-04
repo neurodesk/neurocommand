@@ -84,8 +84,8 @@ def dirty_local_fetch_and_run(work):
     local_script = work / "neurodesk" / "fetch_and_run.sh"
     local_script.write_text(
         local_script.read_text().replace(
-            'export CONTAINER_PATH="${LOCAL_CONTAINERS_PATH}"',
-            'export CONTAINER_PATH="${LOCAL_CONTAINERS_PATH}"\n# local dirty regression',
+            'name=${1:-}',
+            'name=${1:-}\n# local dirty regression',
             1,
         )
     )
