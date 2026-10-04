@@ -190,6 +190,7 @@
         {
             "application": "aslprep_0.2.7_20210323",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -197,6 +198,7 @@
         {
             "application": "aslprep_0.4.0_20230728",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -204,6 +206,7 @@
         {
             "application": "aslprep_0.5.0_20231116",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -211,6 +214,7 @@
         {
             "application": "aslprep_0.6.0_20240318",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -218,6 +222,7 @@
         {
             "application": "aslprep_0.7.0_20240530",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -225,6 +230,7 @@
         {
             "application": "aslprep_0.7.2_20240917",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -232,6 +238,7 @@
         {
             "application": "aslprep_0.7.5_20260413",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -239,6 +246,7 @@
         {
             "application": "aslprep_26.0.2_20260414",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -246,6 +254,7 @@
         {
             "application": "aslprep_26.0.3_20260911",
             "categories": [
+                "arterial spin labelling",
                 "quantitative imaging",
                 "workflows"
             ]
@@ -1326,6 +1335,7 @@
         {
             "application": "exploreasl_1.11.0_20260514",
             "categories": [
+                "arterial spin labelling",
                 "workflows"
             ]
         },
@@ -1547,6 +1557,7 @@
         {
             "application": "fsl_6.0.3_20200905",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1557,6 +1568,7 @@
         {
             "application": "fsl_6.0.4_20210105",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1567,6 +1579,7 @@
         {
             "application": "fsl_6.0.5.1_20221016",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1577,6 +1590,7 @@
         {
             "application": "fsl_6.0.6.4_20230618",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1587,6 +1601,7 @@
         {
             "application": "fsl_6.0.7.1_20230809",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1597,6 +1612,7 @@
         {
             "application": "fsl_6.0.7.14_20241018",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1607,6 +1623,7 @@
         {
             "application": "fsl_6.0.7.16_20250131",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1617,6 +1634,7 @@
         {
             "application": "fsl_6.0.7.18_20250928",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1627,6 +1645,7 @@
         {
             "application": "fsl_6.0.7.19_20260217",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1637,6 +1656,7 @@
         {
             "application": "fsl_6.0.7.22_20260416",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1647,6 +1667,7 @@
         {
             "application": "fsl_6.0.7.23_20260925",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1657,6 +1678,7 @@
         {
             "application": "fsl_6.0.7.4_20231005",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1667,6 +1689,7 @@
         {
             "application": "fsl_6.0.7.8_20240913",
             "categories": [
+                "arterial spin labelling",
                 "diffusion imaging",
                 "functional imaging",
                 "image registration",
@@ -1785,6 +1808,7 @@
         {
             "application": "hcpasl_0.2.0_20260519",
             "categories": [
+                "arterial spin labelling",
                 "functional imaging",
                 "workflows"
             ]
@@ -2583,6 +2607,13 @@
             "application": "nipype_1.8.3_20220825",
             "categories": [
                 "workflows"
+            ]
+        },
+        {
+            "application": "nobrainer_1.2.1_20261003",
+            "categories": [
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
