@@ -840,6 +840,19 @@
             "visualization"
         ]
     },
+    "brainstemnavigator": {
+        "apps": {
+            "brainstemnavigator 1.0.0": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "structural imaging"
+        ]
+    },
     "brainstorm": {
         "apps": {
             "brainstorm 3.211130": {
@@ -1044,6 +1057,19 @@
         },
         "categories": [
             "functional imaging"
+        ]
+    },
+    "chimera-brainparcellation": {
+        "apps": {
+            "chimera-brainparcellation 0.4.1": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
         ]
     },
     "civet": {
@@ -3883,7 +3909,7 @@
                 "apptainer_args": []
             },
             "openmsk 0.2.0": {
-                "version": "20260908",
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             }
