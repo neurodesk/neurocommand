@@ -257,6 +257,15 @@
 				</And>
 			</Include>
 		</Menu>
+		<Menu>
+			<Name>Arterial Spin Labelling</Name>
+			<Directory>neurodesk/arterial-spin-labelling.directory</Directory>
+			<Include>
+				<And>
+					<Category>arterial-spin-labelling</Category>
+				</And>
+			</Include>
+		</Menu>
 	</Menu> <!-- End Neurodesk -->
 
 </Menu> <!-- End Applications -->
