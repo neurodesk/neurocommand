@@ -2065,6 +2065,14 @@
             ]
         },
         {
+            "application": "loftcbf_3.0.0_20261004",
+            "categories": [
+                "arterial spin labelling",
+                "quality control",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "lqt_0.1.0_20260603",
             "categories": [
                 "structural imaging"
@@ -2327,7 +2335,7 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261002",
+            "application": "mneextended_1.2.0_20261003",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -2795,7 +2803,7 @@
             ]
         },
         {
-            "application": "pyem_0.69.0_20261003",
+            "application": "pyem_0.69.0_20261004",
             "categories": [
                 "cryo EM"
             ]
@@ -3080,6 +3088,15 @@
             ]
         },
         {
+            "application": "quantiphyse_0.9.10_20261004",
+            "categories": [
+                "arterial spin labelling",
+                "quantitative imaging",
+                "visualization",
+                "workflows"
+            ]
+        },
+        {
             "application": "quickshear_1.1.0_20240606",
             "categories": [
                 "data organisation"
@@ -3217,6 +3234,18 @@
             "application": "sigviewer_0.6.4_20220315",
             "categories": [
                 "electrophysiology"
+            ]
+        },
+        {
+            "application": "skan_0.13.1_20261004",
+            "categories": [
+                "shape analysis"
+            ]
+        },
+        {
+            "application": "skan_arm64_0.13.1_20261004",
+            "categories": [
+                "shape analysis"
             ]
         },
         {
@@ -3388,6 +3417,12 @@
             "application": "startrack_20250920_20260611",
             "categories": [
                 "diffusion imaging"
+            ]
+        },
+        {
+            "application": "stir_6.4.0_20261003",
+            "categories": [
+                "image reconstruction"
             ]
         },
         {
