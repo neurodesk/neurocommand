@@ -530,7 +530,11 @@ def plan_module_reconciliation(
         for category in categories.get((tool, version), ()):
             for filename, content in canonical_contents.items():
                 target = public_modules_root / category / tool / filename
-                if target in protected or target.is_symlink():
+                if (
+                    canonical_modules_root / tool / filename in protected
+                    or target in protected
+                    or target.is_symlink()
+                ):
                     continue
                 add_change(
                     changes,

@@ -47,6 +47,8 @@ block module updates for other containers. Legacy inventories without `env.txt`
 retain their existing reconciliation behavior.
 When an existing legacy module references an inventory that fails validation,
 reconciliation preserves that module because its generated ownership is unknown.
+Protected canonical content is not copied into public module paths. Modules
+generated directly from a valid selected inventory remain eligible for publication.
 
 For Environment Modules, search command metadata with `module keyword bet`,
 then load a result with `module load fsl/6.0.7.18`.
