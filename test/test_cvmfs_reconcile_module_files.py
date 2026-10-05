@@ -299,7 +299,10 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
     ("mrtrix3src_latest_latest", "mrconvert\n"),
     ("mrtrix3src_latest_20260101", ""),
 ])
-def test_unrecognized_historical_inventory_preserves_modules(tmp_path, old_name, commands):
+@pytest.mark.parametrize("public_exists", [False, True])
+def test_unrecognized_historical_inventory_preserves_modules(
+    tmp_path, old_name, commands, public_exists
+):
     current = "mrtrix3src_latest_20261004"
     make_container(tmp_path, old_name, commands)
     make_container(tmp_path, current, "mrconvert\n")
@@ -308,7 +311,7 @@ def test_unrecognized_historical_inventory_preserves_modules(tmp_path, old_name,
     canonical = tmp_path / "containers/modules/mrtrix3src/latest.lua"
     public = tmp_path / "neurodesk-modules/diffusion_imaging/mrtrix3src/latest.lua"
     before = module_text(old_name)
-    for path in (canonical, public):
+    for path in ((canonical, public) if public_exists else (canonical,)):
         path.parent.mkdir(parents=True)
         path.write_text(before)
     log = tmp_path / "log.txt"
@@ -318,7 +321,13 @@ def test_unrecognized_historical_inventory_preserves_modules(tmp_path, old_name,
     reconcile_module_files.apply_changes(changes)
 
     assert canonical.read_text() == before
-    assert public.read_text() == before
+    if public_exists:
+        assert public.read_text() == before
+    else:
+        assert not public.exists()
+    generated_tcl = public.with_suffix("")
+    assert current in generated_tcl.read_text()
+    assert old_name not in generated_tcl.read_text()
 
 
 @pytest.mark.parametrize(
