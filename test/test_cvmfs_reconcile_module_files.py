@@ -261,6 +261,9 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
     civet.parent.mkdir(parents=True)
     civet.write_text(module_text(incomplete_civet))
     civet_before = civet.read_bytes()
+    public_civet = repo_root / "neurodesk-modules/structural_imaging/civet/2.1.1.lua"
+    public_civet.parent.mkdir(parents=True)
+    public_civet.write_bytes(civet_before)
     log = tmp_path / "log.txt"
     entries = [
         f"{new_fsl} categories:functional imaging,site,",
@@ -272,6 +275,7 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
         inventory = reconcile_module_files.read_container_inventory(repo_root / "containers" / old_civet)
         civet.write_bytes(reconcile_module_files.render_module(inventory, format="lua"))
         civet_before = civet.read_bytes()
+        public_civet.write_bytes(civet_before)
         entries.append(f"{old_civet} categories:structural imaging,")
     log.write_text("\n".join(entries) + "\n")
 
@@ -282,12 +286,39 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
     assert old_fsl not in public.read_text()
     assert customized.read_bytes() == customized_before
     assert civet.read_bytes() == civet_before
+    assert public_civet.read_bytes() == civet_before
     assert incomplete_civet in capsys.readouterr().err
     if older_available:
         published_civet = repo_root / "neurodesk-modules/structural_imaging/civet/2.1.1.lua"
         assert old_civet in published_civet.read_text()
         assert incomplete_civet not in published_civet.read_text()
     assert reconcile_module_files.plan_module_reconciliation(repo_root, log) == []
+
+
+@pytest.mark.parametrize("old_name, commands", [
+    ("mrtrix3src_latest_latest", "mrconvert\n"),
+    ("mrtrix3src_latest_20260101", ""),
+])
+def test_unrecognized_historical_inventory_preserves_modules(tmp_path, old_name, commands):
+    current = "mrtrix3src_latest_20261004"
+    make_container(tmp_path, old_name, commands)
+    make_container(tmp_path, current, "mrconvert\n")
+    for image in (old_name, current):
+        (tmp_path / "containers" / image / "env.txt").touch()
+    canonical = tmp_path / "containers/modules/mrtrix3src/latest.lua"
+    public = tmp_path / "neurodesk-modules/diffusion_imaging/mrtrix3src/latest.lua"
+    before = module_text(old_name)
+    for path in (canonical, public):
+        path.parent.mkdir(parents=True)
+        path.write_text(before)
+    log = tmp_path / "log.txt"
+    log.write_text(f"{current} categories:diffusion imaging,\n")
+
+    changes = reconcile_module_files.plan_module_reconciliation(tmp_path, log)
+    reconcile_module_files.apply_changes(changes)
+
+    assert canonical.read_text() == before
+    assert public.read_text() == before
 
 
 @pytest.mark.parametrize(
