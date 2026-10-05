@@ -229,6 +229,67 @@ def test_reconciliation_removes_managed_extensions_for_empty_inventory(tmp_path)
     assert "old-command/1.0" not in text
 
 
+@pytest.mark.parametrize("commands", ["", " \n\t\n", "../outside\nbad command\n"])
+@pytest.mark.parametrize("older_available", [False, True])
+def test_incomplete_inventory_does_not_block_other_module_updates(
+    tmp_path, commands, older_available, capsys
+):
+    repo_root = tmp_path / "repository"
+    old_fsl = "fsl_6.0.7.23_20260925"
+    new_fsl = "fsl_6.0.7.23_20261004"
+    old_civet = "civet_2.1.1_20260726"
+    incomplete_civet = "civet_2.1.1_20260727"
+    for image, inventory in (
+        (old_fsl, "fslmaths\n"),
+        (new_fsl, "fslmaths\nfsleyes\n"),
+        (incomplete_civet, commands),
+    ):
+        make_container(repo_root, image, inventory)
+        (repo_root / "containers" / image / "env.txt").touch()
+
+    canonical = repo_root / "containers/modules/fsl/6.0.7.23.lua"
+    public = repo_root / "neurodesk-modules/functional_imaging/fsl/6.0.7.23.lua"
+    customized = repo_root / "neurodesk-modules/site/fsl/6.0.7.23.lua"
+    for path, image in ((canonical, new_fsl), (public, old_fsl), (customized, old_fsl)):
+        path.parent.mkdir(parents=True)
+        inventory = reconcile_module_files.read_container_inventory(repo_root / "containers" / image)
+        path.write_bytes(reconcile_module_files.render_module(inventory, format="lua"))
+    customized.write_text(customized.read_text() + 'setenv("SITE_SETTING", "preserve")\n')
+    customized_before = customized.read_bytes()
+
+    civet = repo_root / "containers/modules/civet/2.1.1.lua"
+    civet.parent.mkdir(parents=True)
+    civet.write_text(module_text(incomplete_civet))
+    civet_before = civet.read_bytes()
+    log = tmp_path / "log.txt"
+    entries = [
+        f"{new_fsl} categories:functional imaging,site,",
+        f"{incomplete_civet} categories:structural imaging,",
+    ]
+    if older_available:
+        make_container(repo_root, old_civet, "civet\n")
+        (repo_root / "containers" / old_civet / "env.txt").touch()
+        inventory = reconcile_module_files.read_container_inventory(repo_root / "containers" / old_civet)
+        civet.write_bytes(reconcile_module_files.render_module(inventory, format="lua"))
+        civet_before = civet.read_bytes()
+        entries.append(f"{old_civet} categories:structural imaging,")
+    log.write_text("\n".join(entries) + "\n")
+
+    changes = reconcile_module_files.plan_module_reconciliation(repo_root, log)
+    reconcile_module_files.apply_changes(changes)
+
+    assert new_fsl in public.read_text()
+    assert old_fsl not in public.read_text()
+    assert customized.read_bytes() == customized_before
+    assert civet.read_bytes() == civet_before
+    assert incomplete_civet in capsys.readouterr().err
+    if older_available:
+        published_civet = repo_root / "neurodesk-modules/structural_imaging/civet/2.1.1.lua"
+        assert old_civet in published_civet.read_text()
+        assert incomplete_civet not in published_civet.read_text()
+    assert reconcile_module_files.plan_module_reconciliation(repo_root, log) == []
+
+
 @pytest.mark.parametrize(
     "filename, legacy_block, preserved",
     [
