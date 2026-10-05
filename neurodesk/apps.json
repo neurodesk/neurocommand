@@ -3801,6 +3801,11 @@
                 "version": "20260909",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "niimath 1.0.20260924": {
+                "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3811,6 +3816,11 @@
         "apps": {
             "niimath_arm64 1.0.20260703": {
                 "version": "20260909",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "niimath_arm64 1.0.20260924": {
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             }
