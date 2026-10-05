@@ -7,6 +7,6 @@ reviews:
   path_filters:
     - "!neurodesk/apps.json"
   auto_review:
-    ignore_title_keywords:
-      - "Consolidate pending apps.json updates"
-      - "Update apps.json from neurocontainers releases"
+    # Only review when explicitly requested with "@coderabbitai review".
+    enabled: false
+    auto_incremental_review: false
