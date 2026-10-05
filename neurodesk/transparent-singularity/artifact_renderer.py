@@ -75,8 +75,6 @@ def read_container_inventory(directory: Path, image_basename: str | None = None)
     if not re.fullmatch(r'\d{8}', date):
         raise ValueError('Container identity requires an eight digit build date')
     commands = tuple(dict.fromkeys(c for c in (directory / 'commands.txt').read_text().splitlines() if safe_command(c)))
-    if not commands:
-        raise ValueError('Missing or empty commands.txt')
     environment = []
     with (directory / 'env.txt').open(newline='') as inventory:
         records = inventory.read().split('\n')
@@ -480,6 +478,8 @@ def bundle_cli(argv: list[str]) -> None:
 def check_container(directory: Path) -> bool:
     """Check managed artifacts without regenerating or touching the image."""
     spec = read_container_inventory(directory)
+    if not spec.commands:
+        return False
     source = Path(__file__).resolve().parent
     for name in ['container_runtime.sh', 'artifact_renderer.py', 'wrapper_legacy.py', 'ts_render_artifacts.sh', 'run_transparent_singularity.sh']:
         deployed = directory / name
@@ -526,6 +526,8 @@ def main() -> None:
     if not (directory / args.image).exists():
         parser.error(f'Missing image: {args.image}')
     spec = read_container_inventory(directory, args.image)
+    if not spec.commands:
+        parser.error('Missing or empty commands.txt')
     for command in spec.commands:
         path = directory / command
         if path.is_symlink() or (path.exists() and not path.stat().st_mode & 0o111):

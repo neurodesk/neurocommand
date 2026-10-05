@@ -231,18 +231,18 @@ def test_reconciliation_removes_managed_extensions_for_empty_inventory(tmp_path)
 
 @pytest.mark.parametrize("commands", ["", " \n\t\n", "../outside\nbad command\n"])
 @pytest.mark.parametrize("older_available", [False, True])
-def test_incomplete_inventory_does_not_block_other_module_updates(
-    tmp_path, commands, older_available, capsys
+def test_empty_inventory_reconciliation_updates_other_modules(
+    tmp_path, commands, older_available
 ):
     repo_root = tmp_path / "repository"
     old_fsl = "fsl_6.0.7.23_20260925"
     new_fsl = "fsl_6.0.7.23_20261004"
     old_civet = "civet_2.1.1_20260726"
-    incomplete_civet = "civet_2.1.1_20260727"
+    empty_civet = "civet_2.1.1_20260727"
     for image, inventory in (
         (old_fsl, "fslmaths\n"),
         (new_fsl, "fslmaths\nfsleyes\n"),
-        (incomplete_civet, commands),
+        (empty_civet, commands),
     ):
         make_container(repo_root, image, inventory)
         (repo_root / "containers" / image / "env.txt").touch()
@@ -259,7 +259,10 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
 
     civet = repo_root / "containers/modules/civet/2.1.1.lua"
     civet.parent.mkdir(parents=True)
-    civet.write_text(module_text(incomplete_civet))
+    empty_inventory = reconcile_module_files.read_container_inventory(
+        repo_root / "containers" / empty_civet
+    )
+    civet.write_bytes(reconcile_module_files.render_module(empty_inventory, format="lua"))
     civet_before = civet.read_bytes()
     public_civet = repo_root / "neurodesk-modules/structural_imaging/civet/2.1.1.lua"
     public_civet.parent.mkdir(parents=True)
@@ -267,7 +270,7 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
     log = tmp_path / "log.txt"
     entries = [
         f"{new_fsl} categories:functional imaging,site,",
-        f"{incomplete_civet} categories:structural imaging,",
+        f"{empty_civet} categories:structural imaging,",
     ]
     if older_available:
         make_container(repo_root, old_civet, "civet\n")
@@ -285,13 +288,11 @@ def test_incomplete_inventory_does_not_block_other_module_updates(
     assert new_fsl in public.read_text()
     assert old_fsl not in public.read_text()
     assert customized.read_bytes() == customized_before
-    assert civet.read_bytes() == civet_before
-    assert public_civet.read_bytes() == civet_before
-    assert incomplete_civet in capsys.readouterr().err
-    if older_available:
-        published_civet = repo_root / "neurodesk-modules/structural_imaging/civet/2.1.1.lua"
-        assert old_civet in published_civet.read_text()
-        assert incomplete_civet not in published_civet.read_text()
+    expected_civet = reconcile_module_files.render_module(empty_inventory, format="lua")
+    assert civet.read_bytes() == expected_civet
+    assert public_civet.read_bytes() == expected_civet
+    assert empty_civet in public_civet.read_text()
+    assert old_civet not in public_civet.read_text()
     assert reconcile_module_files.plan_module_reconciliation(repo_root, log) == []
 
 
