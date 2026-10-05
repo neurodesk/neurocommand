@@ -3833,6 +3833,11 @@
     },
     "nipype": {
         "apps": {
+            "nipype 1.11.0": {
+                "version": "20261005",
+                "exec": "",
+                "apptainer_args": []
+            },
             "code-nipype 1.8.3": {
                 "version": "20220825",
                 "exec": "code"
