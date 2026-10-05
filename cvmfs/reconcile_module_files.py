@@ -14,7 +14,7 @@ from typing import Optional
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity"))
-from artifact_renderer import read_container_inventory, render_module, managed_module_content, write_artifact
+from artifact_renderer import read_container_inventory, render_module, managed_module_content, safe_command, write_artifact
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
@@ -147,6 +147,16 @@ def latest_existing_kept_entries(
     for entry in entries:
         container_path = containers_root / entry.image
         if not (container_path / "commands.txt").is_file():
+            continue
+        if (container_path / "env.txt").is_file() and not any(
+            safe_command(command)
+            for command in (container_path / "commands.txt").read_text().splitlines()
+        ):
+            print(
+                f"[WARN] Skipping incomplete container inventory {container_path}: "
+                "commands.txt contains no usable commands",
+                file=sys.stderr,
+            )
             continue
 
         key = (entry.tool, entry.version)
