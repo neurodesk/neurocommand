@@ -4683,12 +4683,12 @@
                 "exec": "Slicer"
             },
             "slicer 5.10.0": {
-                "version": "20260226",
+                "version": "20261005",
                 "exec": "",
                 "apptainer_args": []
             },
             "slicerGUI-slicer 5.10.0": {
-                "version": "20260226",
+                "version": "20261005",
                 "exec": "Slicer",
                 "apptainer_args": []
             }
