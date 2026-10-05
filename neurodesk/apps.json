@@ -2116,7 +2116,7 @@
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
-                "version": "20261002",
+                "version": "20261005",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2215,12 +2215,12 @@
                 "apptainer_args": []
             },
             "fsl 6.0.7.23": {
-                "version": "20260925",
+                "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
             },
             "fsleyesGUI-fsl 6.0.7.23": {
-                "version": "20260925",
+                "version": "20261004",
                 "exec": "fsleyes",
                 "apptainer_args": []
             },
