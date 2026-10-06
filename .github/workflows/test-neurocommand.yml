@@ -48,7 +48,7 @@ jobs:
           sudo apt-get install -y ${{ matrix.package }}
           python -m pip install -r test/requirements.txt
       - name: Exercise generated modulefiles
-        run: python -m pytest -q test/test_module_refresh.py
+        run: python -m pytest -q test/test_module_refresh.py test/test_mrtrix3src_alias_migration.py
 
   slim_image:
     name: build slim image
