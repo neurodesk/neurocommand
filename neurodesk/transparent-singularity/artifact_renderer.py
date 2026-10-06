@@ -186,7 +186,10 @@ def managed_module_content(content: str, spec: ContainerSpec, *, format: str, co
     if containers_root is not None:
         old_directory = containers_root / directory.name
         if (old_directory / 'env.txt').is_file() and (old_directory / 'commands.txt').is_file():
-            old_spec = read_container_inventory(old_directory)
+            try:
+                old_spec = read_container_inventory(old_directory)
+            except ValueError:
+                return None
     # Exact historical output is the only migration authority. Inventory env
     # and owned manual snippets must agree too, so site additions survive.
     if legacy_module_content(old_spec, directory, format=format) != content:

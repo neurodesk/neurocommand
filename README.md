@@ -40,6 +40,13 @@ for Environment Modules. Initialize your host's `module` command before using
 `fetch_and_run.sh`. Container commands require Apptainer or Singularity.
 On CVMFS, module reconciliation generates the Tcl modulefile for each kept
 container that has only a Lua modulefile.
+Reconciliation accepts existing inventories with no usable commands and omits
+their command metadata. Installation, refresh, and artifact checks still require
+a nonempty command inventory.
+When an existing legacy module references an inventory that fails validation,
+reconciliation preserves that module because its generated ownership is unknown.
+Protected canonical content is not copied into public module paths. Modules
+generated directly from a valid selected inventory remain eligible for publication.
 
 For Environment Modules, search command metadata with `module keyword bet`,
 then load a result with `module load fsl/6.0.7.18`.
