@@ -20,6 +20,14 @@ class ModuleId:
     version: str
 
 
+_REVIEWED_LEGACY_MODULE_SHA256: dict[tuple[ModuleId, str], str] = {
+    (ModuleId("mrtrix3src", "latest"), "lua"):
+        "c4d36099a5110a37d658056c169eb63ede0bff905fb70e4a58f33db867ae9f8d",
+    (ModuleId("mrtrix3src", "latest"), "tcl"):
+        "188518341f9a5934a186bd88d3961c55b377af850336c0e5bb031f3b47645636",
+}
+
+
 @dataclass(frozen=True)
 class ContainerSpec:
     module: ModuleId
@@ -170,6 +178,9 @@ def managed_module_content(content: str, spec: ContainerSpec, *, format: str, co
         return rendered
     if 'neurodesk-artifact-v2' in content:
         return rendered if owns_artifact(content) else None
+    reviewed_digest = _REVIEWED_LEGACY_MODULE_SHA256.get((spec.module, format))
+    if reviewed_digest is not None and hashlib.sha256(content.encode()).hexdigest() == reviewed_digest:
+        return rendered
     pattern = r'prepend_path\("PATH", ("(?:\\.|[^"\\])*")\)' if format == 'lua' else r'(?m)^prepend-path PATH ("(?:\\.|[^"\\])*")$'
     paths = re.findall(pattern, content)
     if len(paths) != 1:
@@ -502,7 +513,7 @@ def check_container(directory: Path) -> bool:
         module = directory.parent / 'modules' / spec.module.name / (spec.module.version + suffix)
         if not module.is_file():
             return False
-        current = module.read_text()
+        current = module.read_bytes().decode()
         expected = managed_module_content(current, spec, format=format, containers_root=directory.parent)
         if expected is not None and current.encode() != expected:
             return False
@@ -548,7 +559,7 @@ def main() -> None:
         if path.is_symlink():
             continue
         if path.is_file():
-            content = managed_module_content(path.read_text(), spec, format=format, containers_root=directory.parent)
+            content = managed_module_content(path.read_bytes().decode(), spec, format=format, containers_root=directory.parent)
             if content is None:
                 print(f"[WARN] Preserving customized module: {path}", file=sys.stderr)
                 continue
