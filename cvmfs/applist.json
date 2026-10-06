@@ -681,6 +681,13 @@
             ]
         },
         {
+            "application": "brainstemnavigator_1.0.0_20261004",
+            "categories": [
+                "image registration",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "brainstorm_3.211130_20211207",
             "categories": [
                 "electrophysiology"
@@ -812,6 +819,13 @@
             "application": "cbsb0stats_1.4.0_20260916",
             "categories": [
                 "functional imaging"
+            ]
+        },
+        {
+            "application": "chimera-brainparcellation_0.4.1_20261004",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
             ]
         },
         {
@@ -1561,7 +1575,7 @@
             ]
         },
         {
-            "application": "frisgo_2.10.0_20261002",
+            "application": "frisgo_2.10.0_20261005",
             "categories": [
                 "functional imaging",
                 "image reconstruction"
@@ -1678,7 +1692,7 @@
             ]
         },
         {
-            "application": "fsl_6.0.7.23_20260925",
+            "application": "fsl_6.0.7.23_20261004",
             "categories": [
                 "arterial spin labelling",
                 "diffusion imaging",
@@ -2620,7 +2634,19 @@
             ]
         },
         {
+            "application": "niimath_1.0.20260924_20261004",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "niimath_arm64_1.0.20260703_20260909",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "niimath_arm64_1.0.20260924_20261004",
             "categories": [
                 "data organisation"
             ]
@@ -2629,6 +2655,12 @@
             "application": "niistat_1.0.20191216_20260629",
             "categories": [
                 "statistics"
+            ]
+        },
+        {
+            "application": "nipype_1.11.0_20261005",
+            "categories": [
+                "workflows"
             ]
         },
         {
@@ -2676,7 +2708,7 @@
             ]
         },
         {
-            "application": "openmsk_0.2.0_20260908",
+            "application": "openmsk_0.2.0_20261004",
             "categories": [
                 "image segmentation",
                 "quantitative imaging"
@@ -3282,7 +3314,7 @@
             ]
         },
         {
-            "application": "slicer_5.10.0_20260226",
+            "application": "slicer_5.10.0_20261005",
             "categories": [
                 "image segmentation",
                 "visualization"
