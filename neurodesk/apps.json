@@ -2098,12 +2098,12 @@
                 "apptainer_args": []
             },
             "freesurfer 8.2.0": {
-                "version": "20260818",
+                "version": "20261005",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.2.0": {
-                "version": "20260818",
+                "version": "20261005",
                 "exec": "freeview",
                 "apptainer_args": []
             }
