@@ -1377,6 +1377,11 @@
                 "version": "20261001",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "datalad 1.7.0": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1407,6 +1412,11 @@
             },
             "datalad_arm64 1.6.5": {
                 "version": "20261001",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "datalad_arm64 1.7.0": {
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1637,6 +1647,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "dicompare 0.15.3": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -1652,6 +1667,11 @@
         "apps": {
             "dicompare_arm64 0.15.2": {
                 "version": "20260921",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dicompare_arm64 0.15.3": {
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
             }
