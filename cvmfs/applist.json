@@ -1064,6 +1064,12 @@
             ]
         },
         {
+            "application": "datalad_1.7.0_20261006",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -1089,6 +1095,12 @@
         },
         {
             "application": "datalad_arm64_1.6.5_20261001",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.7.0_20261006",
             "categories": [
                 "data organisation"
             ]
@@ -1242,6 +1254,13 @@
             ]
         },
         {
+            "application": "dicompare_0.15.3_20261006",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
             "application": "dicompare_0.5.4_20260506",
             "categories": [
                 "data organisation",
@@ -1250,6 +1269,13 @@
         },
         {
             "application": "dicompare_arm64_0.15.2_20260921",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
+            "application": "dicompare_arm64_0.15.3_20261006",
             "categories": [
                 "data organisation",
                 "quality control"
