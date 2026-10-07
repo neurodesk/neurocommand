@@ -905,7 +905,7 @@
             ]
         },
         {
-            "application": "code_240320_20261001",
+            "application": "code_240320_20261006",
             "categories": [
                 "programming"
             ]
@@ -2834,6 +2834,13 @@
             ]
         },
         {
+            "application": "petprep_0.0.10_20261005",
+            "categories": [
+                "quantitative imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "petprep_0.0.5_20260519",
             "categories": [
                 "quantitative imaging",
@@ -2863,6 +2870,12 @@
         },
         {
             "application": "pydeface_2.0.2_20260417",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "pydeface_2.1.0_20261006",
             "categories": [
                 "image segmentation"
             ]
@@ -2900,7 +2913,19 @@
             ]
         },
         {
+            "application": "qsiprep_26.0.0_20261007",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "qsirecon_1.1.0_20250423",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "qsirecon_26.0.1_20261006",
             "categories": [
                 "diffusion imaging"
             ]
