@@ -2855,6 +2855,13 @@
             ]
         },
         {
+            "application": "qmrlab_3.0.0_20261006",
+            "categories": [
+                "image reconstruction",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "qsiprep_0.20.0_20240408",
             "categories": [
                 "diffusion imaging"
@@ -2874,6 +2881,12 @@
         },
         {
             "application": "qsmbly_0.11.0_20260506",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "qsmbly_0.29.0_20261006",
             "categories": [
                 "structural imaging"
             ]
