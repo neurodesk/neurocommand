@@ -4188,6 +4188,11 @@
             "qmrlab 2.4.2": {
                 "version": "20240828",
                 "exec": ""
+            },
+            "qmrlab 3.0.0": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4225,6 +4230,11 @@
         "apps": {
             "qsmbly 0.11.0": {
                 "version": "20260506",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qsmbly 0.29.0": {
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
             },
