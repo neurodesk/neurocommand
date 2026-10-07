@@ -1174,7 +1174,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261001",
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3676,7 +3676,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261004",
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3697,7 +3697,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261004",
+                "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4124,6 +4124,11 @@
     },
     "petprep": {
         "apps": {
+            "petprep 0.0.10": {
+                "version": "20261005",
+                "exec": "",
+                "apptainer_args": []
+            },
             "petprep 0.0.5": {
                 "version": "20260519",
                 "exec": "",
@@ -4185,6 +4190,11 @@
                 "version": "20260417",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "pydeface 2.1.0": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4229,6 +4239,11 @@
             "qsiprep 1.0.1": {
                 "version": "20250407",
                 "exec": ""
+            },
+            "qsiprep 26.0.0": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4240,6 +4255,11 @@
             "qsirecon 1.1.0": {
                 "version": "20250423",
                 "exec": ""
+            },
+            "qsirecon 26.0.1": {
+                "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
