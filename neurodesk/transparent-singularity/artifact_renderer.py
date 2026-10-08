@@ -201,11 +201,11 @@ def managed_module_content(content: str, spec: ContainerSpec, *, format: str, co
                 old_spec = read_container_inventory(old_directory)
             except ValueError:
                 return None
-    # Exact historical output is the only migration authority. Inventory env
-    # and owned manual snippets must agree too, so site additions survive.
-    if legacy_module_content(old_spec, directory, format=format) != content:
-        return None
-    return rendered
+    maintained_spec = replace(old_spec, manual_lua=spec.manual_lua, manual_tcl=spec.manual_tcl)
+    for candidate in (old_spec, maintained_spec):
+        if legacy_module_content(candidate, directory, format=format) == content:
+            return rendered
+    return None
 
 
 def legacy_module_content(spec: ContainerSpec, directory: Path, *, format: str) -> str:
