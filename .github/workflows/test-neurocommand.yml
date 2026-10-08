@@ -84,10 +84,18 @@ jobs:
           docker run --rm --privileged --user=root $CVMFS_ENV \
             -e NB_UID="$(id -u)" -e NB_GID="$(id -g)" \
             -v "${{ github.workspace }}:/work" -w /work \
+            -v "${{ github.workspace }}/docker/before-notebook.d/01-cvmfs-mount.sh:/usr/local/bin/before-notebook.d/01-cvmfs-mount.sh:ro" \
             ghcr.io/neurodesk/neurocommand:latest \
             bash -lc '
               set -e
               container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"
+              if [ "${{ matrix.cvmfs }}" = "enabled" ]; then
+                cached_image="/cvmfs/neurodesk.ardc.edu.au/containers/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"
+                if [ "${CVMFS_DISABLE:-false}" != "false" ] || [ ! -d "$cached_image" ]; then
+                  echo "[test] ERROR: CVMFS niimath sandbox is unavailable: $cached_image" >&2
+                  exit 1
+                fi
+              fi
               bash build.sh --cli
               bash containers.sh all
               bash local/fetch_containers.sh niimath 1.0.0 20250617 niimath
