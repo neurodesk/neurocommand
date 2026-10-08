@@ -127,3 +127,20 @@ def test_skipping_region_probe_uses_bundled_config(startup):
     assert calls == ["mount"]
     assert "CVMFS ready (manual mount)" in result.stdout
     assert (root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf").read_text() == "bundled default"
+
+
+@pytest.mark.parametrize("mode", ["offline", "skip-probe"])
+def test_fresh_image_gets_default_config_without_successful_probes(startup, mode):
+    run, root = startup
+    config = root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
+    config.unlink()
+
+    overrides = {"OFFLINE": "1"} if mode == "offline" else {"NEURODESK_SKIP_REGION_PROBE": "1"}
+    result, calls = run(**overrides)
+
+    assert "mount" in calls
+    assert config.read_text() == "cdn america"
+    if mode == "offline":
+        assert "Falling back to local containers" in result.stdout
+    else:
+        assert "CVMFS ready (manual mount)" in result.stdout

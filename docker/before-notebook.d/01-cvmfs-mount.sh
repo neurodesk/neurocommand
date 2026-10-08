@@ -34,6 +34,11 @@ setup_cvmfs() {
     chown -R cvmfs:root "$CACHE_DIR" 2>/dev/null || true
     chmod 755 "/home/${NB_USER}"
 
+    if [ ! -f /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf ]; then
+        cp /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.cdn.america \
+            /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf
+    fi
+
     if [ "${NEURODESK_SKIP_REGION_PROBE:-0}" != "1" ]; then
         probe_and_select_region
     fi
