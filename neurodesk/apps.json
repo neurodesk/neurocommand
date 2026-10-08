@@ -2146,6 +2146,18 @@
             "image reconstruction"
         ]
     },
+    "frisgokspace": {
+        "apps": {
+            "frisgokspace 0.1.0": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "fsl": {
         "apps": {
             "fsl 6.0.3": {
