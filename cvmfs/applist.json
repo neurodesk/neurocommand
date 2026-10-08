@@ -284,6 +284,14 @@
             ]
         },
         {
+            "application": "b0mapromeo_1.3.0_20261008",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "bart_0.7.00_20210302",
             "categories": [
                 "image reconstruction"
@@ -1617,14 +1625,14 @@
             ]
         },
         {
-            "application": "frisgo_2.10.0_20261005",
+            "application": "frisgo_2.10.0_20261008",
             "categories": [
                 "functional imaging",
                 "image reconstruction"
             ]
         },
         {
-            "application": "frisgokspace_0.1.0_20261007",
+            "application": "frisgokspace_0.1.0_20261008",
             "categories": [
                 "image reconstruction"
             ]
@@ -2043,6 +2051,12 @@
             "application": "julia_arm64_1.13.1_20260928",
             "categories": [
                 "programming"
+            ]
+        },
+        {
+            "application": "kspacefilter_0.1.0_20261008",
+            "categories": [
+                "image reconstruction"
             ]
         },
         {
