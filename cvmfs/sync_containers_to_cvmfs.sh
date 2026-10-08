@@ -512,13 +512,25 @@ else
         STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         DOCKER_IMAGE_REF="${STALE_IMAGE%_*}:${STALE_IMAGE##*_}"
         CONTAINER_CHANGES_MADE=0
-        DISABLE_NOTICE="This container was disabled due to a known bug or vulnerability."
-        REPRO_PULL_HINT="docker://vnmd/$DOCKER_IMAGE_REF"
+        DISABLED_WRAPPER="$NEUROCOMMAND_LOCAL_REPO/cvmfs/write_disabled_wrapper.sh"
 
-        # If the stale image payload was already removed in an earlier run,
-        # skip expensive per-wrapper checks for this container directory.
+        # If the stale image payload was already removed in an earlier run and
+        # every wrapper is already in the current disabled form, skip the
+        # per-wrapper loop. Wrappers disabled before they exited non-zero are
+        # rewritten even though their image is gone.
         if [[ ! -e "$STALE_CONTAINER_IMAGE" ]]; then
-            continue
+            OUTDATED_WRAPPER=0
+            while IFS= read -r EXECUTABLE_NAME; do
+                EXECUTABLE_PATH="$STALE_CONTAINER_PATH/$EXECUTABLE_NAME"
+                if [[ -n "$EXECUTABLE_NAME" && -f "$EXECUTABLE_PATH" && -x "$EXECUTABLE_PATH" ]] && \
+                   ! "$DISABLED_WRAPPER" --check "$EXECUTABLE_PATH"; then
+                    OUTDATED_WRAPPER=1
+                    break
+                fi
+            done < "$STALE_CONTAINER_PATH/commands.txt"
+            if [[ $OUTDATED_WRAPPER -eq 0 ]]; then
+                continue
+            fi
         fi
 
         while IFS= read -r EXECUTABLE_NAME; do
@@ -530,8 +542,7 @@ else
                 continue
             fi
 
-            if grep -Fq "$DISABLE_NOTICE" "$EXECUTABLE_PATH" 2>/dev/null && \
-               grep -Fq "$REPRO_PULL_HINT" "$EXECUTABLE_PATH" 2>/dev/null; then
+            if "$DISABLED_WRAPPER" --check "$EXECUTABLE_PATH" 2>/dev/null; then
                 continue
             fi
 
@@ -549,11 +560,7 @@ else
                 echo "[INFO] Disabling executables in stale container directory: $STALE_CONTAINER_PATH"
             fi
 
-            cat > "$EXECUTABLE_PATH" << EOF
-#!/usr/bin/env bash
-echo "This container was disabled due to a known bug or vulnerability. To keep using the software please use a different version. If you absolutely need this container for reproducibility you can pull it from docker hub via the command apptainer pull docker://vnmd/$DOCKER_IMAGE_REF"
-EOF
-            chmod +x "$EXECUTABLE_PATH"
+            "$DISABLED_WRAPPER" "$EXECUTABLE_PATH" "$DOCKER_IMAGE_REF"
             CONTAINER_CHANGES_MADE=1
             STALE_CHANGES_MADE=1
         done < "$STALE_CONTAINER_PATH/commands.txt"
