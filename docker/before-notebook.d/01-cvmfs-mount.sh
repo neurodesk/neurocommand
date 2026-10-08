@@ -24,11 +24,6 @@ setup_cvmfs() {
         return 0
     fi
 
-    if ! timeout 3 nslookup neurodesk.org >/dev/null 2>&1; then
-        echo "[neurocommand] No internet connectivity. Skipping CVMFS."
-        return 0
-    fi
-
     if [ -d "/cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/" ]; then
         echo "[neurocommand] CVMFS already mounted."
         return 0
@@ -70,7 +65,7 @@ probe_and_select_region() {
         local url="$1" probes=3 i out t s
         local latencies=()
         for i in $(seq 1 "$probes"); do
-            out=$(curl --no-keepalive --connect-timeout 3 -s -w "%{time_total} %{http_code}" -o /dev/null "$url")
+            out=$(curl --no-keepalive --connect-timeout 3 --max-time 5 -s -w "%{time_total} %{http_code}" -o /dev/null "$url" || true)
             t=$(echo "$out" | awk '{print $1}')
             s=$(echo "$out" | awk '{print $2}')
             if [ "$s" = "200" ]; then latencies+=("$t"); else latencies+=("999"); fi
@@ -88,6 +83,11 @@ probe_and_select_region() {
     eu=$(cat "$tmpdir/europe"); am=$(cat "$tmpdir/america"); as=$(cat "$tmpdir/asia")
     rm -rf "$tmpdir"
     echo "[neurocommand] Latencies (s): europe=$eu america=$am asia=$as"
+
+    if [ "$eu" = "999" ] && [ "$am" = "999" ] && [ "$as" = "999" ]; then
+        echo "[neurocommand] WARN: CVMFS region probes failed, keeping default config."
+        return 0
+    fi
 
     local fastest_region
     fastest_region=$(printf "%s europe\n%s america\n%s asia\n" "$eu" "$am" "$as" \
