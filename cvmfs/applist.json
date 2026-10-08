@@ -1608,6 +1608,12 @@
             ]
         },
         {
+            "application": "frisgokspace_0.1.0_20261007",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "fsl_6.0.3_20200905",
             "categories": [
                 "arterial spin labelling",
