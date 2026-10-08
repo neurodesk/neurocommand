@@ -38,6 +38,7 @@ aslprep_0.7.5_20260413 categories:arterial spin labelling,quantitative imaging,w
 aslprep_26.0.2_20260414 categories:arterial spin labelling,quantitative imaging,workflows,
 aslprep_26.0.3_20260911 categories:arterial spin labelling,quantitative imaging,workflows,
 b0mapromeo_1.0.0_20261002 categories:image reconstruction,phase processing,quantitative imaging,
+b0mapromeo_1.1.0_20261008 categories:image reconstruction,phase processing,quantitative imaging,
 bart_0.7.00_20210302 categories:image reconstruction,
 bart_0.9.00_20240723 categories:image reconstruction,
 bart_1.0.00_20260911 categories:image reconstruction,
