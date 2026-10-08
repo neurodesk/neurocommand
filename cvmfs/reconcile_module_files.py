@@ -14,7 +14,7 @@ from typing import Optional
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity"))
-from artifact_renderer import read_container_inventory, render_module, managed_module_content, write_artifact
+from artifact_renderer import ContainerSpec, read_container_inventory, render_module, managed_module_content, write_artifact
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
@@ -213,10 +213,6 @@ def inventory_lines(path: Path) -> list[str]:
     return lines
 
 
-def render_tcl_module(container_dir: Path) -> str:
-    return render_module(read_container_inventory(container_dir), format="tcl").decode()
-
-
 def render_exposed_commands(commands_path: Path, *, is_lua: bool = True) -> str:
     commands = exposed_commands(commands_path)
     if not commands:
@@ -285,9 +281,11 @@ def update_module_content(
     latest_name: str,
     latest_dir: Path,
     is_lua: bool,
+    current_spec: ContainerSpec | None = None,
 ) -> str:
-    if (latest_dir / "env.txt").is_file():
-        updated = managed_module_content(content, read_container_inventory(latest_dir), format="lua" if is_lua else "tcl", containers_root=latest_dir.parent)
+    if current_spec is not None or (latest_dir / "env.txt").is_file():
+        spec = current_spec if current_spec is not None else read_container_inventory(latest_dir)
+        updated = managed_module_content(content, spec, format="lua" if is_lua else "tcl", containers_root=latest_dir.parent)
         if updated is None:
             print(f"[WARN] Preserving customized module {tool}/{version}", file=sys.stderr)
             return content
@@ -428,6 +426,7 @@ def plan_module_reconciliation(
     changes: dict[Path, PlannedChange] = {}
     protected: set[Path] = set()
     snapshots: dict[Path, FileSnapshot] = {}
+    current_specs: dict[tuple[str, str], ContainerSpec] = {}
 
     def read_module(path: Path) -> str:
         if path not in snapshots:
@@ -440,6 +439,14 @@ def plan_module_reconciliation(
     for (tool, version), entry in sorted(latest_by_key.items()):
         latest_name = entry.image
         latest_dir = containers_root / latest_name
+        current_spec = None
+        if (latest_dir / "env.txt").is_file():
+            current_spec = replace(
+                read_container_inventory(latest_dir),
+                manual_lua=snippets.get(tool, ""),
+                manual_tcl=tcl_snippets.get(tool, ""),
+            )
+            current_specs[(tool, version)] = current_spec
         expected_public_categories = set(categories.get((tool, version), ()))
 
         canonical_contents: dict[str, str] = {}
@@ -451,7 +458,7 @@ def plan_module_reconciliation(
             if not module_file.is_file() or module_file.is_symlink():
                 continue
 
-            if (latest_dir / "env.txt").is_file() and managed_module_content(read_module(module_file), read_container_inventory(latest_dir), format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
+            if current_spec is not None and managed_module_content(read_module(module_file), current_spec, format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
                 protected.add(module_file)
             updated = update_module_content(
                 read_module(module_file),
@@ -460,6 +467,7 @@ def plan_module_reconciliation(
                 latest_name=latest_name,
                 latest_dir=latest_dir,
                 is_lua=module_file.suffix == ".lua",
+                current_spec=current_spec,
             )
             canonical_contents[module_file.name] = updated
             add_change(
@@ -475,9 +483,9 @@ def plan_module_reconciliation(
             version not in canonical_contents
             and not tcl_module.is_symlink()
             and f"{version}.lua" in canonical_contents
-            and (latest_dir / "env.txt").is_file()
+            and current_spec is not None
         ):
-            canonical_contents[version] = render_tcl_module(latest_dir)
+            canonical_contents[version] = render_module(current_spec, format="tcl").decode()
             add_change(
                 changes,
                 tcl_module,
@@ -490,7 +498,7 @@ def plan_module_reconciliation(
                 continue
             module_category = public_module_category(public_modules_root, module_file)
             if module_category not in expected_public_categories:
-                if "neurodesk-bundle-v1" in read_module(module_file) or ((latest_dir / "env.txt").is_file() and managed_module_content(read_module(module_file), read_container_inventory(latest_dir), format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None):
+                if "neurodesk-bundle-v1" in read_module(module_file) or (current_spec is not None and managed_module_content(read_module(module_file), current_spec, format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None):
                     protected.add(module_file)
                     continue
                 add_delete(
@@ -500,7 +508,7 @@ def plan_module_reconciliation(
                 )
                 continue
 
-            if (latest_dir / "env.txt").is_file() and managed_module_content(read_module(module_file), read_container_inventory(latest_dir), format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
+            if current_spec is not None and managed_module_content(read_module(module_file), current_spec, format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
                 protected.add(module_file)
             updated = update_module_content(
                 read_module(module_file),
@@ -509,6 +517,7 @@ def plan_module_reconciliation(
                 latest_name=latest_name,
                 latest_dir=latest_dir,
                 is_lua=module_file.suffix == ".lua",
+                current_spec=current_spec,
             )
             add_change(
                 changes,
@@ -570,10 +579,8 @@ def plan_module_reconciliation(
             continue
         tool = module_file.parent.name
         if "neurodesk-artifact-v2" in content and content.startswith(("-- -*- lua -*-", "#%Module1.0")):
-            entry = latest_by_key.get((tool, module_file.stem if module_file.suffix == ".lua" else module_file.name))
-            if entry is not None:
-                spec = read_container_inventory(containers_root / entry.image)
-                spec = replace(spec, manual_lua=snippets.get(tool, ""), manual_tcl=tcl_snippets.get(tool, ""))
+            spec = current_specs.get((tool, module_file.stem if module_file.suffix == ".lua" else module_file.name))
+            if spec is not None:
                 updated = render_module(spec, format="lua" if module_file.suffix == ".lua" else "tcl").decode()
                 if updated != content:
                     add_change(changes, module_file, updated, "refresh generated manual module snippets")
@@ -627,6 +634,48 @@ def apply_changes(changes: list[PlannedChange]) -> None:
             ) from error
 
 
+def referenced_containers(repo_root: Path) -> dict[str, tuple[Path, ...]]:
+    containers_root = repo_root / "containers"
+    names = []
+    for directory in containers_root.iterdir():
+        try:
+            inventory = (directory / "commands.txt").stat()
+        except (FileNotFoundError, NotADirectoryError):
+            continue
+        if stat.S_ISREG(inventory.st_mode):
+            names.append(directory.name)
+    pattern = re.compile(
+        r'(?<![A-Za-z0-9_.+\-])('
+        + '|'.join(re.escape(name) for name in sorted(names, key=len, reverse=True))
+        + r')(?:\.simg)?(?![A-Za-z0-9_.+\-])'
+    ) if names else None
+    references: dict[str, list[Path]] = {}
+
+    def scan(path: Path, ancestors: frozenset[tuple[int, int]]) -> None:
+        metadata = path.stat()
+        if stat.S_ISDIR(metadata.st_mode):
+            identity = (metadata.st_dev, metadata.st_ino)
+            if identity in ancestors:
+                raise ValueError(f"Cyclic module directory: {path}")
+            for child in sorted(path.iterdir()):
+                scan(child, ancestors | {identity})
+        elif stat.S_ISREG(metadata.st_mode):
+            content = path.read_text()
+            if pattern is not None:
+                for name in sorted({match[1] for match in pattern.finditer(content)}):
+                    references.setdefault(name, []).append(path)
+        else:
+            raise ValueError(f"Unsupported module file: {path}")
+
+    for root in (containers_root / "modules", repo_root / "neurodesk-modules"):
+        try:
+            root.lstat()
+        except FileNotFoundError:
+            continue
+        scan(root, frozenset())
+    return {name: tuple(paths) for name, paths in references.items()}
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Update CVMFS modulefiles to the latest kept container builds."
@@ -640,8 +689,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--log",
         type=Path,
-        required=True,
-        help="Path to cvmfs/log.txt.",
+        help="Path to cvmfs/log.txt. Required for reconciliation.",
     )
     parser.add_argument(
         "--manual-module-dir",
@@ -654,11 +702,29 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Only report whether changes are needed. Exits 1 when changes are needed.",
     )
+    parser.add_argument(
+        "--referenced-containers",
+        action="store_true",
+        help="List installed container basenames referenced by canonical or public modules.",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    if args.referenced_containers:
+        try:
+            references = referenced_containers(args.repo_root)
+        except (OSError, ValueError) as error:
+            print(f"[ERROR] Cannot scan module references: {error}", file=sys.stderr)
+            return 2
+        for name, paths in sorted(references.items()):
+            print(name)
+            print(f"[INFO] Keeping {name}, referenced by: {', '.join(map(str, paths))}", file=sys.stderr)
+        return 0
+    if args.log is None:
+        parser.error("--log is required for reconciliation")
     try:
         changes = plan_module_reconciliation(args.repo_root, args.log, args.manual_module_dir)
     except (OSError, ValueError) as error:

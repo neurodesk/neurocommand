@@ -504,10 +504,24 @@ done
 if [[ ${#STALE_IMAGES[@]} -eq 0 ]]; then
     echo "[INFO] No stale container directories found to disable."
 else
+    if ! REFERENCED_CONTAINER_NAMES=$(python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_module_files.py" \
+        --repo-root /cvmfs/neurodesk.ardc.edu.au --referenced-containers); then
+        echo "[ERROR] Cannot scan module references; stale container cleanup stopped." >&2
+        exit 2
+    fi
+    declare -A REFERENCED_CONTAINERS=()
+    while IFS= read -r REFERENCED_IMAGE; do
+        [[ -n "$REFERENCED_IMAGE" ]] || continue
+        REFERENCED_CONTAINERS["$REFERENCED_IMAGE"]=1
+    done <<< "$REFERENCED_CONTAINER_NAMES"
     STALE_CHANGES_MADE=0
     TRANSACTION_OPEN=0
 
     for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
+        if [[ -n "${REFERENCED_CONTAINERS[$STALE_IMAGE]+x}" ]]; then
+            echo "[INFO] Preserving stale container referenced by a module: $STALE_IMAGE"
+            continue
+        fi
         STALE_CONTAINER_PATH="$CONTAINERS_ROOT/$STALE_IMAGE"
         STALE_CONTAINER_IMAGE="$STALE_CONTAINER_PATH/$STALE_IMAGE.simg"
         DOCKER_IMAGE_REF="${STALE_IMAGE%_*}:${STALE_IMAGE##*_}"
