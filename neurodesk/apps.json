@@ -311,6 +311,11 @@
                 "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "b0mapromeo 1.2.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
