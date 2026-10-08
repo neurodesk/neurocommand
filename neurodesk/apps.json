@@ -316,6 +316,11 @@
                 "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "b0mapromeo 1.3.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2146,7 +2151,7 @@
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
-                "version": "20261005",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2159,7 +2164,7 @@
     "frisgokspace": {
         "apps": {
             "frisgokspace 0.1.0": {
-                "version": "20261007",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2793,6 +2798,18 @@
         },
         "categories": [
             "programming"
+        ]
+    },
+    "kspacefilter": {
+        "apps": {
+            "kspacefilter 0.1.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "kul-vbg": {
