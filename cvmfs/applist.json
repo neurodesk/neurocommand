@@ -292,6 +292,22 @@
             ]
         },
         {
+            "application": "b0mapromeo_1.4.0_20261008",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging"
+            ]
+        },
+        {
+            "application": "b0mapromeo_1.4.1_20261008",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "bart_0.7.00_20210302",
             "categories": [
                 "image reconstruction"
@@ -3367,6 +3383,14 @@
             "categories": [
                 "image segmentation",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "shim-toolbox_1.5.0_20261008",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging"
             ]
         },
         {
