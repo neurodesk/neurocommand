@@ -2161,7 +2161,7 @@
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
-                "version": "20261008",
+                "version": "20261009",
                 "exec": "",
                 "apptainer_args": []
             }
