@@ -321,6 +321,16 @@
                 "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "b0mapromeo 1.4.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "b0mapromeo 1.4.1": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4695,6 +4705,20 @@
         "categories": [
             "image segmentation",
             "structural imaging"
+        ]
+    },
+    "shim-toolbox": {
+        "apps": {
+            "shim-toolbox 1.5.0": {
+                "version": "20261008",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction",
+            "phase processing",
+            "quantitative imaging"
         ]
     },
     "sigviewer": {
