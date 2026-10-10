@@ -146,7 +146,7 @@ def test_module_generation_advances_metadata_and_preserves_edits(tmp_path, forma
 
 def test_reconciliation_preserves_custom_canonical_and_public_modules(tmp_path):
     from artifact_renderer import read_container_inventory, legacy_module_content
-    from test.support.cvmfs import reconcile_module_files
+    from cvmfs import reconcile_module_files
     directory, image = installed(tmp_path)
     spec = read_container_inventory(directory)
     canonical = tmp_path / 'containers/modules/demo/1.0.lua'
@@ -198,7 +198,7 @@ def test_atomic_artifact_failure_preserves_file_and_cleans_temporary(tmp_path, m
 
 def test_reconciles_old_inventory_before_advancing_to_new_build(tmp_path):
     from artifact_renderer import read_container_inventory, legacy_module_content
-    from test.support.cvmfs import reconcile_module_files
+    from cvmfs import reconcile_module_files
     old, image = installed(tmp_path)
     old_spec = read_container_inventory(old)
     canonical = tmp_path / 'containers/modules/demo/1.0.lua'
