@@ -321,15 +321,30 @@ def test_stale_consolidated_branch_rebuilds_on_current_main_and_then_reuses_it(
     git("config", "user.email", "test@example.invalid", cwd=repo)
     git("remote", "add", "origin", str(remote), cwd=repo)
     (repo / "neurodesk").mkdir()
-    (repo / TARGET).write_text(json.dumps({"tool": 1}))
+    old_main = {
+        "tool": 1,
+        "updated_in_main": 1,
+        "deleted_in_main": 1,
+        "deleted_in_queue": 1,
+    }
+    (repo / TARGET).write_text(json.dumps(old_main))
     git("add", ".", cwd=repo)
     git("commit", "-m", "old main", cwd=repo)
     git("push", "origin", "main", cwd=repo)
     git("checkout", "-b", "bot/consolidated", cwd=repo)
-    (repo / TARGET).write_text(json.dumps({"tool": 2}))
+    queued = {**old_main, "tool": 2}
+    del queued["deleted_in_queue"]
+    (repo / TARGET).write_text(json.dumps(queued))
     git("commit", "-am", "queued tool", cwd=repo)
     git("push", "origin", "bot/consolidated", cwd=repo)
     git("checkout", "main", cwd=repo)
+    current_main = {
+        "tool": 3,
+        "updated_in_main": 2,
+        "added_in_main": 1,
+        "deleted_in_queue": 2,
+    }
+    (repo / TARGET).write_text(json.dumps(current_main))
     (repo / "maintenance").mkdir()
     (repo / "maintenance/check.py").write_text("new shared entrypoint\n")
     workflows = repo / ".github/workflows"
@@ -386,7 +401,23 @@ def test_stale_consolidated_branch_rebuilds_on_current_main_and_then_reuses_it(
         == "new required checks"
     )
     assert json.loads(git("show", f"bot/consolidated:{TARGET}", cwd=repo)) == {
-        "tool": 2
+        "tool": 2,
+        "updated_in_main": 2,
+        "added_in_main": 1,
     }
     assert queue.main() == 0
     assert len(pushed) == 1
+
+
+def test_incoming_source_overrides_rebased_queue_without_mutating_catalog_inputs():
+    before = {"queued": 1, "main_update": 1, "main_delete": 1, "queue_delete": 1}
+    base = {"queued": 3, "main_update": 2, "main_added": 1, "queue_delete": 2}
+    existing = {"queued": 2, "main_update": 1, "main_delete": 1}
+    inputs = copy.deepcopy((base, before, existing))
+    rebased = queue.rebase_tool_delta(base, before, existing)
+    assert rebased == {"queued": 2, "main_update": 2, "main_added": 1}
+    incoming = snapshot(1, before, {**before, "queued": 4})
+    result = plan(base, [incoming], existing=rebased, has_existing_pr=True)
+    assert result.payload == {"queued": 4, "main_update": 2, "main_added": 1}
+    assert result.winners == {"queued": "#1"}
+    assert (base, before, existing) == inputs

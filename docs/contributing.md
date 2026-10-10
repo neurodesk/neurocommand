@@ -35,3 +35,9 @@ Skips for the other absent engine or unsupported old engine features are expecte
 The `quality required` check requires source checks, the unit suite, both module-engine suites, the slim image build, and both CVMFS integration cases. Configure that check as required in GitHub branch protection. CI cannot run the image fetch integration locally without Docker, privileges, and access to the container registry/CVMFS service; its commands remain in `.github/workflows/test-neurocommand.yml`.
 
 Update Python pins through Dependabot. To update ShellCheck or actionlint, change `maintenance/quality-tool-versions.env`, update the version in this document, and run the full entrypoint before merging.
+
+The formatting commit is recorded in `.git-blame-ignore-revs`. To omit it from local blame results, run:
+
+```bash
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```

@@ -364,6 +364,19 @@ def changed_tools(before: Dict[str, Any], after: Dict[str, Any]) -> List[str]:
     return changed
 
 
+def rebase_tool_delta(
+    base: Dict[str, Any], before: Dict[str, Any], after: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Carry queued tool edits and deletions onto the current base catalog."""
+    payload = copy.deepcopy(base)
+    for tool in changed_tools(before, after):
+        if tool in after:
+            payload[tool] = copy.deepcopy(after[tool])
+        else:
+            payload.pop(tool, None)
+    return payload
+
+
 def sort_top_level_keys(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Return ``payload`` with only its top-level (tool) keys sorted.
 
@@ -922,6 +935,15 @@ def main() -> int:
             existing_consolidated_payload = read_json_from_git(
                 consolidated_ref, args.target_file
             )
+            if existing_branch_outdated:
+                merge_base = run_git(
+                    ["merge-base", base_ref, consolidated_ref]
+                ).stdout.strip()
+                existing_consolidated_payload = rebase_tool_delta(
+                    base_payload,
+                    read_json_from_git(merge_base, args.target_file),
+                    existing_consolidated_payload,
+                )
 
     snapshots: List[SourceSnapshot] = []
     for source in sources:
