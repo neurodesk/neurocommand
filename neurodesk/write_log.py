@@ -1,4 +1,5 @@
 """Generate the menu items."""
+
 import configparser
 import json
 from pathlib import Path
@@ -21,10 +22,7 @@ def is_primary_container_app(menu_name: Text, app_name: Text) -> bool:
     if "-" not in app_name:
         return True
     container_and_version = app_name.rsplit(" ", 1)
-    return (
-        len(container_and_version) == 2
-        and container_and_version[0] == menu_name
-    )
+    return len(container_and_version) == 2 and container_and_version[0] == menu_name
 
 
 def add_app(
@@ -52,8 +50,11 @@ def add_app(
     """
     log = configparser.ConfigParser()
     log.optionxform = str
-    log[" " + name.replace(" ", "_") + "_" + version + " categories:" + category] = { }
-    with open('log.txt', "a",) as log_file:
+    log[" " + name.replace(" ", "_") + "_" + version + " categories:" + category] = {}
+    with open(
+        "log.txt",
+        "a",
+    ) as log_file:
         log.write(log_file, space_around_delimiters=False)
 
 
@@ -65,9 +66,9 @@ if __name__ == "__main__":
 
     for menu_name, menu_data in menu_entries.items():
         for app_name, app_data in menu_data.get("apps", {}).items():
-            category_list = ''
+            category_list = ""
             for category in menu_data.get("categories") or []:
-                category_list = category_list + category + ','
+                category_list = category_list + category + ","
             # Add the primary container entry, not its GUI sub-programs.
             if is_primary_container_app(menu_name, app_name):
                 add_app(app_name, category=category_list, **app_log_data(app_data))

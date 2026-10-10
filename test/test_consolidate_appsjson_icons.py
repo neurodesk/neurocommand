@@ -9,7 +9,7 @@ SCRIPTS = ROOT / ".github" / "workflows" / "scripts"
 SCRIPT = SCRIPTS / "consolidate_appsjson_queue.py"
 
 
-consolidate_appsjson_queue = load_script('consolidate_appsjson_queue', SCRIPT)
+consolidate_appsjson_queue = load_script("consolidate_appsjson_queue", SCRIPT)
 
 
 PNG_BYTES = base64.b64decode(

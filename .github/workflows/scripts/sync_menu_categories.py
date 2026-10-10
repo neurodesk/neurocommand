@@ -98,11 +98,7 @@ def load_apps_categories(apps_json_path: Path) -> dict[str, str]:
 def load_menu_categories(menu_path: Path) -> dict[str, str]:
     root = et.parse(menu_path).getroot()
     neurodesk_menu = next(
-        (
-            menu
-            for menu in root.findall("Menu")
-            if menu.findtext("Name") == "Neurodesk"
-        ),
+        (menu for menu in root.findall("Menu") if menu.findtext("Name") == "Neurodesk"),
         None,
     )
     if neurodesk_menu is None:
@@ -159,7 +155,9 @@ def _add_build_directories(build_menu_path: Path, names: list[str]) -> None:
         for name in names
     )
     updated_calls = match.group("calls") + additions
-    build_menu_path.write_text(text[: match.start("calls")] + updated_calls + text[match.end("calls") :])
+    build_menu_path.write_text(
+        text[: match.start("calls")] + updated_calls + text[match.end("calls") :]
+    )
 
 
 def _icon_test_directory_names(icon_test_path: Path) -> set[str]:
@@ -175,7 +173,12 @@ def _add_icon_test_directories(icon_test_path: Path, names: list[str]) -> None:
     if not match:
         raise ValueError(f"{icon_test_path}: DIRECTORY_NAMES list was not found")
     additions = "".join(f'    "{name}",\n' for name in names)
-    updated = match.group("prefix") + match.group("entries") + additions + match.group("suffix")
+    updated = (
+        match.group("prefix")
+        + match.group("entries")
+        + additions
+        + match.group("suffix")
+    )
     icon_test_path.write_text(text[: match.start()] + updated + text[match.end() :])
 
 
@@ -242,7 +245,9 @@ def sync_categories(
     if missing_icons:
         fallback_icon = icons_dir / "neurodesk.png"
         if not fallback_icon.is_file():
-            raise FileNotFoundError(f"fallback category icon {fallback_icon} does not exist")
+            raise FileNotFoundError(
+                f"fallback category icon {fallback_icon} does not exist"
+            )
         for icon_path in missing_icons:
             shutil.copyfile(fallback_icon, icon_path)
             result.changed_files.append(icon_path)
@@ -259,7 +264,9 @@ def _print_result(result: SyncResult, *, check: bool) -> None:
     if result.missing_menu_categories:
         print(f"{action} menu categories: {', '.join(result.missing_menu_categories)}")
     if result.missing_build_directories:
-        print(f"{action} build directories: {', '.join(result.missing_build_directories)}")
+        print(
+            f"{action} build directories: {', '.join(result.missing_build_directories)}"
+        )
     if result.missing_icon_test_directories:
         print(
             f"{action} icon-test directories: "

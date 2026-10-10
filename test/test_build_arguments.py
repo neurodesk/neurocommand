@@ -32,11 +32,18 @@ def test_cli_build_preserves_separate_options_and_spaced_install_path(tmp_path):
     result = subprocess.run(
         ["bash", "build.sh", "--cli"],
         cwd=repo,
-        env={**os.environ, "PATH": f"{bin_dir}:{os.environ['PATH']}", "BUILD_ARGUMENTS": str(output)},
+        env={
+            **os.environ,
+            "PATH": f"{bin_dir}:{os.environ['PATH']}",
+            "BUILD_ARGUMENTS": str(output),
+        },
         capture_output=True,
         text=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert json.loads(output.read_text()) == [
-        "-m", "neurodesk", f"--installdir={repo / 'local'}", "--deskenv=cli"
+        "-m",
+        "neurodesk",
+        f"--installdir={repo / 'local'}",
+        "--deskenv=cli",
     ]

@@ -171,7 +171,9 @@ def test_refetch_repairs_tcl_module(installation, tmp_path, tcl_state):
     if tcl_state == "missing":
         tcl_module.unlink()
     else:
-        tcl_module.write_text(tcl_module.read_text().replace(str(deployed), "/old/location"))
+        tcl_module.write_text(
+            tcl_module.read_text().replace(str(deployed), "/old/location")
+        )
     calls.write_text("")
 
     result = fetch(install, env, containers)
@@ -191,9 +193,14 @@ def test_refetch_of_broken_image_keeps_installation(installation, tmp_path):
     broken_singularity = tmp_path / "broken-bin" / "singularity"
     broken_singularity.parent.mkdir()
     write_executable(broken_singularity, '#!/bin/bash\necho "$*" >> "$CALLS"\nexit 1\n')
-    before = {path: path.read_bytes() for path in (deployed / "demo", deployed / "commands.txt", deployed / "env.txt")}
+    before = {
+        path: path.read_bytes()
+        for path in (deployed / "demo", deployed / "commands.txt", deployed / "env.txt")
+    }
 
-    result = fetch(install, {**env, "PATH": f"{broken_singularity.parent}:{env['PATH']}"}, moved)
+    result = fetch(
+        install, {**env, "PATH": f"{broken_singularity.parent}:{env['PATH']}"}, moved
+    )
 
     assert result.returncode == 2
     assert "the container is incomplete" in result.stdout

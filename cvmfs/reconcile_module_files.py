@@ -13,8 +13,16 @@ import sys
 from typing import Optional
 
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity"))
-from artifact_renderer import ContainerSpec, read_container_inventory, render_module, managed_module_content, write_artifact
+sys.path.insert(
+    0, str(Path(__file__).resolve().parents[1] / "neurodesk/transparent-singularity")
+)
+from artifact_renderer import (
+    ContainerSpec,
+    read_container_inventory,
+    render_module,
+    managed_module_content,
+    write_artifact,
+)
 
 EXPOSED_COMMANDS_MARKER = "neurodesk-exposed-commands"
 MANUAL_MODULE_BEGIN = "-- neurodesk-manual-module-begin"
@@ -76,14 +84,32 @@ def read_snapshot(path: Path) -> FileSnapshot | None:
             raise ValueError(f"Module target is not a regular file: {path}")
         content = source.read()
         after = os.fstat(source.fileno())
-    stable_fields = ("st_dev", "st_ino", "st_mode", "st_uid", "st_gid", "st_size",
-                     "st_mtime_ns", "st_ctime_ns")
-    if (any(getattr(before, field) != getattr(after, field) for field in stable_fields)
-            or len(content) != after.st_size):
+    stable_fields = (
+        "st_dev",
+        "st_ino",
+        "st_mode",
+        "st_uid",
+        "st_gid",
+        "st_size",
+        "st_mtime_ns",
+        "st_ctime_ns",
+    )
+    if (
+        any(getattr(before, field) != getattr(after, field) for field in stable_fields)
+        or len(content) != after.st_size
+    ):
         raise ValueError(f"Module changed while reading: {path}")
-    return FileSnapshot(after.st_dev, after.st_ino, after.st_mode, after.st_uid,
-                        after.st_gid, after.st_size, after.st_mtime_ns,
-                        after.st_ctime_ns, content)
+    return FileSnapshot(
+        after.st_dev,
+        after.st_ino,
+        after.st_mode,
+        after.st_uid,
+        after.st_gid,
+        after.st_size,
+        after.st_mtime_ns,
+        after.st_ctime_ns,
+        content,
+    )
 
 
 @dataclass(frozen=True)
@@ -119,10 +145,14 @@ def parse_log(log_path: Path) -> list[ContainerEntry]:
 
         image = line.split(maxsplit=1)[0]
         tool, version, builddate = parse_image_name(image)
-        categories_text = line.split("categories:", 1)[1] if "categories:" in line else ""
+        categories_text = (
+            line.split("categories:", 1)[1] if "categories:" in line else ""
+        )
         categories = tuple(
             category
-            for category in (normalize_category(item) for item in categories_text.split(","))
+            for category in (
+                normalize_category(item) for item in categories_text.split(",")
+            )
             if category
         )
         entries.append(
@@ -156,7 +186,9 @@ def latest_existing_kept_entries(
     return latest
 
 
-def categories_by_key(entries: list[ContainerEntry]) -> dict[tuple[str, str], tuple[str, ...]]:
+def categories_by_key(
+    entries: list[ContainerEntry],
+) -> dict[tuple[str, str], tuple[str, ...]]:
     categories: dict[tuple[str, str], list[str]] = {}
 
     for entry in entries:
@@ -198,8 +230,15 @@ def tcl_double_quoted(text: str) -> str:
 def tcl_render_quoted(text: str) -> str:
     """Quote like ts_render_artifacts.sh's tcl_quote."""
     for raw, escaped in (
-        ("\\", "\\\\"), ('"', '\\"'), ("$", "\\$"), ("[", "\\["), ("]", "\\]"),
-        ("{", "\\{"), ("}", "\\}"), ("\n", "\\n"), ("\r", "\\r"),
+        ("\\", "\\\\"),
+        ('"', '\\"'),
+        ("$", "\\$"),
+        ("[", "\\["),
+        ("]", "\\]"),
+        ("{", "\\{"),
+        ("}", "\\}"),
+        ("\n", "\\n"),
+        ("\r", "\\r"),
     ):
         text = text.replace(raw, escaped)
     return f'"{text}"'
@@ -221,7 +260,9 @@ def render_exposed_commands(commands_path: Path, *, is_lua: bool = True) -> str:
     description = "Commands: " + ", ".join(commands)
     if is_lua:
         return f"-- {EXPOSED_COMMANDS_MARKER}\nwhatis({lua_double_quoted(description)})"
-    return f"# {EXPOSED_COMMANDS_MARKER}\nmodule-whatis {tcl_double_quoted(description)}"
+    return (
+        f"# {EXPOSED_COMMANDS_MARKER}\nmodule-whatis {tcl_double_quoted(description)}"
+    )
 
 
 def mask_lua_help(content: str) -> str:
@@ -234,9 +275,7 @@ def mask_lua_help(content: str) -> str:
     )
 
 
-def update_exposed_commands(
-    content: str, commands_path: Path, *, is_lua: bool
-) -> str:
+def update_exposed_commands(content: str, commands_path: Path, *, is_lua: bool) -> str:
     block = render_exposed_commands(commands_path, is_lua=is_lua)
     content = EXPOSED_COMMANDS_BLOCK.sub("", content)
 
@@ -244,7 +283,7 @@ def update_exposed_commands(
         return content
 
     whatis_pattern = (
-        r'(?m)^whatis\([^\r\n]*\)\r?$'
+        r"(?m)^whatis\([^\r\n]*\)\r?$"
         if is_lua
         else r"(?m)^module-whatis(?:[ \t]+[^\r\n]*)?\r?$"
     )
@@ -253,12 +292,18 @@ def update_exposed_commands(
         search_content = mask_lua_help(content)
         manual_start = re.search(
             r"(?m)^(?:"
-            + "|".join(re.escape(header) for header in (MANUAL_MODULE_BEGIN, *(f"-- {header}" for header in LEGACY_MANUAL_HEADERS.values())))
+            + "|".join(
+                re.escape(header)
+                for header in (
+                    MANUAL_MODULE_BEGIN,
+                    *(f"-- {header}" for header in LEGACY_MANUAL_HEADERS.values()),
+                )
+            )
             + r")\r?$",
             search_content,
         )
         if manual_start:
-            search_content = search_content[:manual_start.start()]
+            search_content = search_content[: manual_start.start()]
     whatis_lines = list(re.finditer(whatis_pattern, search_content))
     if whatis_lines:
         insertion_point = whatis_lines[-1].end()
@@ -284,10 +329,21 @@ def update_module_content(
     current_spec: ContainerSpec | None = None,
 ) -> str:
     if current_spec is not None or (latest_dir / "env.txt").is_file():
-        spec = current_spec if current_spec is not None else read_container_inventory(latest_dir)
-        updated = managed_module_content(content, spec, format="lua" if is_lua else "tcl", containers_root=latest_dir.parent)
+        spec = (
+            current_spec
+            if current_spec is not None
+            else read_container_inventory(latest_dir)
+        )
+        updated = managed_module_content(
+            content,
+            spec,
+            format="lua" if is_lua else "tcl",
+            containers_root=latest_dir.parent,
+        )
         if updated is None:
-            print(f"[WARN] Preserving customized module {tool}/{version}", file=sys.stderr)
+            print(
+                f"[WARN] Preserving customized module {tool}/{version}", file=sys.stderr
+            )
             return content
         return updated.decode()
     container_pattern = rf"{re.escape(tool)}_{re.escape(version)}_[0-9]+"
@@ -311,9 +367,7 @@ def update_module_content(
             content,
         )
     content = re.sub(container_pattern, lambda match: latest_name, content)
-    return update_exposed_commands(
-        content, latest_dir / "commands.txt", is_lua=is_lua
-    )
+    return update_exposed_commands(content, latest_dir / "commands.txt", is_lua=is_lua)
 
 
 def sanitize_help_text(text: str) -> str:
@@ -323,7 +377,9 @@ def sanitize_help_text(text: str) -> str:
 def sanitize_module_help_content(content: str) -> str:
     return re.sub(
         r"(help\(\[===\[)(.*?)(\]===\]\))",
-        lambda match: match.group(1) + sanitize_help_text(match.group(2)) + match.group(3),
+        lambda match: match.group(1)
+        + sanitize_help_text(match.group(2))
+        + match.group(3),
         content,
         flags=re.DOTALL,
     )
@@ -336,14 +392,18 @@ def existing_public_module_candidates(
     if not public_modules_root.is_dir():
         return candidates
 
-    for category_dir in sorted(path for path in public_modules_root.iterdir() if path.is_dir()):
+    for category_dir in sorted(
+        path for path in public_modules_root.iterdir() if path.is_dir()
+    ):
         module_dir = category_dir / tool
         candidates.extend((module_dir / f"{version}.lua", module_dir / version))
 
     return [candidate for candidate in candidates if candidate.is_file()]
 
 
-def public_module_category(public_modules_root: Path, module_file: Path) -> Optional[str]:
+def public_module_category(
+    public_modules_root: Path, module_file: Path
+) -> Optional[str]:
     try:
         return module_file.relative_to(public_modules_root).parts[0]
     except (IndexError, ValueError):
@@ -360,16 +420,22 @@ def add_change(
     if before is not None and before.content == content.encode():
         changes.pop(path, None)
         return
-    changes[path] = PlannedChange(path=path, content=content, reason=reason, before=before)
+    changes[path] = PlannedChange(
+        path=path, content=content, reason=reason, before=before
+    )
 
 
 def add_delete(changes: dict[Path, PlannedChange], path: Path, reason: str) -> None:
     before = changes[path].before if path in changes else read_snapshot(path)
     if before is not None:
-        changes[path] = PlannedChange(path=path, content=None, reason=reason, before=before)
+        changes[path] = PlannedChange(
+            path=path, content=None, reason=reason, before=before
+        )
 
 
-def update_manual_module(content: str, *, tool: str, version: str, snippet: str, is_lua: bool = True) -> str:
+def update_manual_module(
+    content: str, *, tool: str, version: str, snippet: str, is_lua: bool = True
+) -> str:
     comment = "--" if is_lua else "#"
     begin = f"{comment} neurodesk-manual-module-begin"
     end_marker = f"{comment} neurodesk-manual-module-end"
@@ -380,16 +446,16 @@ def update_manual_module(content: str, *, tool: str, version: str, snippet: str,
         if len(starts) != 1 or len(ends) != 1 or starts[0].start() >= ends[0].start():
             raise ValueError(f"malformed manual module markers in {tool}/{version}")
         end = ends[0].end()
-        if content[end:end + 1] == "\n":
+        if content[end : end + 1] == "\n":
             end += 1
-        content = content[:starts[0].start()] + content[end:]
+        content = content[: starts[0].start()] + content[end:]
     elif tool in LEGACY_MANUAL_HEADERS:
         header = re.search(
             rf"(?m)^{re.escape(f'{comment} {LEGACY_MANUAL_HEADERS[tool]}')}\r?$",
             executable_content,
         )
         if header:
-            content = content[:header.start()]
+            content = content[: header.start()]
 
     if not snippet:
         return content
@@ -412,11 +478,11 @@ def plan_module_reconciliation(
         if path.is_file()
     }
     tcl_dir = manual_module_dir / "tcl"
-    tcl_snippets = {
-        path.name: path.read_text()
-        for path in tcl_dir.iterdir()
-        if path.is_file()
-    } if tcl_dir.is_dir() else {}
+    tcl_snippets = (
+        {path.name: path.read_text() for path in tcl_dir.iterdir() if path.is_file()}
+        if tcl_dir.is_dir()
+        else {}
+    )
     entries = parse_log(log_path)
     latest_by_key = latest_existing_kept_entries(repo_root, entries)
     categories = categories_by_key(entries)
@@ -458,7 +524,16 @@ def plan_module_reconciliation(
             if not module_file.is_file() or module_file.is_symlink():
                 continue
 
-            if current_spec is not None and managed_module_content(read_module(module_file), current_spec, format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
+            if (
+                current_spec is not None
+                and managed_module_content(
+                    read_module(module_file),
+                    current_spec,
+                    format="lua" if module_file.suffix == ".lua" else "tcl",
+                    containers_root=latest_dir.parent,
+                )
+                is None
+            ):
                 protected.add(module_file)
             updated = update_module_content(
                 read_module(module_file),
@@ -485,7 +560,9 @@ def plan_module_reconciliation(
             and f"{version}.lua" in canonical_contents
             and current_spec is not None
         ):
-            canonical_contents[version] = render_module(current_spec, format="tcl").decode()
+            canonical_contents[version] = render_module(
+                current_spec, format="tcl"
+            ).decode()
             add_change(
                 changes,
                 tcl_module,
@@ -493,12 +570,23 @@ def plan_module_reconciliation(
                 f"generate canonical Tcl {tool}/{version} from {latest_name} inventories",
             )
 
-        for module_file in existing_public_module_candidates(public_modules_root, tool, version):
+        for module_file in existing_public_module_candidates(
+            public_modules_root, tool, version
+        ):
             if module_file.is_symlink():
                 continue
             module_category = public_module_category(public_modules_root, module_file)
             if module_category not in expected_public_categories:
-                if "neurodesk-bundle-v1" in read_module(module_file) or (current_spec is not None and managed_module_content(read_module(module_file), current_spec, format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None):
+                if "neurodesk-bundle-v1" in read_module(module_file) or (
+                    current_spec is not None
+                    and managed_module_content(
+                        read_module(module_file),
+                        current_spec,
+                        format="lua" if module_file.suffix == ".lua" else "tcl",
+                        containers_root=latest_dir.parent,
+                    )
+                    is None
+                ):
                     protected.add(module_file)
                     continue
                 add_delete(
@@ -508,7 +596,16 @@ def plan_module_reconciliation(
                 )
                 continue
 
-            if current_spec is not None and managed_module_content(read_module(module_file), current_spec, format="lua" if module_file.suffix == ".lua" else "tcl", containers_root=latest_dir.parent) is None:
+            if (
+                current_spec is not None
+                and managed_module_content(
+                    read_module(module_file),
+                    current_spec,
+                    format="lua" if module_file.suffix == ".lua" else "tcl",
+                    containers_root=latest_dir.parent,
+                )
+                is None
+            ):
                 protected.add(module_file)
             updated = update_module_content(
                 read_module(module_file),
@@ -548,7 +645,13 @@ def plan_module_reconciliation(
         (public_modules_root, "*/*/*"),
     ):
         for module_file in root.glob(pattern):
-            if module_file in changes or module_file in protected or module_file.is_symlink() or not module_file.is_file() or module_file.name.startswith("."):
+            if (
+                module_file in changes
+                or module_file in protected
+                or module_file.is_symlink()
+                or not module_file.is_file()
+                or module_file.name.startswith(".")
+            ):
                 continue
             content = read_module(module_file)
             if "neurodesk-bundle-v1" in content:
@@ -567,7 +670,11 @@ def plan_module_reconciliation(
     module_files.update(public_modules_root.glob("*/*/*"))
     module_files.update(changes)
     for module_file in sorted(module_files):
-        if module_file in protected or module_file.name.startswith(".") or module_file.is_symlink():
+        if (
+            module_file in protected
+            or module_file.name.startswith(".")
+            or module_file.is_symlink()
+        ):
             continue
         planned = changes.get(module_file)
         if planned is not None and planned.content is None:
@@ -578,18 +685,38 @@ def plan_module_reconciliation(
         if "neurodesk-bundle-v1" in content:
             continue
         tool = module_file.parent.name
-        if "neurodesk-artifact-v2" in content and content.startswith(("-- -*- lua -*-", "#%Module1.0")):
-            spec = current_specs.get((tool, module_file.stem if module_file.suffix == ".lua" else module_file.name))
+        if "neurodesk-artifact-v2" in content and content.startswith(
+            ("-- -*- lua -*-", "#%Module1.0")
+        ):
+            spec = current_specs.get(
+                (
+                    tool,
+                    module_file.stem
+                    if module_file.suffix == ".lua"
+                    else module_file.name,
+                )
+            )
             if spec is not None:
-                updated = render_module(spec, format="lua" if module_file.suffix == ".lua" else "tcl").decode()
+                updated = render_module(
+                    spec, format="lua" if module_file.suffix == ".lua" else "tcl"
+                ).decode()
                 if updated != content:
-                    add_change(changes, module_file, updated, "refresh generated manual module snippets")
+                    add_change(
+                        changes,
+                        module_file,
+                        updated,
+                        "refresh generated manual module snippets",
+                    )
                 continue
         updated = update_manual_module(
             content,
             tool=tool,
-            version=module_file.stem if module_file.suffix == ".lua" else module_file.name,
-            snippet=(snippets if module_file.suffix == ".lua" else tcl_snippets).get(tool, ""),
+            version=module_file.stem
+            if module_file.suffix == ".lua"
+            else module_file.name,
+            snippet=(snippets if module_file.suffix == ".lua" else tcl_snippets).get(
+                tool, ""
+            ),
             is_lua=module_file.suffix == ".lua",
         )
         if updated != content:
@@ -600,15 +727,19 @@ def plan_module_reconciliation(
                 reason=f"refresh manual module snippet for {tool}/{module_file.stem}",
             )
 
-    return [replace(changes[path], before=snapshots.get(path, changes[path].before))
-            for path in sorted(changes)]
+    return [
+        replace(changes[path], before=snapshots.get(path, changes[path].before))
+        for path in sorted(changes)
+    ]
 
 
 def verify_change(change: PlannedChange) -> None:
     try:
         current = read_snapshot(change.path)
     except (OSError, ValueError) as error:
-        raise RuntimeError(f"Module changed since planning: {change.path}: {error}") from error
+        raise RuntimeError(
+            f"Module changed since planning: {change.path}: {error}"
+        ) from error
     if current != change.before:
         raise RuntimeError(f"Module changed since planning: {change.path}")
 
@@ -644,11 +775,15 @@ def referenced_containers(repo_root: Path) -> dict[str, tuple[Path, ...]]:
             continue
         if stat.S_ISREG(inventory.st_mode):
             names.append(directory.name)
-    pattern = re.compile(
-        r'(?<![A-Za-z0-9_.+\-])('
-        + '|'.join(re.escape(name) for name in sorted(names, key=len, reverse=True))
-        + r')(?:\.simg)?(?![A-Za-z0-9_.+\-])'
-    ) if names else None
+    pattern = (
+        re.compile(
+            r"(?<![A-Za-z0-9_.+\-])("
+            + "|".join(re.escape(name) for name in sorted(names, key=len, reverse=True))
+            + r")(?:\.simg)?(?![A-Za-z0-9_.+\-])"
+        )
+        if names
+        else None
+    )
     references: dict[str, list[Path]] = {}
 
     def scan(path: Path, ancestors: frozenset[tuple[int, int]]) -> None:
@@ -721,12 +856,17 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         for name, paths in sorted(references.items()):
             print(name)
-            print(f"[INFO] Keeping {name}, referenced by: {', '.join(map(str, paths))}", file=sys.stderr)
+            print(
+                f"[INFO] Keeping {name}, referenced by: {', '.join(map(str, paths))}",
+                file=sys.stderr,
+            )
         return 0
     if args.log is None:
         parser.error("--log is required for reconciliation")
     try:
-        changes = plan_module_reconciliation(args.repo_root, args.log, args.manual_module_dir)
+        changes = plan_module_reconciliation(
+            args.repo_root, args.log, args.manual_module_dir
+        )
     except (OSError, ValueError) as error:
         print(f"[ERROR] {error}", file=sys.stderr)
         return 2

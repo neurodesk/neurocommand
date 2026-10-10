@@ -15,7 +15,9 @@ def run(command, root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("check", choices=["quality", "tests", "all"], default="all", nargs="?")
+    parser.add_argument(
+        "check", choices=["quality", "tests", "all"], default="all", nargs="?"
+    )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     if args.check in {"quality", "all"}:
@@ -24,7 +26,11 @@ def main():
             [sys.executable, "-m", "ruff", "format", "--check", "."],
         ):
             run(command, root)
-        sources = subprocess.check_output(["git", "ls-files", "-z", "*.sh"], cwd=root).decode().split("\0")
+        sources = (
+            subprocess.check_output(["git", "ls-files", "-z", "*.sh"], cwd=root)
+            .decode()
+            .split("\0")
+        )
         run(["shellcheck", *filter(None, sources)], root)
         run(["actionlint"], root)
         run([sys.executable, "-m", "codespell_lib"], root)

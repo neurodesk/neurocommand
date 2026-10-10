@@ -45,7 +45,9 @@ def test_check_flags_wrappers_that_still_exit_zero(tmp_path):
 
 def test_check_rejects_active_wrappers(tmp_path):
     wrapper = tmp_path / "recon-all"
-    wrapper.write_text('#!/usr/bin/env bash\nexec apptainer run image.simg recon-all "$@"\n')
+    wrapper.write_text(
+        '#!/usr/bin/env bash\nexec apptainer run image.simg recon-all "$@"\n'
+    )
     assert check(wrapper) == 1
 
 

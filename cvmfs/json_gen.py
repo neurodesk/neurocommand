@@ -26,7 +26,9 @@ def hidden_applist_app_ids(apps_json_path):
     for menu_data in menu_entries.values():
         default_show_in_applist = visibility_flag(menu_data, "show_in_applist")
         for app_name, app_data in menu_data.get("apps", {}).items():
-            if not visibility_flag(app_data, "show_in_applist", default_show_in_applist):
+            if not visibility_flag(
+                app_data, "show_in_applist", default_show_in_applist
+            ):
                 hidden.add(app_log_app_id(app_name))
     return hidden
 
@@ -43,7 +45,9 @@ def default_apps_json_path():
     return None
 
 
-def process_text_to_json(log_path=Path("log.txt"), output_path=Path("applist.json"), apps_json_path=None):
+def process_text_to_json(
+    log_path=Path("log.txt"), output_path=Path("applist.json"), apps_json_path=None
+):
     my_dict = {}
     val = []
     hidden_app_ids = hidden_applist_app_ids(apps_json_path)
@@ -56,15 +60,25 @@ def process_text_to_json(log_path=Path("log.txt"), output_path=Path("applist.jso
             app_id = log_entry_app_id(line[0])
             if app_id in hidden_app_ids:
                 continue
-            val.append({"application": line[0], "categories": ' '.join(line[1:]).replace("categories:","").rstrip(',').split(",")})
-        my_dict['list'] = val
-        
-    with output_path.open('w') as fp:
+            val.append(
+                {
+                    "application": line[0],
+                    "categories": " ".join(line[1:])
+                    .replace("categories:", "")
+                    .rstrip(",")
+                    .split(","),
+                }
+            )
+        my_dict["list"] = val
+
+    with output_path.open("w") as fp:
         json.dump(my_dict, fp, sort_keys=True, indent=4)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Convert cvmfs/log.txt to applist.json.")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Convert cvmfs/log.txt to applist.json."
+    )
     parser.add_argument("--log-path", default=Path("log.txt"), type=Path)
     parser.add_argument("--output", default=Path("applist.json"), type=Path)
     parser.add_argument("--apps-json", default=default_apps_json_path(), type=Path)

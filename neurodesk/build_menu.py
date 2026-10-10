@@ -1,4 +1,5 @@
 """Generate the menu items."""
+
 import configparser
 import json
 import os
@@ -75,13 +76,17 @@ def _stat_mode(path: Path) -> Optional[int]:
     return path.stat().st_mode & 0o777
 
 
-def _restore_mode(path: Path, existed_before: bool, was_recreated: bool, previous_mode: Optional[int]) -> None:
+def _restore_mode(
+    path: Path, existed_before: bool, was_recreated: bool, previous_mode: Optional[int]
+) -> None:
     """Preserve mode when replacing an existing non-writable file."""
     if existed_before and was_recreated and previous_mode is not None:
         os.chmod(path, previous_mode)
 
 
-def writefile_with_mode(path: Path, writer: Callable[[TextIO], None], mode: Optional[int] = None) -> None:
+def writefile_with_mode(
+    path: Path, writer: Callable[[TextIO], None], mode: Optional[int] = None
+) -> None:
     """Write file content with fallback for non-writable existing files."""
     path_existed = path.exists()
     previous_mode = _stat_mode(path)
@@ -123,16 +128,16 @@ def copyfile_with_mode(src: Path, dest: Path, mode: Optional[int] = None) -> Non
 
 def write_directory_file(name, file_dir, icon_dir):
     logging.info(f"Adding submenu for '{name}'")
-    file_path = file_dir/f"{name.lower().replace(' ', '-')}.directory"
-    icon_path = icon_dir/f"{name.lower().split()[0]}.png"
-    if name == 'Neurodesk':
-        icon_path = icon_dir/f"aedapt.png"
-    icon_src = (Path(__file__).parent/'icons'/icon_path.name)
+    file_path = file_dir / f"{name.lower().replace(' ', '-')}.directory"
+    icon_path = icon_dir / f"{name.lower().split()[0]}.png"
+    if name == "Neurodesk":
+        icon_path = icon_dir / f"aedapt.png"
+    icon_src = Path(__file__).parent / "icons" / icon_path.name
     try:
         copyfile_with_mode(icon_src, icon_path)
     except FileNotFoundError:
-        logging.warning(f'{icon_src} not found')
-        icon_src = (Path(__file__).parent/'icons/neurodesk.png')
+        logging.warning(f"{icon_src} not found")
+        icon_src = Path(__file__).parent / "icons/neurodesk.png"
         copyfile_with_mode(icon_src, icon_path)
 
     # Generate `.directory` file
@@ -145,8 +150,10 @@ def write_directory_file(name, file_dir, icon_dir):
         "Type": "Directory",
     }
     file_dir.mkdir(exist_ok=True)
+
     def _write_directory(directory_file):
         entry.write(directory_file, space_around_delimiters=False)
+
     writefile_with_mode(file_path, _write_directory, mode=0o644)
     return file_path
 
@@ -161,33 +168,37 @@ def add_menu(installdir: Path, name: Text, category: Text) -> None:
     """
 
     # Generate `.directory` file
-    file_dir = installdir/"desktop-directories/apps"
-    icon_dir = installdir/f"icons"
+    file_dir = installdir / "desktop-directories/apps"
+    icon_dir = installdir / f"icons"
     file_path = write_directory_file(name, file_dir, icon_dir)
 
     # Add entry to `.menu` file
-    menu_path = installdir/"neurodesk-applications.menu"
+    menu_path = installdir / "neurodesk-applications.menu"
     with open(menu_path, "r") as xml_file:
         s = xml_file.read()
     s = re.sub(r"\s+(?=<)", "", s)
     root = et.fromstring(s)
-    category_name = f'{category.lower().replace(" ", "-")}'
+    category_name = f"{category.lower().replace(' ', '-')}"
     for menu_el in root.findall(".//Menu/Menu"):
         if menu_el.findtext("Include/And/Category") == category_name:
             sub_el = et.SubElement(menu_el, "Menu")
             name_el = et.SubElement(sub_el, "Name")
             name_el.text = name.capitalize()
             dir_el = et.SubElement(sub_el, "Directory")
-            dir_el.text = f'neurodesk/apps/{file_path.name}'
+            dir_el.text = f"neurodesk/apps/{file_path.name}"
             include_el = et.SubElement(sub_el, "Include")
             and_el = et.SubElement(include_el, "And")
             cat_el = et.SubElement(and_el, "Category")
             cat_el.text = name.replace(" ", "-")
             xmlstr = minidom.parseString(et.tostring(root)).toprettyxml(indent="\t")
+
             def _write_menu(f):
                 f.write('<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"\n ')
-                f.write('"http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">\n\n')
+                f.write(
+                    '"http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">\n\n'
+                )
                 f.write(xmlstr[xmlstr.find("?>") + 3 :])
+
             writefile_with_mode(menu_path, _write_menu, mode=0o644)
             break
 
@@ -223,7 +234,7 @@ class NeurodeskApp:
 
     @property
     def basename(self) -> str:
-        return self.name.lower().replace(' ', '-').replace('.', '_')
+        return self.name.lower().replace(" ", "-").replace(".", "_")
 
     @property
     def container_name(self) -> str:
@@ -279,7 +290,7 @@ def desktop_argument(value: str) -> str:
         return value
     escaped = value.replace("\\", "\\\\").replace('"', '\\"')
     escaped = escaped.replace("`", "\\`").replace("$", "\\$")
-    return '"' + escaped.replace('\\', '\\\\') + '"'
+    return '"' + escaped.replace("\\", "\\\\") + '"'
 
 
 def render_app_menu(app: NeurodeskApp) -> str:
@@ -294,7 +305,7 @@ def render_app_menu(app: NeurodeskApp) -> str:
         "Type": "Application",
         "Categories": app.category,
     }
-    if app.deskenv == 'mate':
+    if app.deskenv == "mate":
         shell_command = f"/bin/bash {shlex.quote(str(app.sh_path))}"
         desktop["Exec"] = (
             f"mate-terminal --window --title {desktop_argument(app.name)} "
@@ -314,18 +325,22 @@ def render_app_menu(app: NeurodeskApp) -> str:
 
 def write_app_menu(app: NeurodeskApp) -> None:
     app.icon_path.parent.mkdir(exist_ok=True)
-    icon_src = Path(__file__).parent / 'icons' / app.icon_path.name
+    icon_src = Path(__file__).parent / "icons" / app.icon_path.name
     try:
         copyfile_with_mode(icon_src, app.icon_path)
     except FileNotFoundError:
-        logging.warning(f'{icon_src} not found')
-        copyfile_with_mode(Path(__file__).parent / 'icons/neurodesk.png', app.icon_path)
+        logging.warning(f"{icon_src} not found")
+        copyfile_with_mode(Path(__file__).parent / "icons/neurodesk.png", app.icon_path)
     app.desktop_path.parent.mkdir(exist_ok=True)
     content = render_app_menu(app)
-    writefile_with_mode(app.desktop_path, lambda output: output.write(content), mode=0o644)
+    writefile_with_mode(
+        app.desktop_path, lambda output: output.write(content), mode=0o644
+    )
 
 
-def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_prefix='')  -> None:
+def apps_from_json(
+    cli, deskenv: Text, installdir: Path, appsjson: Path, sh_prefix=""
+) -> None:
     # Read applications file
     with open(appsjson, "r") as json_file:
         menu_entries = json.load(json_file)
@@ -335,7 +350,9 @@ def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_pref
         for name, bundle_group in bundle_menu_entries(bundles).items():
             group = menu_entries.setdefault(name, {"apps": {}, "categories": []})
             group["apps"].update(bundle_group["apps"])
-            group["categories"] = list(dict.fromkeys(group.get("categories", []) + bundle_group["categories"]))
+            group["categories"] = list(
+                dict.fromkeys(group.get("categories", []) + bundle_group["categories"])
+            )
 
     for menu_name, menu_data in menu_entries.items():
         default_show_in_menu = visibility_flag(menu_data, "show_in_menu")
@@ -347,28 +364,31 @@ def apps_from_json(cli, deskenv: Text, installdir: Path, appsjson: Path, sh_pref
         ]
         # Add submenu
         if not cli and menu_apps:
-            add_menu(installdir, menu_name, 'all applications')
+            add_menu(installdir, menu_name, "all applications")
             for category in menu_data.get("categories") or []:
                 add_menu(installdir, menu_name, category)
         for app_name, app_data in apps.items():
-            show_in_menu = visibility_flag(app_data, "show_in_menu", default_show_in_menu)
+            show_in_menu = visibility_flag(
+                app_data, "show_in_menu", default_show_in_menu
+            )
             app = NeurodeskApp(
                 deskenv=deskenv,
                 installdir=installdir,
                 sh_prefix=sh_prefix,
                 name=app_name,
                 category=menu_name.replace(" ", "-"),
-                **app_menu_data(app_data))
+                **app_menu_data(app_data),
+            )
             write_app_sh(app)
             if not cli and show_in_menu:
                 write_app_menu(app)
 
 
 def neurodesk_xml(xml: Path, newxml: Path) -> None:
-    oldtag = '<Menu>'
-    newtag = '<MergeFile>neurodesk-applications.menu</MergeFile>'
+    oldtag = "<Menu>"
+    newtag = "<MergeFile>neurodesk-applications.menu</MergeFile>"
     replace = True
-    
+
     with open(xml, "r") as fh:
         lines = fh.readlines()
         for line in lines:
@@ -377,22 +397,24 @@ def neurodesk_xml(xml: Path, newxml: Path) -> None:
                 break
 
     tagcount = [0]
+
     def _write_xml(fh):
         for line in lines:
             if replace and oldtag in line:
                 tagcount[0] += 1
                 if tagcount[0] == 2:
-                    fh.write(re.sub(f'{oldtag}', f'{newtag}\n\t{oldtag}', line))
+                    fh.write(re.sub(f"{oldtag}", f"{newtag}\n\t{oldtag}", line))
                 else:
                     fh.write(line)
             else:
                 fh.write(line)
+
     writefile_with_mode(newxml, _write_xml)
     try:
         et.parse(newxml)
     except et.ParseError:
-        logging.error(f'InvalidXMLError with appmenu [{newxml}]')
-        logging.error('Exiting ...')
+        logging.error(f"InvalidXMLError with appmenu [{newxml}]")
+        logging.error("Exiting ...")
         sys.exit()
 
 
@@ -400,7 +422,7 @@ def copy_runtime_tree(source: Path, destination: Path) -> None:
     """Merge runtime files, dereferencing links and retaining directory modes."""
     destination.mkdir(parents=True, exist_ok=True)
     for entry in source.iterdir():
-        if entry.name.startswith('.nfs'):
+        if entry.name.startswith(".nfs"):
             continue
         target = destination / entry.name
         if entry.is_dir():
@@ -410,20 +432,34 @@ def copy_runtime_tree(source: Path, destination: Path) -> None:
 
 
 def build_menu(installdir, deskenv, sh_prefix):
-    climode = deskenv == 'cli'
+    climode = deskenv == "cli"
 
-    copyfile_with_mode(Path('neurodesk/neurodesk-applications.menu'), installdir/'neurodesk-applications.menu')
-    copyfile_with_mode(Path('neurodesk/fetch_and_run.sh'), installdir/'fetch_and_run.sh', mode=0o755)
-    copyfile_with_mode(Path('neurodesk/fetch_containers.sh'), installdir/'fetch_containers.sh', mode=0o755)
-    copyfile_with_mode(Path('neurodesk/configparser.sh'), installdir/'configparser.sh', mode=0o755)
-    copyfile_with_mode(Path('config.ini'), installdir/'config.ini')
-    copyfile_with_mode(Path('neurodesk/apps.json'), installdir/'apps.json')
-    copyfile_with_mode(Path('neurodesk/bundles.json'), installdir/'bundles.json')
-    copy_runtime_tree(Path('neurodesk/transparent-singularity'), installdir/'transparent-singularity')
+    copyfile_with_mode(
+        Path("neurodesk/neurodesk-applications.menu"),
+        installdir / "neurodesk-applications.menu",
+    )
+    copyfile_with_mode(
+        Path("neurodesk/fetch_and_run.sh"), installdir / "fetch_and_run.sh", mode=0o755
+    )
+    copyfile_with_mode(
+        Path("neurodesk/fetch_containers.sh"),
+        installdir / "fetch_containers.sh",
+        mode=0o755,
+    )
+    copyfile_with_mode(
+        Path("neurodesk/configparser.sh"), installdir / "configparser.sh", mode=0o755
+    )
+    copyfile_with_mode(Path("config.ini"), installdir / "config.ini")
+    copyfile_with_mode(Path("neurodesk/apps.json"), installdir / "apps.json")
+    copyfile_with_mode(Path("neurodesk/bundles.json"), installdir / "bundles.json")
+    copy_runtime_tree(
+        Path("neurodesk/transparent-singularity"),
+        installdir / "transparent-singularity",
+    )
 
     if not climode:
-        directories_path = installdir/"desktop-directories"
-        icon_dir = installdir/"icons"
+        directories_path = installdir / "desktop-directories"
+        icon_dir = installdir / "icons"
         write_directory_file("Neurodesk", directories_path, icon_dir)
         write_directory_file("All Applications", directories_path, icon_dir)
         write_directory_file("Functional Imaging", directories_path, icon_dir)
@@ -454,10 +490,12 @@ def build_menu(installdir, deskenv, sh_prefix):
         write_directory_file("Fetal Imaging", directories_path, icon_dir)
         write_directory_file("Arterial Spin Labelling", directories_path, icon_dir)
 
-    appsjson = Path('neurodesk/apps.json').resolve(strict=True)
-    (installdir/'icons').mkdir(exist_ok=True)
-    bundles = load_bundles(Path('neurodesk/bundles.json'), json.loads(appsjson.read_text()))
-    publish_bundles(bundles, installdir/'containers/modules')
+    appsjson = Path("neurodesk/apps.json").resolve(strict=True)
+    (installdir / "icons").mkdir(exist_ok=True)
+    bundles = load_bundles(
+        Path("neurodesk/bundles.json"), json.loads(appsjson.read_text())
+    )
+    publish_bundles(bundles, installdir / "containers/modules")
     apps_from_json(climode, deskenv, installdir, appsjson, sh_prefix)
 
     # Neurodesk help app
@@ -466,7 +504,8 @@ def build_menu(installdir, deskenv, sh_prefix):
         installdir=installdir,
         name="Help",
         category="Neurodesk",
-        launcher_command="firefox https://neurodesk.github.io/docs/neurodesktop")
+        launcher_command="firefox https://neurodesk.github.io/docs/neurodesktop",
+    )
     write_app_sh(help_app)
     if not climode:
         write_app_menu(help_app)
@@ -477,14 +516,15 @@ def build_menu(installdir, deskenv, sh_prefix):
         installdir=installdir,
         name="Update",
         category="Neurodesk",
-        launcher_command=f"cd {shlex.quote(str(installdir / 'neurocommand'))}; bash build.sh --update --runsudo; read -p \"Press enter to close this window ...\"")
+        launcher_command=f'cd {shlex.quote(str(installdir / "neurocommand"))}; bash build.sh --update --runsudo; read -p "Press enter to close this window ..."',
+    )
     write_app_sh(update_app)
     if not climode:
         write_app_menu(update_app)
 
     # Remove any symlinks from local appdir
     # Prevents symlink recursion
-    neurodesk_appdir = installdir/'applications'
-    for file in neurodesk_appdir.glob('*'):
+    neurodesk_appdir = installdir / "applications"
+    for file in neurodesk_appdir.glob("*"):
         if file.is_symlink():
             os.unlink(file)

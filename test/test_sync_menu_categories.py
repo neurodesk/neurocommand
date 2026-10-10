@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "sync_menu_categories.py"
 
 
-sync_menu_categories = load_script('sync_menu_categories', SCRIPT)
+sync_menu_categories = load_script("sync_menu_categories", SCRIPT)
 
 
 MENU = """<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"

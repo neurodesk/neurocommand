@@ -121,9 +121,13 @@ def _svg_to_png(svg_content: bytes, source: Path) -> bytes:
         ) from error
 
     try:
-        content = cairosvg.svg2png(bytestring=svg_content, output_width=128, output_height=128)
+        content = cairosvg.svg2png(
+            bytestring=svg_content, output_width=128, output_height=128
+        )
     except Exception as error:  # noqa: BLE001 - surface converter context to callers
-        raise ValueError(f"{source}: failed to convert SVG icon to PNG: {error}") from error
+        raise ValueError(
+            f"{source}: failed to convert SVG icon to PNG: {error}"
+        ) from error
 
     if not content.startswith(PNG_MAGIC):
         raise ValueError(f"{source}: converted SVG icon is not a PNG")
@@ -176,7 +180,10 @@ def collect_recipe_icons(
         icon_names = set()
         for base_name in {recipe_name, declared_name} - {None}:
             # Named variants publish as <recipe>_<variant> and share the recipe icon.
-            menu_names = [base_name, *(f"{base_name}_{variant}" for variant in variants)]
+            menu_names = [
+                base_name,
+                *(f"{base_name}_{variant}" for variant in variants),
+            ]
             for menu_name in menu_names:
                 icon_names.update(app_icon_names.get(menu_name, ()))
         if not icon_names:
@@ -198,7 +205,11 @@ def collect_recipe_icons(
             result.unsupported_icons.append(build_file)
             continue
 
-        icons.append(RecipeIcon(names=tuple(sorted(icon_names)), source=build_file, content=content))
+        icons.append(
+            RecipeIcon(
+                names=tuple(sorted(icon_names)), source=build_file, content=content
+            )
+        )
 
     return icons
 

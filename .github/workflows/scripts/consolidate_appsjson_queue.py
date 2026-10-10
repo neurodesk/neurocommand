@@ -67,8 +67,7 @@ class PullRequest:
         by the consolidation and safe to close.
         """
         return all(
-            path == target_file or path.startswith(icons_prefix)
-            for path in self.files
+            path == target_file or path.startswith(icons_prefix) for path in self.files
         )
 
 
@@ -118,7 +117,8 @@ def build_consolidation_plan(
     ordered = sorted(
         snapshots,
         key=lambda snapshot: (
-            parse_timestamp(snapshot.source.created_at), snapshot.source.label
+            parse_timestamp(snapshot.source.created_at),
+            snapshot.source.label,
         ),
     )
     active = has_existing_pr or bool(ordered)
@@ -164,7 +164,9 @@ def build_consolidation_plan(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", required=True, help="owner/repo")
-    parser.add_argument("--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com"))
+    parser.add_argument(
+        "--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com")
+    )
     parser.add_argument("--base-ref", default="main")
     parser.add_argument("--target-file", default="neurodesk/apps.json")
     parser.add_argument("--consolidated-branch", default="bot/appsjson-consolidated")
@@ -288,7 +290,9 @@ def github_paginated_get(
     return items
 
 
-def list_open_pull_requests(api_url: str, repo: str, token: str) -> List[Dict[str, Any]]:
+def list_open_pull_requests(
+    api_url: str, repo: str, token: str
+) -> List[Dict[str, Any]]:
     prs = github_paginated_get(
         api_url,
         f"/repos/{repo}/pulls",
@@ -299,7 +303,9 @@ def list_open_pull_requests(api_url: str, repo: str, token: str) -> List[Dict[st
     return prs
 
 
-def list_pull_request_files(api_url: str, repo: str, pr_number: int, token: str) -> List[str]:
+def list_pull_request_files(
+    api_url: str, repo: str, pr_number: int, token: str
+) -> List[str]:
     files = github_paginated_get(
         api_url,
         f"/repos/{repo}/pulls/{pr_number}/files",
@@ -321,7 +327,12 @@ def find_open_head_pr(
         api_url,
         f"/repos/{repo}/pulls",
         token,
-        query={"state": "open", "head": f"{owner}:{head_branch}", "base": base_ref, "per_page": 1},
+        query={
+            "state": "open",
+            "head": f"{owner}:{head_branch}",
+            "base": base_ref,
+            "per_page": 1,
+        },
     )
     if prs:
         return prs[0]
@@ -453,14 +464,18 @@ def build_consolidation_pr_body(
     lines.append("")
     lines.append("## Consolidated PR State")
     if should_have_consolidated_pr:
-        lines.append("- A consolidated PR is required because queue output differs from `main`.")
+        lines.append(
+            "- A consolidated PR is required because queue output differs from `main`."
+        )
     else:
         lines.append("- No consolidated PR is required (queue output matches `main`).")
 
     lines.append("")
     lines.append("## Proposed `apps.json` Changes")
     if appsjson_diff:
-        diff_for_body, is_truncated = truncate_diff(appsjson_diff, MAX_PR_BODY_DIFF_CHARS)
+        diff_for_body, is_truncated = truncate_diff(
+            appsjson_diff, MAX_PR_BODY_DIFF_CHARS
+        )
         lines.append("```diff")
         lines.append(diff_for_body)
         lines.append("```")
@@ -482,7 +497,13 @@ def stage_and_push_branch(
     commit_message: str,
 ) -> bool:
     run_git(["config", "user.name", "github-actions[bot]"])
-    run_git(["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
+    run_git(
+        [
+            "config",
+            "user.email",
+            "41898282+github-actions[bot]@users.noreply.github.com",
+        ]
+    )
 
     run_git(["checkout", "-B", head_branch, f"refs/remotes/origin/{base_ref}"])
     run_git(["add", *files])
@@ -592,7 +613,9 @@ def post_consolidated_diff_comment(
     target_file: str,
     appsjson_diff: str,
 ) -> str:
-    diff_for_comment, is_truncated = truncate_diff(appsjson_diff, MAX_PR_COMMENT_DIFF_CHARS)
+    diff_for_comment, is_truncated = truncate_diff(
+        appsjson_diff, MAX_PR_COMMENT_DIFF_CHARS
+    )
     lines: List[str] = []
     lines.append(DIFF_COMMENT_MARKER)
     lines.append("### Proposed `apps.json` changes")
@@ -773,7 +796,14 @@ def main() -> int:
     owner = args.repo.split("/", 1)[0]
     icons_prefix = f"{args.icons_dir.as_posix()}/"
 
-    run_git(["fetch", "--no-tags", "origin", f"+refs/heads/{args.base_ref}:refs/remotes/origin/{args.base_ref}"])
+    run_git(
+        [
+            "fetch",
+            "--no-tags",
+            "origin",
+            f"+refs/heads/{args.base_ref}:refs/remotes/origin/{args.base_ref}",
+        ]
+    )
 
     open_prs_raw = list_open_pull_requests(args.api_url, args.repo, token)
 
@@ -788,7 +818,9 @@ def main() -> int:
         ):
             continue
 
-        files = list_pull_request_files(args.api_url, args.repo, int(pr["number"]), token)
+        files = list_pull_request_files(
+            args.api_url, args.repo, int(pr["number"]), token
+        )
         if args.target_file not in files:
             continue
         if (
@@ -833,7 +865,9 @@ def main() -> int:
             check=False,
         )
         if fetched.returncode == 0:
-            commit_date = run_git(["log", "-1", "--format=%cI", source_branch_ref]).stdout.strip()
+            commit_date = run_git(
+                ["log", "-1", "--format=%cI", source_branch_ref]
+            ).stdout.strip()
             sources.append(
                 QueueSource(
                     created_at=commit_date,
@@ -885,23 +919,29 @@ def main() -> int:
         )
         if fetch_consolidated.returncode == 0:
             existing_branch_outdated = branch_needs_refresh(base_ref, consolidated_ref)
-            existing_consolidated_payload = read_json_from_git(consolidated_ref, args.target_file)
+            existing_consolidated_payload = read_json_from_git(
+                consolidated_ref, args.target_file
+            )
 
     snapshots: List[SourceSnapshot] = []
     for source in sources:
         if source.pr is not None:
-            run_git([
-                "fetch",
-                "--no-tags",
-                "origin",
-                f"+refs/pull/{source.pr.number}/head:{source.ref}",
-            ])
+            run_git(
+                [
+                    "fetch",
+                    "--no-tags",
+                    "origin",
+                    f"+refs/pull/{source.pr.number}/head:{source.ref}",
+                ]
+            )
         merge_base = run_git(["merge-base", base_ref, source.ref]).stdout.strip()
-        snapshots.append(SourceSnapshot(
-            source=source,
-            before=read_json_from_git(merge_base, args.target_file),
-            after=read_json_from_git(source.ref, args.target_file),
-        ))
+        snapshots.append(
+            SourceSnapshot(
+                source=source,
+                before=read_json_from_git(merge_base, args.target_file),
+                after=read_json_from_git(source.ref, args.target_file),
+            )
+        )
 
     plan = build_consolidation_plan(
         base_payload=base_payload,
@@ -973,12 +1013,14 @@ def main() -> int:
     unit_test_failure: Optional[str] = None
     if args.merge_consolidated and consolidated_pr_number is not None:
         consolidated_ref = f"refs/remotes/origin/{args.consolidated_branch}"
-        run_git([
-            "fetch",
-            "--no-tags",
-            "origin",
-            f"+refs/heads/{args.consolidated_branch}:{consolidated_ref}",
-        ])
+        run_git(
+            [
+                "fetch",
+                "--no-tags",
+                "origin",
+                f"+refs/heads/{args.consolidated_branch}:{consolidated_ref}",
+            ]
+        )
         unit_test_failure = run_unit_tests_on_ref(consolidated_ref)
 
     if unit_test_failure is not None:
@@ -989,7 +1031,9 @@ def main() -> int:
             token=token,
             pr_number=consolidated_pr_number,
             marker=UNIT_TEST_COMMENT_MARKER,
-            comment_body=unit_test_failure_comment(args.consolidated_branch, unit_test_failure),
+            comment_body=unit_test_failure_comment(
+                args.consolidated_branch, unit_test_failure
+            ),
         )
         print(
             f"ERROR: Unit tests failed on {args.consolidated_branch}; "

@@ -17,7 +17,9 @@ def pytest_sessionstart(session):
     try:
         init = module_init(engine)
     except pytest.skip.Exception as exc:
-        raise pytest.UsageError(f"Required module engine {engine} is unavailable: {exc}") from exc
+        raise pytest.UsageError(
+            f"Required module engine {engine} is unavailable: {exc}"
+        ) from exc
     result = subprocess.run(
         ["bash", "-c", f"{init}\nmodule --version"],
         text=True,
@@ -29,4 +31,6 @@ def pytest_sessionstart(session):
             f"{result.stdout}{result.stderr}"
         )
     if engine == "lmod" and not os.environ.get("LMOD_CMD"):
-        raise pytest.UsageError("Required Lmod engine has no LMOD_CMD; source its bash initialization")
+        raise pytest.UsageError(
+            "Required Lmod engine has no LMOD_CMD; source its bash initialization"
+        )

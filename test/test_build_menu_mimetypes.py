@@ -2,7 +2,13 @@ from pathlib import Path
 import configparser
 import shlex
 
-from neurodesk.build_menu import EXEC_MIMETYPES, NeurodeskApp, write_app_menu, write_app_sh
+from neurodesk.build_menu import (
+    EXEC_MIMETYPES,
+    NeurodeskApp,
+    write_app_menu,
+    write_app_sh,
+)
+
 
 def make_app(tmp_path, name, exec):
     (tmp_path / "icons").mkdir(exist_ok=True)
@@ -112,16 +118,31 @@ def test_generated_launcher_runs_with_quoted_path_and_arguments(tmp_path):
     install = tmp_path / "install with 'quotes' $literal"
     install.mkdir()
     fetch = install / "fetch_and_run.sh"
-    fetch.write_text('#!/usr/bin/env python3\nimport json, sys\nprint(json.dumps(sys.argv[1:]))\n')
+    fetch.write_text(
+        "#!/usr/bin/env python3\nimport json, sys\nprint(json.dumps(sys.argv[1:]))\n"
+    )
     fetch.chmod(0o755)
     app = NeurodeskApp(
-        "lxde", install, "viewerGUI-tool_arm64 1.2", command="viewer --label 'space value'"
+        "lxde",
+        install,
+        "viewerGUI-tool_arm64 1.2",
+        command="viewer --label 'space value'",
     )
     write_app_sh(app)
-    result = subprocess.run([str(app.sh_path), "file with spaces", "$literal"], capture_output=True, text=True)
+    result = subprocess.run(
+        [str(app.sh_path), "file with spaces", "$literal"],
+        capture_output=True,
+        text=True,
+    )
     assert result.returncode == 0, result.stderr
     assert json.loads(result.stdout) == [
-        "tool_arm64", "1.2", "viewer", "--label", "space value", "file with spaces", "$literal"
+        "tool_arm64",
+        "1.2",
+        "viewer",
+        "--label",
+        "space value",
+        "file with spaces",
+        "$literal",
     ]
 
 
@@ -139,7 +160,10 @@ def desktop_argv(app):
     entry.read_string(render_app_menu(app))
     # Desktop Entry string escaping precedes Exec argument parsing.
     command = entry["Desktop Entry"]["Exec"].replace("\\\\", "\\")
-    return [argument.replace("\\$", "$").replace("\\`", "`") for argument in shlex.split(command)]
+    return [
+        argument.replace("\\$", "$").replace("\\`", "`")
+        for argument in shlex.split(command)
+    ]
 
 
 def test_desktop_exec_quotes_install_paths_for_both_environments(tmp_path):
@@ -159,7 +183,11 @@ def test_custom_launcher_preserves_prefix_and_command(tmp_path):
     from neurodesk.build_menu import render_app_sh
 
     app = NeurodeskApp(
-        "lxde", tmp_path, "Help", sh_prefix="env DEMO=1", launcher_command="printf 'help\\n'"
+        "lxde",
+        tmp_path,
+        "Help",
+        sh_prefix="env DEMO=1",
+        launcher_command="printf 'help\\n'",
     )
     assert render_app_sh(app) == "#!/usr/bin/env bash\nenv DEMO=1 printf 'help\\n'\n"
     assert not (tmp_path / "bin").exists()
