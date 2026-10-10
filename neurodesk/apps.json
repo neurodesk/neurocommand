@@ -5074,7 +5074,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20260902",
+                "version": "20261010",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -5180,7 +5180,7 @@
                 "apptainer_args": []
             },
             "topofit 0.6.0": {
-                "version": "20260917",
+                "version": "20261010",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5294,6 +5294,19 @@
         "categories": [
             "quantitative imaging",
             "visualization"
+        ]
+    },
+    "vessynth": {
+        "apps": {
+            "vessynth 2026.10.9": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
         ]
     },
     "vina": {
