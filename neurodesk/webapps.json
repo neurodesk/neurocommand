@@ -66,7 +66,7 @@
       "description": "RStudio IDE for R - web-based version",
       "port": 8787,
       "module": "rstudio",
-      "version": "2023.12.1"
+      "version": "2026.09.0"
     }
   }
 }
