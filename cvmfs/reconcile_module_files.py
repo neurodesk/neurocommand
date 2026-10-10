@@ -377,9 +377,9 @@ def sanitize_help_text(text: str) -> str:
 def sanitize_module_help_content(content: str) -> str:
     return re.sub(
         r"(help\(\[===\[)(.*?)(\]===\]\))",
-        lambda match: match.group(1)
-        + sanitize_help_text(match.group(2))
-        + match.group(3),
+        lambda match: (
+            match.group(1) + sanitize_help_text(match.group(2)) + match.group(3)
+        ),
         content,
         flags=re.DOTALL,
     )
