@@ -98,6 +98,16 @@
                 "version": "20260921",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.02": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.02": {
+                "version": "20261010",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -367,8 +377,22 @@
     "batchheudiconv": {
         "apps": {
             "batchheudiconv 1.0.0": {
-                "version": "20250628",
-                "exec": ""
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "workflows"
+        ]
+    },
+    "batchheudiconv_arm64": {
+        "apps": {
+            "batchheudiconv_arm64 1.0.0": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3153,6 +3177,11 @@
                 "version": "20261001",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "meganorm 0.2.2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4554,6 +4583,11 @@
                 "version": "20251014",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "rabies 0.6.2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4711,6 +4745,11 @@
                 "version": "20260608",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "samri 0.5.4": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4844,6 +4883,16 @@
                 "version": "20261005",
                 "exec": "Slicer",
                 "apptainer_args": []
+            },
+            "slicer 5.12.4": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "slicerGUI-slicer 5.12.4": {
+                "version": "20261010",
+                "exec": "Slicer",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4901,6 +4950,11 @@
             "sovabids 0.3.1a0": {
                 "version": "20221202",
                 "exec": ""
+            },
+            "sovabids 0.4.7": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4912,6 +4966,23 @@
         "apps": {
             "spant 3.7.0": {
                 "version": "20260319",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "spant 4.5.0": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "spectroscopy"
+        ]
+    },
+    "spant_arm64": {
+        "apps": {
+            "spant_arm64 4.5.0": {
+                "version": "20261010",
                 "exec": "",
                 "apptainer_args": []
             }
