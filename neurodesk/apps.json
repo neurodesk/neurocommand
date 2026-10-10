@@ -331,6 +331,11 @@
                 "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "b0mapromeo 1.4.3": {
+                "version": "20261009",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1407,6 +1412,11 @@
                 "version": "20261006",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "datalad 1.7.1": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1442,6 +1452,11 @@
             },
             "datalad_arm64 1.7.0": {
                 "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "datalad_arm64 1.7.1": {
+                "version": "20261007",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3396,7 +3411,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261004",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4551,6 +4566,11 @@
                 "version": "20260203",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "radtract 0.2.4": {
+                "version": "20261007",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4561,6 +4581,11 @@
         "apps": {
             "rapidtide 3.1.11": {
                 "version": "20260714",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "rapidtide 3.2.0": {
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4605,6 +4630,11 @@
             "root 6.22.02": {
                 "version": "20201104",
                 "exec": ""
+            },
+            "root 6.24.06": {
+                "version": "20261009",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4659,6 +4689,16 @@
                 "version": "20260211",
                 "exec": "rstudio",
                 "apptainer_args": []
+            },
+            "rstudio 2026.09.0": {
+                "version": "20261009",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "rstudioGUI-rstudio 2026.09.0": {
+                "version": "20261009",
+                "exec": "rstudio",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4710,7 +4750,7 @@
     "shim-toolbox": {
         "apps": {
             "shim-toolbox 1.5.0": {
-                "version": "20261008",
+                "version": "20261009",
                 "exec": "",
                 "apptainer_args": []
             }
