@@ -1,9 +1,9 @@
-import importlib.util
 from pathlib import Path
-import sys
 
 import pytest
 
+from cvmfs import reconcile_module_files
+from test.support.cvmfs import make_container
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "cvmfs" / "reconcile_module_files.py"
@@ -13,11 +13,6 @@ STALE_FREESURFER_SNIPPET = (
     "-- Append custom paths\n"
     'local additional_bind_paths = "/tmp:/scratch"\n'
 )
-
-spec = importlib.util.spec_from_file_location("reconcile_module_files", SCRIPT)
-reconcile_module_files = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = reconcile_module_files
-spec.loader.exec_module(reconcile_module_files)
 
 
 def module_text(container_name):
@@ -30,12 +25,6 @@ def module_text(container_name):
             "",
         ]
     )
-
-
-def make_container(repo_root, container_name, commands="datalad\n"):
-    container = repo_root / "containers" / container_name
-    container.mkdir(parents=True)
-    (container / "commands.txt").write_text(commands)
 
 
 def test_parse_image_name_supports_named_variants():

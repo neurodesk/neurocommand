@@ -1,26 +1,17 @@
+from pathlib import Path
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 
 import pytest
 
-from test.test_module_refresh import installed, refresh, clean_env, module_init
-from test.test_run_transparent_singularity import write_executable
+from test.support.artifacts import installed, refresh
+from test.support.module_engines import module_init
+from test.support.shell import fake_runtime, clean_env
 
 ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / 'neurodesk/transparent-singularity/container_runtime.sh'
-
-
-def fake_runtime(directory, name):
-    path = directory / name
-    write_executable(path, '''#!/usr/bin/env python3
-import json, os, sys
-print(json.dumps({'runtime': os.path.basename(sys.argv[0]), 'argv': sys.argv[1:],
-                  'nv': [os.getenv('APPTAINER_NV'), os.getenv('SINGULARITY_NV')]}))
-''')
-    return path
 
 
 @pytest.mark.parametrize('operation', ['pull', 'build', 'exec', 'shell', 'version'])
@@ -155,7 +146,7 @@ def test_module_generation_advances_metadata_and_preserves_edits(tmp_path, forma
 
 def test_reconciliation_preserves_custom_canonical_and_public_modules(tmp_path):
     from artifact_renderer import read_container_inventory, legacy_module_content
-    from test.test_cvmfs_reconcile_module_files import reconcile_module_files
+    from test.support.cvmfs import reconcile_module_files
     directory, image = installed(tmp_path)
     spec = read_container_inventory(directory)
     canonical = tmp_path / 'containers/modules/demo/1.0.lua'
@@ -207,7 +198,7 @@ def test_atomic_artifact_failure_preserves_file_and_cleans_temporary(tmp_path, m
 
 def test_reconciles_old_inventory_before_advancing_to_new_build(tmp_path):
     from artifact_renderer import read_container_inventory, legacy_module_content
-    from test.test_cvmfs_reconcile_module_files import reconcile_module_files
+    from test.support.cvmfs import reconcile_module_files
     old, image = installed(tmp_path)
     old_spec = read_container_inventory(old)
     canonical = tmp_path / 'containers/modules/demo/1.0.lua'

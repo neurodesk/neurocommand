@@ -1,21 +1,15 @@
-import base64
-import importlib.util
-import json
 from pathlib import Path
-import sys
+import base64
+import json
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / ".github" / "workflows" / "scripts"
 SCRIPT = SCRIPTS / "consolidate_appsjson_queue.py"
 
-# The consolidation script imports sync_neurocontainer_icons from its own
-# directory, so make that importable before loading it.
-sys.path.insert(0, str(SCRIPTS))
-spec = importlib.util.spec_from_file_location("consolidate_appsjson_queue", SCRIPT)
-consolidate_appsjson_queue = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = consolidate_appsjson_queue
-spec.loader.exec_module(consolidate_appsjson_queue)
+
+consolidate_appsjson_queue = load_script('consolidate_appsjson_queue', SCRIPT)
 
 
 PNG_BYTES = base64.b64decode(

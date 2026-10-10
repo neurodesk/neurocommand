@@ -1,19 +1,13 @@
+from pathlib import Path
 import os
 import shutil
 import subprocess
-import textwrap
-from pathlib import Path
 
-from test.test_cvmfs_reconcile_wrapper_xauthority import assert_gpu_environment, reconcile
-
+from test.support.shell import write_executable
+from test.support.wrappers import assert_gpu_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 TRANSPARENT_SINGULARITY = ROOT / "neurodesk" / "transparent-singularity"
-
-
-def write_executable(path, text):
-    path.write_text(textwrap.dedent(text).lstrip())
-    path.chmod(0o755)
 
 
 def test_oras_pull_failure_falls_back_to_nectar(tmp_path):

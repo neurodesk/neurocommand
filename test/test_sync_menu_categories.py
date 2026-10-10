@@ -1,16 +1,13 @@
-import importlib.util
-import json
 from pathlib import Path
-import sys
+import json
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "sync_menu_categories.py"
 
-spec = importlib.util.spec_from_file_location("sync_menu_categories", SCRIPT)
-sync_menu_categories = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = sync_menu_categories
-spec.loader.exec_module(sync_menu_categories)
+
+sync_menu_categories = load_script('sync_menu_categories', SCRIPT)
 
 
 MENU = """<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"

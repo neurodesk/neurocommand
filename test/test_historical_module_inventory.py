@@ -5,9 +5,9 @@ import sys
 
 import pytest
 
-from test.test_cvmfs_reconcile_module_files import SCRIPT, make_container
 from artifact_renderer import legacy_module_content, managed_module_content, read_container_inventory
-
+from test.support.cvmfs import make_container
+from test.support.paths import MODULE_RECONCILIATION_SCRIPT as SCRIPT
 
 @pytest.fixture
 def historical_modules(tmp_path):

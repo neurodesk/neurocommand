@@ -4,11 +4,11 @@
 sudo swapoff -a
 sudo rm -f /swapfile
 sudo apt clean
-docker rmi $(docker image ls -aq)
+docker image ls -aq | xargs -r docker rmi
 
 df -ha
 du -sh /opt
-du -sh $AGENT_TOOLSDIRECTORY
+du -sh "$AGENT_TOOLSDIRECTORY"
 df -ha
 
 # 30 GB

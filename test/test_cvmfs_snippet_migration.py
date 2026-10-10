@@ -5,9 +5,9 @@ import sys
 
 import pytest
 
-from test.test_cvmfs_reconcile_module_files import ROOT, SCRIPT, make_container
 from artifact_renderer import legacy_module_content, read_container_inventory
-
+from test.support.cvmfs import make_container
+from test.support.paths import ROOT, MODULE_RECONCILIATION_SCRIPT as SCRIPT
 
 @pytest.fixture
 def maintained_freesurfer_modules(tmp_path):

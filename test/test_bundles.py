@@ -1,26 +1,16 @@
-import importlib.util
-import json
-import os
 from pathlib import Path
+import json
 import shlex
 import subprocess
 import sys
 
 import pytest
 
-from test.test_module_refresh import installed, refresh, clean_env, module_init
+from artifact_renderer import BundleSpec, ModuleId, load_bundles, publish_bundles
+from test.support.artifacts import installed, refresh
+from test.support.bundles import manifest, catalog, bundle_tree, run_engine
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'neurodesk/transparent-singularity'))
-from artifact_renderer import BundleSpec, ModuleId, load_bundles, publish_bundles, render_module
-
-
-def manifest():
-    return {'schema_version': 1, 'bundles': [{'name': 'demo-bundle', 'version': '1.0', 'description': 'Demo', 'categories': ['data organisation'], 'dependencies': [{'name': 'first', 'version': '1.0'}, {'name': 'second', 'version': '1.0'}]}]}
-
-
-def catalog():
-    return {name: {'apps': {f'{name} 1.0': {'version': '20260629', 'exec': ''}}} for name in ['first', 'second']}
 
 
 @pytest.mark.parametrize('defect', ['schema', 'unknown', 'duplicate', 'empty', 'fields', 'collision', 'incompatible', 'unsafe-category'])
@@ -49,32 +39,6 @@ def test_initial_bundle_uses_published_pins_and_preserves_old_versions():
     assert bundle.dependencies == (ModuleId('bidscoin', '4.6.2'), ModuleId('dcm2niix', 'v1.0.20260724'))
     assert cat['bidstools']['apps']
     assert 'bru2nii' in bundle.description
-
-
-def bundle_tree(tmp_path, engine):
-    for name in ['first', 'second']:
-        directory, image = installed(tmp_path, name, '1.0')
-        (directory / 'commands.txt').write_text('collision\n' + name + '\n')
-        (directory / 'env.txt').write_text('')
-        assert refresh(directory, image).returncode == 0
-    module_root = tmp_path / 'containers/modules'
-    spec = BundleSpec(ModuleId('demo-bundle', '1.0'), (ModuleId('first', '1.0'), ModuleId('second', '1.0')), ('data',), 'Demo')
-    shared = BundleSpec(ModuleId('shared', '1.0'), (ModuleId('first', '1.0'),), ('data',), 'Shared')
-    publish_bundles((spec, shared), module_root, tmp_path / 'neurodesk-modules')
-    if engine != 'lmod-lua':
-        for path in tmp_path.rglob('*.lua'): path.unlink()
-    return module_root
-
-
-def run_engine(engine, root, commands):
-    init = module_init(engine)
-    if engine.startswith('lmod'):
-        probe = subprocess.run(['bash', '-c', init + '; echo "$LMOD_VERSION"'], env=clean_env(), capture_output=True, text=True)
-        version = probe.stdout.strip().split('.')
-        if version and version[0].isdigit() and int(version[0]) < 7:
-            pytest.skip('Bundle lifetime requires Lmod depends_on; old Lmod tested separately')
-    script = f'set -e\n{init}\nmodule use {shlex.quote(str(root))}\n' + commands
-    return subprocess.run(['bash', '-c', script], env=clean_env(), capture_output=True, text=True, timeout=30)
 
 
 DUMP = '''python3 -c 'import os,json; print(json.dumps(os.environ.get("LOADEDMODULES", "").split(":")))'\n'''

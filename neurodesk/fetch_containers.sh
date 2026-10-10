@@ -23,7 +23,11 @@ echo "[INFO] fetch_containers.sh: SINGULARITY_BINDPATH : $SINGULARITY_BINDPATH"
 
 _script="$(readlink -f "${BASH_SOURCE[0]}")"
 _base="$(dirname "$_script")"
+# This source is deployed beside the script or installed by the module engine.
+# shellcheck disable=SC1091
 source "${_base}/transparent-singularity/container_runtime.sh"
+# This source is deployed beside the script or installed by the module engine.
+# shellcheck disable=SC1091
 source "${_base}/configparser.sh" "${_base}/config.ini"
 
 # if $neurodesk_installdir is empty then this it's not installed and running in developer mode:
@@ -66,6 +70,8 @@ if [[ "$refresh" == true ]]; then
     fi
 elif [[ -e "$CONTAINER_FILE_NAME" ]]; then
     echo "[INFO] fetch_containers.sh: Container ${IMG_NAME} is there. Checking that it is fully downloaded and executable:"
+    # Legacy container options are a whitespace-separated argument list.
+    # shellcheck disable=SC2086,SC2154
     if ! neurodesk_runtime exec ${neurodesk_singularity_opts} "${CONTAINER_FILE_NAME}" ls; then
         echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         echo "the container is incomplete and needs to be re-downloaded. You could try:"
@@ -86,6 +92,8 @@ fi
 
 if [[ "$refresh" != true ]]; then
     if ! type module >/dev/null 2>&1 && [[ -f /usr/share/module.sh ]]; then
+        # This source is deployed beside the script or installed by the module engine.
+        # shellcheck disable=SC1091
         source /usr/share/module.sh
     fi
     if type module >/dev/null 2>&1; then

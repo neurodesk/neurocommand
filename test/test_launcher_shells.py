@@ -1,42 +1,22 @@
+from pathlib import Path
 import json
 import os
-from pathlib import Path
 import pty
 import re
 import select
 import shlex
-import shutil
 import subprocess
 import time
 
 import pytest
 
-from test.test_bundles import bundle_tree, catalog, manifest, run_engine
-from test.test_container_policy import fake_runtime
-from test.test_module_refresh import clean_env, installed, refresh, module_init
-from test.test_run_transparent_singularity import write_executable
+from test.support.artifacts import refresh
+from test.support.bundles import run_engine
+from test.support.launchers import launcher_tree
+from test.support.module_engines import module_init
+from test.support.shell import clean_env
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def launcher_tree(tmp_path, engine):
-    install = tmp_path / 'installation with spaces'
-    install.mkdir()
-    for name in ['fetch_and_run.sh', 'configparser.sh']:
-        shutil.copy2(ROOT / 'neurodesk' / name, install / name)
-    shutil.copytree(ROOT / 'neurodesk/transparent-singularity', install / 'transparent-singularity')
-    (install / 'config.ini').write_text('singularity_opts=--bind /configured-bind\n')
-    (install / 'apps.json').write_text(json.dumps(catalog()))
-    (install / 'bundles.json').write_text(json.dumps(manifest()))
-    write_executable(install / 'fetch_containers.sh', '#!/bin/bash\necho unexpected-fetch >&2\nexit 91\n')
-    root = bundle_tree(install, engine)
-    directory, image = installed(install, 'third', '1.0')
-    (directory / 'commands.txt').write_text('third\n')
-    (directory / 'env.txt').write_text('')
-    assert refresh(directory, image).returncode == 0
-    if engine != 'lmod-lua': (root / 'third/1.0.lua').unlink()
-    runtime = fake_runtime(tmp_path, 'fake runtime')
-    return install, root, runtime
 
 
 @pytest.mark.parametrize('engine', ['modules', 'lmod-lua'])

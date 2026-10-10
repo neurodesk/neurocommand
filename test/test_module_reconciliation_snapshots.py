@@ -1,16 +1,13 @@
-import importlib.util
-import os
 from pathlib import Path
-import sys
+import os
 
 import pytest
 
+from test.support.scripts import load_script
 
 SCRIPT = Path(__file__).resolve().parents[1] / 'cvmfs/reconcile_module_files.py'
-spec = importlib.util.spec_from_file_location('module_snapshot_reconciler', SCRIPT)
-reconciler = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = reconciler
-spec.loader.exec_module(reconciler)
+
+reconciler = load_script('module_snapshot_reconciler', SCRIPT)
 
 
 def planned_change(path, *, delete=False):

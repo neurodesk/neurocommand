@@ -1,42 +1,20 @@
+from pathlib import Path
 import json
 import os
 import shlex
 import shutil
 import subprocess
-from pathlib import Path
 
 import pytest
 
-from test.test_run_transparent_singularity import TRANSPARENT_SINGULARITY, write_executable
-from test.test_cvmfs_reconcile_module_files import reconcile_module_files
-from test.test_cvmfs_reconcile_wrapper_xauthority import reconcile
+from cvmfs import reconcile_module_files, reconcile_wrapper_xauthority as reconcile
+from test.support.artifacts import installed, refresh
+from test.support.module_engines import module_init
+from test.support.paths import TRANSPARENT_SINGULARITY
+from test.support.shell import clean_env, write_executable
 
 ROOT = Path(__file__).resolve().parents[1]
 IMAGE = "demo_1.0_20260629.simg"
-
-
-def clean_env(**overrides):
-    env = {k: v for k, v in os.environ.items() if k != "BASH_ENV"}
-    env.update(overrides)
-    return env
-
-
-def installed(tmp_path, name="demo", version="1.0"):
-    directory = tmp_path / "containers" / f"{name}_{version}_20260629"
-    shutil.copytree(TRANSPARENT_SINGULARITY, directory)
-    image = f"{directory.name}.simg"
-    (directory / image).touch()
-    (directory / "commands.txt").write_text("demo\ndemo\n.hidden\nlib.so\n")
-    (directory / "env.txt").write_text('DEPLOY_ENV_TEST_VALUE=BASEPATH/a=b "quoted" $d [e] \\ tail\n')
-    (directory / "README.md").write_text('Help "quoted" $d [error boom] \\ { unmatched\n')
-    return directory, image
-
-
-def refresh(directory, image, env=None):
-    return subprocess.run(
-        ["bash", str(directory / "run_transparent_singularity.sh"), "--container", image, "--refresh"],
-        env=env or clean_env(), capture_output=True, text=True,
-    )
 
 
 def test_refresh_relocates_offline_and_preserves_wrapper_arguments(tmp_path):
@@ -114,24 +92,6 @@ def test_fetch_refresh_uses_current_helpers_after_whole_install_moves(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     assert "neurodesk-artifact-v2" in (moved / "containers/modules/demo/1.0.lua").read_text()
     assert (directory / "manual_module_files/tcl/matlab").is_file()
-
-
-def module_init(engine):
-    if engine.startswith("lmod"):
-        init = Path(os.environ.get("LMOD_INIT", "/usr/share/lmod/lmod/init/bash"))
-        if not init.is_file():
-            pytest.skip("Lmod is not installed")
-        return f"source {shlex.quote(str(init))}"
-    cmd = os.environ.get("MODULES_CMD") or shutil.which("modulecmd")
-    if not cmd:
-        for path in ("/usr/lib/x86_64-linux-gnu/modulecmd.tcl", "/usr/share/modules/libexec/modulecmd.tcl"):
-            if Path(path).is_file():
-                cmd = path
-                break
-    if not cmd:
-        pytest.skip("Environment Modules is not installed; set MODULES_CMD")
-    launcher = f"tclsh {shlex.quote(cmd)}" if cmd.endswith(".tcl") else shlex.quote(cmd)
-    return f'eval "$({launcher} bash autoinit)"'
 
 
 @pytest.mark.parametrize("engine", ["modules", "lmod-tcl", "lmod-lua"])

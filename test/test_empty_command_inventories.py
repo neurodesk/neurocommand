@@ -4,10 +4,9 @@ import sys
 
 import pytest
 
-from test.test_cvmfs_reconcile_module_files import SCRIPT
-from test.test_module_refresh import installed, refresh
 from artifact_renderer import legacy_module_content, managed_module_content, read_container_inventory, render_module
-
+from test.support.artifacts import installed, refresh
+from test.support.paths import MODULE_RECONCILIATION_SCRIPT as SCRIPT
 
 @pytest.mark.parametrize('format, suffix', [('lua', '.lua'), ('tcl', '')])
 @pytest.mark.parametrize('commands', ['', '/opt/bin/demo\nbad/name\nbad command\n'])

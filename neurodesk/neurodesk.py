@@ -20,12 +20,6 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # Global settings
 CONFIG_FILE = 'config.ini'
-# DEFAULT_PATHS = {}
-# DEFAULT_PATHS['lxde'] = {
-#     'appmenu': '/etc/xdg/menus/lxde-applications.menu',
-#     'appdir': '/usr/share/applications/',
-#     'deskdir': '/usr/share/desktop-directories/'
-# }
 
 
 def get_args():
@@ -36,9 +30,6 @@ def get_args():
     parser.add_argument('--appdir', action="store")
     parser.add_argument('--deskdir', action="store")
     parser.add_argument('--edit', action="store")
-    # parser.add_argument('--edit', action="store_true", default=False)
-    # parser.add_argument('--lxde', action="store_true", default=False)
-    # parser.add_argument('--cli', action="store_true", default=False)
 
     args = parser.parse_args()
     return args

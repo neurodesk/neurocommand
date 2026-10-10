@@ -1,12 +1,11 @@
+from pathlib import Path
 import os
 import re
 import subprocess
-from pathlib import Path
 
 import pytest
 
-from test.test_run_transparent_singularity import write_executable
-
+from test.support.shell import write_executable
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "docker/before-notebook.d/01-cvmfs-mount.sh"

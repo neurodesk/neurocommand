@@ -4,13 +4,13 @@ import subprocess
 
 import pytest
 
-from test.test_module_refresh import installed, refresh, clean_env, reconcile_module_files
-from test.test_cvmfs_reconcile_wrapper_xauthority import reconcile, fixed_wrapper, make_container
-from test.test_launcher_shells import launcher_tree
-from test.test_bundles import run_engine
-from test.test_container_policy import fake_runtime
 from artifact_renderer import legacy_module_content, read_container_inventory, render_module
-
+from cvmfs import reconcile_module_files, reconcile_wrapper_xauthority as reconcile
+from test.support.artifacts import installed, refresh
+from test.support.bundles import run_engine
+from test.support.launchers import launcher_tree
+from test.support.shell import clean_env, fake_runtime
+from test.support.wrappers import fixed_wrapper, make_container
 
 @pytest.mark.parametrize('dangling', [False, True])
 def test_canonical_tcl_symlink_survives_synthesis(tmp_path, dangling):

@@ -66,6 +66,8 @@ esac
 trap - 1 2 3
 EOF
 
+# This source is deployed beside the script or installed by the module engine.
+# shellcheck disable=SC1091
 source /usr/share/module.sh
 
 module use /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/*

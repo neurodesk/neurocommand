@@ -1,12 +1,11 @@
+from pathlib import Path
 import os
 import shutil
 import subprocess
-from pathlib import Path
 
 import pytest
 
-from test.test_run_transparent_singularity import write_executable
-
+from test.support.shell import write_executable
 
 ROOT = Path(__file__).resolve().parents[1]
 IMAGE = "demo_1.0_20260629"

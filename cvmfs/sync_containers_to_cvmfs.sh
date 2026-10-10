@@ -313,18 +313,18 @@ export RCLONE_VERBOSE=2
 
 NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 
-cd "$NEUROCOMMAND_LOCAL_REPO"
+cd "$NEUROCOMMAND_LOCAL_REPO" || exit
 
 # Pull latest changes, regenerate published metadata from apps.json, then sync CVMFS.
 if ! git_pull_rebase_non_interactive "$NEUROCOMMAND_LOCAL_REPO"; then
     echo "[WARNING] Continuing with local checkout because pull --rebase failed."
 fi
 regenerate_metadata_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
-cd cvmfs
+cd cvmfs || exit
 
 # check if there is enough free space - otherwise don't do anything:
-FREE=`df -k --output=avail / | tail -n1`
-if [[ $FREE -lt 100000000 ]]; then               # 100GB = 
+FREE=$(df -k --output=avail / | tail -n1)
+if [[ $FREE -lt 100000000 ]]; then               # 100GB =
     echo "There is not enough free disk space!"
     exit 1
 fi;
@@ -342,7 +342,7 @@ declare -A KEEP_IMAGES
 while IFS= read -r LINE
 do
     # echo "LINE: $LINE"
-    IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< ${LINE})"
+    IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< "${LINE}")"
     # echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
 
     KEEP_IMAGES["$IMAGENAME_BUILDDATE"]=1

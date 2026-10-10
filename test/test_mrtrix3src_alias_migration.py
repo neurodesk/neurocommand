@@ -1,8 +1,8 @@
 from dataclasses import replace
+from pathlib import Path
 import hashlib
 import json
 import os
-from pathlib import Path
 import shlex
 import shutil
 import subprocess
@@ -10,10 +10,11 @@ import sys
 
 import pytest
 
-from test.test_cvmfs_reconcile_module_files import SCRIPT
-from test.test_module_refresh import clean_env, installed, module_init, refresh
-from test.test_run_transparent_singularity import write_executable
 from artifact_renderer import ModuleId, identity_variable, managed_module_content, read_container_inventory
+from test.support.artifacts import installed, refresh
+from test.support.module_engines import module_init
+from test.support.paths import MODULE_RECONCILIATION_SCRIPT as SCRIPT
+from test.support.shell import clean_env, write_executable
 
 FIXTURES = Path(__file__).parent / 'fixtures/mrtrix3src-alias'
 FORMATS = [('lua', 'latest.lua'), ('tcl', 'latest')]

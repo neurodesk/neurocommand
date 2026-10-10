@@ -1,0 +1,12 @@
+[tool.ruff]
+required-version = ">=0.14.14"
+target-version = "py312"
+
+[tool.ruff.lint]
+# Syntax errors, invalid comparisons/control flow, and undefined names.
+select = ["E9", "F63", "F7", "F82"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+addopts = "-rs"
+pythonpath = [".", "neurodesk/transparent-singularity", ".github/workflows/scripts"]

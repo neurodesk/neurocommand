@@ -1,12 +1,11 @@
-from pathlib import Path
 import shlex
 import subprocess
 import sys
 
 import pytest
 
-from test.test_cvmfs_reconcile_module_files import ROOT, SCRIPT, reconcile_module_files
-
+from cvmfs import reconcile_module_files
+from test.support.paths import ROOT, MODULE_RECONCILIATION_SCRIPT as SCRIPT
 
 OLD = 'freesurfer_8.2.0_20260818'
 OTHER = 'unused_1.0_20260101'

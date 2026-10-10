@@ -92,7 +92,7 @@ _base="$(dirname "$_script")"
 # echo "making sure this is not running in a symlinked directory (singularity bug)"
 # echo "path: $_base"
 cd "$_base" || fail "Could not enter installation directory."
-_base=`pwd -P`
+_base=$(pwd -P)
 # echo "corrected path: $_base"
 
 POSITIONAL=()
@@ -126,7 +126,7 @@ while [[ $# -gt 0 ]]
       shift
       ;;
       --default)
-      DEFAULT=YES
+      true
       shift # past argument
       ;;
       *)    # unknown option
@@ -204,6 +204,8 @@ if [[ ${refresh:-false} == true ]]; then
    exit 0
 fi
 
+# This source is deployed beside the script or installed by the module engine.
+# shellcheck disable=SC1091
 source "$_base/container_runtime.sh" || exit 2
 neurodesk_runtime version >/dev/null || fail "Container runtime unavailable."
 container_runtime=neurodesk_runtime
@@ -263,7 +265,7 @@ if [ -z "$storage" ]; then
             | awk 'tolower($1)=="docker-content-digest:" {print $2}' | tr -d '\r')
          if [ -n "$ts_docker_digest" ]; then
             # GHCR exposes referrers via the OCI fallback tag: sha256-<digest>
-            ts_referrers_tag=$(echo "$ts_docker_digest" | sed 's/:/-/')
+            ts_referrers_tag=${ts_docker_digest/:/-}
             ts_sif_digest=$(curl -sL -H "Authorization: Bearer $ts_token" \
                -H "Accept: application/vnd.oci.image.index.v1+json" \
                "https://ghcr.io/v2/${ts_ghcr_repo}/manifests/${ts_referrers_tag}" 2>/dev/null \
@@ -281,7 +283,7 @@ fi
 
 if [ -z "$storage" ]; then
    echo "$container does not exist in cvmfs or v2 oras. Testing Nectar temporary Object storage next: "
-   if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/$container"; then      
+   if curl --output /dev/null --silent --head --fail "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/$container"; then
       echo "$container exists in the temporary builds nectar cache"
       url_nectar="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/"
    fi
@@ -293,7 +295,7 @@ if [ -z "$storage" ]; then
    fi
 
    echo "Testing temporary AWS S3 Object storage next: "
-   if curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/$container"; then      
+   if curl --output /dev/null --silent --head --fail "https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/$container"; then
       echo "$container exists in the temporary builds cache"
       url_awss3="https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/"
    fi
@@ -306,10 +308,10 @@ if [ -z "$storage" ]; then
 
    if [[ -n "${url_awss3+x}" ]] || [[ -n "${url_nectar+x}" ]]; then
       # echo "check if aria2 is installed ..."
-      qq=`which  aria2c`
+      qq=$(which  aria2c)
       if [[  ${#qq} -lt 1 ]]; then
           echo "aria2 is not installed. Defaulting to curl."
-         
+
           urls=()
           if [[ -n "${url_awss3+x}" ]]; then
              urls+=("$url_awss3")
@@ -317,22 +319,22 @@ if [ -z "$storage" ]; then
           if [[ -n "${url_nectar+x}" ]]; then
              urls+=("$url_nectar")
           fi
-          declare -a speeds   
-              
+          declare -a speeds
+
           echo "testing which server is fastest."
-          for url in "${urls[@]}";          
-          do  
-             echo testing $url
-             if avg_speed=$(curl -s -w %{time_total}\\n -o /dev/null "$url")
-                then          
+          for url in "${urls[@]}";
+          do
+             echo testing "$url"
+             if avg_speed=$(curl -s -w '%{time_total}\n' -o /dev/null "$url")
+                then
                    echo ResponseTime: "$avg_speed"
-                   speeds+=($avg_speed)     
-             fi  # of speed test            
+                   speeds+=("$avg_speed")
+             fi  # of speed test
           done # end of URL for loop
-              
-          count=0             
-          for speed in "${speeds[@]}";      
-          do 
+
+          count=0
+          for speed in "${speeds[@]}";
+          do
              #echo comparing $speed with $avg_speed
              #echo currently fastest server is: $url
              #echo count: $count
@@ -342,12 +344,12 @@ if [ -z "$storage" ]; then
                 url=${urls[$count]}
                 #echo setting URL to $url
              fi
-             count=$((count+1))                                                                                                                                  
+             count=$((count+1))
           done  # ed of Speed for loop
-          echo using server $url
-              
+          echo using server "$url"
+
           container_pull="curl -X GET ${url}${container} -O"
-       else 
+       else
           aria_args=""
           if [[ -n "${url_awss3+x}" ]]; then
              aria_args="${aria_args} ${url_awss3}${container}"
@@ -406,6 +408,8 @@ fi
 # Unpacking is architecture-neutral, so it can succeed even when the host is
 # unable to execute the image. Fail here with an actionable QEMU/binfmt error
 # before attempting metadata and executable discovery.
+# Legacy container options are a whitespace-separated argument list.
+# shellcheck disable=SC2086
 if ! neurodesk_runtime exec $singularity_opts "$container" /bin/true; then
    fail "Container '${container}' unpacked but could not execute. Verify that QEMU and an enabled binfmt_misc handler with the F flag are installed for foreign-architecture images."
 fi
@@ -413,14 +417,18 @@ fi
 rm -f README.md commands.txt commands_raw.txt env.txt
 
 echo "checking if there is a README.md file in the container"
-echo "executing: neurodesk_runtime exec $singularity_opts --pwd "$_base" "$container" cat /README.md"
+echo "executing: neurodesk_runtime exec $singularity_opts --pwd $_base $container cat /README.md"
+# Legacy container options are a whitespace-separated argument list.
+# shellcheck disable=SC2086
 if ! neurodesk_runtime exec $singularity_opts --pwd "$_base" "$container" cat /README.md > README.md; then
    echo "[WARN] run_transparent_singularity.sh: Could not read /README.md from container '${container}'. Continuing with empty module help." >&2
    : > README.md
 fi
 
 echo "checking which executables exist inside container"
-echo "executing: neurodesk_runtime exec $singularity_opts --pwd "$_base" "$container" "$_base/ts_binaryFinder.sh""
+echo "executing: neurodesk_runtime exec $singularity_opts --pwd $_base $container $_base/ts_binaryFinder.sh"
+# Legacy container options are a whitespace-separated argument list.
+# shellcheck disable=SC2086
 if ! neurodesk_runtime exec $singularity_opts --pwd "$_base" "$container" "$_base/ts_binaryFinder.sh"; then
    fail "Could not inspect executables in container '${container}'. Not creating wrapper or module files."
 fi
