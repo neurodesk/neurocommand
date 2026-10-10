@@ -308,6 +308,14 @@
             ]
         },
         {
+            "application": "b0mapromeo_1.4.3_20261009",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "bart_0.7.00_20210302",
             "categories": [
                 "image reconstruction"
@@ -1110,6 +1118,12 @@
             ]
         },
         {
+            "application": "datalad_1.7.1_20261007",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -1141,6 +1155,12 @@
         },
         {
             "application": "datalad_arm64_1.7.0_20261006",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.7.1_20261007",
             "categories": [
                 "data organisation"
             ]
@@ -2434,7 +2454,7 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261004",
+            "application": "mneextended_1.2.0_20261008",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -3298,7 +3318,19 @@
             ]
         },
         {
+            "application": "radtract_0.2.4_20261007",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "rapidtide_3.1.11_20260714",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "rapidtide_3.2.0_20261008",
             "categories": [
                 "functional imaging"
             ]
@@ -3329,6 +3361,12 @@
         },
         {
             "application": "root_6.22.02_20201104",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
+            "application": "root_6.24.06_20261009",
             "categories": [
                 "programming"
             ]
@@ -3365,6 +3403,12 @@
             ]
         },
         {
+            "application": "rstudio_2026.09.0_20261009",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
             "application": "samri_0.5_20260608",
             "categories": [
                 "functional imaging",
@@ -3386,7 +3430,7 @@
             ]
         },
         {
-            "application": "shim-toolbox_1.5.0_20261008",
+            "application": "shim-toolbox_1.5.0_20261009",
             "categories": [
                 "image reconstruction",
                 "phase processing",
