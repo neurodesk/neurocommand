@@ -17,6 +17,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  quality:
+    uses: ./.github/workflows/quality.yml
+
   unit_tests:
     name: unit tests
     runs-on: ubuntu-24.04
@@ -28,7 +31,7 @@ jobs:
       - name: Install test dependencies
         run: python -m pip install -r test/requirements.txt
       - name: Run unit tests
-        run: python -m pytest -q
+        run: python maintenance/check.py tests
 
   module_engines:
     name: module integration (${{ matrix.package }})
@@ -47,8 +50,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.package }}
           python -m pip install -r test/requirements.txt
-      - name: Exercise generated modulefiles
-        run: python -m pytest -q test/test_module_refresh.py test/test_mrtrix3src_alias_migration.py
+      - name: Run complete suite with installed engine
+        env:
+          MODULE_ENGINE_PACKAGE: ${{ matrix.package }}
+        run: |
+          if [ "$MODULE_ENGINE_PACKAGE" = "lmod" ]; then
+            source /usr/share/lmod/lmod/init/bash
+            export NEUROCOMMAND_TEST_ENGINE=lmod
+          else
+            export NEUROCOMMAND_TEST_ENGINE=modules
+          fi
+          python maintenance/check.py tests
 
   slim_image:
     name: build slim image
@@ -77,11 +89,11 @@ jobs:
         run: docker pull ghcr.io/neurodesk/neurocommand:latest
       - name: Run neurocommand fetch test inside image
         run: |
-          CVMFS_ENV=""
+          CVMFS_ENV=()
           if [ "${{ matrix.cvmfs }}" = "disabled" ]; then
-            CVMFS_ENV="-e NEURODESK_CVMFS_DISABLE=1"
+            CVMFS_ENV=(-e NEURODESK_CVMFS_DISABLE=1)
           fi
-          docker run --rm --privileged --user=root $CVMFS_ENV \
+          docker run --rm --privileged --user=root "${CVMFS_ENV[@]}" \
             -e NB_UID="$(id -u)" -e NB_GID="$(id -g)" \
             -v "${{ github.workspace }}:/work" -w /work \
             -v "${{ github.workspace }}/docker/before-notebook.d/01-cvmfs-mount.sh:/usr/local/bin/before-notebook.d/01-cvmfs-mount.sh:ro" \
@@ -111,3 +123,25 @@ jobs:
               "${container_root}/niimath_1.0.0_20250617/niimath" --version
               echo "[test] OK"
             '
+
+  required:
+    name: quality required
+    if: ${{ always() }}
+    needs: [quality, unit_tests, module_engines, slim_image, test_neurocommand]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require successful checks
+        env:
+          CHECK_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          results = json.loads(os.environ["CHECK_RESULTS"])
+          failures = {name: job["result"] for name, job in results.items() if job["result"] != "success"}
+          if failures:
+              print(f"Required quality jobs did not succeed: {failures}")
+              sys.exit(1)
+          PY

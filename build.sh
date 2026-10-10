@@ -3,12 +3,12 @@
 
 set -e
 
-_script="$(readlink -f ${BASH_SOURCE[0]})" ## who am i? ##
-_base="$(dirname $_script)" ## Delete last component from $_script ##
+_script="$(readlink -f "${BASH_SOURCE[0]}")" ## who am i? ##
+_base="$(dirname "$_script")" ## Delete last component from $_script ##
 
-source ${_base}/neurodesk/configparser.sh ${_base}/config.ini
+source "${_base}"/neurodesk/configparser.sh "${_base}"/config.ini
 
-args=""
+args=()
 
 # Arguments
 POSITIONAL=()
@@ -42,7 +42,7 @@ while [[ $# -gt 0 ]]
       shift # past argument
       ;;
       --default)
-      DEFAULT=YES
+      true
       shift # past argument
       ;;
       *)    # unknown option
@@ -65,27 +65,27 @@ if [ "$lxde" = true ]; then
         neurodesk_appmenu="$lxde_fallback_appmenu"
     fi
     neurodesk_edit=n
-    echo "deskenv> lxde preset" 
+    echo "deskenv> lxde preset"
     echo
 fi
 
 if [ "$edit" = true ]; then
     neurodesk_edit=y
-    echo "edit> Yes" 
+    echo "edit> Yes"
     echo
 fi
 
 if [ "$cli" = true ]; then
     neurodesk_deskenv=cli
     neurodesk_installdir="$(pwd -P)/local"
-    echo "deskenv> cli preset" 
+    echo "deskenv> cli preset"
     echo
 fi
 
 if [ "$init" = true ]; then
     # Installation Directory [./local]
     echo "Enter Installation Directory. Blank for default [./local]"
-    read -e -p "installdir> " neurodesk_installdir
+    read -r -e -p "installdir> " neurodesk_installdir
     neurodesk_installdir="${neurodesk_installdir/#\~/$HOME}"
     if [ -z "$neurodesk_installdir" ]; then
         neurodesk_installdir="$(pwd -P)"
@@ -93,19 +93,19 @@ if [ "$init" = true ]; then
     if [ ! -d "$neurodesk_installdir" ]; then
         echo "Installation directory does not exist"
         echo "Creating $neurodesk_installdir"
-        mkdir -p $neurodesk_installdir
+        mkdir -p "$neurodesk_installdir"
     fi
-    neurodesk_installdir=$(readlink -f ${neurodesk_installdir})
-    if [ "$neurodesk_installdir" == $(pwd -P) ]; then
+    neurodesk_installdir=$(readlink -f "${neurodesk_installdir}")
+    if [ "$neurodesk_installdir" == "$(pwd -P)" ]; then
         neurodesk_installdir="$(pwd -P)/local"
-        mkdir -p $neurodesk_installdir
+        mkdir -p "$neurodesk_installdir"
     fi
     echo "Installation directory at $neurodesk_installdir"
-    echo 
+    echo
 
     # Desktop Environment [cli/lxde/mate]
     echo "Enter Desktop Environment [cli/lxde/mate]"
-    read -p "deskenv> " neurodesk_deskenv
+    read -r -p "deskenv> " neurodesk_deskenv
     neurodesk_deskenv=$(echo "$neurodesk_deskenv" | tr '[:upper:]' '[:lower:]')
     case "$neurodesk_deskenv" in
       cli|lxde|mate)
@@ -118,27 +118,27 @@ if [ "$init" = true ]; then
     esac
     echo
 
-    if [ $neurodesk_deskenv != "cli" ]; then
+    if [ "$neurodesk_deskenv" != "cli" ]; then
         # Applications Menu
-        read -e -p "appmenu: " neurodesk_appmenu
-        neurodesk_appmenu=$(resolve_abs_path $neurodesk_appmenu)
+        read -r -e -p "appmenu: " neurodesk_appmenu
+        neurodesk_appmenu=$(resolve_abs_path "$neurodesk_appmenu")
         echo "Applications Menu at $neurodesk_appmenu"
-        echo 
+        echo
 
         # Applications Directory
-        read -e -p "appdir: " neurodesk_appdir
-        neurodesk_appdir=$(resolve_abs_path $neurodesk_appdir)
+        read -r -e -p "appdir: " neurodesk_appdir
+        neurodesk_appdir=$(resolve_abs_path "$neurodesk_appdir")
         echo "Installation directory at $neurodesk_installdir"
-        echo 
+        echo
 
         # Desktop Directories
-        read -e -p "deskdir: " neurodesk_deskdir
-        neurodesk_deskdir=$(resolve_abs_path $neurodesk_deskdir)
+        read -r -e -p "deskdir: " neurodesk_deskdir
+        neurodesk_deskdir=$(resolve_abs_path "$neurodesk_deskdir")
         echo "Installation directory at $neurodesk_installdir"
-        echo 
+        echo
 
         # neurodesk_edit mode [y/n]
-        read -p "edit : " neurodesk_edit
+        read -r -p "edit : " neurodesk_edit
         case "$neurodesk_edit" in
         y/n)
             echo "edit set to $neurodesk_edit"
@@ -152,16 +152,16 @@ if [ "$init" = true ]; then
     fi
 fi
 
-args="${args} --installdir=$neurodesk_installdir"
-args="${args} --deskenv=$neurodesk_deskenv"
-mkdir -p $neurodesk_installdir
+args+=("--installdir=$neurodesk_installdir")
+args+=("--deskenv=$neurodesk_deskenv")
+mkdir -p "$neurodesk_installdir"
 
 function build_apps () {
-    _script="$(readlink -f ${BASH_SOURCE[0]})" ## who am i? ##
-    _base="$(dirname $_script)" ## Delete last component from $_script ##
-    source ${_base}/neurodesk/configparser.sh ${_base}/config.ini
+    _script="$(readlink -f "${BASH_SOURCE[0]}")" ## who am i? ##
+    _base="$(dirname "$_script")" ## Delete last component from $_script ##
+    source "${_base}"/neurodesk/configparser.sh "${_base}"/config.ini
 
-    if [ $neurodesk_deskenv != "cli" ]; then
+    if [ "$neurodesk_deskenv" != "cli" ]; then
         # Test Applications Menu
         echo "Checking appmenu> $neurodesk_appmenu"
         validfile=false
@@ -169,15 +169,15 @@ function build_apps () {
             echo "Applications Menu not found"
             exit 1
         fi
-        mkdir -p $neurodesk_installdir/desktop-directories
-        mkdir -p $neurodesk_installdir/icons
-        cp $neurodesk_appmenu $neurodesk_installdir/local-applications.menu.template
-        cp neurodesk/icons/*.png $neurodesk_installdir/icons
+        mkdir -p "$neurodesk_installdir"/desktop-directories
+        mkdir -p "$neurodesk_installdir"/icons
+        cp "$neurodesk_appmenu" "$neurodesk_installdir"/local-applications.menu.template
+        cp neurodesk/icons/*.png "$neurodesk_installdir"/icons
 
         # Test Applications Directory
         echo "Checking appdir> $neurodesk_appdir"
         validfile=false
-        for i in $neurodesk_appdir/*.desktop; do
+        for i in "$neurodesk_appdir"/*.desktop; do
             if [[ -e $i ]]; then
                 echo " - contains *.desktop file(s)"
                 validfile=true
@@ -194,7 +194,7 @@ function build_apps () {
         # Test Desktop Directory
         echo "Checking deskdir> $neurodesk_deskdir"
         validfile=false
-        for i in $neurodesk_deskdir/*.directory; do
+        for i in "$neurodesk_deskdir"/*.directory; do
             if [[ -e $i ]]; then
                 echo " - contains *.directory file(s)"
                 validfile=true
@@ -208,17 +208,17 @@ function build_apps () {
         fi
         echo
 
-        args="${args} --appmenu=$neurodesk_appmenu"
-        args="${args} --appdir=$neurodesk_appdir"
-        args="${args} --deskdir=$neurodesk_deskdir"
-        args="${args} --edit=$neurodesk_edit"
+        args+=("--appmenu=$neurodesk_appmenu")
+        args+=("--appdir=$neurodesk_appdir")
+        args+=("--deskdir=$neurodesk_deskdir")
+        args+=("--edit=$neurodesk_edit")
     fi
 
     # Symlink neurocommand directory into installdir
     # Used for neurocommand updater
-    ln -vfns ${_base} $neurodesk_installdir/neurocommand
+    ln -vfns "${_base}" "$neurodesk_installdir"/neurocommand
 
-    python3 -m neurodesk $args
+    python3 -m neurodesk "${args[@]}"
     err=$?
     if [ $err -eq 0 ] ; then
         echo "-----------------------------------------"
@@ -259,14 +259,14 @@ echo
 
 case "$runsudo" in
     [nN][oO]|[nN])
-        echo $neurodesk_installdir
+        echo "$neurodesk_installdir"
         if [ "$update" = true ]; then
             update_neurocommand_repo
         fi
         build_apps
         ;;
-    *)  
-        echo $neurodesk_installdir
+    *)
+        echo "$neurodesk_installdir"
         if [ "$update" = true ]; then
             update_neurocommand_repo sudo
         fi

@@ -24,7 +24,8 @@ neurodesk_container() (
     local operation=$1 image=$2 gpu=${NEURODESK_GPU:-auto} customtmp option
     shift 2
     [[ -e $image ]] || { echo "[ERROR] Missing container image: $image" >&2; return 2; }
-    export PWD="$(pwd -P)"
+    PWD="$(pwd -P)"
+    export PWD
     local options=() legacy=() gpu_options=()
     read -r -a legacy <<< "${neurodesk_singularity_opts:-}"
     case $gpu in

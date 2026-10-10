@@ -1,19 +1,13 @@
+from pathlib import Path
 import os
 import shutil
 import subprocess
-import textwrap
-from pathlib import Path
 
-from test.test_cvmfs_reconcile_wrapper_xauthority import assert_gpu_environment, reconcile
-
+from test.support.shell import write_executable
+from test.support.wrappers import assert_gpu_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 TRANSPARENT_SINGULARITY = ROOT / "neurodesk" / "transparent-singularity"
-
-
-def write_executable(path, text):
-    path.write_text(textwrap.dedent(text).lstrip())
-    path.chmod(0o755)
 
 
 def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
@@ -202,14 +196,16 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
 
 
 def test_cached_cvmfs_image_handles_spaces_without_download(tmp_path):
-    workdir = tmp_path / 'demo_1.0_20260629'
+    workdir = tmp_path / "demo_1.0_20260629"
     shutil.copytree(TRANSPARENT_SINGULARITY, workdir)
     cache = tmp_path / "cache root with 'quote'"
-    cached_image = cache / 'containers/demo_1.0_20260629/demo_1.0_20260629.simg'
+    cached_image = cache / "containers/demo_1.0_20260629/demo_1.0_20260629.simg"
     cached_image.parent.mkdir(parents=True)
     cached_image.touch()
-    runtime = tmp_path / 'runtime'
-    write_executable(runtime, '''#!/bin/bash
+    runtime = tmp_path / "runtime"
+    write_executable(
+        runtime,
+        """#!/bin/bash
 if [[ $1 == --silent ]]; then shift; fi
 case $1 in
   version) echo 1.5.4;;
@@ -220,9 +216,26 @@ case $1 in
       : > env.txt
     fi;;
 esac
-''')
-    result = subprocess.run(['bash', str(workdir / 'run_transparent_singularity.sh'), '--container', cached_image.name], cwd=workdir, env={**os.environ, 'NEURODESK_CVMFS_ROOT': str(cache), 'CVMFS_DISABLE': 'false', 'NEURODESK_CONTAINER_RUNTIME': str(runtime)}, capture_output=True, text=True)
+""",
+    )
+    result = subprocess.run(
+        [
+            "bash",
+            str(workdir / "run_transparent_singularity.sh"),
+            "--container",
+            cached_image.name,
+        ],
+        cwd=workdir,
+        env={
+            **os.environ,
+            "NEURODESK_CVMFS_ROOT": str(cache),
+            "CVMFS_DISABLE": "false",
+            "NEURODESK_CONTAINER_RUNTIME": str(runtime),
+        },
+        capture_output=True,
+        text=True,
+    )
     assert result.returncode == 0, result.stdout + result.stderr
     assert (workdir / cached_image.name).is_symlink()
     assert (workdir / cached_image.name).resolve() == cached_image
-    assert 'unexpected-download' not in result.stderr
+    assert "unexpected-download" not in result.stderr

@@ -1,17 +1,14 @@
-import base64
-import importlib.util
-import json
 from pathlib import Path
-import sys
+import base64
+import json
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "sync_neurocontainer_icons.py"
 
-spec = importlib.util.spec_from_file_location("sync_neurocontainer_icons", SCRIPT)
-sync_neurocontainer_icons = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = sync_neurocontainer_icons
-spec.loader.exec_module(sync_neurocontainer_icons)
+
+sync_neurocontainer_icons = load_script("sync_neurocontainer_icons", SCRIPT)
 
 
 PNG_BYTES = base64.b64decode(
@@ -218,7 +215,9 @@ def test_sync_ignores_missing_unsupported_and_unmanaged_icons(tmp_path):
     apps_json_path = tmp_path / "apps.json"
 
     write_recipe(neurocontainers_path, "missing-icon")
-    write_recipe(neurocontainers_path, "unsupported-icon", "data:image/jpeg;base64,ZmFrZQ==")
+    write_recipe(
+        neurocontainers_path, "unsupported-icon", "data:image/jpeg;base64,ZmFrZQ=="
+    )
     write_recipe(neurocontainers_path, "unmanaged", PNG_DATA_URI)
     write_apps_json(apps_json_path, "missing-icon", "unsupported-icon")
 

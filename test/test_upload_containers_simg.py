@@ -11,7 +11,9 @@ WORKFLOW = ROOT / ".github" / "workflows" / "update-neurocontainers.yml"
 TEST_WORKFLOW = ROOT / ".github" / "workflows" / "test-neurocommand.yml"
 APPSJSON_QUEUE_WORKFLOW = ROOT / ".github" / "workflows" / "appsjson-queue.yml"
 SYNC_ICONS_WORKFLOW = ROOT / ".github" / "workflows" / "sync-icons.yml"
-SYNC_MENU_CATEGORIES_WORKFLOW = ROOT / ".github" / "workflows" / "sync-menu-categories.yml"
+SYNC_MENU_CATEGORIES_WORKFLOW = (
+    ROOT / ".github" / "workflows" / "sync-menu-categories.yml"
+)
 RUNTIME_REQUIREMENTS = ROOT / "neurodesk" / "requirements.txt"
 TOOLCHAIN_REQUIREMENTS = ROOT / "test" / "requirements.txt"
 
@@ -55,7 +57,7 @@ def test_workflows_install_the_pinned_toolchain_on_python_3_12():
         SYNC_MENU_CATEGORIES_WORKFLOW,
     ):
         text = workflow.read_text()
-        assert "python-version: \"3.12\"" in text, workflow
+        assert 'python-version: "3.12"' in text, workflow
         assert "python -m pip install -r test/requirements.txt" in text, workflow
 
 
@@ -83,9 +85,15 @@ def test_appsjson_queue_does_not_run_on_pr_close_events():
 
 def test_neurocommand_image_test_asserts_configured_container_root():
     workflow = TEST_WORKFLOW.read_text()
-    assert 'container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"' in workflow
+    assert (
+        'container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"'
+        in workflow
+    )
     assert "bash local/fetch_containers.sh niimath 1.0.0 20250617 niimath" in workflow
-    assert 'image="${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"' in workflow
+    assert (
+        'image="${container_root}/niimath_1.0.0_20250617/niimath_1.0.0_20250617.simg"'
+        in workflow
+    )
     assert 'test -f "$image"' in workflow
     assert 'test -f "${container_root}/niimath_1.0.0_20250617/niimath"' in workflow
 

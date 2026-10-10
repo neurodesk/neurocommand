@@ -8,13 +8,14 @@ Rules implemented:
 - Compute each source's changed tools using merge-base(main, source_head).
 - Apply those tool changes to a consolidated apps.json snapshot.
 - Later sources overwrite earlier sources for the same tool.
+- Rebuild outdated consolidated branches from current main while preserving
+  queued tool changes, so they include the current checks and test entrypoint.
 - With ``--merge-consolidated`` (scheduled/manual runs), squash-merge the
   consolidated PR directly via the REST API. Auto-merge cannot be used here:
-  the repository disallows it, and with no required status checks GitHub
-  rejects enabling auto-merge on an already-mergeable PR anyway.
+  the repository disallows auto-merge.
 - Before merging, run the unit tests against the consolidated branch and skip
-  the merge when they fail. The consolidated branch is pushed with
-  GITHUB_TOKEN, so the regular test workflow never runs on it.
+  the merge when they fail. The bot PAT also triggers regular PR checks,
+  which GitHub requires before allowing the REST merge.
 - Close source PRs (apps.json plus synced icons only) once their changes are
   in main — either merged in this run or already contained in the base.
 """
@@ -33,7 +34,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -44,7 +45,7 @@ from sync_neurocontainer_icons import sync_icons  # noqa: E402
 
 DIFF_COMMENT_MARKER = "<!-- appsjson-consolidation-diff -->"
 UNIT_TEST_COMMENT_MARKER = "<!-- appsjson-consolidation-unit-tests -->"
-UNIT_TEST_COMMAND = [sys.executable, "-m", "pytest", "-q"]
+UNIT_TEST_COMMAND = [sys.executable, "maintenance/check.py", "tests"]
 MAX_UNIT_TEST_OUTPUT_LINES = 80
 MAX_PR_BODY_DIFF_CHARS = 15_000
 MAX_PR_COMMENT_DIFF_CHARS = 55_000
@@ -66,8 +67,7 @@ class PullRequest:
         by the consolidation and safe to close.
         """
         return all(
-            path == target_file or path.startswith(icons_prefix)
-            for path in self.files
+            path == target_file or path.startswith(icons_prefix) for path in self.files
         )
 
 
@@ -82,10 +82,91 @@ class QueueSource:
     pr: Optional[PullRequest] = None
 
 
+@dataclass(frozen=True)
+class SourceSnapshot:
+    source: QueueSource
+    before: Dict[str, Any]
+    after: Dict[str, Any]
+
+
+@dataclass(frozen=True)
+class ConsolidationPlan:
+    sources: tuple[QueueSource, ...]
+    payload: Dict[str, Any]
+    winners: Dict[str, str]
+    source_prs: tuple[PullRequest, ...]
+    active: bool
+    should_have_pr: bool
+    needs_branch_push: bool
+
+    def sources_landed(self, merge_status: Optional[str]) -> bool:
+        return (self.active and not self.should_have_pr) or merge_status == "merged"
+
+
+def build_consolidation_plan(
+    base_payload: Dict[str, Any],
+    existing_payload: Dict[str, Any],
+    snapshots: Iterable[SourceSnapshot],
+    has_existing_pr: bool,
+    existing_has_non_target_files: bool,
+    target_file: str,
+    icons_prefix: str,
+    existing_branch_outdated: bool = False,
+) -> ConsolidationPlan:
+    """Apply merge-base tool changes in queue order without doing any I/O."""
+    ordered = sorted(
+        snapshots,
+        key=lambda snapshot: (
+            parse_timestamp(snapshot.source.created_at),
+            snapshot.source.label,
+        ),
+    )
+    active = has_existing_pr or bool(ordered)
+    payload = copy.deepcopy(existing_payload if active else base_payload)
+    winners: Dict[str, str] = {}
+    changed_by_source: Dict[str, List[str]] = {}
+    for snapshot in ordered:
+        source = snapshot.source
+        changed = changed_tools(snapshot.before, snapshot.after)
+        changed_by_source[source.label] = changed
+        for tool in changed:
+            if tool in snapshot.after:
+                payload[tool] = copy.deepcopy(snapshot.after[tool])
+            else:
+                payload.pop(tool, None)
+            winners[tool] = source.label
+
+    source_prs = tuple(
+        snapshot.source.pr
+        for snapshot in ordered
+        if snapshot.source.pr is not None
+        and changed_by_source[snapshot.source.label]
+        and snapshot.source.pr.consolidatable(target_file, icons_prefix)
+    )
+    should_have_pr = active and payload != base_payload
+    needs_branch_push = should_have_pr and (
+        not has_existing_pr
+        or payload != existing_payload
+        or existing_has_non_target_files
+        or existing_branch_outdated
+    )
+    return ConsolidationPlan(
+        sources=tuple(snapshot.source for snapshot in ordered),
+        payload=payload,
+        winners=winners,
+        source_prs=source_prs,
+        active=active,
+        should_have_pr=should_have_pr,
+        needs_branch_push=needs_branch_push,
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", required=True, help="owner/repo")
-    parser.add_argument("--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com"))
+    parser.add_argument(
+        "--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com")
+    )
     parser.add_argument("--base-ref", default="main")
     parser.add_argument("--target-file", default="neurodesk/apps.json")
     parser.add_argument("--consolidated-branch", default="bot/appsjson-consolidated")
@@ -136,6 +217,15 @@ def run_git(args: List[str], check: bool = True) -> subprocess.CompletedProcess:
             f"stderr:\n{result.stderr}"
         )
     return result
+
+
+def branch_needs_refresh(base_ref: str, branch_ref: str) -> bool:
+    result = run_git(["merge-base", "--is-ancestor", base_ref, branch_ref], check=False)
+    if result.returncode not in (0, 1):
+        raise RuntimeError(
+            f"Cannot compare {base_ref} with {branch_ref}: {result.stderr.strip()}"
+        )
+    return result.returncode == 1
 
 
 def require_token() -> str:
@@ -200,7 +290,9 @@ def github_paginated_get(
     return items
 
 
-def list_open_pull_requests(api_url: str, repo: str, token: str) -> List[Dict[str, Any]]:
+def list_open_pull_requests(
+    api_url: str, repo: str, token: str
+) -> List[Dict[str, Any]]:
     prs = github_paginated_get(
         api_url,
         f"/repos/{repo}/pulls",
@@ -211,7 +303,9 @@ def list_open_pull_requests(api_url: str, repo: str, token: str) -> List[Dict[st
     return prs
 
 
-def list_pull_request_files(api_url: str, repo: str, pr_number: int, token: str) -> List[str]:
+def list_pull_request_files(
+    api_url: str, repo: str, pr_number: int, token: str
+) -> List[str]:
     files = github_paginated_get(
         api_url,
         f"/repos/{repo}/pulls/{pr_number}/files",
@@ -233,7 +327,12 @@ def find_open_head_pr(
         api_url,
         f"/repos/{repo}/pulls",
         token,
-        query={"state": "open", "head": f"{owner}:{head_branch}", "base": base_ref, "per_page": 1},
+        query={
+            "state": "open",
+            "head": f"{owner}:{head_branch}",
+            "base": base_ref,
+            "per_page": 1,
+        },
     )
     if prs:
         return prs[0]
@@ -263,6 +362,19 @@ def changed_tools(before: Dict[str, Any], after: Dict[str, Any]) -> List[str]:
     changed = [tool for tool in keys if before.get(tool) != after.get(tool)]
     changed.sort()
     return changed
+
+
+def rebase_tool_delta(
+    base: Dict[str, Any], before: Dict[str, Any], after: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Carry queued tool edits and deletions onto the current base catalog."""
+    payload = copy.deepcopy(base)
+    for tool in changed_tools(before, after):
+        if tool in after:
+            payload[tool] = copy.deepcopy(after[tool])
+        else:
+            payload.pop(tool, None)
+    return payload
 
 
 def sort_top_level_keys(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -326,9 +438,9 @@ def truncate_diff(diff_text: str, max_chars: int) -> tuple[str, bool]:
 def build_consolidation_pr_body(
     base_ref: str,
     target_file: str,
-    sources: List[QueueSource],
+    sources: Sequence[QueueSource],
     applied_tools: Dict[str, str],
-    closed_prs: List[PullRequest],
+    closed_prs: Sequence[PullRequest],
     should_have_consolidated_pr: bool,
     appsjson_diff: str,
 ) -> str:
@@ -365,14 +477,18 @@ def build_consolidation_pr_body(
     lines.append("")
     lines.append("## Consolidated PR State")
     if should_have_consolidated_pr:
-        lines.append("- A consolidated PR is required because queue output differs from `main`.")
+        lines.append(
+            "- A consolidated PR is required because queue output differs from `main`."
+        )
     else:
         lines.append("- No consolidated PR is required (queue output matches `main`).")
 
     lines.append("")
     lines.append("## Proposed `apps.json` Changes")
     if appsjson_diff:
-        diff_for_body, is_truncated = truncate_diff(appsjson_diff, MAX_PR_BODY_DIFF_CHARS)
+        diff_for_body, is_truncated = truncate_diff(
+            appsjson_diff, MAX_PR_BODY_DIFF_CHARS
+        )
         lines.append("```diff")
         lines.append(diff_for_body)
         lines.append("```")
@@ -394,7 +510,13 @@ def stage_and_push_branch(
     commit_message: str,
 ) -> bool:
     run_git(["config", "user.name", "github-actions[bot]"])
-    run_git(["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
+    run_git(
+        [
+            "config",
+            "user.email",
+            "41898282+github-actions[bot]@users.noreply.github.com",
+        ]
+    )
 
     run_git(["checkout", "-B", head_branch, f"refs/remotes/origin/{base_ref}"])
     run_git(["add", *files])
@@ -504,7 +626,9 @@ def post_consolidated_diff_comment(
     target_file: str,
     appsjson_diff: str,
 ) -> str:
-    diff_for_comment, is_truncated = truncate_diff(appsjson_diff, MAX_PR_COMMENT_DIFF_CHARS)
+    diff_for_comment, is_truncated = truncate_diff(
+        appsjson_diff, MAX_PR_COMMENT_DIFF_CHARS
+    )
     lines: List[str] = []
     lines.append(DIFF_COMMENT_MARKER)
     lines.append("### Proposed `apps.json` changes")
@@ -617,7 +741,7 @@ def close_consolidated_source_prs(
     api_url: str,
     repo: str,
     token: str,
-    source_prs: List[PullRequest],
+    source_prs: Sequence[PullRequest],
 ) -> None:
     if not source_prs:
         return
@@ -651,13 +775,15 @@ def merge_pull_request(
     last_error = "unknown error"
     for attempt in range(1, attempts + 1):
         try:
-            github_request(
+            result = github_request(
                 "PUT",
                 api_url,
                 f"/repos/{repo}/pulls/{pr_number}/merge",
                 token,
                 payload={"merge_method": merge_method},
             )
+            if not result.get("merged"):
+                return f"failed ({result.get('message', 'merge was declined')})"
             return "merged"
         except HTTPError as exc:
             detail = ""
@@ -683,7 +809,14 @@ def main() -> int:
     owner = args.repo.split("/", 1)[0]
     icons_prefix = f"{args.icons_dir.as_posix()}/"
 
-    run_git(["fetch", "--no-tags", "origin", f"+refs/heads/{args.base_ref}:refs/remotes/origin/{args.base_ref}"])
+    run_git(
+        [
+            "fetch",
+            "--no-tags",
+            "origin",
+            f"+refs/heads/{args.base_ref}:refs/remotes/origin/{args.base_ref}",
+        ]
+    )
 
     open_prs_raw = list_open_pull_requests(args.api_url, args.repo, token)
 
@@ -698,7 +831,9 @@ def main() -> int:
         ):
             continue
 
-        files = list_pull_request_files(args.api_url, args.repo, int(pr["number"]), token)
+        files = list_pull_request_files(
+            args.api_url, args.repo, int(pr["number"]), token
+        )
         if args.target_file not in files:
             continue
         if (
@@ -743,7 +878,9 @@ def main() -> int:
             check=False,
         )
         if fetched.returncode == 0:
-            commit_date = run_git(["log", "-1", "--format=%cI", source_branch_ref]).stdout.strip()
+            commit_date = run_git(
+                ["log", "-1", "--format=%cI", source_branch_ref]
+            ).stdout.strip()
             sources.append(
                 QueueSource(
                     created_at=commit_date,
@@ -768,6 +905,7 @@ def main() -> int:
 
     existing_consolidated_payload: Dict[str, Any] = copy.deepcopy(base_payload)
     existing_consolidated_has_non_target_files = False
+    existing_branch_outdated = False
     if existing_consolidated_pr is not None:
         existing_pr_files = list_pull_request_files(
             args.api_url,
@@ -793,83 +931,69 @@ def main() -> int:
             check=False,
         )
         if fetch_consolidated.returncode == 0:
-            existing_consolidated_payload = read_json_from_git(consolidated_ref, args.target_file)
+            existing_branch_outdated = branch_needs_refresh(base_ref, consolidated_ref)
+            existing_consolidated_payload = read_json_from_git(
+                consolidated_ref, args.target_file
+            )
+            if existing_branch_outdated:
+                merge_base = run_git(
+                    ["merge-base", base_ref, consolidated_ref]
+                ).stdout.strip()
+                existing_consolidated_payload = rebase_tool_delta(
+                    base_payload,
+                    read_json_from_git(merge_base, args.target_file),
+                    existing_consolidated_payload,
+                )
 
-    # Route every apps.json update (even a lone source) through the
-    # consolidated branch so its recipe icons can be synced inline before merge.
-    consolidation_active = existing_consolidated_pr is not None or len(sources) >= 1
-
-    if consolidation_active:
-        consolidated_payload: Dict[str, Any] = copy.deepcopy(existing_consolidated_payload)
-    else:
-        consolidated_payload = copy.deepcopy(base_payload)
-
-    source_changed_tools: Dict[str, List[str]] = {}
-    final_winner_by_tool: Dict[str, str] = {}
-
-    if consolidation_active:
-        for source in sources:
-            if source.pr is not None:
-                run_git([
+    snapshots: List[SourceSnapshot] = []
+    for source in sources:
+        if source.pr is not None:
+            run_git(
+                [
                     "fetch",
                     "--no-tags",
                     "origin",
                     f"+refs/pull/{source.pr.number}/head:{source.ref}",
-                ])
+                ]
+            )
+        merge_base = run_git(["merge-base", base_ref, source.ref]).stdout.strip()
+        snapshots.append(
+            SourceSnapshot(
+                source=source,
+                before=read_json_from_git(merge_base, args.target_file),
+                after=read_json_from_git(source.ref, args.target_file),
+            )
+        )
 
-            merge_base = run_git(["merge-base", base_ref, source.ref]).stdout.strip()
-
-            before_payload = read_json_from_git(merge_base, args.target_file)
-            after_payload = read_json_from_git(source.ref, args.target_file)
-
-            changed = changed_tools(before_payload, after_payload)
-            source_changed_tools[source.label] = changed
-
-            for tool in changed:
-                if tool in after_payload:
-                    consolidated_payload[tool] = copy.deepcopy(after_payload[tool])
-                elif tool in consolidated_payload:
-                    del consolidated_payload[tool]
-                final_winner_by_tool[tool] = source.label
-
-    write_json(args.target_file, consolidated_payload)
-
-    consolidated_differs_from_base = consolidated_payload != base_payload
-    consolidated_differs_from_existing = consolidated_payload != existing_consolidated_payload
-    should_have_consolidated_pr = consolidation_active and consolidated_differs_from_base
-    needs_branch_push = should_have_consolidated_pr and (
-        existing_consolidated_pr is None
-        or consolidated_differs_from_existing
-        or existing_consolidated_has_non_target_files
+    plan = build_consolidation_plan(
+        base_payload=base_payload,
+        existing_payload=existing_consolidated_payload,
+        snapshots=snapshots,
+        has_existing_pr=existing_consolidated_pr is not None,
+        existing_has_non_target_files=existing_consolidated_has_non_target_files,
+        target_file=args.target_file,
+        icons_prefix=icons_prefix,
+        existing_branch_outdated=existing_branch_outdated,
     )
-
-    consolidated_source_prs: List[PullRequest] = []
-    if consolidation_active:
-        for source in sources:
-            pr = source.pr
-            if pr is None:
-                continue
-            changed = source_changed_tools.get(source.label, [])
-            if changed and pr.consolidatable(args.target_file, icons_prefix):
-                consolidated_source_prs.append(pr)
+    write_json(args.target_file, plan.payload)
 
     appsjson_diff = render_appsjson_diff(
         args.target_file,
         base_payload,
-        consolidated_payload,
+        plan.payload,
     )
     pr_body = build_consolidation_pr_body(
         args.base_ref,
         args.target_file,
-        sources,
-        final_winner_by_tool,
-        consolidated_source_prs,
-        should_have_consolidated_pr,
+        plan.sources,
+        plan.winners,
+        plan.source_prs,
+        plan.should_have_pr,
         appsjson_diff,
     )
 
     synced_icon_files: List[str] = []
-    if needs_branch_push:
+    if plan.needs_branch_push:
         if not args.skip_icon_sync:
             synced_icon_files = sync_consolidated_icons(
                 neurocontainers_path=args.neurocontainers_path,
@@ -891,7 +1015,7 @@ def main() -> int:
         token=token,
         base_ref=args.base_ref,
         head_branch=args.consolidated_branch,
-        should_exist=should_have_consolidated_pr,
+        should_exist=plan.should_have_pr,
         title=consolidated_pr_title,
         body=pr_body,
     )
@@ -911,12 +1035,14 @@ def main() -> int:
     unit_test_failure: Optional[str] = None
     if args.merge_consolidated and consolidated_pr_number is not None:
         consolidated_ref = f"refs/remotes/origin/{args.consolidated_branch}"
-        run_git([
-            "fetch",
-            "--no-tags",
-            "origin",
-            f"+refs/heads/{args.consolidated_branch}:{consolidated_ref}",
-        ])
+        run_git(
+            [
+                "fetch",
+                "--no-tags",
+                "origin",
+                f"+refs/heads/{args.consolidated_branch}:{consolidated_ref}",
+            ]
+        )
         unit_test_failure = run_unit_tests_on_ref(consolidated_ref)
 
     if unit_test_failure is not None:
@@ -927,7 +1053,9 @@ def main() -> int:
             token=token,
             pr_number=consolidated_pr_number,
             marker=UNIT_TEST_COMMENT_MARKER,
-            comment_body=unit_test_failure_comment(args.consolidated_branch, unit_test_failure),
+            comment_body=unit_test_failure_comment(
+                args.consolidated_branch, unit_test_failure
+            ),
         )
         print(
             f"ERROR: Unit tests failed on {args.consolidated_branch}; "
@@ -952,25 +1080,24 @@ def main() -> int:
     # either the consolidated PR merged in this run, or the queue output
     # already matches main. Otherwise leave them open for the next
     # scheduled merge run.
-    changes_already_in_main = consolidation_active and not should_have_consolidated_pr
-    sources_landed = changes_already_in_main or merge_status == "merged"
+    sources_landed = plan.sources_landed(merge_status)
     if sources_landed:
         close_consolidated_source_prs(
             api_url=args.api_url,
             repo=args.repo,
             token=token,
-            source_prs=consolidated_source_prs,
+            source_prs=plan.source_prs,
         )
 
     print("Consolidation summary:")
-    print(f"- Queue sources: {[source.label for source in sources]}")
-    print(f"- Consolidated tools: {len(final_winner_by_tool)}")
+    print(f"- Queue sources: {[source.label for source in plan.sources]}")
+    print(f"- Consolidated tools: {len(plan.winners)}")
     print(
         "- Source PRs closed: "
-        f"{[pr.number for pr in consolidated_source_prs] if sources_landed else '[] (pending merge)'}"
+        f"{[pr.number for pr in plan.source_prs] if sources_landed else '[] (pending merge)'}"
     )
     print(f"- Consolidated PR number: {consolidated_pr_number}")
-    print(f"- Consolidated branch pushed: {'yes' if needs_branch_push else 'no'}")
+    print(f"- Consolidated branch pushed: {'yes' if plan.needs_branch_push else 'no'}")
     print(f"- Icons synced inline: {len(synced_icon_files)}")
     print(
         "- Existing consolidated PR had non-target files: "

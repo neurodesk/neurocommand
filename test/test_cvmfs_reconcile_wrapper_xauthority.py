@@ -1,20 +1,18 @@
-import importlib.util
-import os
 from pathlib import Path
 import stat
-import subprocess
-import sys
 import tempfile
 import unittest
 
+from cvmfs import reconcile_wrapper_xauthority as reconcile
+from test.support.wrappers import (
+    legacy_wrapper,
+    fixed_wrapper,
+    make_container,
+    assert_gpu_environment,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "cvmfs" / "reconcile_wrapper_xauthority.py"
-
-spec = importlib.util.spec_from_file_location("reconcile_wrapper_xauthority", SCRIPT)
-reconcile = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = reconcile
-spec.loader.exec_module(reconcile)
 
 
 XAUTHORITY_BLOCK = """xauthority_opts=()
@@ -24,30 +22,13 @@ fi
 """
 
 
-def legacy_wrapper(container_dir, command, bind_option=""):
-    container_name = container_dir.name
-    return (
-        "#!/usr/bin/env bash\n"
-        "export PWD=`pwd -P`\n"
-        "singularity --silent exec --cleanenv --env DISPLAY=$DISPLAY "
-        f"{bind_option} $neurodesk_singularity_opts --pwd \"$PWD\" "
-        f"{container_dir}/{container_name}.simg {command} \"$@\"\n"
-    )
-
-
-def fixed_wrapper(container_dir, command, bind_option=""):
-    return reconcile._fixed_wrapper(
-        legacy_wrapper(container_dir, command, bind_option).encode()
-    ).decode()
-
-
 def legacy_wrapper_without_display(container_dir, command, bind_option=""):
     container_name = container_dir.name
     return (
         "#!/usr/bin/env bash\n"
         "export PWD=`pwd -P`\n"
         f"singularity --silent exec {bind_option} $neurodesk_singularity_opts "
-        f"--pwd \"$PWD\" {container_dir}/{container_name}.simg {command} \"$@\"\n"
+        f'--pwd "$PWD" {container_dir}/{container_name}.simg {command} "$@"\n'
     )
 
 
@@ -55,10 +36,10 @@ def disabled_wrapper(container_dir):
     image, builddate = container_dir.name.rsplit("_", 1)
     return (
         "#!/usr/bin/env bash\n"
-        "echo \"This container was disabled due to a known bug or vulnerability. "
+        'echo "This container was disabled due to a known bug or vulnerability. '
         "To keep using the software please use a different version. If you absolutely "
         "need this container for reproducibility you can pull it from docker hub via "
-        f"the command apptainer pull docker://vnmd/{image}:{builddate}\"\n"
+        f'the command apptainer pull docker://vnmd/{image}:{builddate}"\n'
     )
 
 
@@ -67,62 +48,6 @@ def write_wrapper(container_dir, command, content, mode=0o755):
     wrapper.write_text(content)
     wrapper.chmod(mode)
     return wrapper
-
-
-def make_container(repo_root, commands):
-    container = repo_root / "containers" / "demo_1.0_20260101"
-    container.mkdir(parents=True)
-    (container / (container.name + ".simg")).touch()
-    (container / "commands.txt").write_text("".join(f"{name}\n" for name in commands))
-    return container
-
-
-def assert_gpu_environment(wrapper):
-    # Override only the driver-file check; execute the wrapper and a child
-    # runtime process to verify exports without requiring NVIDIA hardware.
-    shell = '''
-function [() {
-    if [[ "$1" == -f && "$2" == /proc/driver/nvidia/version ]]; then
-        return "$DRIVER_STATUS"
-    fi
-    builtin [ "$@"
-}
-source "$1" "argument with spaces"
-'''
-    with tempfile.TemporaryDirectory() as directory:
-        runtime = Path(directory) / "singularity"
-        runtime.write_text(
-            '#!/usr/bin/env bash\n'
-            'printf "%s|%s\\n" "${APPTAINER_NV-unset}" "${SINGULARITY_NV-unset}"\n'
-            'printf "%s\\n" "${@: -1}"\n'
-        )
-        runtime.chmod(0o755)
-        base_env = {
-            key: value for key, value in os.environ.items()
-            if key not in {"APPTAINER_NV", "SINGULARITY_NV", "BASH_ENV"}
-        }
-        base_env["NEURODESK_CONTAINER_RUNTIME"] = "singularity"
-        base_env["PATH"] = f"{directory}:{os.environ['PATH']}"
-        overrides = [{}, {"APPTAINER_NV": "0", "SINGULARITY_NV": "1"}]
-        for name in ("APPTAINER_NV", "SINGULARITY_NV"):
-            overrides.extend({name: value} for value in ("0", "1", "false", ""))
-        for driver_present in (False, True):
-            for override in overrides:
-                expected = override or (
-                    {"APPTAINER_NV": "1", "SINGULARITY_NV": "1"}
-                    if driver_present else {}
-                )
-                result = subprocess.run(
-                    ["bash", "-c", shell, "test-wrapper", str(wrapper)],
-                    env={**base_env, **override, "DRIVER_STATUS": "0" if driver_present else "1"},
-                    capture_output=True,
-                    text=True,
-                )
-                assert result.returncode == 0, result.stderr
-                assert result.stdout.splitlines() == [
-                    f"{expected.get('APPTAINER_NV', 'unset')}|{expected.get('SINGULARITY_NV', 'unset')}",
-                    "argument with spaces",
-                ], (driver_present, override, result.stdout)
 
 
 class WrapperReconciliationTests(unittest.TestCase):
@@ -140,8 +65,13 @@ class WrapperReconciliationTests(unittest.TestCase):
 
         self.assertEqual(len(plan.rewrites), 1)
         self.assertEqual(plan.diagnostics, ())
-        self.assertEqual(reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers))
-        self.assertEqual(wrapper.read_text(), reconcile.render_wrapper(container.name + ".simg", "demo").decode())
+        self.assertEqual(
+            reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers)
+        )
+        self.assertEqual(
+            wrapper.read_text(),
+            reconcile.render_wrapper(container.name + ".simg", "demo").decode(),
+        )
 
         after = wrapper.stat()
         self.assertNotEqual(after.st_ino, before.st_ino)
@@ -168,16 +98,18 @@ class WrapperReconciliationTests(unittest.TestCase):
                 "--bind $TEMPDIR:/tmp",
             )
         ]
-        variants.append(variants[0].replace("DISPLAY=$DISPLAY  ", "DISPLAY=$DISPLAY ", 1))
+        variants.append(
+            variants[0].replace("DISPLAY=$DISPLAY  ", "DISPLAY=$DISPLAY ", 1)
+        )
 
         for legacy in variants:
             with self.subTest(invocation=legacy.splitlines()[-1]):
                 with tempfile.TemporaryDirectory() as directory:
                     repo_root = Path(directory) / "repo"
                     container = make_container(repo_root, ["demo"])
-                    live_path = Path(
-                        "/cvmfs/neurodesk.ardc.edu.au/containers"
-                    ) / container.name
+                    live_path = (
+                        Path("/cvmfs/neurodesk.ardc.edu.au/containers") / container.name
+                    )
                     wrapper = write_wrapper(
                         container,
                         "demo",
@@ -189,9 +121,12 @@ class WrapperReconciliationTests(unittest.TestCase):
                     reconcile.apply_wrapper_plan(plan)
                     wrapper_text = wrapper.read_text()
                     self.assertIn("container_runtime.sh", wrapper_text)
-                    self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
+                    self.assertEqual(
+                        wrapper.read_bytes(),
+                        reconcile.render_wrapper(container.name + ".simg", "demo"),
+                    )
                     self.assertIn(
-                        'neurodesk_container exec',
+                        "neurodesk_container exec",
                         wrapper_text,
                     )
 
@@ -217,9 +152,9 @@ class WrapperReconciliationTests(unittest.TestCase):
                 with tempfile.TemporaryDirectory() as directory:
                     repo_root = Path(directory) / "repo"
                     container = make_container(repo_root, ["demo"])
-                    live_path = Path(
-                        "/cvmfs/neurodesk.ardc.edu.au/containers"
-                    ) / container.name
+                    live_path = (
+                        Path("/cvmfs/neurodesk.ardc.edu.au/containers") / container.name
+                    )
                     content = legacy.replace(str(live_path), str(container))
                     wrapper = write_wrapper(container, "demo", content)
 
@@ -230,9 +165,12 @@ class WrapperReconciliationTests(unittest.TestCase):
 
                     wrapper_text = wrapper.read_text()
                     self.assertIn("container_runtime.sh", wrapper_text)
-                    self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
+                    self.assertEqual(
+                        wrapper.read_bytes(),
+                        reconcile.render_wrapper(container.name + ".simg", "demo"),
+                    )
                     self.assertIn(
-                        'neurodesk_container exec',
+                        "neurodesk_container exec",
                         wrapper_text,
                     )
 
@@ -280,12 +218,19 @@ class WrapperReconciliationTests(unittest.TestCase):
         self.assertEqual(plan.diagnostics, ())
         self.assertEqual(len(plan.rewrites), 1)
         reconcile.apply_wrapper_plan(plan)
-        self.assertEqual(wrapper.read_text(), reconcile.render_wrapper(container.name + ".simg", "demo").decode())
+        self.assertEqual(
+            wrapper.read_text(),
+            reconcile.render_wrapper(container.name + ".simg", "demo").decode(),
+        )
 
     def test_skips_fixed_disabled_missing_and_non_executable_targets(self):
         commands = ["fixed", "disabled", "missing", "metadata"]
         container = make_container(self.repo_root, commands)
-        write_wrapper(container, "fixed", reconcile.render_wrapper(container.name + ".simg", "fixed").decode())
+        write_wrapper(
+            container,
+            "fixed",
+            reconcile.render_wrapper(container.name + ".simg", "fixed").decode(),
+        )
         write_wrapper(container, "disabled", disabled_wrapper(container))
         write_wrapper(container, "metadata", "not a wrapper\n", mode=0o644)
 
@@ -305,20 +250,37 @@ class WrapperReconciliationTests(unittest.TestCase):
                 )
                 plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
                 self.assertEqual(plan.diagnostics, ())
-                self.assertEqual(reconcile.apply_wrapper_plan(plan), len(plan.rewrites) + len(plan.helpers))
-                self.assertEqual(wrapper.read_bytes(), reconcile.render_wrapper(container.name + ".simg", "demo"))
-                self.assertTrue(reconcile.plan_wrapper_reconciliation(self.repo_root).is_clean)
+                self.assertEqual(
+                    reconcile.apply_wrapper_plan(plan),
+                    len(plan.rewrites) + len(plan.helpers),
+                )
+                self.assertEqual(
+                    wrapper.read_bytes(),
+                    reconcile.render_wrapper(container.name + ".simg", "demo"),
+                )
+                self.assertTrue(
+                    reconcile.plan_wrapper_reconciliation(self.repo_root).is_clean
+                )
 
     def test_reconciled_wrapper_gpu_defaults_and_overrides(self):
         container = make_container(self.repo_root, ["demo"])
         wrapper = write_wrapper(container, "demo", legacy_wrapper(container, "demo"))
-        reconcile.apply_wrapper_plan(reconcile.plan_wrapper_reconciliation(self.repo_root))
+        reconcile.apply_wrapper_plan(
+            reconcile.plan_wrapper_reconciliation(self.repo_root)
+        )
         assert_gpu_environment(wrapper)
 
     def test_partial_gpu_edit_blocks_reconciliation(self):
         container = make_container(self.repo_root, ["demo"])
-        self.assertIs(reconcile._classify_wrapper(container, "demo", fixed_wrapper(container, "demo").encode())[0], reconcile.WrapperState.LEGACY)
-        content = fixed_wrapper(container, "demo").replace("  export SINGULARITY_NV=1\n", "")
+        self.assertIs(
+            reconcile._classify_wrapper(
+                container, "demo", fixed_wrapper(container, "demo").encode()
+            )[0],
+            reconcile.WrapperState.LEGACY,
+        )
+        content = fixed_wrapper(container, "demo").replace(
+            "  export SINGULARITY_NV=1\n", ""
+        )
         wrapper = write_wrapper(container, "demo", content)
         plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
         self.assertEqual(len(plan.diagnostics), 1)
@@ -328,9 +290,7 @@ class WrapperReconciliationTests(unittest.TestCase):
 
     def test_unknown_executable_blocks_every_planned_write(self):
         container = make_container(self.repo_root, ["legacy", "custom"])
-        legacy = write_wrapper(
-            container, "legacy", legacy_wrapper(container, "legacy")
-        )
+        legacy = write_wrapper(container, "legacy", legacy_wrapper(container, "legacy"))
         write_wrapper(container, "custom", "#!/usr/bin/env bash\necho custom\n")
         before = legacy.read_bytes()
 
@@ -347,9 +307,7 @@ class WrapperReconciliationTests(unittest.TestCase):
             self.repo_root,
             ["legacy", "../escape", "nested/name", "back\\slash", "bad name"],
         )
-        legacy = write_wrapper(
-            container, "legacy", legacy_wrapper(container, "legacy")
-        )
+        legacy = write_wrapper(container, "legacy", legacy_wrapper(container, "legacy"))
         before = legacy.read_bytes()
 
         plan = reconcile.plan_wrapper_reconciliation(self.repo_root)
@@ -404,15 +362,26 @@ class WrapperReconciliationTests(unittest.TestCase):
 
     def test_sync_runs_reconciler_after_stale_disabling_with_transaction_guard(self):
         sync = (ROOT / "cvmfs" / "sync_containers_to_cvmfs.sh").read_text()
-        stale_publish = 'publish_cvmfs_transaction neurodesk.ardc.edu.au "disabled stale containers'
+        stale_publish = (
+            'publish_cvmfs_transaction neurodesk.ardc.edu.au "disabled stale containers'
+        )
         reconciler = "reconcile_wrapper_xauthority.py"
 
         self.assertIn(reconciler, sync)
         self.assertLess(sync.index(stale_publish), sync.index(reconciler))
         self.assertIn("--check", sync[sync.index(reconciler) :])
-        self.assertIn("open_cvmfs_transaction neurodesk.ardc.edu.au", sync[sync.index(reconciler) :])
-        self.assertIn("abort_cvmfs_transaction neurodesk.ardc.edu.au", sync[sync.index(reconciler) :])
-        self.assertIn("publish_cvmfs_transaction neurodesk.ardc.edu.au", sync[sync.index(reconciler) :])
+        self.assertIn(
+            "open_cvmfs_transaction neurodesk.ardc.edu.au",
+            sync[sync.index(reconciler) :],
+        )
+        self.assertIn(
+            "abort_cvmfs_transaction neurodesk.ardc.edu.au",
+            sync[sync.index(reconciler) :],
+        )
+        self.assertIn(
+            "publish_cvmfs_transaction neurodesk.ardc.edu.au",
+            sync[sync.index(reconciler) :],
+        )
 
     def test_sync_releases_its_lockfile_on_reconciliation_failure(self):
         sync = (ROOT / "cvmfs" / "sync_containers_to_cvmfs.sh").read_text()

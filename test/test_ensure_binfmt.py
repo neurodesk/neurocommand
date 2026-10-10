@@ -183,11 +183,11 @@ def test_container_installer_installs_podman_with_dnf_when_missing(tmp_path):
     dnf.write_text(
         f"""#!/bin/bash
 printf 'dnf %s\\n' "$*" >> {calls}
-/bin/cat > {bin_dir / 'podman'} <<'EOF'
+/bin/cat > {bin_dir / "podman"} <<'EOF'
 #!/bin/bash
 printf 'podman %s\\n' "$*" >> {calls}
 EOF
-    /bin/chmod +x {bin_dir / 'podman'}
+    /bin/chmod +x {bin_dir / "podman"}
 """
     )
     dnf.chmod(0o755)

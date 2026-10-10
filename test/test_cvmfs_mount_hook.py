@@ -1,12 +1,11 @@
+from pathlib import Path
 import os
 import re
 import subprocess
-from pathlib import Path
 
 import pytest
 
-from test.test_run_transparent_singularity import write_executable
-
+from test.support.shell import write_executable
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "docker/before-notebook.d/01-cvmfs-mount.sh"
@@ -43,7 +42,7 @@ def startup(tmp_path):
     )
     write_executable(
         bin_dir / "curl",
-        '''#!/bin/bash
+        """#!/bin/bash
 echo curl >> "$CALLS"
 if [[ ${OFFLINE:-0} == 1 ]]; then
     echo "0.000 000"
@@ -53,15 +52,15 @@ case "${@: -1}" in
     *jetstream*|*cvmfs.neurodesk.org*) echo "0.100 200";;
     *) echo "0.200 200";;
 esac
-''',
+""",
     )
     write_executable(
         bin_dir / "mount",
-        '''#!/bin/bash
+        """#!/bin/bash
 echo mount >> "$CALLS"
 [[ ${OFFLINE:-0} == 1 ]] && exit 1
 mkdir -p "${@: -1}/neurodesk-modules"
-''',
+""",
     )
     env = {
         **{key: value for key, value in os.environ.items() if key != "BASH_ENV"},
@@ -92,7 +91,9 @@ def test_unrelated_dns_failure_does_not_prevent_mount(startup):
 
     assert "mount" in calls
     assert "CVMFS ready (manual mount)" in result.stdout
-    assert (root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf").read_text() == "cdn america"
+    assert (
+        root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
+    ).read_text() == "cdn america"
 
 
 def test_offline_probes_still_reach_local_container_fallback(startup):
@@ -101,7 +102,9 @@ def test_offline_probes_still_reach_local_container_fallback(startup):
 
     assert "mount" in calls
     assert "Falling back to local containers" in result.stdout
-    assert (root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf").read_text() == "bundled default"
+    assert (
+        root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
+    ).read_text() == "bundled default"
 
 
 @pytest.mark.parametrize("reason", ["disabled", "missing-fuse", "already-mounted"])
@@ -126,7 +129,9 @@ def test_skipping_region_probe_uses_bundled_config(startup):
 
     assert calls == ["mount"]
     assert "CVMFS ready (manual mount)" in result.stdout
-    assert (root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf").read_text() == "bundled default"
+    assert (
+        root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
+    ).read_text() == "bundled default"
 
 
 @pytest.mark.parametrize("mode", ["offline", "skip-probe"])
@@ -135,7 +140,9 @@ def test_fresh_image_gets_default_config_without_successful_probes(startup, mode
     config = root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
     config.unlink()
 
-    overrides = {"OFFLINE": "1"} if mode == "offline" else {"NEURODESK_SKIP_REGION_PROBE": "1"}
+    overrides = (
+        {"OFFLINE": "1"} if mode == "offline" else {"NEURODESK_SKIP_REGION_PROBE": "1"}
+    )
     result, calls = run(**overrides)
 
     assert "mount" in calls

@@ -47,20 +47,22 @@ jobs:
       - name: Set environment variables
         run: |
           IMAGENAME="neurocommand"
-          BUILDDATE=`date +%Y-%m-%d`
+          BUILDDATE=$(date +%Y-%m-%d)
           IMAGEID=ghcr.io/$GITHUB_REPOSITORY
-          IMAGEID=$(echo $IMAGEID | tr '[A-Z]' '[a-z]')
-          echo "BUILDDATE=$BUILDDATE" >> $GITHUB_ENV
-          echo "IMAGEID=$IMAGEID" >> $GITHUB_ENV
-          echo "IMAGENAME=$IMAGENAME" >> $GITHUB_ENV
+          IMAGEID=$(echo "$IMAGEID" | tr '[:upper:]' '[:lower:]')
+          {
+            echo "BUILDDATE=$BUILDDATE"
+            echo "IMAGEID=$IMAGEID"
+            echo "IMAGENAME=$IMAGENAME"
+          } >> "$GITHUB_ENV"
       - name: Check if image exists
         if: github.event_name == 'schedule'
         id: check_image
         run: |
-          if docker manifest inspect $IMAGEID:$BUILDDATE > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
+          if docker manifest inspect "$IMAGEID:$BUILDDATE" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Set up QEMU
         if: matrix.platform.arch == 'arm64' && steps.check_image.outputs.exists != 'true'
@@ -115,20 +117,22 @@ jobs:
       - name: Set environment variables
         run: |
           IMAGENAME="neurocommand"
-          BUILDDATE=`date +%Y-%m-%d`
+          BUILDDATE=$(date +%Y-%m-%d)
           IMAGEID=ghcr.io/$GITHUB_REPOSITORY
-          IMAGEID=$(echo $IMAGEID | tr '[A-Z]' '[a-z]')
-          echo "BUILDDATE=$BUILDDATE" >> $GITHUB_ENV
-          echo "IMAGEID=$IMAGEID" >> $GITHUB_ENV
-          echo "IMAGENAME=$IMAGENAME" >> $GITHUB_ENV
+          IMAGEID=$(echo "$IMAGEID" | tr '[:upper:]' '[:lower:]')
+          {
+            echo "BUILDDATE=$BUILDDATE"
+            echo "IMAGEID=$IMAGEID"
+            echo "IMAGENAME=$IMAGENAME"
+          } >> "$GITHUB_ENV"
       - name: Check if image exists
         if: github.event_name == 'schedule'
         id: check_image
         run: |
-          if docker manifest inspect $IMAGEID:$BUILDDATE > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
+          if docker manifest inspect "$IMAGEID:$BUILDDATE" > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Set up Docker Buildx
         if: steps.check_image.outputs.exists != 'true'
@@ -175,9 +179,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh api --method DELETE -H "Accept: application/vnd.github+json" \
-            /repos/${GITHUB_REPOSITORY}/git/refs/tags/${BUILDDATE} 2>/dev/null || true
+            "/repos/${GITHUB_REPOSITORY}/git/refs/tags/${BUILDDATE}" 2>/dev/null || true
           gh api --method POST -H "Accept: application/vnd.github+json" \
-            /repos/${GITHUB_REPOSITORY}/git/refs \
+            "/repos/${GITHUB_REPOSITORY}/git/refs" \
             -f ref="refs/tags/${BUILDDATE}" -f sha="${GITHUB_SHA}"
       - name: Write image publish summary
         run: |

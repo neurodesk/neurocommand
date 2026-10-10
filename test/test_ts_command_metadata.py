@@ -8,12 +8,7 @@ from cvmfs import reconcile_module_files
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = (
-    ROOT
-    / "neurodesk"
-    / "transparent-singularity"
-    / "ts_command_metadata.sh"
-)
+SCRIPT = ROOT / "neurodesk" / "transparent-singularity" / "ts_command_metadata.sh"
 
 
 def render(commands_path):
@@ -29,13 +24,7 @@ def test_renders_sorted_unique_whatis_commands_and_skips_invalid_names(
 ):
     commands = tmp_path / "commands.txt"
     commands.write_text(
-        "flirt\n"
-        "bet\n"
-        "bet\n"
-        "bad/name\n"
-        "bad,command\n"
-        "bad command\n"
-        'quoted"command\n'
+        'flirt\nbet\nbet\nbad/name\nbad,command\nbad command\nquoted"command\n'
     )
 
     result = render(commands)
@@ -43,7 +32,7 @@ def test_renders_sorted_unique_whatis_commands_and_skips_invalid_names(
     assert result.returncode == 0
     assert result.stdout == (
         "-- neurodesk-exposed-commands\n"
-        'whatis("Commands: bad,command, bet, flirt, quoted\\\"command")\n'
+        'whatis("Commands: bad,command, bet, flirt, quoted\\"command")\n'
     )
     assert result.stderr.count("Skipping invalid command name") == 2
 
@@ -61,11 +50,18 @@ def test_empty_command_inventory_emits_no_metadata_block(tmp_path):
 
 @pytest.mark.parametrize("renderer", ["install", "reconcile-lua", "reconcile-tcl"])
 @pytest.mark.parametrize("include_commands", [False, True])
-def test_discovery_omits_libraries_and_hidden_files(tmp_path, renderer, include_commands):
+def test_discovery_omits_libraries_and_hidden_files(
+    tmp_path, renderer, include_commands
+):
     excluded = [
-        "model_beta.so", "plug_betafit.so", "libmwoauth_connector_betaBuiltins.so",
-        "libbeta.so.1.2", "libbeta.dylib", "beta.DLL",
-        ".fsl-bet2-post-link.sh", ".fsl-bet2-pre-unlink.sh",
+        "model_beta.so",
+        "plug_betafit.so",
+        "libmwoauth_connector_betaBuiltins.so",
+        "libbeta.so.1.2",
+        "libbeta.dylib",
+        "beta.DLL",
+        ".fsl-bet2-post-link.sh",
+        ".fsl-bet2-pre-unlink.sh",
     ]
     kept = ["bet", "bet.fsl", "obj2_bet.pl", "Bet_gui", "libtool", "beta.software"]
     commands = tmp_path / "commands.txt"
@@ -80,9 +76,12 @@ def test_discovery_omits_libraries_and_hidden_files(tmp_path, renderer, include_
         output = reconcile_module_files.update_exposed_commands(
             "", commands, is_lua=renderer == "reconcile-lua"
         )
-        assert reconcile_module_files.update_exposed_commands(
-            output, commands, is_lua=renderer == "reconcile-lua"
-        ) == output
+        assert (
+            reconcile_module_files.update_exposed_commands(
+                output, commands, is_lua=renderer == "reconcile-lua"
+            )
+            == output
+        )
 
     for name in excluded:
         assert name not in output
@@ -98,23 +97,30 @@ def test_discovery_omits_libraries_and_hidden_files(tmp_path, renderer, include_
     "is_lua, old_block",
     [
         (True, 'extensions("old/1.0")\n'),
-        (True, 'if type(extensions) == "function" then\n'
-         '    extensions("old/1.0")\nend\n'),
+        (
+            True,
+            'if type(extensions) == "function" then\n    extensions("old/1.0")\nend\n',
+        ),
         (False, 'extensions "old/1.0"\n'),
-        (False, 'if {[llength [info commands extensions]] > 0} {\n'
-         '    extensions "old/1.0"\n}\n'),
+        (
+            False,
+            "if {[llength [info commands extensions]] > 0} {\n"
+            '    extensions "old/1.0"\n}\n',
+        ),
         (True, 'whatis("Commands: old")\n'),
         (False, 'module-whatis "Commands: old"\n'),
     ],
 )
-def test_migrates_managed_metadata_and_removes_it_when_empty(tmp_path, is_lua, old_block):
+def test_migrates_managed_metadata_and_removes_it_when_empty(
+    tmp_path, is_lua, old_block
+):
     commands = tmp_path / "commands.txt"
     commands.write_text("bet\nmodel_beta.so\n")
     prefix = "--" if is_lua else "#"
     other_metadata = (
         'whatis("Description: FSL")\nextensions("unrelated/1.0")\n'
-        if is_lua else
-        '#%Module\nmodule-whatis "Description: FSL"\nextensions "unrelated/1.0"\n'
+        if is_lua
+        else '#%Module\nmodule-whatis "Description: FSL"\nextensions "unrelated/1.0"\n'
     )
     content = other_metadata + f"{prefix} neurodesk-exposed-commands\n" + old_block
     updated = reconcile_module_files.update_exposed_commands(
@@ -124,14 +130,16 @@ def test_migrates_managed_metadata_and_removes_it_when_empty(tmp_path, is_lua, o
     assert "model_beta" not in updated
     assert updated.count("Commands: bet") == 1
     assert updated.count("extensions") == 1  # Only the unrelated extension remains.
-    assert reconcile_module_files.update_exposed_commands(
-        updated, commands, is_lua=is_lua
-    ) == updated
+    assert (
+        reconcile_module_files.update_exposed_commands(updated, commands, is_lua=is_lua)
+        == updated
+    )
 
     commands.write_text("")
-    assert reconcile_module_files.update_exposed_commands(
-        updated, commands, is_lua=is_lua
-    ) == other_metadata
+    assert (
+        reconcile_module_files.update_exposed_commands(updated, commands, is_lua=is_lua)
+        == other_metadata
+    )
 
 
 def test_install_and_reconciliation_escape_the_same_command_names(tmp_path):
@@ -141,10 +149,10 @@ def test_install_and_reconciliation_escape_the_same_command_names(tmp_path):
         reconcile_module_files.render_exposed_commands(commands) + "\n"
     )
     tcl = reconcile_module_files.render_exposed_commands(commands, is_lua=False)
-    assert r'\$variable' in tcl
-    assert r'\[brackets\]' in tcl
-    assert r'back\\slash' in tcl
-    assert r'quoted\"command' in tcl
+    assert r"\$variable" in tcl
+    assert r"\[brackets\]" in tcl
+    assert r"back\\slash" in tcl
+    assert r"quoted\"command" in tcl
 
 
 @pytest.mark.skipif(not os.environ.get("LMOD_CMD"), reason="Lmod is not initialized")
@@ -156,16 +164,17 @@ def test_lmod_keyword_finds_provider_without_extensions(tmp_path, renderer):
     module_dir.mkdir(parents=True)
     is_lua = renderer != "reconcile-tcl"
     description = (
-        'whatis("Description: FSL tools")\n' if is_lua else
-        '#%Module\nmodule-whatis "Description: FSL tools"\n'
+        'whatis("Description: FSL tools")\n'
+        if is_lua
+        else '#%Module\nmodule-whatis "Description: FSL tools"\n'
     )
     if renderer == "install":
         content = description + render(commands).stdout
     else:
         old_block = (
             '-- neurodesk-exposed-commands\nextensions("bet/6.0.7.18")\n'
-            if is_lua else
-            '# neurodesk-exposed-commands\nextensions "bet/6.0.7.18"\n'
+            if is_lua
+            else '# neurodesk-exposed-commands\nextensions "bet/6.0.7.18"\n'
         )
         content = reconcile_module_files.update_exposed_commands(
             description + old_block, commands, is_lua=is_lua
@@ -187,7 +196,9 @@ def test_lmod_keyword_finds_provider_without_extensions(tmp_path, renderer):
     ]:
         result = subprocess.run(
             [env["LMOD_CMD"], "bash", *query],
-            env=env, capture_output=True, text=True,
+            env=env,
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0, result.stderr
         assert ("fsl/6.0.7.18" in result.stderr) == finds_provider

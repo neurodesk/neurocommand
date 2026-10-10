@@ -22,9 +22,10 @@ jobs:
               run: |
                 # Get the list of unpublished images from app.json
                 echo "Get the list of unpublished images..."
-                export APP_BATCHES=$(python .github/workflows/get-unpublished-apps.py --zenodo_token ${{ secrets.ZENODO_TOKEN }})
+                APP_BATCHES=$(python .github/workflows/get-unpublished-apps.py --zenodo_token ${{ secrets.ZENODO_TOKEN }})
+                export APP_BATCHES
                 echo "app_batches=${APP_BATCHES}"
-                echo "app_batches=${APP_BATCHES}" >> $GITHUB_OUTPUT
+                echo "app_batches=${APP_BATCHES}" >> "$GITHUB_OUTPUT"
 
     publish-doi:
       needs: get-updated-apps
@@ -59,7 +60,7 @@ jobs:
                   # curl --output "$IMAGE_HOME/${app}.simg" "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg"
                   echo "Upload container ${app}.simg to Zenodo"
                   # echo $(find $IMAGE_HOME/${app}.simg)
-                  if DOI_URL=$(python3 .github/workflows/publish-doi.py --container_filepath="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg" --container_name=${app} --zenodo_token=${{ secrets.ZENODO_TOKEN }} --gh_token=${{ secrets.GITHUB_TOKEN }}); then
+                  if DOI_URL=$(python3 .github/workflows/publish-doi.py --container_filepath="https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg" --container_name="${app}" --zenodo_token=${{ secrets.ZENODO_TOKEN }} --gh_token=${{ secrets.GITHUB_TOKEN }}); then
                     echo "DOI_URL: $DOI_URL"
                   else
                     echo "Failed to publish ${app} to Zenodo"

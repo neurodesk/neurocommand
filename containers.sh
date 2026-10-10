@@ -17,18 +17,18 @@ if [[ -z "$1" ]] || [ "$1" = "-h" ] || [ "$1" = "--help" ] ; then
     exit 1
 fi
 
-_script="$(readlink -f ${BASH_SOURCE[0]})" ## who am i? ##
-_base="$(dirname $_script)" ## Delete last component from $_script ##
-source neurodesk/configparser.sh ${_base}/config.ini
+_script="$(readlink -f "${BASH_SOURCE[0]}")" ## who am i? ##
+_base="$(dirname "$_script")" ## Delete last component from $_script ##
+source neurodesk/configparser.sh "${_base}"/config.ini
 
 install="false"
 pattern=$1
-if [ ${1:0:2} = '--' ]; then
+if [ "${1:0:2}" = '--' ]; then
     install="true"
     pattern=${1:2}
 fi
 
-echo "--------------------------------------" 
+echo "--------------------------------------"
 if [ "$install" = "true" ]; then
     echo "Installing *${pattern}* containers"
 else
@@ -40,43 +40,45 @@ fi
 echo "--------------------------------------"
 echo
 
-while read appsh; do
+while read -r appsh; do
 
-    arrayIn=(${appsh//_/ })
+    read -r -a arrayIn <<< "${appsh//_/ }"
     if [ "$pattern" != "all" ] && [[ ${arrayIn[0]} != *${pattern}* ]]; then
         continue
     fi
-    appcat=${arrayIn[@]:3}
-    appcat_clean=${appcat:11:-1}                                                                                                                                                           
+    appcat=${arrayIn[*]:3}
+    appcat_clean=${appcat:11:-1}
     apphead="| ${arrayIn[0]} | ${arrayIn[1]} | ${arrayIn[2]} | ${appcat_clean} | Run:"
+    # Configuration keys are assigned dynamically by sourced configparser.sh.
+    # shellcheck disable=SC2154
     appfetch="${neurodesk_installdir}/fetch_containers.sh ${arrayIn[0]} ${arrayIn[1]} ${arrayIn[2]}"
 
-    eval $(echo printf '"%.0s-"' {1..${#apphead}})
+    printf '%*s' "${#apphead}" '' | tr ' ' '-'
     echo
-    echo $apphead
-    eval $(echo printf '"%.0s-"' {1..${#apphead}})
+    echo "$apphead"
+    printf '%*s' "${#apphead}" '' | tr ' ' '-'
     echo
-    echo $appfetch
+    echo "$appfetch"
     echo
 
     if [ "$install" = "true" ]; then
-        eval $appfetch
+        eval "$appfetch"
         err=$?
         if [ $err -eq 0 ] ; then
             installmsg="| SUCCESS | ${arrayIn[0]} ${arrayIn[1]} ${arrayIn[2]} | $(date)"
-            eval $(echo printf '"%.0s-"' {1..${#installmsg}})
+            printf '%*s' "${#installmsg}" '' | tr ' ' '-'
             echo
-            echo $installmsg
-            eval $(echo printf '"%.0s-"' {1..${#installmsg}})
+            echo "$installmsg"
+            printf '%*s' "${#installmsg}" '' | tr ' ' '-'
             echo
             echo
             echo
         else
             installmsg="| FAILED | ${arrayIn[0]} ${arrayIn[1]} ${arrayIn[2]} | $(date)"
-            eval $(echo printf '"%.0s-"' {1..${#installmsg}})
+            printf '%*s' "${#installmsg}" '' | tr ' ' '-'
             echo
-            echo $installmsg
-            eval $(echo printf '"%.0s-"' {1..${#installmsg}})
+            echo "$installmsg"
+            printf '%*s' "${#installmsg}" '' | tr ' ' '-'
             echo
             echo
             echo "Existing due to install error(s) ..."

@@ -1,16 +1,15 @@
-import importlib.util
-import json
 from pathlib import Path
+import json
 
 import pytest
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "cleanup_stale_containers.py"
 
-spec = importlib.util.spec_from_file_location("cleanup_stale_containers", SCRIPT)
-cleanup = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(cleanup)
+
+cleanup = load_script("cleanup_stale_containers", SCRIPT)
 
 
 def test_release_metadata_protects_named_and_legacy_images(tmp_path):
@@ -18,7 +17,9 @@ def test_release_metadata_protects_named_and_legacy_images(tmp_path):
 
     named = releases / "workshopdemo_arm64" / "1.0.0.json"
     named.parent.mkdir(parents=True)
-    named.write_text(json.dumps({"apps": {"workshopdemo_arm64 1.0.0": {"version": "20260721"}}}))
+    named.write_text(
+        json.dumps({"apps": {"workshopdemo_arm64 1.0.0": {"version": "20260721"}}})
+    )
 
     legacy = releases / "amico" / "2.1.0-arm64.json"
     legacy.parent.mkdir(parents=True)

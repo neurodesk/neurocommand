@@ -1,23 +1,19 @@
-import importlib.util
 from pathlib import Path
-import sys
 
 import pytest
 
+from cvmfs import reconcile_module_files
+from test.support.cvmfs import make_container
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "cvmfs" / "reconcile_module_files.py"
-FREESURFER_SNIPPET = ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer"
+FREESURFER_SNIPPET = (
+    ROOT / "neurodesk/transparent-singularity/manual_module_files/freesurfer"
+)
 # A superseded snippet, used to check that stale on-disk modules get refreshed.
 STALE_FREESURFER_SNIPPET = (
-    "-- Append custom paths\n"
-    'local additional_bind_paths = "/tmp:/scratch"\n'
+    '-- Append custom paths\nlocal additional_bind_paths = "/tmp:/scratch"\n'
 )
-
-spec = importlib.util.spec_from_file_location("reconcile_module_files", SCRIPT)
-reconcile_module_files = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = reconcile_module_files
-spec.loader.exec_module(reconcile_module_files)
 
 
 def module_text(container_name):
@@ -30,12 +26,6 @@ def module_text(container_name):
             "",
         ]
     )
-
-
-def make_container(repo_root, container_name, commands="datalad\n"):
-    container = repo_root / "containers" / container_name
-    container.mkdir(parents=True)
-    (container / "commands.txt").write_text(commands)
 
 
 def test_parse_image_name_supports_named_variants():
@@ -113,7 +103,9 @@ def test_current_category_module_is_created_from_canonical(tmp_path):
     canonical.parent.mkdir(parents=True)
     canonical.write_text(module_text(latest_container))
 
-    public = repo_root / "neurodesk-modules" / "data_organisation" / "datalad" / "1.3.1.lua"
+    public = (
+        repo_root / "neurodesk-modules" / "data_organisation" / "datalad" / "1.3.1.lua"
+    )
     assert not public.exists()
 
     changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
@@ -141,7 +133,7 @@ def test_reconciliation_sanitizes_lmod_cache_delimiter_in_help_text(tmp_path):
                 "]===])",
                 f'whatis("{latest_container}")',
                 (
-                    "prepend_path(\"PATH\", "
+                    'prepend_path("PATH", '
                     f'"/cvmfs/neurodesk.ardc.edu.au/containers/{latest_container}")'
                 ),
                 "",
@@ -191,9 +183,7 @@ def test_reconciliation_updates_exposed_commands_and_preserves_other_extensions(
     assert "old-command/1.0" not in text
     assert 'extensions("python-package/2.0")' in text
 
-    (repo_root / "containers" / latest_container / "commands.txt").write_text(
-        "beta\n"
-    )
+    (repo_root / "containers" / latest_container / "commands.txt").write_text("beta\n")
     changes = reconcile_module_files.plan_module_reconciliation(repo_root, log_path)
     reconcile_module_files.apply_changes(changes)
 
@@ -252,9 +242,13 @@ def test_empty_inventory_reconciliation_updates_other_modules(
     customized = repo_root / "neurodesk-modules/site/fsl/6.0.7.23.lua"
     for path, image in ((canonical, new_fsl), (public, old_fsl), (customized, old_fsl)):
         path.parent.mkdir(parents=True)
-        inventory = reconcile_module_files.read_container_inventory(repo_root / "containers" / image)
+        inventory = reconcile_module_files.read_container_inventory(
+            repo_root / "containers" / image
+        )
         path.write_bytes(reconcile_module_files.render_module(inventory, format="lua"))
-    customized.write_text(customized.read_text() + 'setenv("SITE_SETTING", "preserve")\n')
+    customized.write_text(
+        customized.read_text() + 'setenv("SITE_SETTING", "preserve")\n'
+    )
     customized_before = customized.read_bytes()
 
     civet = repo_root / "containers/modules/civet/2.1.1.lua"
@@ -262,7 +256,9 @@ def test_empty_inventory_reconciliation_updates_other_modules(
     empty_inventory = reconcile_module_files.read_container_inventory(
         repo_root / "containers" / empty_civet
     )
-    civet.write_bytes(reconcile_module_files.render_module(empty_inventory, format="lua"))
+    civet.write_bytes(
+        reconcile_module_files.render_module(empty_inventory, format="lua")
+    )
     civet_before = civet.read_bytes()
     public_civet = repo_root / "neurodesk-modules/structural_imaging/civet/2.1.1.lua"
     public_civet.parent.mkdir(parents=True)
@@ -275,7 +271,9 @@ def test_empty_inventory_reconciliation_updates_other_modules(
     if older_available:
         make_container(repo_root, old_civet, "civet\n")
         (repo_root / "containers" / old_civet / "env.txt").touch()
-        inventory = reconcile_module_files.read_container_inventory(repo_root / "containers" / old_civet)
+        inventory = reconcile_module_files.read_container_inventory(
+            repo_root / "containers" / old_civet
+        )
         civet.write_bytes(reconcile_module_files.render_module(inventory, format="lua"))
         civet_before = civet.read_bytes()
         public_civet.write_bytes(civet_before)
@@ -296,10 +294,13 @@ def test_empty_inventory_reconciliation_updates_other_modules(
     assert reconcile_module_files.plan_module_reconciliation(repo_root, log) == []
 
 
-@pytest.mark.parametrize("old_name, commands", [
-    ("mrtrix3src_latest_latest", "mrconvert\n"),
-    ("mrtrix3src_latest_20260101", ""),
-])
+@pytest.mark.parametrize(
+    "old_name, commands",
+    [
+        ("mrtrix3src_latest_latest", "mrconvert\n"),
+        ("mrtrix3src_latest_20260101", ""),
+    ],
+)
 @pytest.mark.parametrize("public_exists", [False, True])
 def test_unrecognized_historical_inventory_preserves_modules(
     tmp_path, old_name, commands, public_exists
@@ -312,7 +313,7 @@ def test_unrecognized_historical_inventory_preserves_modules(
     canonical = tmp_path / "containers/modules/mrtrix3src/latest.lua"
     public = tmp_path / "neurodesk-modules/diffusion_imaging/mrtrix3src/latest.lua"
     before = module_text(old_name)
-    for path in ((canonical, public) if public_exists else (canonical,)):
+    for path in (canonical, public) if public_exists else (canonical,):
         path.parent.mkdir(parents=True)
         path.write_text(before)
     log = tmp_path / "log.txt"
@@ -354,8 +355,8 @@ def test_unrecognized_historical_inventory_preserves_modules(
         ),
         (
             "2.1.3",
-            '# neurodesk-exposed-commands\n'
-            'if {[llength [info commands extensions]] > 0} {\n'
+            "# neurodesk-exposed-commands\n"
+            "if {[llength [info commands extensions]] > 0} {\n"
             '    extensions "panopticacli/2.1.3"\n}\n',
             '#%Module\nmodule-whatis "Panoptica"\nprepend-path PATH /retired/container\n',
         ),
@@ -369,7 +370,8 @@ def test_cleans_legacy_extensions_outside_active_containers(
     log_path = tmp_path / "log.txt"
     log_path.write_text(
         "panoptica_2.1.3_20260728 categories:image segmentation,quality control,\n"
-        if listed_without_inventory else ""
+        if listed_without_inventory
+        else ""
     )
     paths = [
         repo_root / "containers/modules/panoptica" / filename,
@@ -479,7 +481,9 @@ def test_manual_snippet_changes_reach_existing_modules(tmp_path, active):
     make_container(repo_root, container, "freeview\n")
     log = tmp_path / "log.txt"
     log.write_text(
-        f"{container} categories:structural imaging,image segmentation,\n" if active else ""
+        f"{container} categories:structural imaging,image segmentation,\n"
+        if active
+        else ""
     )
     paths = [
         repo_root / "containers/modules/freesurfer/8.2.0.lua",
@@ -489,8 +493,14 @@ def test_manual_snippet_changes_reach_existing_modules(tmp_path, active):
     for path in paths:
         path.parent.mkdir(parents=True)
         path.write_text(module_text(container) + STALE_FREESURFER_SNIPPET)
-    args = ["--repo-root", str(repo_root), "--log", str(log),
-            "--manual-module-dir", str(snippets)]
+    args = [
+        "--repo-root",
+        str(repo_root),
+        "--log",
+        str(log),
+        "--manual-module-dir",
+        str(snippets),
+    ]
 
     before = [path.read_text() for path in paths]
     assert reconcile_module_files.main(args + ["--check"]) == 1
@@ -535,8 +545,14 @@ def test_new_snippet_updates_orphan_public_lua_but_not_tcl(tmp_path):
     tcl = directory / "1.0"
     tcl.write_text('#%Module\nmodule-whatis "demo"\n')
     (snippets / "demo").write_text('setenv("CUSTOM_VERSION", "toolVersion")')
-    args = ["--repo-root", str(tmp_path), "--log", str(log),
-            "--manual-module-dir", str(snippets)]
+    args = [
+        "--repo-root",
+        str(tmp_path),
+        "--log",
+        str(log),
+        "--manual-module-dir",
+        str(snippets),
+    ]
 
     assert reconcile_module_files.main(args) == 0
     assert 'setenv("CUSTOM_VERSION", "1.0")\n' in lua.read_text()
@@ -545,11 +561,15 @@ def test_new_snippet_updates_orphan_public_lua_but_not_tcl(tmp_path):
 
 
 def test_matlab_legacy_migration_preserves_help_and_license_mapping(tmp_path):
-    snippet = (ROOT / "neurodesk/transparent-singularity/manual_module_files/matlab").read_text()
-    help_text = 'help([===[\n' + snippet + ']===])\n'
+    snippet = (
+        ROOT / "neurodesk/transparent-singularity/manual_module_files/matlab"
+    ).read_text()
+    help_text = "help([===[\n" + snippet + "]===])\n"
     module = tmp_path / "containers/modules/matlab/2025b.lua"
     module.parent.mkdir(parents=True)
-    module.write_text(help_text + 'whatis("MATLAB")\n' + snippet.replace("toolVersion", "2025b"))
+    module.write_text(
+        help_text + 'whatis("MATLAB")\n' + snippet.replace("toolVersion", "2025b")
+    )
     log = tmp_path / "log.txt"
     log.write_text("")
 
@@ -558,12 +578,14 @@ def test_matlab_legacy_migration_preserves_help_and_license_mapping(tmp_path):
 
     content = module.read_text()
     assert content.startswith(help_text + 'whatis("MATLAB")\n')
-    assert content.count('local additional_bind_paths') == 2
+    assert content.count("local additional_bind_paths") == 2
     assert 'os.getenv("HOME") .. ":/opt/matlab/R2025b/licenses"' in content
     assert reconcile_module_files.plan_module_reconciliation(tmp_path, log) == []
 
 
-@pytest.mark.parametrize("failure", ["missing-source", "unclosed-block", "duplicate-block"])
+@pytest.mark.parametrize(
+    "failure", ["missing-source", "unclosed-block", "duplicate-block"]
+)
 def test_invalid_snippet_inputs_do_not_partially_write_modules(tmp_path, failure):
     snippets = tmp_path / "snippets"
     snippets.mkdir()
@@ -577,14 +599,21 @@ def test_invalid_snippet_inputs_do_not_partially_write_modules(tmp_path, failure
     good.write_text('whatis("unchanged until validation succeeds")\n')
     block = '-- neurodesk-manual-module-begin\nsetenv("CUSTOM", "old")\n'
     bad.write_text(
-        (block + '-- neurodesk-manual-module-end\n') * 2
-        if failure == "duplicate-block" else block
+        (block + "-- neurodesk-manual-module-end\n") * 2
+        if failure == "duplicate-block"
+        else block
     )
     if failure == "missing-source":
         snippets = tmp_path / "absent"
     before = [good.read_text(), bad.read_text()]
-    args = ["--repo-root", str(tmp_path), "--log", str(log),
-            "--manual-module-dir", str(snippets)]
+    args = [
+        "--repo-root",
+        str(tmp_path),
+        "--log",
+        str(log),
+        "--manual-module-dir",
+        str(snippets),
+    ]
 
     assert reconcile_module_files.main(args) == 2
     assert [good.read_text(), bad.read_text()] == before
@@ -598,13 +627,13 @@ def test_tcl_reconciliation_updates_path_commands_and_dotted_manual_version(tmp_
     log.write_text(f"{name} categories:research,\n")
     module = repo / "containers/modules/matlab/2024.2"
     module.parent.mkdir(parents=True)
-    module.write_text('''#%Module1.0
+    module.write_text("""#%Module1.0
 module-whatis "matlab_2024.2_20260101"
 prepend-path PATH "/old/containers/matlab_2024.2_20260101"
 # neurodesk-manual-module-begin
 setenv OLD old
 # neurodesk-manual-module-end
-''')
+""")
     metadata = module.parent / ".version"
     metadata.write_text('#%Module1.0\nset ModulesVersion "2024.2"\n')
     before_metadata = metadata.read_text()
@@ -613,9 +642,9 @@ setenv OLD old
     content = module.read_text()
     assert f'prepend-path PATH "{repo / "containers" / name}"' in content
     assert 'module-whatis "Commands: newcommand"' in content
-    assert 'R2024.2/licenses' in content
-    assert 'setenv OLD' not in content
-    assert content.count('# neurodesk-manual-module-begin') == 1
+    assert "R2024.2/licenses" in content
+    assert "setenv OLD" not in content
+    assert content.count("# neurodesk-manual-module-begin") == 1
     assert (repo / "neurodesk-modules/research/matlab/2024.2").read_text() == content
     assert metadata.read_text() == before_metadata
     assert reconcile_module_files.plan_module_reconciliation(repo, log) == []
@@ -643,7 +672,10 @@ if { [info exists env(SINGULARITY_BINDPATH)] } {
 
     content = module.read_text()
     assert content.startswith("#%Module###")
-    assert "prepend-path PATH /cvmfs/neurodesk.ardc.edu.au/containers/matlab_2022a_20231207\n" in content
+    assert (
+        "prepend-path PATH /cvmfs/neurodesk.ardc.edu.au/containers/matlab_2022a_20231207\n"
+        in content
+    )
     assert "append-path" not in content
     assert content.count('"$env(HOME):/opt/matlab/R2022a/licenses"') == 1
     assert reconcile_module_files.plan_module_reconciliation(tmp_path, log) == []
@@ -651,7 +683,9 @@ if { [info exists env(SINGULARITY_BINDPATH)] } {
 
 @pytest.mark.parametrize("tool", ["demo", "freesurfer"])
 @pytest.mark.parametrize("carriage_return", ["", "\r"])
-def test_missing_tcl_module_is_generated_like_the_renderer(tmp_path, tool, carriage_return):
+def test_missing_tcl_module_is_generated_like_the_renderer(
+    tmp_path, tool, carriage_return
+):
     import shutil
     import subprocess
 
@@ -669,7 +703,8 @@ def test_missing_tcl_module_is_generated_like_the_renderer(tmp_path, tool, carri
     )
     subprocess.run(
         ["bash", str(container / "ts_render_artifacts.sh"), f"{container_name}.simg"],
-        check=True, capture_output=True,
+        check=True,
+        capture_output=True,
     )
     canonical = repo_root / "containers/modules" / tool / "1.0"
     rendered = canonical.read_text()

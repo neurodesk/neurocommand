@@ -1,19 +1,13 @@
-import importlib.util
 from pathlib import Path
-import sys
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / ".github" / "workflows" / "scripts"
 SCRIPT = SCRIPTS / "consolidate_appsjson_queue.py"
 
-# The consolidation script imports sync_neurocontainer_icons from its own
-# directory, so make that importable before loading it.
-sys.path.insert(0, str(SCRIPTS))
-spec = importlib.util.spec_from_file_location("consolidate_appsjson_queue", SCRIPT)
-consolidate_appsjson_queue = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = consolidate_appsjson_queue
-spec.loader.exec_module(consolidate_appsjson_queue)
+
+consolidate_appsjson_queue = load_script("consolidate_appsjson_queue", SCRIPT)
 
 
 def test_diff_comment_updates_existing_marker_comment(monkeypatch):
@@ -37,7 +31,9 @@ def test_diff_comment_updates_existing_marker_comment(monkeypatch):
         "github_paginated_get",
         fake_paginated_get,
     )
-    monkeypatch.setattr(consolidate_appsjson_queue, "github_request", fake_github_request)
+    monkeypatch.setattr(
+        consolidate_appsjson_queue, "github_request", fake_github_request
+    )
 
     status = consolidate_appsjson_queue.post_consolidated_diff_comment(
         api_url="https://api.github.com",
@@ -105,7 +101,9 @@ def test_source_pr_closure_does_not_post_comments(monkeypatch):
     def fake_github_request(method, api_url, path, token, query=None, payload=None):
         calls.append((method, path, payload))
 
-    monkeypatch.setattr(consolidate_appsjson_queue, "github_request", fake_github_request)
+    monkeypatch.setattr(
+        consolidate_appsjson_queue, "github_request", fake_github_request
+    )
 
     consolidate_appsjson_queue.close_consolidated_source_prs(
         api_url="https://api.github.com",
@@ -143,7 +141,9 @@ def test_closing_empty_queue_pr_does_not_post_comment(monkeypatch):
     def fake_github_request(method, api_url, path, token, query=None, payload=None):
         calls.append((method, path, payload))
 
-    monkeypatch.setattr(consolidate_appsjson_queue, "github_request", fake_github_request)
+    monkeypatch.setattr(
+        consolidate_appsjson_queue, "github_request", fake_github_request
+    )
 
     result = consolidate_appsjson_queue.upsert_consolidated_pr(
         api_url="https://api.github.com",

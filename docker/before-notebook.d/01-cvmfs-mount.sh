@@ -45,6 +45,8 @@ setup_cvmfs() {
 
     echo "[neurocommand] Mounting CVMFS..."
     if [ -x /etc/init.d/autofs ] && service autofs start >/dev/null 2>&1; then
+        # A failed readiness probe or status message must trigger the manual mount fallback.
+        # shellcheck disable=SC2015
         ls /cvmfs/neurodesk.ardc.edu.au/neurodesk-modules/ >/dev/null 2>&1 \
             && echo "[neurocommand] CVMFS ready (autofs)." \
             || mount_cvmfs_manually
@@ -67,9 +69,9 @@ mount_cvmfs_manually() {
 probe_and_select_region() {
     # Median of 3 latency probes against .cvmfspublished.
     get_latency() {
-        local url="$1" probes=3 i out t s
+        local url="$1" probes=3 out t s
         local latencies=()
-        for i in $(seq 1 "$probes"); do
+        for _ in $(seq 1 "$probes"); do
             out=$(curl --no-keepalive --connect-timeout 3 --max-time 5 -s -w "%{time_total} %{http_code}" -o /dev/null "$url" || true)
             t=$(echo "$out" | awk '{print $1}')
             s=$(echo "$out" | awk '{print $2}')

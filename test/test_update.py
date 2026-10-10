@@ -61,7 +61,9 @@ def make_update_fixture(tmp_path):
 
 def push_upstream_fetch_and_run_update(upstream):
     upstream_script = upstream / "neurodesk" / "fetch_and_run.sh"
-    upstream_script.write_text(upstream_script.read_text() + "\n# remote update regression\n")
+    upstream_script.write_text(
+        upstream_script.read_text() + "\n# remote update regression\n"
+    )
     run(["git", "add", "neurodesk/fetch_and_run.sh"], cwd=upstream)
     run(
         [
@@ -84,8 +86,8 @@ def dirty_local_fetch_and_run(work):
     local_script = work / "neurodesk" / "fetch_and_run.sh"
     local_script.write_text(
         local_script.read_text().replace(
-            'name=${1:-}',
-            'name=${1:-}\n# local dirty regression',
+            "name=${1:-}",
+            "name=${1:-}\n# local dirty regression",
             1,
         )
     )
@@ -119,9 +121,10 @@ def test_update_autostashes_dirty_tracked_files(tmp_path):
     )
 
     assert result.returncode == 0, result.stderr + result.stdout
-    assert run(["git", "rev-parse", "HEAD"], cwd=work).stdout == run(
-        ["git", "rev-parse", "origin/main"], cwd=work
-    ).stdout
+    assert (
+        run(["git", "rev-parse", "HEAD"], cwd=work).stdout
+        == run(["git", "rev-parse", "origin/main"], cwd=work).stdout
+    )
     assert "# local dirty regression" in local_script.read_text()
 
 
@@ -141,9 +144,10 @@ def test_update_handles_detached_head_checkout(tmp_path):
     )
 
     assert result.returncode == 0, result.stderr + result.stdout
-    assert run(["git", "rev-parse", "HEAD"], cwd=work).stdout == run(
-        ["git", "rev-parse", "origin/main"], cwd=work
-    ).stdout
+    assert (
+        run(["git", "rev-parse", "HEAD"], cwd=work).stdout
+        == run(["git", "rev-parse", "origin/main"], cwd=work).stdout
+    )
     assert "# local dirty regression" in local_script.read_text()
 
 

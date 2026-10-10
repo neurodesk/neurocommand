@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /maintenance
+    schedule:
+      interval: monthly
+    groups:
+      quality-tools:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /test
+    schedule:
+      interval: monthly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

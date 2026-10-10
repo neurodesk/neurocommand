@@ -19,7 +19,9 @@ def generate_log(log_path: Path) -> None:
     print("[DEBUG] Generating log file from neurodesk/apps.json ...")
     run_command(["python3", "neurodesk/write_log.py"])
     if not log_path.exists():
-        raise SystemExit(f"[ERROR] {log_path} was not created by neurodesk/write_log.py")
+        raise SystemExit(
+            f"[ERROR] {log_path} was not created by neurodesk/write_log.py"
+        )
 
 
 def normalize_log(log_path: Path) -> None:
@@ -82,7 +84,9 @@ def parse_iso8601(timestamp: str) -> Optional[datetime]:
 
 def load_expected_keys(log_path: Path) -> Set[str]:
     if not log_path.exists():
-        raise SystemExit("[ERROR] log.txt not found; cannot determine expected containers")
+        raise SystemExit(
+            "[ERROR] log.txt not found; cannot determine expected containers"
+        )
 
     expected_keys = set()
     for raw_line in log_path.read_text(encoding="utf-8").splitlines():
@@ -90,7 +94,11 @@ def load_expected_keys(log_path: Path) -> Set[str]:
         if not line:
             continue
         image_builddate = line.split()[0]
-        key = image_builddate if image_builddate.endswith(".simg") else f"{image_builddate}.simg"
+        key = (
+            image_builddate
+            if image_builddate.endswith(".simg")
+            else f"{image_builddate}.simg"
+        )
         expected_keys.add(key)
 
     return expected_keys
@@ -115,7 +123,9 @@ def load_release_keys(releases_dir: Path) -> Set[str]:
             ) from exc
 
         if not isinstance(release, dict):
-            raise SystemExit(f"[ERROR] Invalid release metadata {release_path}: expected an object")
+            raise SystemExit(
+                f"[ERROR] Invalid release metadata {release_path}: expected an object"
+            )
 
         apps = release.get("apps")
         if not isinstance(apps, dict) or not apps:
@@ -131,7 +141,9 @@ def load_release_keys(releases_dir: Path) -> Set[str]:
                     f"app {app_name!r} must be an object"
                 )
             builddate = app.get("version")
-            if not isinstance(builddate, str) or not re.fullmatch(r"[0-9]{8}", builddate):
+            if not isinstance(builddate, str) or not re.fullmatch(
+                r"[0-9]{8}", builddate
+            ):
                 raise SystemExit(
                     f"[ERROR] Invalid release metadata {release_path}: "
                     f"app {app_name!r} has invalid build date {builddate!r}"
@@ -172,7 +184,9 @@ def list_nectar_objects(remote_root: str) -> List[dict]:
             text=True,
         )
     except subprocess.CalledProcessError as exc:
-        raise SystemExit(f"[ERROR] Failed to list objects in {remote_root}: {exc}") from exc
+        raise SystemExit(
+            f"[ERROR] Failed to list objects in {remote_root}: {exc}"
+        ) from exc
     return json.loads(lsjson)
 
 
@@ -183,14 +197,20 @@ def list_nectar_objects_optional(remote_root: str) -> Optional[List[dict]]:
         capture_output=True,
     )
     if result.returncode != 0:
-        err = result.stderr.strip() or result.stdout.strip() or f"exit status {result.returncode}"
+        err = (
+            result.stderr.strip()
+            or result.stdout.strip()
+            or f"exit status {result.returncode}"
+        )
         print(f"[DEBUG] Unable to list {remote_root}; skipping optional check ({err})")
         return None
 
     try:
         return json.loads(result.stdout)
     except json.JSONDecodeError as exc:
-        print(f"[DEBUG] Unable to parse lsjson output for {remote_root}; skipping optional check ({exc})")
+        print(
+            f"[DEBUG] Unable to parse lsjson output for {remote_root}; skipping optional check ({exc})"
+        )
         return None
 
 
@@ -213,7 +233,9 @@ def parse_remote_container(remote_root: str) -> Optional[Tuple[str, str]]:
 def check_orphaned_segments(remote_root: str, dry_run: bool) -> None:
     parsed = parse_remote_container(remote_root)
     if parsed is None:
-        print(f"[DEBUG] Could not infer Swift container from {remote_root}; skipping orphaned-segment check")
+        print(
+            f"[DEBUG] Could not infer Swift container from {remote_root}; skipping orphaned-segment check"
+        )
         return
 
     remote, container = parsed
@@ -248,7 +270,9 @@ def check_orphaned_segments(remote_root: str, dry_run: bool) -> None:
         print("[DEBUG] Orphaned-segment scan: no orphaned segment objects found")
         return
 
-    print(f"[WARNING] Orphaned-segment scan: found {len(orphaned_segments)} orphaned segment object(s)")
+    print(
+        f"[WARNING] Orphaned-segment scan: found {len(orphaned_segments)} orphaned segment object(s)"
+    )
     orphaned_segments = sorted(orphaned_segments)
 
     if dry_run:
@@ -277,9 +301,13 @@ def check_orphaned_segments(remote_root: str, dry_run: bool) -> None:
             failed += 1
             print(f"[WARNING] Failed to delete orphaned segment {segment_obj}: {exc}")
 
-    print(f"[DEBUG] Deleted {deleted} orphaned segment object(s) from {segments_remote}")
+    print(
+        f"[DEBUG] Deleted {deleted} orphaned segment object(s) from {segments_remote}"
+    )
     if failed:
-        print(f"[WARNING] Failed deleting {failed} orphaned segment object(s) from {segments_remote}")
+        print(
+            f"[WARNING] Failed deleting {failed} orphaned segment object(s) from {segments_remote}"
+        )
 
 
 def list_s3_objects(bucket: str) -> List[dict]:
@@ -325,13 +353,17 @@ def main() -> None:
         description="Find stale container images in Nectar and S3 using log.txt membership."
     )
     parser.add_argument("--s3-bucket", required=True, help="S3 bucket name")
-    parser.add_argument("--remote-root", default="nectar:/neurodesk/", help="Nectar remote path")
+    parser.add_argument(
+        "--remote-root", default="nectar:/neurodesk/", help="Nectar remote path"
+    )
     parser.add_argument("--log-path", default="log.txt", help="Path to log file")
     parser.add_argument(
         "--releases-dir",
         help="Path to neurocontainers release metadata; referenced images are protected",
     )
-    parser.add_argument("--retention-days", type=int, default=30, help="Retention period in days")
+    parser.add_argument(
+        "--retention-days", type=int, default=30, help="Retention period in days"
+    )
     parser.add_argument(
         "--skip-log-generation",
         action="store_true",
@@ -361,7 +393,9 @@ def main() -> None:
     if args.releases_dir:
         release_keys = load_release_keys(Path(args.releases_dir))
         expected_keys.update(release_keys)
-        print(f"[DEBUG] Protected container count from release metadata: {len(release_keys)}")
+        print(
+            f"[DEBUG] Protected container count from release metadata: {len(release_keys)}"
+        )
 
     print(f"[DEBUG] Expected container count from log: {len(expected_keys)}")
     print(f"[DEBUG] Retention window for stale deletions: {args.retention_days} day(s)")
@@ -378,7 +412,9 @@ def main() -> None:
 
         mod_time = parse_iso8601(obj.get("ModTime", ""))
         if mod_time is None:
-            print(f"[WARNING] Skipping Nectar deletion for {key}: missing/invalid ModTime")
+            print(
+                f"[WARNING] Skipping Nectar deletion for {key}: missing/invalid ModTime"
+            )
             continue
 
         if mod_time >= cutoff:
@@ -399,7 +435,9 @@ def main() -> None:
             subprocess.run(["rclone", "deletefile", remote_obj], check=True)
 
     if args.dry_run:
-        print(f"[DRY-RUN] Would delete {len(nectar_to_delete)} stale object(s) from Nectar")
+        print(
+            f"[DRY-RUN] Would delete {len(nectar_to_delete)} stale object(s) from Nectar"
+        )
     else:
         print(f"[DEBUG] Deleted {len(nectar_to_delete)} stale object(s) from Nectar")
 
@@ -411,7 +449,9 @@ def main() -> None:
 
         last_modified = parse_iso8601(obj.get("LastModified", ""))
         if last_modified is None:
-            print(f"[WARNING] Skipping AWS deletion for {key}: missing/invalid LastModified")
+            print(
+                f"[WARNING] Skipping AWS deletion for {key}: missing/invalid LastModified"
+            )
             continue
 
         if last_modified >= cutoff:
@@ -425,9 +465,13 @@ def main() -> None:
 
     for key in sorted(aws_to_delete):
         if args.dry_run:
-            print(f"[DRY-RUN] Would delete AWS object not in log: s3://{args.s3_bucket}/{key}")
+            print(
+                f"[DRY-RUN] Would delete AWS object not in log: s3://{args.s3_bucket}/{key}"
+            )
         else:
-            print(f"[DEBUG] Deleting AWS object not in log: s3://{args.s3_bucket}/{key}")
+            print(
+                f"[DEBUG] Deleting AWS object not in log: s3://{args.s3_bucket}/{key}"
+            )
             subprocess.run(
                 [
                     "aws",
@@ -447,7 +491,9 @@ def main() -> None:
             f"[DRY-RUN] Would delete {len(aws_to_delete)} stale object(s) from AWS S3 bucket {args.s3_bucket}"
         )
     else:
-        print(f"[DEBUG] Deleted {len(aws_to_delete)} stale object(s) from AWS S3 bucket {args.s3_bucket}")
+        print(
+            f"[DEBUG] Deleted {len(aws_to_delete)} stale object(s) from AWS S3 bucket {args.s3_bucket}"
+        )
 
     check_orphaned_segments(args.remote_root, args.dry_run)
 

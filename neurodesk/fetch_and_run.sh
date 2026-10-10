@@ -2,6 +2,8 @@
 # fetch_and_run.sh NAME VERSION [BUILD_DATE] [--container-shell | COMMAND ARGS...]
 
 _neurodesk_base=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+# This source is deployed beside the script or installed by the module engine.
+# shellcheck disable=SC1091
 source "$_neurodesk_base/configparser.sh" "$_neurodesk_base/config.ini" >/dev/null || exit 2
 export neurodesk_singularity_opts
 
@@ -16,6 +18,8 @@ neurodesk_init_modules() {
         fi
     fi
     if [[ -n ${LMOD_INIT:-} && -f $LMOD_INIT ]]; then
+        # The initialization file is supplied by the deployment environment.
+        # shellcheck disable=SC1090
         source "$LMOD_INIT"
     elif [[ -n ${MODULES_CMD:-} ]]; then
         if [[ $MODULES_CMD == *.tcl ]]; then
@@ -24,14 +28,24 @@ neurodesk_init_modules() {
             eval "$("$MODULES_CMD" bash autoinit)"
         fi
     elif [[ -n ${LMOD_CMD:-} && -f $(dirname "$LMOD_CMD")/../init/bash ]]; then
+        # This source is deployed beside the script or installed by the module engine.
+        # shellcheck disable=SC1091
         source "$(dirname "$LMOD_CMD")/../init/bash"
     elif [[ -f /usr/share/module.sh ]]; then
+        # This source is deployed beside the script or installed by the module engine.
+        # shellcheck disable=SC1091
         source /usr/share/module.sh
     elif [[ -f /etc/profile.d/modules.sh ]]; then
+        # This source is deployed beside the script or installed by the module engine.
+        # shellcheck disable=SC1091
         source /etc/profile.d/modules.sh
     elif [[ -f /usr/share/lmod/lmod/init/bash ]]; then
+        # This source is deployed beside the script or installed by the module engine.
+        # shellcheck disable=SC1091
         source /usr/share/lmod/lmod/init/bash
     elif [[ -f /usr/share/modules/init/bash ]]; then
+        # This source is deployed beside the script or installed by the module engine.
+        # shellcheck disable=SC1091
         source /usr/share/modules/init/bash
     fi
     type module >/dev/null 2>&1 || { echo '[ERROR] Initialize Lmod or Environment Modules before launching Neurodesk.' >&2; return 2; }
@@ -121,6 +135,8 @@ PY
 fi
 
 if [[ $isolated == true ]]; then
+    # This source is deployed beside the script or installed by the module engine.
+    # shellcheck disable=SC1091
     source "$_neurodesk_base/transparent-singularity/container_runtime.sh" || exit 2
     export APPTAINERENV_PS1="[$name/$version] \\w\\$ "
     export SINGULARITYENV_PS1=$APPTAINERENV_PS1
@@ -169,6 +185,8 @@ export PATH
 unset _neurodesk_keys _neurodesk_dirs _neurodesk_key _neurodesk_image _neurodesk_remaining _neurodesk_parts _neurodesk_part _neurodesk_owned _neurodesk_dir
 RC
         printf 'if ! type ml >/dev/null 2>&1; then ml() { module "$@"; }; fi\n'
+        # Emit this expression literally into the child shell initialization file.
+        # shellcheck disable=SC2016
         printf 'PS1=%q"${PS1:-\\w\\$ }"\n' "[$name/$version] "
     } > "$rcfile"
     bash --noprofile --rcfile "$rcfile" -i

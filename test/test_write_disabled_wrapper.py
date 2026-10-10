@@ -1,11 +1,10 @@
-import subprocess
-import sys
 from pathlib import Path
+import subprocess
+
+from wrapper_legacy import WrapperState, _classify_wrapper
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "cvmfs" / "write_disabled_wrapper.sh"
-sys.path.insert(0, str(ROOT / "neurodesk" / "transparent-singularity"))
-from wrapper_legacy import WrapperState, _classify_wrapper  # noqa: E402
 
 REF = "freesurfer_8.2.0:20260818"
 OLD_WRAPPER = (
@@ -46,7 +45,9 @@ def test_check_flags_wrappers_that_still_exit_zero(tmp_path):
 
 def test_check_rejects_active_wrappers(tmp_path):
     wrapper = tmp_path / "recon-all"
-    wrapper.write_text('#!/usr/bin/env bash\nexec apptainer run image.simg recon-all "$@"\n')
+    wrapper.write_text(
+        '#!/usr/bin/env bash\nexec apptainer run image.simg recon-all "$@"\n'
+    )
     assert check(wrapper) == 1
 
 

@@ -1,23 +1,16 @@
-import importlib.util
-import io
-import json
 from pathlib import Path
-import subprocess
-import sys
 from urllib.error import HTTPError
+import io
+import subprocess
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / ".github" / "workflows" / "scripts"
 SCRIPT = SCRIPTS / "consolidate_appsjson_queue.py"
 
-# The consolidation script imports sync_neurocontainer_icons from its own
-# directory, so make that importable before loading it.
-sys.path.insert(0, str(SCRIPTS))
-spec = importlib.util.spec_from_file_location("consolidate_appsjson_queue_merge", SCRIPT)
-consolidate_appsjson_queue = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = consolidate_appsjson_queue
-spec.loader.exec_module(consolidate_appsjson_queue)
+
+consolidate_appsjson_queue = load_script("consolidate_appsjson_queue_merge", SCRIPT)
 
 
 def _pr(files):
@@ -81,7 +74,10 @@ def test_merge_pull_request_retries_405_then_merges(monkeypatch):
 
     assert status == "merged"
     assert len(calls) == 2
-    assert all(method == "PUT" and path.endswith("/pulls/739/merge") for method, path, _ in calls)
+    assert all(
+        method == "PUT" and path.endswith("/pulls/739/merge")
+        for method, path, _ in calls
+    )
     assert calls[0][2] == {"merge_method": "squash"}
 
 
@@ -139,7 +135,9 @@ def _git(repo, *args):
 
 
 def _commit_test_file(repo, branch, assertion):
-    (repo / "test_sample.py").write_text(f"def test_sample():\n    assert {assertion}\n")
+    (repo / "test_sample.py").write_text(
+        f"def test_sample():\n    assert {assertion}\n"
+    )
     _git(repo, "add", "test_sample.py")
     _git(repo, "commit", "-m", branch)
     _git(repo, "branch", branch)
@@ -149,6 +147,11 @@ def test_run_unit_tests_on_ref_reports_failures_only(tmp_path, monkeypatch):
     repo = tmp_path / "repo"
     repo.mkdir()
     _git(repo, "init", "-q")
+    (repo / "maintenance").mkdir()
+    (repo / "maintenance" / "check.py").write_text(
+        (ROOT / "maintenance" / "check.py").read_text()
+    )
+    _git(repo, "add", "maintenance/check.py")
     _commit_test_file(repo, "passing", "1 == 1")
     _commit_test_file(repo, "failing", "1 == 2")
     monkeypatch.chdir(repo)
@@ -156,10 +159,29 @@ def test_run_unit_tests_on_ref_reports_failures_only(tmp_path, monkeypatch):
     assert consolidate_appsjson_queue.run_unit_tests_on_ref("passing") is None
 
     failure = consolidate_appsjson_queue.run_unit_tests_on_ref("failing")
-    assert "FAILED test_sample.py::test_sample" in failure
+    assert "test_sample.py:2: AssertionError" in failure
     assert "1 failed" in failure
 
     worktrees = subprocess.run(
-        ["git", "worktree", "list"], cwd=repo, check=True, capture_output=True, text=True
+        ["git", "worktree", "list"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
     ).stdout
     assert len(worktrees.splitlines()) == 1
+
+
+def test_merge_response_that_declines_merge_does_not_report_landed_changes(monkeypatch):
+    monkeypatch.setattr(
+        consolidate_appsjson_queue,
+        "github_request",
+        lambda *args, **kwargs: {
+            "merged": False,
+            "message": "Required checks are pending",
+        },
+    )
+    status = consolidate_appsjson_queue.merge_pull_request(
+        "https://example.invalid", "owner/repo", "token", 1, "squash"
+    )
+    assert status == "failed (Required checks are pending)"

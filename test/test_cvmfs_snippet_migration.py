@@ -5,8 +5,9 @@ import sys
 
 import pytest
 
-from test.test_cvmfs_reconcile_module_files import ROOT, SCRIPT, make_container
 from artifact_renderer import legacy_module_content, read_container_inventory
+from test.support.cvmfs import make_container
+from test.support.paths import ROOT, MODULE_RECONCILIATION_SCRIPT as SCRIPT
 
 
 @pytest.fixture
@@ -19,7 +20,9 @@ def maintained_freesurfer_modules(tmp_path):
     for name in (old, current):
         make_container(tmp_path, name, "recon-all\nfreeview\n")
         directory = tmp_path / "containers" / name
-        (directory / "env.txt").write_text("DEPLOY_ENV_FREESURFER_HOME=BASEPATH/opt/freesurfer\n")
+        (directory / "env.txt").write_text(
+            "DEPLOY_ENV_FREESURFER_HOME=BASEPATH/opt/freesurfer\n"
+        )
         (directory / "README.md").write_text(f"FreeSurfer build {name}\n")
         (directory / "manual_module_files").mkdir()
         (directory / "manual_module_files/freesurfer").write_text(
@@ -39,10 +42,13 @@ def maintained_freesurfer_modules(tmp_path):
         for format, suffix in (("lua", ".lua"), ("tcl", "")):
             path = tmp_path / root / "freesurfer" / ("8.2.0" + suffix)
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(legacy_module_content(
-                old_spec, Path("/cvmfs/neurodesk.ardc.edu.au/containers") / old,
-                format=format,
-            ))
+            path.write_text(
+                legacy_module_content(
+                    old_spec,
+                    Path("/cvmfs/neurodesk.ardc.edu.au/containers") / old,
+                    format=format,
+                )
+            )
             modules.append(path)
     log = tmp_path / "log.txt"
     log.write_text(f"{current} categories:image segmentation,structural imaging,\n")
@@ -51,12 +57,23 @@ def maintained_freesurfer_modules(tmp_path):
 
 def reconcile(repo_root, log, *args):
     return subprocess.run(
-        [sys.executable, str(SCRIPT), "--repo-root", str(repo_root), "--log", str(log), *args],
-        capture_output=True, text=True,
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--repo-root",
+            str(repo_root),
+            "--log",
+            str(log),
+            *args,
+        ],
+        capture_output=True,
+        text=True,
     )
 
 
-def test_maintained_snippets_advance_all_freesurfer_modules(tmp_path, maintained_freesurfer_modules):
+def test_maintained_snippets_advance_all_freesurfer_modules(
+    tmp_path, maintained_freesurfer_modules
+):
     modules, log = maintained_freesurfer_modules
     pending = reconcile(tmp_path, log, "--check")
     assert pending.returncode == 1, pending.stdout + pending.stderr
@@ -73,7 +90,9 @@ def test_maintained_snippets_advance_all_freesurfer_modules(tmp_path, maintained
 
 @pytest.mark.parametrize("edit", ["snippet", "footer", "environment"])
 def test_maintained_snippet_migration_preserves_site_edits(
-    tmp_path, maintained_freesurfer_modules, edit,
+    tmp_path,
+    maintained_freesurfer_modules,
+    edit,
 ):
     modules, log = maintained_freesurfer_modules
     before = {}
@@ -84,9 +103,11 @@ def test_maintained_snippet_migration_preserves_site_edits(
         elif edit == "environment":
             content = content.replace("/opt/freesurfer", "/site/freesurfer")
         else:
-            content += ('setenv("SITE_LICENSE", "/site/license")\n'
-                        if module.suffix == ".lua"
-                        else 'setenv SITE_LICENSE /site/license\n')
+            content += (
+                'setenv("SITE_LICENSE", "/site/license")\n'
+                if module.suffix == ".lua"
+                else "setenv SITE_LICENSE /site/license\n"
+            )
         module.write_text(content)
         before[module] = module.read_bytes()
     applied = reconcile(tmp_path, log)

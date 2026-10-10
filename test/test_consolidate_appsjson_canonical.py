@@ -1,20 +1,14 @@
-import importlib.util
-import json
 from pathlib import Path
-import sys
+import json
 
+from test.support.scripts import load_script
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / ".github" / "workflows" / "scripts"
 SCRIPT = SCRIPTS / "consolidate_appsjson_queue.py"
 
-# The consolidation script imports sync_neurocontainer_icons from its own
-# directory, so make that importable before loading it.
-sys.path.insert(0, str(SCRIPTS))
-spec = importlib.util.spec_from_file_location("consolidate_appsjson_queue", SCRIPT)
-consolidate_appsjson_queue = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = consolidate_appsjson_queue
-spec.loader.exec_module(consolidate_appsjson_queue)
+
+consolidate_appsjson_queue = load_script("consolidate_appsjson_queue", SCRIPT)
 
 
 def _sample_payload():
@@ -27,12 +21,20 @@ def _sample_payload():
             "categories": ["image segmentation"],
         },
         "afni": {
-            "apps": {"afni 1.0": {"version": "20260101", "exec": "", "apptainer_args": []}},
+            "apps": {
+                "afni 1.0": {"version": "20260101", "exec": "", "apptainer_args": []}
+            },
             "categories": ["functional imaging"],
         },
         # appended out of alphabetical order, as a freshly consolidated tool
         "blastct": {
-            "apps": {"blastct 2.0.0": {"version": "20260512", "exec": "", "apptainer_args": []}},
+            "apps": {
+                "blastct 2.0.0": {
+                    "version": "20260512",
+                    "exec": "",
+                    "apptainer_args": [],
+                }
+            },
             "categories": ["structural imaging"],
         },
     }
@@ -44,7 +46,11 @@ def test_sort_top_level_keys_sorts_only_top_level():
     # Top-level tool names alphabetised...
     assert list(ordered) == ["afni", "blastct", "blender"]
     # ...but nested field order is preserved (generator does not sort these).
-    assert list(ordered["afni"]["apps"]["afni 1.0"]) == ["version", "exec", "apptainer_args"]
+    assert list(ordered["afni"]["apps"]["afni 1.0"]) == [
+        "version",
+        "exec",
+        "apptainer_args",
+    ]
     assert list(ordered["blastct"]) == ["apps", "categories"]
 
 
@@ -75,7 +81,9 @@ def test_render_diff_ignores_pure_reordering():
     # Same content, different top-level insertion order -> canonicalisation must
     # collapse it to an empty diff (no phantom reorder churn in the PR body).
     reordered = {k: base[k] for k in reversed(list(base))}
-    diff = consolidate_appsjson_queue.render_appsjson_diff("neurodesk/apps.json", base, reordered)
+    diff = consolidate_appsjson_queue.render_appsjson_diff(
+        "neurodesk/apps.json", base, reordered
+    )
     assert diff == ""
 
 
@@ -83,10 +91,20 @@ def test_render_diff_shows_real_change_only():
     base = _sample_payload()
     changed = json.loads(json.dumps(base))
     changed["afni"]["apps"]["afni 1.0"]["version"] = "20260601"
-    diff = consolidate_appsjson_queue.render_appsjson_diff("neurodesk/apps.json", base, changed)
+    diff = consolidate_appsjson_queue.render_appsjson_diff(
+        "neurodesk/apps.json", base, changed
+    )
 
-    added = [line for line in diff.splitlines() if line.startswith("+") and not line.startswith("+++")]
-    removed = [line for line in diff.splitlines() if line.startswith("-") and not line.startswith("---")]
+    added = [
+        line
+        for line in diff.splitlines()
+        if line.startswith("+") and not line.startswith("+++")
+    ]
+    removed = [
+        line
+        for line in diff.splitlines()
+        if line.startswith("-") and not line.startswith("---")
+    ]
     assert any('"version": "20260601"' in line for line in added)
     assert any('"version": "20260101"' in line for line in removed)
     # Only the single version line changed on each side.
