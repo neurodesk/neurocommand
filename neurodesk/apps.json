@@ -4860,6 +4860,11 @@
             "3DSlicerGUI-slicersalt 3.0.0": {
                 "version": "20210301",
                 "exec": "SlicerSALTApp-real"
+            },
+            "slicersalt 6.0.0": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5037,6 +5042,36 @@
         },
         "categories": [
             "functional imaging",
+            "structural imaging"
+        ]
+    },
+    "spmpython": {
+        "apps": {
+            "spmpython 25.1.2.post2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "spmpython_arm64": {
+        "apps": {
+            "spmpython_arm64 25.1.2.post2": {
+                "version": "20261010",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "image registration",
+            "image segmentation",
             "structural imaging"
         ]
     },
