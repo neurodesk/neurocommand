@@ -1204,7 +1204,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261006",
+                "version": "20261008",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3740,7 +3740,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261006",
+                "version": "20261007",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3761,7 +3761,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261006",
+                "version": "20261007",
                 "exec": "",
                 "apptainer_args": []
             }
