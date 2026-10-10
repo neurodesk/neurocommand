@@ -3610,7 +3610,7 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20260902",
+            "application": "synthseg_8.2.0_20261010",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -3699,7 +3699,7 @@
             ]
         },
         {
-            "application": "topofit_0.6.0_20260917",
+            "application": "topofit_0.6.0_20261010",
             "categories": [
                 "machine learning",
                 "shape analysis",
@@ -3772,6 +3772,13 @@
             "categories": [
                 "quantitative imaging",
                 "visualization"
+            ]
+        },
+        {
+            "application": "vessynth_2026.10.9_20261010",
+            "categories": [
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
