@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import List, Optional, Set, Tuple
 
 
+PUBLISHED_LOG = Path(__file__).resolve().parents[3] / "cvmfs" / "log.txt"
+
+
 def run_command(cmd: List[str]) -> None:
     try:
         subprocess.run(cmd, check=True)
@@ -102,6 +105,65 @@ def load_expected_keys(log_path: Path) -> Set[str]:
         expected_keys.add(key)
 
     return expected_keys
+
+
+def load_published_keys(log_path: Path) -> Set[str]:
+    try:
+        rows = log_path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError) as exc:
+        raise SystemExit(
+            f"[ERROR] Cannot read published inventory {log_path}: {exc}"
+        ) from exc
+
+    keys = set()
+    for number, raw_line in enumerate(rows, start=1):
+        line = raw_line.strip()
+        if not line:
+            continue
+        match = re.fullmatch(
+            r"(?P<image>[A-Za-z0-9][A-Za-z0-9_.+-]*_(?P<date>[0-9]{8}))"
+            r"(?:\.simg)?(?:\s+categories:[^\[\]<>\r\n]*)?",
+            line,
+        )
+        if match is None:
+            raise SystemExit(
+                f"[ERROR] Invalid published inventory {log_path}, line {number}"
+            )
+        try:
+            datetime.strptime(match.group("date"), "%Y%m%d")
+        except ValueError as exc:
+            raise SystemExit(
+                f"[ERROR] Invalid date in published inventory {log_path}, line {number}"
+            ) from exc
+        keys.add(f"{match.group('image')}.simg")
+    if not keys:
+        raise SystemExit(f"[ERROR] Empty published inventory {log_path}")
+    return keys
+
+
+def load_protected_keys(
+    log_path: Path, releases_dir: Optional[Path], *, generate: bool
+) -> Set[str]:
+    published_keys = load_published_keys(PUBLISHED_LOG)
+    release_keys = (
+        load_release_keys(releases_dir) if releases_dir is not None else set()
+    )
+    if generate:
+        generate_log(log_path)
+        normalize_log(log_path)
+    current_keys = load_expected_keys(log_path)
+    protected_keys = published_keys | current_keys | release_keys
+    print(
+        f"[DEBUG] Protected container count from published inventory: {len(published_keys)}"
+    )
+    print(
+        f"[DEBUG] Protected container count from current app log: {len(current_keys)}"
+    )
+    print(
+        f"[DEBUG] Protected container count from release metadata: {len(release_keys)}"
+    )
+    print(f"[DEBUG] Total protected container count: {len(protected_keys)}")
+    return protected_keys
 
 
 def load_release_keys(releases_dir: Path) -> Set[str]:
@@ -350,7 +412,7 @@ def list_s3_objects(bucket: str) -> List[dict]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Find stale container images in Nectar and S3 using log.txt membership."
+        description="Find stale container images in Nectar and S3 using published, current app, and release references."
     )
     parser.add_argument("--s3-bucket", required=True, help="S3 bucket name")
     parser.add_argument(
@@ -385,19 +447,12 @@ def main() -> None:
     args = parser.parse_args()
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=args.retention_days)
-    log_path = Path(args.log_path)
-    if not args.skip_log_generation:
-        generate_log(log_path)
-        normalize_log(log_path)
-    expected_keys = load_expected_keys(log_path)
-    if args.releases_dir:
-        release_keys = load_release_keys(Path(args.releases_dir))
-        expected_keys.update(release_keys)
-        print(
-            f"[DEBUG] Protected container count from release metadata: {len(release_keys)}"
-        )
+    expected_keys = load_protected_keys(
+        Path(args.log_path),
+        Path(args.releases_dir) if args.releases_dir else None,
+        generate=not args.skip_log_generation,
+    )
 
-    print(f"[DEBUG] Expected container count from log: {len(expected_keys)}")
     print(f"[DEBUG] Retention window for stale deletions: {args.retention_days} day(s)")
     if args.dry_run:
         print("[DEBUG] Deletion mode: DRY-RUN (no objects will be deleted)")

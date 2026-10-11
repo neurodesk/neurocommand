@@ -564,6 +564,22 @@ singularity exec {container}.simg {gui_command}
 - Review and update category classifications
 - Test GUI applications on different desktop environments
 
+### Container cleanup protection
+
+`.github/workflows/scripts/cleanup_stale_containers.py` protects every image referenced by the checked-out `cvmfs/log.txt`, the current app log, or configured neurocontainers release metadata. An advertised generation stays protected regardless of age. Cleanup deletes only unreferenced images older than the retention window in Nectar and AWS S3.
+
+The published inventory is mandatory and resolved relative to the repository, independent of the working directory and `--log-path`. Missing, empty, unreadable, or malformed published inventories stop cleanup before log generation or any remote listing or deletion, including orphaned-segment cleanup. Each nonblank row must name an image ending in a valid `_YYYYMMDD` date, optionally followed by `.simg` and `categories:` metadata. Category values may contain spaces and trailing commas.
+
+A manual invocation defaults to a dry run:
+
+```bash
+python3 .github/workflows/scripts/cleanup_stale_containers.py --s3-bucket neurocontainers
+```
+
+`--skip-log-generation --log-path PATH` supplies an existing current app log while retaining mandatory published protection. `--releases-dir PATH` adds release references; invalid configured release metadata aborts cleanup. Review the source counts and deletion candidates before using `--apply`.
+
+The cleanup workflow supplies release metadata and runs after a successful uploader completion or an explicit manual dispatch. Failed, cancelled, and skipped uploader runs do not trigger cleanup.
+
 ### Emergency Procedures
 - Rollback apps.json changes if builds fail
 - Manual container upload for critical tools
