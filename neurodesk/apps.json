@@ -365,7 +365,19 @@
                 "exec": ""
             },
             "bart 1.0.00": {
-                "version": "20260911",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "bart_arm64": {
+        "apps": {
+            "bart_arm64 1.0.00": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -404,6 +416,16 @@
         "apps": {
             "bcbtoolkit 0.0.0": {
                 "version": "20260610",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bcbtoolkit 5.3.0": {
+                "version": "20261002",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bcbtoolkit 5.4.1": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -864,7 +886,19 @@
                 "exec": ""
             },
             "brainlifecli 1.8.2": {
-                "version": "20260913",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "workflows"
+        ]
+    },
+    "brainlifecli_arm64": {
+        "apps": {
+            "brainlifecli_arm64 1.8.2": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1001,6 +1035,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "brats 0.1.13": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
             "brats 0.1.8": {
                 "version": "20260822",
                 "exec": "",
@@ -1026,7 +1065,19 @@
                 "apptainer_args": []
             },
             "brkraw 0.5.7": {
-                "version": "20260914",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "brkraw_arm64": {
+        "apps": {
+            "brkraw_arm64 0.5.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1223,7 +1274,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261008",
+                "version": "20261011",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1344,6 +1395,30 @@
             "bids apps",
             "functional imaging",
             "workflows"
+        ]
+    },
+    "cryosparc": {
+        "apps": {
+            "cryosparc 1.0.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
+        ]
+    },
+    "ctffind": {
+        "apps": {
+            "ctffind 4.1.14": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "dafne": {
@@ -1642,6 +1717,11 @@
                 "version": "20260727",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "deepretinotopy 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1863,6 +1943,28 @@
             "image registration"
         ]
     },
+    "eman2": {
+        "apps": {
+            "eman2 2.99.85": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "e2projectmanagerGUI-eman2 2.99.85": {
+                "version": "20261012",
+                "exec": "e2projectmanager.py",
+                "apptainer_args": []
+            },
+            "e2displayGUI-eman2 2.99.85": {
+                "version": "20261012",
+                "exec": "e2display.py",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
+        ]
+    },
     "emuses": {
         "apps": {
             "emuses 1.3.0": {
@@ -1972,6 +2074,11 @@
             },
             "fastsurfer 2.5.4": {
                 "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fastsurfer 2.6.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2369,6 +2476,18 @@
         "categories": [
             "diffusion imaging",
             "functional imaging"
+        ]
+    },
+    "gautomatch": {
+        "apps": {
+            "gautomatch 0.56.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "gigaconnectome": {
@@ -3435,7 +3554,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261008",
+                "version": "20261011",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3460,6 +3579,18 @@
         },
         "categories": [
             "data organisation"
+        ]
+    },
+    "motioncor3": {
+        "apps": {
+            "motioncor3 1.2.4": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "mricrogl": {
@@ -3764,7 +3895,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261007",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3785,7 +3916,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261007",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4184,7 +4315,20 @@
                 "apptainer_args": []
             },
             "panoptica 2.1.7": {
-                "version": "20260822",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "quality control"
+        ]
+    },
+    "panoptica_arm64": {
+        "apps": {
+            "panoptica_arm64 2.1.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4768,6 +4912,19 @@
             "functional imaging"
         ]
     },
+    "scipion": {
+        "apps": {
+            "scipion 3.8.3": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM",
+            "workflows"
+        ]
+    },
     "segmentator": {
         "apps": {
             "segmentator 1.6.1": {
@@ -5179,6 +5336,16 @@
             "surficeGUI-surfice 1.0.20210730": {
                 "version": "20211218",
                 "exec": "surfice"
+            },
+            "surfice 1.0.20211006": {
+                "version": "20261011",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "surficeGUI-surfice 1.0.20211006": {
+                "version": "20261011",
+                "exec": "surfice",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5235,6 +5402,11 @@
         "apps": {
             "synthstrip 7.4.1": {
                 "version": "20260514",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "synthstrip 8.2.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5532,6 +5704,18 @@
         },
         "categories": [
             "functional imaging"
+        ]
+    },
+    "xmipp": {
+        "apps": {
+            "xmipp 6.0.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
         ]
     },
     "xnat": {
