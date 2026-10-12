@@ -207,7 +207,21 @@
                 "exec": ""
             },
             "ants 2.6.5": {
-                "version": "20260602",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "ants_arm64": {
+        "apps": {
+            "ants_arm64 2.6.5": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -829,7 +843,21 @@
     "brainles-aurora": {
         "apps": {
             "brainles-aurora 0.2.7": {
-                "version": "20260825",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
+    "brainles-aurora_arm64": {
+        "apps": {
+            "brainles-aurora_arm64 0.2.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1196,7 +1224,20 @@
                 "apptainer_args": []
             },
             "clearswi 1.7.0": {
-                "version": "20260914",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "phase processing",
+            "structural imaging"
+        ]
+    },
+    "clearswi_arm64": {
+        "apps": {
+            "clearswi_arm64 1.7.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1287,6 +1328,23 @@
         "apps": {
             "condaenvs 1.0.1": {
                 "version": "20260513",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "condaenvs 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "condaenvs_arm64": {
+        "apps": {
+            "condaenvs_arm64 1.1.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1620,7 +1678,21 @@
     "deep-quality-estimation": {
         "apps": {
             "deep-quality-estimation 0.0.3": {
-                "version": "20260822",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "quality control"
+        ]
+    },
+    "deep-quality-estimation_arm64": {
+        "apps": {
+            "deep-quality-estimation_arm64 0.0.3": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1825,6 +1897,23 @@
             "dicomtools 1.0.0": {
                 "version": "20250204",
                 "exec": ""
+            },
+            "dicomtools 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "dicomtools_arm64": {
+        "apps": {
+            "dicomtools_arm64 1.1.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1886,12 +1975,24 @@
     "dwidenoise2": {
         "apps": {
             "dwidenoise2 1.0.0": {
-                "version": "20260727",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             },
             "dwidenoise2 20260603": {
                 "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "dwidenoise2_arm64": {
+        "apps": {
+            "dwidenoise2_arm64 1.0.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2451,7 +2552,19 @@
     "fsqc": {
         "apps": {
             "fsqc 2.1.7": {
-                "version": "20261002",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "quality control"
+        ]
+    },
+    "fsqc_arm64": {
+        "apps": {
+            "fsqc_arm64 2.1.7": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2551,7 +2664,19 @@
                 "exec": ""
             },
             "gingerale 4.0.0": {
-                "version": "20260928",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "statistics"
+        ]
+    },
+    "gingerale_arm64": {
+        "apps": {
+            "gingerale_arm64 4.0.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2687,7 +2812,19 @@
                 "exec": ""
             },
             "hdbet 2.0.1": {
-                "version": "20260629",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "hdbet_arm64": {
+        "apps": {
+            "hdbet_arm64 2.0.1": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3013,13 +3150,25 @@
     "laynii": {
         "apps": {
             "laynii 2.10.0": {
-                "version": "20260929",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             },
             "laynii 2.2.1": {
                 "version": "20220701",
                 "exec": ""
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
+    "laynii_arm64": {
+        "apps": {
+            "laynii_arm64 2.10.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3293,7 +3442,21 @@
                 "apptainer_args": []
             },
             "meganorm 0.2.2": {
-                "version": "20261010",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology",
+            "machine learning",
+            "statistics"
+        ]
+    },
+    "meganorm_arm64": {
+        "apps": {
+            "meganorm_arm64 0.2.2": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3567,12 +3730,29 @@
     "modsort": {
         "apps": {
             "modsort 0.0.2": {
-                "version": "20260822",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             },
             "modsort-modsort 0.0.2": {
-                "version": "20260822",
+                "version": "20261012",
+                "exec": "modsort",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "modsort_arm64": {
+        "apps": {
+            "modsort_arm64 0.0.2": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "modsort-modsort_arm64 0.0.2": {
+                "version": "20261012",
                 "exec": "modsort",
                 "apptainer_args": []
             }
@@ -4345,7 +4525,19 @@
                 "exec": ""
             },
             "pcntoolkit 1.3.0": {
-                "version": "20260731",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "statistics"
+        ]
+    },
+    "pcntoolkit_arm64": {
+        "apps": {
+            "pcntoolkit_arm64 1.3.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4775,6 +4967,11 @@
             },
             "relion 4.0.1.sm75": {
                 "version": "20260606",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "relion 5.1.1": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5458,6 +5655,24 @@
             "topaz 0.2.5": {
                 "version": "20240313",
                 "exec": ""
+            },
+            "topaz 0.3.20": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM",
+            "machine learning"
+        ]
+    },
+    "topaz_arm64": {
+        "apps": {
+            "topaz_arm64 0.3.20": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5506,8 +5721,25 @@
     },
     "totalsegmentator": {
         "apps": {
+            "totalsegmentator 2.18.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
             "totalsegmentator 2.5.0": {
                 "version": "20260323",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "totalsegmentator_arm64": {
+        "apps": {
+            "totalsegmentator_arm64 2.18.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
