@@ -140,9 +140,11 @@ singularity() {{
             echo final > "$2"
             return 0
             ;;
-        inspect)
-            echo "inspect:$2" >> {shlex.quote(str(calls))}
-            grep -q '^final$' "$2"
+        sif)
+            [[ "$3" == --help ]] && return 0
+            echo "validate:$3" >> {shlex.quote(str(calls))}
+            grep -q '^final$' "$3" || return 1
+            echo "1    |1       |NONE    |0-6                       |FS"
             ;;
         *)
             return 1
@@ -160,7 +162,71 @@ test "$(cat {shlex.quote(str(target))})" = final
     assert result.returncode == 0, result.stderr + result.stdout
     call_log = calls.read_text()
     assert call_log.count("build:") == 2
-    assert call_log.count("inspect:") == 2
+    assert call_log.count("validate:") == 2
+
+
+ARM64_SIF_LISTING = """\
+------------------------------------------------------------------------------
+ID   |GROUP   |LINK    |SIF POSITION (start-end)  |TYPE
+------------------------------------------------------------------------------
+1    |1       |NONE    |32176-32271               |Def.FILE
+4    |1       |NONE    |40960-177324032           |FS (Squashfs/*System/arm64)
+"""
+# An FSL image's data ends beyond 2 GiB.
+LARGE_SIF_LISTING = """\
+1    |1       |NONE    |32176-32271               |Def.FILE
+4    |1       |NONE    |40960-8260636672          |FS (Squashfs/*System/amd64)
+"""
+
+
+def _validate(tmp_path, size, listing_status=0, listing=ARM64_SIF_LISTING):
+    image = tmp_path / "image.simg"
+    with image.open("wb") as handle:
+        handle.truncate(size)
+    script = f"""
+source {shlex.quote(str(SCRIPT))}
+apptainer() {{
+    # inspect would refuse this arm64 image on an amd64 host.
+    [[ "$1 $2" == "sif list" ]] || return 255
+    printf '%s' {shlex.quote(listing)}
+    return {listing_status}
+}}
+container_runtime() {{ echo apptainer; }}
+validate_singularity_image {shlex.quote(str(image))}
+"""
+    return run_bash(script)
+
+
+def test_foreign_architecture_image_validates_from_its_sif_descriptors(tmp_path):
+    result = _validate(tmp_path, 177324032)
+    assert result.returncode == 0, result.stderr + result.stdout
+
+
+def test_truncated_or_unparseable_sif_image_is_rejected(tmp_path):
+    assert _validate(tmp_path, 100000000).returncode == 1
+    assert _validate(tmp_path, 177324032, listing_status=1).returncode == 1
+
+
+def test_truncated_image_beyond_2_gib_is_rejected(tmp_path):
+    truncated = _validate(tmp_path, 100000000, listing=LARGE_SIF_LISTING)
+    complete = _validate(tmp_path, 8260636672, listing=LARGE_SIF_LISTING)
+
+    assert truncated.returncode == 1, truncated.stderr + truncated.stdout
+    assert complete.returncode == 0, complete.stderr + complete.stdout
+
+
+def test_runtime_without_sif_list_is_not_selected(tmp_path):
+    script = f"""
+source {shlex.quote(str(SCRIPT))}
+singularity() {{ return 1; }}  # Singularity < 3.3 has no "sif list".
+apptainer() {{ return 0; }}
+container_runtime
+"""
+
+    result = run_bash(script)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert result.stdout.strip() == "apptainer"
 
 
 def test_named_arm64_rebuild_uses_full_image_name_and_last_build_date(tmp_path):

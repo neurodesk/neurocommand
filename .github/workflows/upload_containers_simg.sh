@@ -70,14 +70,17 @@ url_exists_with_retries() {
     run_with_retries "confirm URL exists: ${url}" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" url_exists_once "$url"
 }
 
+# Image validation needs "sif list" (Singularity 3.3+, every Apptainer).
 container_runtime() {
-    if command -v singularity >/dev/null 2>&1; then
-        echo "singularity"
-    elif command -v apptainer >/dev/null 2>&1; then
-        echo "apptainer"
-    else
-        return 1
-    fi
+    local runtime
+    for runtime in singularity apptainer; do
+        if command -v "$runtime" >/dev/null 2>&1 &&
+            "$runtime" sif list --help >/dev/null 2>&1; then
+            echo "$runtime"
+            return 0
+        fi
+    done
+    return 1
 }
 
 ensure_container_runtime() {
@@ -120,9 +123,25 @@ validate_singularity_image() {
     fi
 
     ensure_container_runtime
-    local runtime
+    local runtime listing position data_end=0 size
     runtime="$(container_runtime)"
-    "$runtime" inspect "$image_path" > /dev/null
+    # inspect refuses images built for another architecture, such as arm64
+    # images on the amd64 runner. The SIF descriptor table is architecture
+    # independent: it must parse, and the file must hold every data object.
+    # Compare in bash: its 64-bit integers hold offsets beyond 2 GiB.
+    listing="$("$runtime" sif list "$image_path")" || return 1
+    while IFS='|' read -r _ _ _ position _; do
+        position="${position// /}"
+        if [[ "$position" =~ ^[0-9]+-([0-9]+)$ ]] &&
+            (( BASH_REMATCH[1] > data_end )); then
+            data_end="${BASH_REMATCH[1]}"
+        fi
+    done <<< "$listing"
+    size="$(stat -c %s "$image_path")" || return 1
+    if (( data_end == 0 || size < data_end )); then
+        echo "[ERROR] ${image_path} is not a complete SIF image"
+        return 1
+    fi
 }
 
 download_image_once() {
