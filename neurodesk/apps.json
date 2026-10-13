@@ -242,7 +242,7 @@
                 "apptainer_args": []
             },
             "apptainer 1.5.3": {
-                "version": "20260910",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -256,7 +256,7 @@
         "show_in_applist": false,
         "apps": {
             "apptainer_arm64 1.5.3": {
-                "version": "20260910",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2019,7 +2019,19 @@
     "eharmonize": {
         "apps": {
             "eharmonize 1.0.0": {
-                "version": "20260611",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "eharmonize_arm64": {
+        "apps": {
+            "eharmonize_arm64 1.0.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2606,8 +2618,22 @@
     "gigaconnectome": {
         "apps": {
             "gigaconnectome 0.6.0": {
-                "version": "20250630",
-                "exec": ""
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "functional imaging"
+        ]
+    },
+    "gigaconnectome_arm64": {
+        "apps": {
+            "gigaconnectome_arm64 0.6.0": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3043,17 +3069,17 @@
                 "exec": "julia"
             },
             "julia 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             },
             "vscodeGUI-julia 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "code",
                 "apptainer_args": []
             },
             "REPLGUI-julia 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "julia",
                 "apptainer_args": []
             },
@@ -3081,17 +3107,17 @@
     "julia_arm64": {
         "apps": {
             "julia_arm64 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             },
             "vscodeGUI-julia_arm64 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "code",
                 "apptainer_args": []
             },
             "REPLGUI-julia_arm64 1.13.1": {
-                "version": "20260928",
+                "version": "20261012",
                 "exec": "julia",
                 "apptainer_args": []
             }
@@ -3304,7 +3330,19 @@
     "lqt": {
         "apps": {
             "lqt 0.1.0": {
-                "version": "20260603",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "lqt_arm64": {
+        "apps": {
+            "lqt_arm64 0.1.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3701,6 +3739,23 @@
             },
             "mne 1.12.1": {
                 "version": "20260608",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "mne 1.13.2": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ]
+    },
+    "mne_arm64": {
+        "apps": {
+            "mne_arm64 1.13.2": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4305,6 +4360,19 @@
             "diffusion imaging"
         ]
     },
+    "nomis": {
+        "apps": {
+            "nomis 20220225": {
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "statistics",
+            "structural imaging"
+        ]
+    },
     "openads": {
         "apps": {
             "openads 1.0.0": {
@@ -4868,7 +4936,19 @@
                 "exec": ""
             },
             "quickshear 1.2.0": {
-                "version": "20260629",
+                "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "quickshear_arm64": {
+        "apps": {
+            "quickshear_arm64 1.2.0": {
+                "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4933,7 +5013,19 @@
                 "apptainer_args": []
             },
             "radtract 0.2.4": {
-                "version": "20261007",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "radtract_arm64": {
+        "apps": {
+            "radtract_arm64 0.2.4": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5924,6 +6016,36 @@
         "categories": [
             "phase processing",
             "quantitative imaging"
+        ]
+    },
+    "workshopdemo": {
+        "show_in_menu": false,
+        "show_in_applist": false,
+        "apps": {
+            "workshopdemo 1.0.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "workflows"
+        ]
+    },
+    "workshopdemo_arm64": {
+        "show_in_menu": false,
+        "show_in_applist": false,
+        "apps": {
+            "workshopdemo_arm64 1.0.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "workflows"
         ]
     },
     "xcpd": {
