@@ -2086,13 +2086,13 @@
             ]
         },
         {
-            "application": "globus_3.3.1_20260927",
+            "application": "globus_3.3.1_20261013",
             "categories": [
                 "data organisation"
             ]
         },
         {
-            "application": "globus_arm64_3.3.1_20260927",
+            "application": "globus_arm64_3.3.1_20261013",
             "categories": [
                 "data organisation"
             ]
@@ -3638,7 +3638,15 @@
             ]
         },
         {
-            "application": "qupath_0.7.0_20260723",
+            "application": "qupath_0.7.0_20261013",
+            "categories": [
+                "data organisation",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "qupath_arm64_0.7.0_20261013",
             "categories": [
                 "data organisation",
                 "image segmentation",
