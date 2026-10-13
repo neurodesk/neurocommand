@@ -24,17 +24,15 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    outputs:
-      uploaded_sha: ${{ steps.revision.outputs.sha }}
     steps:
+    # Upload the triggering revision; a newer apps.json triggers its own run.
+    # publish_metadata publishes this same github.sha. A job output cannot
+    # carry it: GitHub drops outputs containing a masked secret value.
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
-        ref: main
+        ref: ${{ github.sha }}
         fetch-depth: 0
-    - name: Record the apps.json revision being uploaded
-      id: revision
-      run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: "3.12"
@@ -92,5 +90,5 @@ jobs:
     - name: Publish CVMFS metadata for the uploaded revision
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        UPLOADED_SHA: ${{ needs.upload_containers_simg.outputs.uploaded_sha }}
+        UPLOADED_SHA: ${{ github.sha }}
       run: bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$UPLOADED_SHA"

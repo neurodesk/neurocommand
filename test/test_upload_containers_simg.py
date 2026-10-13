@@ -50,6 +50,18 @@ def test_update_neurocontainers_has_explicit_timeouts():
     assert "timeout-minutes: 330" in workflow
 
 
+def test_publish_and_upload_share_the_triggering_revision():
+    workflow = WORKFLOW.read_text()
+    jobs = workflow[workflow.index("\njobs:") :]
+    upload = jobs[: jobs.index("  publish_metadata:")]
+    publish = jobs[jobs.index("  publish_metadata:") :]
+
+    # Job outputs are dropped when they contain a masked secret value.
+    assert "outputs:" not in upload
+    assert "ref: ${{ github.sha }}" in upload
+    assert "UPLOADED_SHA: ${{ github.sha }}" in publish
+
+
 def test_publish_rerun_cannot_cancel_a_newer_upload():
     workflow = WORKFLOW.read_text()
     jobs = workflow[workflow.index("\njobs:") :]
