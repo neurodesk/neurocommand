@@ -120,9 +120,20 @@ validate_singularity_image() {
     fi
 
     ensure_container_runtime
-    local runtime
+    local runtime listing data_end
     runtime="$(container_runtime)"
-    "$runtime" inspect "$image_path" > /dev/null
+    # inspect refuses images built for another architecture, such as arm64
+    # images on the amd64 runner. The SIF descriptor table is architecture
+    # independent: it must parse, and the file must hold every data object.
+    listing="$("$runtime" sif list "$image_path")" || return 1
+    data_end="$(awk -F'|' '$4 ~ /^ *[0-9]+-[0-9]+/ {
+        split($4, range, "-")
+        if (range[2] + 0 > end) end = range[2] + 0
+    } END { print end + 0 }' <<< "$listing")"
+    if [[ "$data_end" -eq 0 || "$(stat -c %s "$image_path")" -lt "$data_end" ]]; then
+        echo "[ERROR] ${image_path} is not a complete SIF image"
+        return 1
+    fi
 }
 
 download_image_once() {
