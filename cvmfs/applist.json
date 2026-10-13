@@ -645,7 +645,14 @@
             ]
         },
         {
-            "application": "bidsvue_0.1.20260704_20260707",
+            "application": "bidsvue_0.1.20260704_20261013",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsvue_arm64_0.1.20260704_20261013",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -1927,7 +1934,7 @@
             ]
         },
         {
-            "application": "fsl_6.0.7.23_20261004",
+            "application": "fsl_6.0.7.23_20261013",
             "categories": [
                 "arterial spin labelling",
                 "diffusion imaging",
@@ -1950,6 +1957,17 @@
         },
         {
             "application": "fsl_6.0.7.8_20240913",
+            "categories": [
+                "arterial spin labelling",
+                "diffusion imaging",
+                "functional imaging",
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "fsl_arm64_6.0.7.23_20261013",
             "categories": [
                 "arterial spin labelling",
                 "diffusion imaging",
@@ -2357,7 +2375,14 @@
             ]
         },
         {
-            "application": "lipsia_4.1.1_20260929",
+            "application": "lipsia_4.1.1_20261013",
+            "categories": [
+                "functional imaging",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "lipsia_arm64_4.1.1_20261013",
             "categories": [
                 "functional imaging",
                 "machine learning"
@@ -2674,7 +2699,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261011",
+            "application": "mneextended_1.2.0_20261013",
+            "categories": [
+                "electrophysiology",
+                "programming"
+            ]
+        },
+        {
+            "application": "mneextended_arm64_1.2.0_20261013",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -2719,6 +2751,22 @@
             ]
         },
         {
+            "application": "mricron_1.2.20211006_20261013",
+            "categories": [
+                "data organisation",
+                "structural imaging",
+                "visualization"
+            ]
+        },
+        {
+            "application": "mricron_arm64_1.2.20211006_20261013",
+            "categories": [
+                "data organisation",
+                "structural imaging",
+                "visualization"
+            ]
+        },
+        {
             "application": "mriqc_0.16.1_20210917",
             "categories": [
                 "data organisation",
@@ -2752,7 +2800,13 @@
             ]
         },
         {
-            "application": "mritools_4.9.0_20261003",
+            "application": "mritools_4.9.0_20261013",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
+            "application": "mritools_arm64_4.9.0_20261013",
             "categories": [
                 "phase processing"
             ]
@@ -3218,7 +3272,14 @@
             ]
         },
         {
-            "application": "qmrlab_3.0.0_20261006",
+            "application": "qmrlab_3.0.0_20261013",
+            "categories": [
+                "image reconstruction",
+                "quantitative imaging"
+            ]
+        },
+        {
+            "application": "qmrlab_arm64_3.0.0_20261013",
             "categories": [
                 "image reconstruction",
                 "quantitative imaging"
@@ -3495,7 +3556,7 @@
             ]
         },
         {
-            "application": "qsmxt_9.22.0_20260923",
+            "application": "qsmxt_9.22.0_20261013",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -3654,7 +3715,14 @@
             ]
         },
         {
-            "application": "rshrf_1.7.0_20260529",
+            "application": "rshrf_1.7.0_20261013",
+            "categories": [
+                "bids apps",
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "rshrf_arm64_1.7.0_20261013",
             "categories": [
                 "bids apps",
                 "functional imaging"
@@ -3735,7 +3803,13 @@
             ]
         },
         {
-            "application": "sigviewer_0.6.4_20220315",
+            "application": "sigviewer_0.6.4_20261013",
+            "categories": [
+                "electrophysiology"
+            ]
+        },
+        {
+            "application": "sigviewer_arm64_0.6.4_20261013",
             "categories": [
                 "electrophysiology"
             ]
@@ -3826,7 +3900,14 @@
             ]
         },
         {
-            "application": "sovabids_0.4.7_20261010",
+            "application": "sovabids_0.4.7_20261013",
+            "categories": [
+                "bids apps",
+                "electrophysiology"
+            ]
+        },
+        {
+            "application": "sovabids_arm64_0.4.7_20261013",
             "categories": [
                 "bids apps",
                 "electrophysiology"
@@ -4156,7 +4237,14 @@
             ]
         },
         {
-            "application": "vertexwiser_1.5.1_20260608",
+            "application": "vertexwiser_1.5.1_20261013",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "vertexwiser_arm64_1.5.1_20261013",
             "categories": [
                 "structural imaging",
                 "workflows"
