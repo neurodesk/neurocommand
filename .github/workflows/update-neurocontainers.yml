@@ -8,29 +8,33 @@ on:
     paths:
       - '.github/workflows/update-neurocontainers.yml'
       - '.github/workflows/upload_containers_simg.sh'
+      - '.github/workflows/scripts/publish_cvmfs_metadata.sh'
       - 'neurodesk/apps.json'
-      - 'neurodesk/write_log.py'
-
-# Prevent race conditions when multiple PRs are merged in quick succession.
-# This ensures only one instance of this workflow runs at a time.
-# If a second trigger occurs while the first is running, the older run is cancelled.
-concurrency:
-  group: update-neurocontainers
-  cancel-in-progress: true
+      - 'cvmfs/generate_metadata.py'
 
 jobs:
   upload_containers_simg:
+    # A newer apps.json supersedes an older upload. This is job-level so that
+    # re-running an older run's publish job cannot cancel a newer upload.
+    concurrency:
+      group: update-neurocontainers
+      cancel-in-progress: true
     runs-on: self-hosted
     timeout-minutes: 360
     permissions:
       id-token: write
       contents: read
+    outputs:
+      uploaded_sha: ${{ steps.revision.outputs.sha }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         ref: main
         fetch-depth: 0
+    - name: Record the apps.json revision being uploaded
+      id: revision
+      run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: "3.12"
@@ -61,3 +65,32 @@ jobs:
         rclone config create nectar swift env_auth true
         rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true region us-east-2 no_check_bucket true
         /bin/bash .github/workflows/upload_containers_simg.sh
+
+  # cvmfs/log.txt is the published inventory read by the CVMFS Stratum 0, the
+  # website and object-storage checks, so it only advances once every image it
+  # lists has been uploaded.
+  publish_metadata:
+    needs: upload_containers_simg
+    # No concurrency group: a queued publisher could be replaced by an older
+    # rerun. Publishers of a superseded apps.json exit, and the current one
+    # rebuilds the shared branch if another publisher replaced it.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        # Pushes and merges with the PAT trigger the required PR checks and
+        # the push workflows on main.
+        token: ${{ secrets.ACCESS_TOKEN }}
+        ref: main
+        fetch-depth: 0
+    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+      with:
+        python-version: "3.12"
+    - name: Publish CVMFS metadata for the uploaded revision
+      env:
+        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        UPLOADED_SHA: ${{ needs.upload_containers_simg.outputs.uploaded_sha }}
+      run: bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$UPLOADED_SHA"
