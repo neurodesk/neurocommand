@@ -24,17 +24,12 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    outputs:
-      uploaded_sha: ${{ steps.revision.outputs.sha }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         token: ${{ secrets.ACCESS_TOKEN }}
         ref: main
         fetch-depth: 0
-    - name: Record the apps.json revision being uploaded
-      id: revision
-      run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: "3.12"
@@ -92,5 +87,8 @@ jobs:
     - name: Publish CVMFS metadata for the uploaded revision
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        UPLOADED_SHA: ${{ needs.upload_containers_simg.outputs.uploaded_sha }}
-      run: bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$UPLOADED_SHA"
+        TRIGGER_SHA: ${{ github.sha }}
+      # Publishes main's inventory after confirming every image is uploaded,
+      # so no revision passes between jobs. A job output could not carry one:
+      # GitHub drops outputs that contain a masked secret value.
+      run: bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$TRIGGER_SHA"

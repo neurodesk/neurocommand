@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
-# Publish cvmfs/log.txt and cvmfs/applist.json for the apps.json revision whose
-# images the upload job has just made available in object storage.
+# Publish cvmfs/log.txt and cvmfs/applist.json for main's apps.json once every
+# image it lists is in object storage.
 #
 # main requires the "quality required" check and an up-to-date branch, so the
 # metadata reaches main through a pull request rebuilt on the latest main and
 # merged once branch protection accepts it.
+#
+# The optional argument is the revision whose upload triggered this run. It only
+# tells apart a newer apps.json that its own run is still uploading (exit 0)
+# from an incomplete upload of this run's inventory (exit 1).
 set -euo pipefail
 
-SOURCE_SHA="${1:?usage: publish_cvmfs_metadata.sh <uploaded-commit-sha>}"
+TRIGGER_SHA="${1:-}"
+OBJECT_STORES="${CVMFS_METADATA_OBJECT_STORES:-https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk https://neurocontainers.s3.us-east-2.amazonaws.com}"
 BRANCH="${CVMFS_METADATA_BRANCH:-bot/cvmfs-metadata}"
 BASE="${CVMFS_METADATA_BASE:-main}"
 MERGE_ATTEMPTS="${CVMFS_METADATA_MERGE_ATTEMPTS:-80}"
@@ -15,41 +20,58 @@ MERGE_RETRY_DELAY="${CVMFS_METADATA_MERGE_RETRY_DELAY:-30}"
 METADATA_FILES=(cvmfs/log.txt cvmfs/applist.json)
 TITLE="Publish CVMFS metadata for uploaded containers"
 
-apps_json="$(mktemp)"
-trap 'rm -f "$apps_json"' EXIT
-
-git fetch --no-tags origin "$BASE"
-git show "${SOURCE_SHA}:neurodesk/apps.json" > "$apps_json"
-source_apps="$(git rev-parse "${SOURCE_SHA}:neurodesk/apps.json")"
+verified_apps=""
 
 open_pr() {
     gh pr list --base "$BASE" --head "$BRANCH" --state open --json number --jq '.[0].number // empty'
 }
 
+# Print each inventory image missing from an object store; fail if any is.
+# Checks run in parallel: the inventory needs over a thousand requests.
+missing_images() {
+    local entry store stores missing
+    read -ra stores <<< "$OBJECT_STORES"
+    # shellcheck disable=SC2016 # $1 expands in the per-URL shell.
+    mapfile -t missing < <(while read -r entry _; do
+        for store in "${stores[@]}"; do
+            echo "${store}/${entry}.simg"
+        done
+    done < cvmfs/log.txt | xargs -P 16 -I{} sh -c \
+        'curl --silent --fail --head --output /dev/null --connect-timeout 15 \
+            --retry 3 --retry-delay 5 "$1" || echo "$1"' _ {})
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        printf '[INFO] Not in object storage: %s\n' "${missing[@]}"
+        return 1
+    fi
+}
+
 # Rebuild the metadata commit on the current base. Returns 1 when the base
-# already publishes this revision's metadata.
+# already publishes its apps.json inventory.
 # Callers test the result, which disables errexit here; exit explicitly.
 build_branch() {
     git fetch --no-tags origin "$BASE" || exit 1
     base_sha="$(git rev-parse "origin/$BASE")" || exit 1
-    # Every apps.json change on the base starts an upload run that publishes
-    # its own inventory, so this one only publishes while it is current. This
-    # also stops a rerun of an older upload from rolling metadata back.
-    if [[ "$(git rev-parse "${base_sha}:neurodesk/apps.json")" != "$source_apps" ]]; then
-        echo "[INFO] $BASE has a newer neurodesk/apps.json than ${SOURCE_SHA}; its upload run publishes it."
-        exit 0
-    fi
     git checkout --quiet -B "$BRANCH" "$base_sha" || exit 1
-    python3 cvmfs/generate_metadata.py \
-        --apps-json "$apps_json" \
-        --log cvmfs/log.txt \
-        --applist cvmfs/applist.json || exit 1
+    python3 cvmfs/generate_metadata.py --applist cvmfs/applist.json || exit 1
     if git diff --quiet -- "${METADATA_FILES[@]}"; then
         return 1
     fi
+    local apps
+    apps="$(git rev-parse "${base_sha}:neurodesk/apps.json")" || exit 1
+    if [[ "$apps" != "$verified_apps" ]]; then
+        if ! missing_images; then
+            if [[ -n "$TRIGGER_SHA" ]] &&
+                [[ "$(git rev-parse "${TRIGGER_SHA}:neurodesk/apps.json")" != "$apps" ]]; then
+                echo "[INFO] $BASE has a newer neurodesk/apps.json; its upload run publishes it."
+                exit 0
+            fi
+            echo "[ERROR] The inventory for $BASE's neurodesk/apps.json is not fully uploaded."
+            exit 1
+        fi
+        verified_apps="$apps"
+    fi
     # Publishers of the same inventory on the same base build the same commit,
-    # whatever their source revision, so concurrent runs never displace each
-    # other's PR head.
+    # so concurrent runs never displace each other's PR head.
     GIT_AUTHOR_DATE="$(git show -s --format=%cI "$base_sha")" \
         GIT_COMMITTER_DATE="$(git show -s --format=%cI "$base_sha")" \
         git -c user.name="github-actions[bot]" \
@@ -68,10 +90,10 @@ base_publishes_head() {
 }
 
 if ! build_branch; then
-    echo "[INFO] Published CVMFS metadata already matches ${SOURCE_SHA}."
+    echo "[INFO] Published CVMFS metadata already matches $BASE's neurodesk/apps.json."
     pr="$(open_pr)"
     if [[ -n "$pr" ]]; then
-        gh pr close "$pr" --comment "Superseded: $BASE already publishes the metadata for ${SOURCE_SHA}."
+        gh pr close "$pr" --comment "Superseded: $BASE already publishes this metadata."
     fi
     exit 0
 fi
@@ -89,7 +111,7 @@ for ((attempt = 1; attempt <= MERGE_ATTEMPTS; attempt++)); do
 
     if [[ -n "$pr" ]] && gh pr merge "$pr" --squash --match-head-commit "$head_sha" &&
         base_publishes_head; then
-        echo "[INFO] Merged CVMFS metadata PR #${pr} for ${SOURCE_SHA}."
+        echo "[INFO] Merged CVMFS metadata PR #${pr}."
         exit 0
     fi
 
@@ -99,7 +121,7 @@ for ((attempt = 1; attempt <= MERGE_ATTEMPTS; attempt++)); do
     branch_head="$(git ls-remote origin "refs/heads/$BRANCH" | cut -f1)"
     if [[ "$(git rev-parse "origin/$BASE")" != "$base_sha" || "$branch_head" != "$head_sha" ]] &&
         ! build_branch; then
-        echo "[INFO] $BASE now publishes the metadata for ${SOURCE_SHA}."
+        echo "[INFO] $BASE now publishes this metadata."
         exit 0
     fi
 
@@ -109,5 +131,5 @@ for ((attempt = 1; attempt <= MERGE_ATTEMPTS; attempt++)); do
     fi
 done
 
-echo "[ERROR] CVMFS metadata PR was not merged; published metadata still lags ${SOURCE_SHA}."
+echo "[ERROR] CVMFS metadata PR was not merged; published metadata still lags $BASE's neurodesk/apps.json."
 exit 1

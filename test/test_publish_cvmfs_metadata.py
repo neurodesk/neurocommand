@@ -68,7 +68,14 @@ def _write_apps(repo, version):
     (repo / "neurodesk" / "apps.json").write_text(json.dumps(apps))
 
 
-def _bump(seed, version):
+def _upload(seed, version):
+    for store in ("nectar", "aws"):
+        (seed.parent / store / f"tool_1.0_{version}.simg").write_text("image")
+
+
+def _bump(seed, version, uploaded=True):
+    if uploaded:
+        _upload(seed, version)
     _git(seed, "pull", "--quiet", "--rebase", "origin", "main")
     _write_apps(seed, version)
     _git(seed, "commit", "-am", f"apps.json {version}")
@@ -86,6 +93,9 @@ def _fixture(tmp_path):
     (seed / "cvmfs").mkdir()
     for name in ("generate_metadata.py", "json_gen.py"):
         shutil.copy(ROOT / "cvmfs" / name, seed / "cvmfs" / name)
+    for store in ("nectar", "aws"):
+        (tmp_path / store).mkdir()
+    _upload(seed, "20250628")
     _write_apps(seed, "20250628")
     subprocess.run(
         ["python3", "cvmfs/generate_metadata.py", "--applist", "cvmfs/applist.json"],
@@ -115,6 +125,7 @@ def _fixture(tmp_path):
         "GIT_COMMITTER_NAME": "t",
         "GIT_COMMITTER_EMAIL": "t@t",
         "CVMFS_METADATA_MERGE_RETRY_DELAY": "0",
+        "CVMFS_METADATA_OBJECT_STORES": f"file://{tmp_path / 'nectar'} file://{tmp_path / 'aws'}",
     }
     return origin, seed, work, state, env
 
@@ -139,7 +150,7 @@ def _merges(tmp_path):
     return [call for call in calls if call.startswith("pr merge")]
 
 
-def test_publishes_the_uploaded_revision_once_checks_pass(tmp_path):
+def test_publishes_main_inventory_once_checks_pass(tmp_path):
     origin, seed, work, state, env = _fixture(tmp_path)
     uploaded = _bump(seed, "20261010")
     (state / "pending").touch()
@@ -257,11 +268,11 @@ def test_merge_reported_for_a_stale_pr_is_not_success(tmp_path):
     assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
 
 
-def test_newer_apps_json_on_main_supersedes_the_upload(tmp_path):
+def test_newer_apps_json_still_uploading_is_left_to_its_run(tmp_path):
     origin, seed, work, state, env = _fixture(tmp_path)
     uploaded = _bump(seed, "20261010")
     # main moves on to an image the upload job has not handled yet.
-    _bump(seed, "20261012")
+    _bump(seed, "20261012", uploaded=False)
 
     result = _publish(work, uploaded, env)
 
@@ -269,6 +280,30 @@ def test_newer_apps_json_on_main_supersedes_the_upload(tmp_path):
     assert "its upload run publishes it" in result.stdout
     assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
     assert _merges(tmp_path) == []
+
+
+def test_incomplete_upload_of_the_triggering_inventory_fails(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010", uploaded=False)
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 1
+    assert "nectar/tool_1.0_20261010.simg" in result.stdout
+    assert "not fully uploaded" in result.stdout
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
+    assert _merges(tmp_path) == []
+
+
+def test_rerun_of_an_older_run_publishes_the_current_inventory(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    older = _bump(seed, "20261010")
+    _bump(seed, "20261012")
+
+    result = _publish(work, older, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert _main_log(origin) == "tool_1.0_20261012 categories:a,"
 
 
 def test_rerun_of_an_older_upload_does_not_roll_back(tmp_path):

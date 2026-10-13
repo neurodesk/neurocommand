@@ -50,6 +50,17 @@ def test_update_neurocontainers_has_explicit_timeouts():
     assert "timeout-minutes: 330" in workflow
 
 
+def test_publish_needs_no_revision_from_the_upload_job():
+    workflow = WORKFLOW.read_text()
+    jobs = workflow[workflow.index("\njobs:") :]
+    upload = jobs[: jobs.index("  publish_metadata:")]
+
+    # Job outputs are dropped when they contain a masked secret value.
+    assert "outputs:" not in upload
+    assert "needs.upload_containers_simg.outputs" not in workflow
+    assert "ref: main" in upload
+
+
 def test_publish_rerun_cannot_cancel_a_newer_upload():
     workflow = WORKFLOW.read_text()
     jobs = workflow[workflow.index("\njobs:") :]
