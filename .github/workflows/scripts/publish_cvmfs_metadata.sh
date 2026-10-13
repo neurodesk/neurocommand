@@ -27,19 +27,22 @@ open_pr() {
 }
 
 # Print each inventory image missing from an object store; fail if any is.
+# Checks run in parallel: the inventory needs over a thousand requests.
 missing_images() {
-    local entry store missing=0
-    while read -r entry _; do
-        for store in $OBJECT_STORES; do
-            if ! curl --silent --fail --head --output /dev/null \
-                --connect-timeout 15 --retry 3 --retry-delay 5 \
-                "${store}/${entry}.simg"; then
-                echo "[INFO] Not in object storage: ${store}/${entry}.simg"
-                missing=1
-            fi
+    local entry store stores missing
+    read -ra stores <<< "$OBJECT_STORES"
+    # shellcheck disable=SC2016 # $1 expands in the per-URL shell.
+    mapfile -t missing < <(while read -r entry _; do
+        for store in "${stores[@]}"; do
+            echo "${store}/${entry}.simg"
         done
-    done < cvmfs/log.txt
-    return "$missing"
+    done < cvmfs/log.txt | xargs -P 16 -I{} sh -c \
+        'curl --silent --fail --head --output /dev/null --connect-timeout 15 \
+            --retry 3 --retry-delay 5 "$1" || echo "$1"' _ {})
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        printf '[INFO] Not in object storage: %s\n' "${missing[@]}"
+        return 1
+    fi
 }
 
 # Rebuild the metadata commit on the current base. Returns 1 when the base
