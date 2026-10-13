@@ -55,8 +55,11 @@ build_branch() {
         git -c user.name="github-actions[bot]" \
         -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
         commit --quiet -m "$TITLE" -- "${METADATA_FILES[@]}" || exit 1
-    git push --quiet --force origin "HEAD:refs/heads/$BRANCH" || exit 1
     head_sha="$(git rev-parse HEAD)"
+    # A concurrent publisher's push can reject this one; the merge loop sees
+    # the branch head differ and rebuilds.
+    git push --quiet --force origin "HEAD:refs/heads/$BRANCH" ||
+        echo "[WARNING] Pushing $BRANCH failed; retrying after the merge attempt."
 }
 
 base_publishes_head() {

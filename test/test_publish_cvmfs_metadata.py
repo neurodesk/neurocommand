@@ -226,6 +226,25 @@ def test_uses_the_pr_another_publisher_created_first(tmp_path):
     assert merge.startswith("pr merge 17 ")
 
 
+def test_retries_after_a_concurrent_push_rejects_the_branch(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    hook = origin / "hooks" / "pre-receive"
+    hook.write_text(
+        "#!/usr/bin/env bash\n"
+        f"marker={state / 'rejected'}\n"
+        'grep -q bot/cvmfs-metadata && [[ ! -f "$marker" ]] && touch "$marker" && exit 1\n'
+        "exit 0\n"
+    )
+    hook.chmod(0o755)
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert (state / "rejected").exists()
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+
+
 def test_merge_reported_for_a_stale_pr_is_not_success(tmp_path):
     origin, seed, work, state, env = _fixture(tmp_path)
     uploaded = _bump(seed, "20261010")
