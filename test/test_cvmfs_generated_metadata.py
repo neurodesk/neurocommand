@@ -65,12 +65,60 @@ def test_hidden_app_remains_hidden_after_build_date_changes(tmp_path):
     }
 
 
-def test_stratum_sync_publishes_log_and_applist_together():
+def _shell_function(script, name):
+    start = script.index(f"{name}() {{")
+    return script[start : script.index("\n}\n", start) + 3]
+
+
+def _git(cwd, *args):
+    return subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def test_stratum_sync_mirrors_origin_and_discards_rejected_metadata_commits(
+    tmp_path,
+):
+    origin = tmp_path / "origin.git"
+    seed = tmp_path / "seed"
+    checkout = tmp_path / "checkout"
+    _git(tmp_path, "init", "--bare", "-b", "main", str(origin))
+    _git(tmp_path, "clone", str(origin), str(seed))
+    (seed / "log.txt").write_text("old_1.0_20250628 categories:\n")
+    _git(seed, "add", "log.txt")
+    _git(seed, "commit", "-m", "published")
+    _git(seed, "push", "origin", "HEAD:main")
+    _git(tmp_path, "clone", str(origin), str(checkout))
+    # A metadata commit whose push branch protection rejected.
+    (checkout / "log.txt").write_text("local_1.0_20261010 categories:\n")
+    _git(checkout, "commit", "-am", "Regenerate CVMFS metadata from apps.json")
+    (seed / "log.txt").write_text("new_1.0_20261010 categories:\n")
+    _git(seed, "commit", "-am", "publish uploaded metadata")
+    _git(seed, "push", "origin", "HEAD:main")
+
+    function = _shell_function(SYNC_SCRIPT.read_text(), "sync_checkout_to_origin")
+    result = subprocess.run(
+        ["bash", "-c", f'{function}\nsync_checkout_to_origin "$1"', "_", checkout],
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert "Regenerate CVMFS metadata from apps.json" in result.stdout
+    assert _git(checkout, "rev-parse", "HEAD") == _git(seed, "rev-parse", "HEAD")
+    assert (checkout / "log.txt").read_text() == "new_1.0_20261010 categories:\n"
+
+
+def test_stratum_sync_does_not_write_published_metadata():
     script = SYNC_SCRIPT.read_text()
 
-    assert 'python3 "$repo_path/cvmfs/json_gen.py"' in script
-    assert 'local generated_rel_paths=("cvmfs/log.txt" "cvmfs/applist.json")' in script
-    assert 'git -C "$repo_path" add "${generated_rel_paths[@]}"' in script
+    assert "push" not in script
+    assert "generate_metadata" not in script
+    assert "json_gen" not in script
 
 
 def test_stratum_sync_uses_tested_retrieval_scripts_without_nectar_gate():

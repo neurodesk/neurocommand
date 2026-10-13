@@ -1,5 +1,6 @@
 import shlex
 import subprocess
+import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -300,3 +301,51 @@ rclone_copy_image {shlex.quote(str(image))} nectar:/neurodesk/ "upload test imag
     assert "--retries 2" in call_log
     assert "--low-level-retries 7" in call_log
     assert "--checksum" in call_log
+
+
+def test_exhausted_retries_return_the_command_failure():
+    script = f"""
+source {shlex.quote(str(SCRIPT))}
+run_with_retries "always fails" 2 0 bash -c 'exit 7'
+"""
+
+    result = run_bash(script)
+
+    assert result.returncode == 7, result.stderr + result.stdout
+    assert result.stdout.count("failed with exit code 7") == 2
+
+
+def test_main_processes_generated_inventory_without_writing_published_metadata(
+    tmp_path,
+):
+    processed = tmp_path / "processed.txt"
+    published = [ROOT / "cvmfs" / "log.txt", ROOT / "cvmfs" / "applist.json"]
+    before = [path.read_bytes() for path in published]
+
+    script = f"""
+set -euo pipefail
+source {shlex.quote(str(SCRIPT))}
+IMAGE_HOME={shlex.quote(str(tmp_path / "images"))}
+process_container_line() {{
+    echo "$1" >> {shlex.quote(str(processed))}
+}}
+main
+"""
+
+    result = run_bash(script)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    expected = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "cvmfs" / "generate_metadata.py"),
+            "--log",
+            "/dev/stdout",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    assert processed.read_text() == expected
+    assert [path.read_bytes() for path in published] == before
+    assert not (ROOT / "log.txt").exists()

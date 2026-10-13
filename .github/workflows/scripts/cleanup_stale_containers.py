@@ -20,25 +20,7 @@ def run_command(cmd: List[str]) -> None:
 
 def generate_log(log_path: Path) -> None:
     print("[DEBUG] Generating log file from neurodesk/apps.json ...")
-    run_command(["python3", "neurodesk/write_log.py"])
-    if not log_path.exists():
-        raise SystemExit(
-            f"[ERROR] {log_path} was not created by neurodesk/write_log.py"
-        )
-
-
-def normalize_log(log_path: Path) -> None:
-    lines = []
-    for raw_line in log_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        line = line.replace("[", "").replace("]", "").strip()
-        if line:
-            lines.append(line)
-
-    log_path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
-    print("[DEBUG] Normalized log file:")
+    run_command(["python3", "cvmfs/generate_metadata.py", "--log", str(log_path)])
     print(log_path.read_text(encoding="utf-8"), end="")
 
 
@@ -150,7 +132,6 @@ def load_protected_keys(
     )
     if generate:
         generate_log(log_path)
-        normalize_log(log_path)
     current_keys = load_expected_keys(log_path)
     protected_keys = published_keys | current_keys | release_keys
     print(
@@ -429,7 +410,7 @@ def main() -> None:
     parser.add_argument(
         "--skip-log-generation",
         action="store_true",
-        help="Use existing log.txt and skip running neurodesk/write_log.py",
+        help="Use existing log.txt and skip running cvmfs/generate_metadata.py",
     )
     parser.add_argument(
         "--dry-run",

@@ -187,7 +187,6 @@ def test_invalid_published_snapshot_aborts_before_any_operation(
     calls = []
     for name in [
         "generate_log",
-        "normalize_log",
         "list_nectar_objects",
         "list_s3_objects",
         "check_orphaned_segments",

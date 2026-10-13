@@ -29,9 +29,9 @@ run_with_retries() {
         echo "[DEBUG] ${description} (attempt ${attempt}/${attempts})"
         if "$@"; then
             return 0
+        else
+            exit_code=$?
         fi
-
-        exit_code=$?
         echo "[WARNING] ${description} failed with exit code ${exit_code}"
         if [[ $attempt -lt $attempts ]]; then
             echo "[DEBUG] Retrying ${description} in ${delay_seconds}s"
@@ -288,38 +288,23 @@ process_container_line() {
 main() {
     echo "checking if containers are built"
 
-    # creating logfile with available containers
-    python3 neurodesk/write_log.py
-    pip3 install requests
+    local inventory
+    inventory="$(mktemp)"
+    # shellcheck disable=SC2064 # Expand the path now; the local is gone at exit.
+    trap "rm -f '$inventory'" EXIT
+    python3 cvmfs/generate_metadata.py --log "$inventory"
 
-    # remove empty lines
-    sed -i '/^$/d' log.txt
-
-    # remove square brackets
-    sed -i 's/[][]//g' log.txt
-
-    # remove spaces around
-    sed -i -e 's/^[ \t]*//' -e 's/[ \t]*$//' log.txt
-
-    echo "[debug] logfile:"
-    cat log.txt
-    echo "[debug] logfile is at: $PWD"
+    echo "[debug] container inventory:"
+    cat "$inventory"
 
     mkdir -p "$IMAGE_HOME"
 
-    mapfile -t arr < log.txt
+    mapfile -t arr < "$inventory"
     for line in "${arr[@]}"; do
         process_container_line "$line"
     done
-
-    # once everything is uploaded successfully move log file to cvmfs folder, so cvmfs can start downloading the containers:
-    echo "[Debug] mv logfile to cvmfs directory"
-    mv log.txt cvmfs
-
-    cd cvmfs
-    echo "[Debug] generate applist.json file for website"
-    python json_gen.py --apps-json ../neurodesk/apps.json # this generates the applist.json for the website
-    # The CVMFS Stratum 0 regenerates and publishes these files after synchronization.
+    # The workflow's publish_metadata job commits cvmfs/log.txt and
+    # cvmfs/applist.json for this revision only after this script succeeds.
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

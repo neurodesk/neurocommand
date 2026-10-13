@@ -194,38 +194,19 @@ neurocommand_has_upstream_updates() {
     return 0
 }
 
-regenerate_metadata_from_apps_json() {
+sync_checkout_to_origin() {
     local repo_path="$1"
-    local generated_log="$repo_path/log.txt"
-    local target_log="$repo_path/cvmfs/log.txt"
-    local target_applist="$repo_path/cvmfs/applist.json"
+    local upstream_ref discarded
 
-    echo "[INFO] Regenerating CVMFS metadata from neurodesk/apps.json."
+    upstream_ref="$(git -C "$repo_path" rev-parse --abbrev-ref --symbolic-full-name '@{u}')" || return 1
+    GIT_TERMINAL_PROMPT=0 git -C "$repo_path" fetch --prune "${upstream_ref%%/*}" || return 1
 
-    rm -f "$generated_log"
-
-    if ! (cd "$repo_path" && python3 neurodesk/write_log.py); then
-        echo "[ERROR] Failed to generate log.txt from neurodesk/apps.json."
-        exit 2
+    discarded="$(git -C "$repo_path" log --oneline "${upstream_ref}..HEAD")"
+    if [[ -n "$discarded" ]]; then
+        echo "[WARNING] Discarding local commits in $repo_path:"
+        echo "$discarded"
     fi
-
-    # Keep the same formatting conventions as the container upload pipeline.
-    sed -i '/^$/d' "$generated_log"
-    sed -i 's/[][]//g' "$generated_log"
-    sed -i -e 's/^[ \t]*//' -e 's/[ \t]*$//' "$generated_log"
-
-    mv -f "$generated_log" "$target_log"
-    echo "[INFO] Updated $target_log"
-
-    if ! python3 "$repo_path/cvmfs/json_gen.py" \
-        --log-path "$target_log" \
-        --output "$target_applist" \
-        --apps-json "$repo_path/neurodesk/apps.json"; then
-        echo "[ERROR] Failed to generate applist.json from $target_log."
-        exit 2
-    fi
-
-    echo "[INFO] Updated $target_applist"
+    git -C "$repo_path" reset --hard "$upstream_ref"
 }
 
 git_pull_rebase_non_interactive() {
@@ -241,48 +222,6 @@ git_pull_rebase_non_interactive() {
         return 1
     fi
 
-    return 0
-}
-
-commit_generated_metadata_to_github_if_changed() {
-    local repo_path="$1"
-    local generated_rel_paths=("cvmfs/log.txt" "cvmfs/applist.json")
-
-    if git -C "$repo_path" diff --quiet -- "${generated_rel_paths[@]}"; then
-        echo "[INFO] No generated metadata changes; skipping git commit/push."
-        return 0
-    fi
-
-    echo "[INFO] Committing regenerated CVMFS metadata to GitHub."
-    git -C "$repo_path" add "${generated_rel_paths[@]}"
-
-    if [[ -z "$(git -C "$repo_path" config --get user.name)" ]]; then
-        git -C "$repo_path" config user.name "neurodesk-cvmfs-bot"
-    fi
-    if [[ -z "$(git -C "$repo_path" config --get user.email)" ]]; then
-        git -C "$repo_path" config user.email "neurodesk-cvmfs-bot@users.noreply.github.com"
-    fi
-
-    if ! git -C "$repo_path" commit -m "Regenerate CVMFS metadata from apps.json"; then
-        echo "[WARNING] Unable to commit generated CVMFS metadata; continuing."
-        return 1
-    fi
-
-    if ! git -C "$repo_path" push; then
-        echo "[WARNING] Initial metadata push failed. Attempting git pull --rebase and one push retry."
-        if ! git_pull_rebase_non_interactive "$repo_path"; then
-            echo "[WARNING] Rebase failed while retrying metadata push; continuing."
-            git -C "$repo_path" rebase --abort >/dev/null 2>&1 || true
-            return 1
-        fi
-
-        if ! git -C "$repo_path" push; then
-            echo "[WARNING] Metadata push retry failed; continuing."
-            return 1
-        fi
-    fi
-
-    echo "[INFO] Successfully committed and pushed generated CVMFS metadata."
     return 0
 }
 
@@ -315,11 +254,12 @@ NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 
 cd "$NEUROCOMMAND_LOCAL_REPO" || exit
 
-# Pull latest changes, regenerate published metadata from apps.json, then sync CVMFS.
-if ! git_pull_rebase_non_interactive "$NEUROCOMMAND_LOCAL_REPO"; then
-    echo "[WARNING] Continuing with local checkout because pull --rebase failed."
+# cvmfs/log.txt on main is the published inventory: the upload workflow commits
+# it after the listed images are in object storage. Mirror main exactly; this
+# checkout carries no local work.
+if ! sync_checkout_to_origin "$NEUROCOMMAND_LOCAL_REPO"; then
+    echo "[WARNING] Continuing with the current checkout because fetching origin failed."
 fi
-regenerate_metadata_from_apps_json "$NEUROCOMMAND_LOCAL_REPO"
 cd cvmfs || exit
 
 # check if there is enough free space - otherwise don't do anything:
@@ -659,8 +599,6 @@ if neurocommand_has_upstream_updates "$NEUROCOMMAND_REPO"; then
 else
     echo "[INFO] Skipping LXDE menu rebuild/publish; no upstream neurocommand changes detected."
 fi
-
-commit_generated_metadata_to_github_if_changed "$NEUROCOMMAND_LOCAL_REPO"
 
 if ! cleanup_lockfile; then
     echo "[ERROR] Failed to delete lockfile: $LOCKFILE"
