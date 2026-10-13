@@ -15,7 +15,14 @@ FAKE_GH = """#!/usr/bin/env bash
 echo "$*" >> "$GH_LOG"
 case "$1 $2" in
     "pr list") cat "$GH_STATE/open" 2>/dev/null || true ;;
-    "pr create") echo 17 > "$GH_STATE/open" ;;
+    "pr create")
+        echo 17 > "$GH_STATE/open"
+        # Another publisher created the PR first.
+        if [[ -f "$GH_STATE/create_race" ]]; then
+            rm "$GH_STATE/create_race"
+            exit 1
+        fi
+        ;;
     "pr close") rm -f "$GH_STATE/open" ;;
     "pr merge")
         head="$6"
@@ -204,6 +211,19 @@ def test_identical_publications_build_the_same_commit(tmp_path):
 
     assert heads[0] == heads[1]
     assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
+
+
+def test_uses_the_pr_another_publisher_created_first(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "create_race").touch()
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+    (merge,) = _merges(tmp_path)
+    assert merge.startswith("pr merge 17 ")
 
 
 def test_merge_reported_for_a_stale_pr_is_not_success(tmp_path):
