@@ -3674,12 +3674,29 @@
                 "apptainer_args": []
             },
             "mipview 0.6.2": {
-                "version": "20261001",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
             "MipViewGUI-mipview 0.6.2": {
-                "version": "20261001",
+                "version": "20261013",
+                "exec": "mipview",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "visualization"
+        ]
+    },
+    "mipview_arm64": {
+        "apps": {
+            "mipview_arm64 0.6.2": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "MipViewGUI-mipview_arm64 0.6.2": {
+                "version": "20261013",
                 "exec": "mipview",
                 "apptainer_args": []
             }
