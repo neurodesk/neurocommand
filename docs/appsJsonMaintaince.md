@@ -287,12 +287,14 @@ bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$UPLOADED_SHA"
 ```
 - Runs in the `publish_metadata` job only after the upload job succeeds
 - Regenerates `cvmfs/log.txt` and `cvmfs/applist.json` from `apps.json` at the uploaded revision, not from a newer `main`
-- Opens or updates the `bot/cvmfs-metadata` pull request and squash-merges it once the required `quality required` check passes on that head; the job fails if the PR is not merged within its retry window
-- `cvmfs/log.txt` on `main` is therefore the published inventory: every entry is in Nectar and AWS object storage. The CVMFS Stratum 0 syncs containers from it, the website reads `applist.json`, and the Neurodesktop object-storage check verifies it
+- Opens or updates the `bot/cvmfs-metadata` pull request and squash-merges it once the required `quality required` check passes on that head. It rebuilds the branch when `main` advances, confirms that `main` contains the generated files, and fails if the PR is not merged within its retry window
+- `cvmfs/log.txt` on `main` is therefore the published inventory: every entry is in Nectar and AWS object storage. The website reads `applist.json`, and the Neurodesktop object-storage check verifies it
+- A rerun of an older upload never replaces metadata published for a later revision; the merge commit records `Uploaded-Revision: <sha>`
 - Stale-object cleanup never deletes an image that the published inventory lists
 
 #### CVMFS Stratum 0
 - `cvmfs/sync_containers_to_cvmfs.sh` resets its `~/neurocommand` checkout to `origin/main` on every run and never commits or pushes
+- It regenerates `cvmfs/log.txt` locally from `apps.json` and installs from that, as before. It does not wait for the published inventory, because syncing from an older inventory would disable newer installations
 - The checkout must carry no local work. Local commits, including metadata commits rejected by branch protection before this design, are discarded with a warning
 
 ### 3. Storage Locations

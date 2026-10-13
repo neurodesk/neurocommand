@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -7,6 +8,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "publish_cvmfs_metadata.sh"
 
+# Merging pushes the matched head to main. Optional state files make the first
+# merge attempt fail while checks run, fail after main advances, or report
+# success without merging (as gh does for an already-merged PR).
 FAKE_GH = """#!/usr/bin/env bash
 echo "$*" >> "$GH_LOG"
 case "$1 $2" in
@@ -14,11 +18,23 @@ case "$1 $2" in
     "pr create") echo 17 > "$GH_STATE/open" ;;
     "pr close") rm -f "$GH_STATE/open" ;;
     "pr merge")
-        # Branch protection rejects the first attempt while checks run.
-        if [[ ! -f "$GH_STATE/pending" ]]; then
-            touch "$GH_STATE/pending"
-            exit 1
-        fi
+        head="$6"
+        for mode in pending advance stale; do
+            if [[ -f "$GH_STATE/$mode" ]]; then
+                rm "$GH_STATE/$mode"
+                case "$mode" in
+                    pending) exit 1 ;;
+                    advance)
+                        git -C "$GH_SEED" commit --quiet --allow-empty -m docs
+                        git -C "$GH_SEED" push --quiet origin HEAD:main
+                        exit 1
+                        ;;
+                    stale) exit 0 ;;
+                esac
+            fi
+        done
+        git push --quiet "$GH_ORIGIN" "$head:refs/heads/main"
+        rm -f "$GH_STATE/open"
         ;;
 esac
 """
@@ -34,17 +50,23 @@ def _git(cwd, *args):
     ).stdout.strip()
 
 
-def _apps(version):
-    return {"tool": {"apps": {"tool 1.0": {"version": version}}, "categories": ["a"]}}
-
-
 def _write_apps(repo, version):
-    (repo / "neurodesk" / "apps.json").write_text(json.dumps(_apps(version)))
+    apps = {"tool": {"apps": {"tool 1.0": {"version": version}}, "categories": ["a"]}}
+    (repo / "neurodesk" / "apps.json").write_text(json.dumps(apps))
+
+
+def _bump(seed, version):
+    _git(seed, "pull", "--quiet", "--rebase", "origin", "main")
+    _write_apps(seed, version)
+    _git(seed, "commit", "-am", f"apps.json {version}")
+    _git(seed, "push", "origin", "HEAD:main")
+    return _git(seed, "rev-parse", "HEAD")
 
 
 def _fixture(tmp_path):
     origin = tmp_path / "origin.git"
     seed = tmp_path / "seed"
+    work = tmp_path / "work"
     _git(tmp_path, "init", "--bare", "-b", "main", str(origin))
     _git(tmp_path, "clone", str(origin), str(seed))
     (seed / "neurodesk").mkdir()
@@ -60,6 +82,7 @@ def _fixture(tmp_path):
     _git(seed, "add", ".")
     _git(seed, "commit", "-m", "published 20250628")
     _git(seed, "push", "origin", "HEAD:main")
+    _git(tmp_path, "clone", str(origin), str(work))
 
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
@@ -72,72 +95,115 @@ def _fixture(tmp_path):
         "PATH": f"{bin_dir}:{os.environ['PATH']}",
         "GH_LOG": str(tmp_path / "gh.log"),
         "GH_STATE": str(state),
+        "GH_ORIGIN": str(origin),
+        "GH_SEED": str(seed),
+        "GIT_AUTHOR_NAME": "t",
+        "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t",
+        "GIT_COMMITTER_EMAIL": "t@t",
         "CVMFS_METADATA_MERGE_RETRY_DELAY": "0",
     }
-    return origin, seed, state, env
+    return origin, seed, work, state, env
 
 
-def _publish(seed, sha, env):
+def _publish(work, sha, env):
     return subprocess.run(
         ["bash", str(SCRIPT), sha],
-        cwd=seed,
+        cwd=work,
         env=env,
         capture_output=True,
         text=True,
     )
 
 
-def test_publishes_uploaded_revision_and_merges_the_exact_head(tmp_path):
-    origin, seed, state, env = _fixture(tmp_path)
-    _write_apps(seed, "20261010")
-    _git(seed, "commit", "-am", "apps.json bump")
-    uploaded = _git(seed, "rev-parse", "HEAD")
-    _git(seed, "push", "origin", "HEAD:main")
-    # main moves on to an image the upload job has not handled yet.
-    _write_apps(seed, "20261012")
-    _git(seed, "commit", "-am", "newer apps.json bump")
-    _git(seed, "push", "origin", "HEAD:main")
+def _main_log(origin):
+    return _git(origin, "show", "main:cvmfs/log.txt")
 
-    result = _publish(seed, uploaded, env)
+
+def _merges(tmp_path):
+    log = tmp_path / "gh.log"
+    calls = log.read_text().splitlines() if log.exists() else []
+    return [call for call in calls if call.startswith("pr merge")]
+
+
+def test_publishes_the_uploaded_revision_not_a_newer_main(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    # main moves on to an image the upload job has not handled yet.
+    _bump(seed, "20261012")
+    (state / "pending").touch()
+
+    result = _publish(work, uploaded, env)
 
     assert result.returncode == 0, result.stderr + result.stdout
-    head = _git(origin, "rev-parse", "bot/cvmfs-metadata")
-    published = _git(origin, "show", "bot/cvmfs-metadata:cvmfs/log.txt")
-    assert published == "tool_1.0_20261010 categories:a,"
-    applist = json.loads(_git(origin, "show", "bot/cvmfs-metadata:cvmfs/applist.json"))
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+    applist = json.loads(_git(origin, "show", "main:cvmfs/applist.json"))
     assert applist["list"][0]["application"] == "tool_1.0_20261010"
-    assert _git(origin, "rev-parse", "bot/cvmfs-metadata^") == _git(
-        origin, "rev-parse", "main"
+    head = _git(origin, "rev-parse", "bot/cvmfs-metadata")
+    assert all(f"--match-head-commit {head}" in call for call in _merges(tmp_path))
+    assert len(_merges(tmp_path)) == 2
+
+
+def test_rebuilds_on_main_when_main_advances_during_the_wait(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "advance").touch()
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+    assert _git(origin, "log", "-1", "--format=%s", "main^") == "docs"
+    first, second = (
+        re.search(r"--match-head-commit (\S+)", call)[1] for call in _merges(tmp_path)
     )
-    calls = (tmp_path / "gh.log").read_text().splitlines()
-    merges = [call for call in calls if call.startswith("pr merge")]
-    assert merges == [f"pr merge 17 --squash --match-head-commit {head}"] * 2
+    assert first != second
+
+
+def test_merge_reported_for_a_stale_pr_is_not_success(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "stale").touch()
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert len(_merges(tmp_path)) == 2
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+
+
+def test_rerun_of_an_older_upload_does_not_roll_back(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    older = _bump(seed, "20261010")
+    newer = _bump(seed, "20261012")
+    assert _publish(work, newer, env).returncode == 0
+
+    result = _publish(work, older, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert "superseded" in result.stdout
+    assert _main_log(origin) == "tool_1.0_20261012 categories:a,"
 
 
 def test_unmerged_metadata_pr_fails_the_job(tmp_path):
-    origin, seed, state, env = _fixture(tmp_path)
-    _write_apps(seed, "20261010")
-    _git(seed, "commit", "-am", "apps.json bump")
-    _git(seed, "push", "origin", "HEAD:main")
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "pending").touch()
 
-    result = _publish(
-        seed,
-        _git(seed, "rev-parse", "HEAD"),
-        {**env, "CVMFS_METADATA_MERGE_ATTEMPTS": "1"},
-    )
+    result = _publish(work, uploaded, {**env, "CVMFS_METADATA_MERGE_ATTEMPTS": "1"})
 
     assert result.returncode == 1
     assert "was not merged" in result.stdout
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
 
 
 def test_up_to_date_metadata_closes_a_stale_pr_without_pushing(tmp_path):
-    origin, seed, state, env = _fixture(tmp_path)
+    origin, seed, work, state, env = _fixture(tmp_path)
     (state / "open").write_text("17\n")
 
-    result = _publish(seed, _git(seed, "rev-parse", "HEAD"), env)
+    result = _publish(work, _git(seed, "rev-parse", "HEAD"), env)
 
     assert result.returncode == 0, result.stderr + result.stdout
-    calls = (tmp_path / "gh.log").read_text()
-    assert "pr close 17" in calls
-    assert "pr merge" not in calls
+    assert "pr close 17" in (tmp_path / "gh.log").read_text()
+    assert _merges(tmp_path) == []
     assert _git(origin, "branch", "--list", "bot/cvmfs-metadata") == ""

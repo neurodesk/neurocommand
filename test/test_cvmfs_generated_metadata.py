@@ -113,12 +113,8 @@ def test_stratum_sync_mirrors_origin_and_discards_rejected_metadata_commits(
     assert (checkout / "log.txt").read_text() == "new_1.0_20261010 categories:\n"
 
 
-def test_stratum_sync_does_not_write_published_metadata():
-    script = SYNC_SCRIPT.read_text()
-
-    assert "push" not in script
-    assert "generate_metadata" not in script
-    assert "json_gen" not in script
+def test_stratum_sync_never_pushes_metadata():
+    assert "push" not in SYNC_SCRIPT.read_text()
 
 
 def test_stratum_sync_uses_tested_retrieval_scripts_without_nectar_gate():

@@ -254,11 +254,16 @@ NEUROCOMMAND_LOCAL_REPO="$HOME/neurocommand"
 
 cd "$NEUROCOMMAND_LOCAL_REPO" || exit
 
-# cvmfs/log.txt on main is the published inventory: the upload workflow commits
-# it after the listed images are in object storage. Mirror main exactly; this
-# checkout carries no local work.
+# Mirror main exactly; this checkout carries no local work. Install what
+# apps.json describes rather than the published cvmfs/log.txt, which the upload
+# workflow advances later: syncing from an older inventory would disable newer
+# installations. The regenerated log is local and discarded by the next reset.
 if ! sync_checkout_to_origin "$NEUROCOMMAND_LOCAL_REPO"; then
     echo "[WARNING] Continuing with the current checkout because fetching origin failed."
+fi
+if ! python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/generate_metadata.py"; then
+    echo "[ERROR] Failed to generate cvmfs/log.txt from neurodesk/apps.json."
+    exit 2
 fi
 cd cvmfs || exit
 
