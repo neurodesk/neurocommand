@@ -2815,12 +2815,12 @@
                 "apptainer_args": []
             },
             "globus 3.3.1": {
-                "version": "20260927",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
             "globusGUI-globus 3.3.1": {
-                "version": "20260927",
+                "version": "20261013",
                 "exec": "globusconnectpersonal -gui",
                 "apptainer_args": []
             }
@@ -2832,12 +2832,12 @@
     "globus_arm64": {
         "apps": {
             "globus_arm64 3.3.1": {
-                "version": "20260927",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
             "globusGUI-globus_arm64 3.3.1": {
-                "version": "20260927",
+                "version": "20261013",
                 "exec": "globusconnectpersonal -gui",
                 "apptainer_args": []
             }
@@ -5159,12 +5159,31 @@
                 "exec": "QuPath"
             },
             "qupath 0.7.0": {
-                "version": "20260723",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
             "qupathGUI-qupath 0.7.0": {
-                "version": "20260723",
+                "version": "20261013",
+                "exec": "QuPath",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "qupath_arm64": {
+        "apps": {
+            "qupath_arm64 0.7.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qupathGUI-qupath_arm64 0.7.0": {
+                "version": "20261013",
                 "exec": "QuPath",
                 "apptainer_args": []
             }
