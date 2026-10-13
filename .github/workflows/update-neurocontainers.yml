@@ -71,9 +71,9 @@ jobs:
   # lists has been uploaded.
   publish_metadata:
     needs: upload_containers_simg
-    concurrency:
-      group: publish-cvmfs-metadata
-      cancel-in-progress: false
+    # No concurrency group: a queued publisher could be replaced by an older
+    # rerun. Publishers of a superseded apps.json exit, and the current one
+    # rebuilds the shared branch if another publisher replaced it.
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:

@@ -19,7 +19,7 @@ case "$1 $2" in
     "pr close") rm -f "$GH_STATE/open" ;;
     "pr merge")
         head="$6"
-        for mode in pending advance stale; do
+        for mode in pending advance stale clobber; do
             if [[ -f "$GH_STATE/$mode" ]]; then
                 rm "$GH_STATE/$mode"
                 case "$mode" in
@@ -30,9 +30,15 @@ case "$1 $2" in
                         exit 1
                         ;;
                     stale) exit 0 ;;
+                    clobber)
+                        git -C "$GH_SEED" push --quiet --force origin HEAD:refs/heads/bot/cvmfs-metadata
+                        exit 1
+                        ;;
                 esac
             fi
         done
+        # Like GitHub, refuse a head that is no longer the PR's head.
+        [[ "$(git -C "$GH_ORIGIN" rev-parse bot/cvmfs-metadata)" == "$head" ]] || exit 1
         git push --quiet "$GH_ORIGIN" "$head:refs/heads/main"
         rm -f "$GH_STATE/open"
         ;;
@@ -156,6 +162,42 @@ def test_rebuilds_on_main_when_main_advances_during_the_wait(tmp_path):
         re.search(r"--match-head-commit (\S+)", call)[1] for call in _merges(tmp_path)
     )
     assert first != second
+
+
+def test_restores_the_branch_after_another_publisher_replaces_it(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "clobber").touch()
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+    assert len(_merges(tmp_path)) == 2
+
+
+def test_identical_publications_build_the_same_commit(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    heads = []
+    for second in range(2):
+        (state / "pending").touch()
+        clock = f"2026-10-13T00:00:0{second}Z"
+        result = _publish(
+            work,
+            uploaded,
+            {
+                **env,
+                "CVMFS_METADATA_MERGE_ATTEMPTS": "1",
+                "GIT_AUTHOR_DATE": clock,
+                "GIT_COMMITTER_DATE": clock,
+            },
+        )
+        assert result.returncode == 1, result.stderr + result.stdout
+        heads.append(_git(origin, "rev-parse", "bot/cvmfs-metadata"))
+
+    assert heads[0] == heads[1]
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
 
 
 def test_merge_reported_for_a_stale_pr_is_not_success(tmp_path):

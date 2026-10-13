@@ -56,8 +56,7 @@ def test_publish_rerun_cannot_cancel_a_newer_upload():
     publish = jobs[jobs.index("  publish_metadata:") :]
 
     assert "concurrency:" not in workflow[: workflow.index("\njobs:")]
-    assert "group: update-neurocontainers" not in publish
-    assert "group: publish-cvmfs-metadata\n      cancel-in-progress: false" in publish
+    assert "concurrency:" not in publish
 
 
 def test_workflows_install_the_pinned_toolchain_on_python_3_12():
