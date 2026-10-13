@@ -734,12 +734,30 @@
     "bidsvue": {
         "apps": {
             "bidsvue 0.1.20260704": {
-                "version": "20260707",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
             "BIDSvue-bidsvue 0.1.20260704": {
-                "version": "20260707",
+                "version": "20261013",
+                "exec": "bidsvue",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "data organisation"
+        ]
+    },
+    "bidsvue_arm64": {
+        "apps": {
+            "bidsvue_arm64 0.1.20260704": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "BIDSvue-bidsvue_arm64 0.1.20260704": {
+                "version": "20261013",
                 "exec": "bidsvue",
                 "apptainer_args": []
             }
@@ -2526,12 +2544,12 @@
                 "apptainer_args": []
             },
             "fsl 6.0.7.23": {
-                "version": "20261004",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
             "fsleyesGUI-fsl 6.0.7.23": {
-                "version": "20261004",
+                "version": "20261013",
                 "exec": "fsleyes",
                 "apptainer_args": []
             },
@@ -2550,6 +2568,28 @@
             "fsleyesGUI-fsl 6.0.7.8": {
                 "version": "20240913",
                 "exec": "fsleyes"
+            }
+        },
+        "categories": [
+            "arterial spin labelling",
+            "diffusion imaging",
+            "functional imaging",
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "fsl_arm64": {
+        "apps": {
+            "fsl_arm64 6.0.7.23": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fsleyesGUI-fsl_arm64 6.0.7.23": {
+                "version": "20261013",
+                "exec": "fsleyes",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3303,7 +3343,20 @@
                 "apptainer_args": []
             },
             "lipsia 4.1.1": {
-                "version": "20260929",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging",
+            "machine learning"
+        ]
+    },
+    "lipsia_arm64": {
+        "apps": {
+            "lipsia_arm64 4.1.1": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3789,7 +3842,20 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261011",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology",
+            "programming"
+        ]
+    },
+    "mneextended_arm64": {
+        "apps": {
+            "mneextended_arm64 1.2.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3879,6 +3945,25 @@
             "mricronGUI-mricron 1.0.20190902": {
                 "version": "20220311",
                 "exec": "MRIcron"
+            },
+            "mricron 1.2.20211006": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "structural imaging",
+            "visualization"
+        ]
+    },
+    "mricron_arm64": {
+        "apps": {
+            "mricron_arm64 1.2.20211006": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3916,7 +4001,19 @@
                 "exec": ""
             },
             "mritools 4.9.0": {
-                "version": "20261003",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "phase processing"
+        ]
+    },
+    "mritools_arm64": {
+        "apps": {
+            "mritools_arm64 4.9.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4729,7 +4826,20 @@
                 "exec": ""
             },
             "qmrlab 3.0.0": {
-                "version": "20261006",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction",
+            "quantitative imaging"
+        ]
+    },
+    "qmrlab_arm64": {
+        "apps": {
+            "qmrlab_arm64 3.0.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4908,7 +5018,7 @@
                 "apptainer_args": []
             },
             "qsmxt 9.22.0": {
-                "version": "20260923",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -5135,7 +5245,20 @@
     "rshrf": {
         "apps": {
             "rshrf 1.7.0": {
-                "version": "20260529",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "functional imaging"
+        ]
+    },
+    "rshrf_arm64": {
+        "apps": {
+            "rshrf_arm64 1.7.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5273,12 +5396,31 @@
     "sigviewer": {
         "apps": {
             "sigviewer 0.6.4": {
-                "version": "20220315",
-                "exec": ""
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
             },
             "sigviewerGUI-sigviewer 0.6.4": {
-                "version": "20220315",
-                "exec": "sigviewer"
+                "version": "20261013",
+                "exec": "sigviewer",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ]
+    },
+    "sigviewer_arm64": {
+        "apps": {
+            "sigviewer_arm64 0.6.4": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sigviewerGUI-sigviewer_arm64 0.6.4": {
+                "version": "20261013",
+                "exec": "sigviewer",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5422,7 +5564,20 @@
                 "exec": ""
             },
             "sovabids 0.4.7": {
-                "version": "20261010",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "electrophysiology"
+        ]
+    },
+    "sovabids_arm64": {
+        "apps": {
+            "sovabids_arm64 0.4.7": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5900,7 +6055,20 @@
     "vertexwiser": {
         "apps": {
             "vertexwiser 1.5.1": {
-                "version": "20260608",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging",
+            "workflows"
+        ]
+    },
+    "vertexwiser_arm64": {
+        "apps": {
+            "vertexwiser_arm64 1.5.1": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
