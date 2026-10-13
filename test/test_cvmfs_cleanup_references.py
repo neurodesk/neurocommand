@@ -29,7 +29,7 @@ def module(root, relative, content):
     return path
 
 
-def cleanup(root, *, fail_scan=False):
+def cleanup(root, *, fail_scan=False, retained=()):
     source = (ROOT / "cvmfs/sync_containers_to_cvmfs.sh").read_text()
     block = source.split(
         "# disable unpacked container versions that no longer exist in log.txt:\n", 1
@@ -43,6 +43,7 @@ def cleanup(root, *, fail_scan=False):
             "set -euo pipefail",
             f"NEUROCOMMAND_LOCAL_REPO={shlex.quote(str(ROOT))}",
             "declare -A KEEP_IMAGES=([kept]=1)",
+            *[f"KEEP_IMAGES[{shlex.quote(name)}]=1" for name in retained],
             f"open_cvmfs_transaction() {{ echo open >> {shlex.quote(str(root / 'transactions'))}; }}",
             "publish_cvmfs_transaction() { :; }",
             'sudo() { "$@"; }',
@@ -161,3 +162,88 @@ def test_empty_reference_inventory_allows_cleanup(tmp_path):
     result = cleanup(tmp_path)
     assert result.returncode == 0, result.stderr
     assert not (old / (OLD + ".simg")).exists()
+
+
+def test_cleanup_preserves_committed_public_only_container(tmp_path):
+    old = container(tmp_path, OLD)
+    other = container(tmp_path, OTHER)
+    before = (old / "recon-all").read_bytes()
+    result = cleanup(tmp_path, retained={OLD})
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (old / "recon-all").read_bytes() == before
+    assert (old / (OLD + ".simg")).exists()
+    assert not (other / (OTHER + ".simg")).exists()
+
+
+@pytest.mark.parametrize("fetch_fails", [False, True])
+def test_refresh_protects_public_and_latest_desired_or_stops_cleanup(
+    tmp_path, fetch_fails
+):
+    from test.test_publish_cvmfs_metadata import _fixture, _bump
+
+    gitroot = tmp_path / "git"
+    gitroot.mkdir()
+    _, seed, work, _, _ = _fixture(gitroot)
+    _bump(seed, "20261010")
+    root = tmp_path / "cvmfs"
+    public = container(root, "tool_1.0_20250628")
+    desired = container(root, "tool_1.0_20261010")
+    other = container(root, OTHER)
+    source = (ROOT / "cvmfs/sync_containers_to_cvmfs.sh").read_text()
+    block = source[
+        source.index("UPSTREAM=") : source.index(
+            "# Existing commands.txt files make completed containers immutable"
+        )
+    ]
+    block = block.replace("/cvmfs/neurodesk.ardc.edu.au", str(root))
+    block = block.replace("$NEUROCOMMAND_LOCAL_REPO/cvmfs/", str(ROOT / "cvmfs") + "/")
+    setup = "\n".join(
+        [
+            "set -euo pipefail",
+            f"NEUROCOMMAND_LOCAL_REPO={shlex.quote(str(work))}",
+            "CLEANUP_ALLOWED=1",
+            "declare -A KEEP_IMAGES=([kept]=1)",
+            "open_cvmfs_transaction() { :; }",
+            "publish_cvmfs_transaction() { :; }",
+            'sudo() { "$@"; }',
+        ]
+    )
+    if fetch_fails:
+        setup += '\ngit() { if [[ "$*" == *"fetch --prune"* ]]; then return 1; fi; command git "$@"; }'
+    result = subprocess.run(
+        ["bash", "-c", setup + "\n" + block], capture_output=True, text=True
+    )
+    assert result.returncode == (2 if fetch_fails else 0), result.stdout + result.stderr
+    for path in (public, desired):
+        assert (path / (path.name + ".simg")).exists()
+        assert (path / "recon-all").read_text() == "#!/bin/bash\necho original\n"
+    assert (other / (OTHER + ".simg")).exists() == fetch_fails
+
+
+@pytest.mark.parametrize("operation", ["publish", "abort"])
+def test_failed_publication_or_abort_stops_the_sync_before_later_work(
+    tmp_path, operation
+):
+    source = (ROOT / "cvmfs/sync_containers_to_cvmfs.sh").read_text()
+    functions = source[: source.index("ensure_nested_catalog_markers_for_container()")]
+    calls = tmp_path / "calls"
+    setup = f'''
+sudo() {{
+    echo "$*" >> {shlex.quote(str(calls))}
+    [[ "$2" != "{operation}" ]]
+}}
+'''
+    result = subprocess.run(
+        [
+            "bash",
+            "-c",
+            functions
+            + setup
+            + f"\n{operation}_cvmfs_transaction example message\necho unsafe-retirement\n",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "unsafe-retirement" not in result.stdout
+    assert "cvmfs_server abort -f example" in calls.read_text()

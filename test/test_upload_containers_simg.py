@@ -435,3 +435,26 @@ main
     assert processed.read_text() == expected
     assert [path.read_bytes() for path in published] == before
     assert not (ROOT / "log.txt").exists()
+
+
+def test_scheduled_metadata_retry_skips_upload_and_installs_signed_client():
+    workflow = WORKFLOW.read_text()
+    assert "cron: '*/30 * * * *'" in workflow
+    assert "if: github.event_name != 'schedule'" in workflow
+    assert (
+        "if: always() && (github.event_name == 'schedule' || needs.upload_containers_simg.result == 'success')"
+        in workflow
+    )
+    assert (
+        "TRIGGER_SHA: ${{ github.event_name != 'schedule' && github.sha || '' }}"
+        in workflow
+    )
+    assert (
+        "cvmfs-contrib/github-action-cvmfs@72f2a8d366043978d6aebee154bc9ed321c2f2a8"
+        in workflow
+    )
+    assert (
+        "cvmfs_public_key: ${{ github.workspace }}/cvmfs/neurodesk.ardc.edu.au.pub"
+        in workflow
+    )
+    assert "cvmfs_auto_update: 'no'" in workflow
