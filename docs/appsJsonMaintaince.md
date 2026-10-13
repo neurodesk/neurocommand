@@ -285,16 +285,46 @@ singularity build {container}.simg docker://vnmd/{name}:{date}
 ```bash
 bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$TRIGGER_SHA"
 ```
-- Runs in the `publish_metadata` job only after the upload job succeeds
-- Regenerates `cvmfs/log.txt` and `cvmfs/applist.json` from `main`'s `apps.json` and publishes them only after every listed image answers HTTP 200 in Nectar and AWS. No revision passes between the jobs; a job output could not carry one, because GitHub drops outputs that contain a masked secret value
+- Runs in the `publish_metadata` job after the upload job succeeds, or every 30 minutes without uploads to retry pending publication
+- Regenerates `cvmfs/log.txt` and `cvmfs/applist.json` from `main`'s `apps.json` and publishes them only after every listed image answers HTTP 200 in Nectar and AWS and is present in a signed, committed public CVMFS snapshot. No revision passes between the jobs; a job output could not carry one, because GitHub drops outputs that contain a masked secret value
 - If images are missing because `main` has a newer `apps.json` than the triggering commit, the job exits successfully and leaves publication to that newer run. Missing images for the triggering commit's own inventory fail the job
 - Opens or updates the `bot/cvmfs-metadata` pull request and squash-merges it once the required `quality required` check passes on that head. It rebuilds the branch when `main` advances, confirms that `main` contains the generated files, and fails if the PR is not merged within its retry window
-- `cvmfs/log.txt` on `main` is therefore the published inventory: every entry is in Nectar and AWS object storage. The website reads `applist.json`, and the Neurodesktop object-storage check verifies it. A rerun of an older run publishes the current inventory, never an older one
+- `cvmfs/log.txt` on `main` is therefore the published inventory: every entry was confirmed in Nectar, AWS object storage, and committed public CVMFS before promotion. The website reads `applist.json`, and the Neurodesktop object-storage check verifies it. A rerun of an older run publishes the current inventory, never an older one
 - Stale-object cleanup never deletes an image that the published inventory lists
+
+The readiness command is `python3 cvmfs/check_publication.py --log cvmfs/log.txt`.
+It mounts a fresh official CVMFS client with a private cache, workspace, and reload
+socket directory. The sole origin is
+`http://stratum0.neurodesk.cloud.edu.au/cvmfs/neurodesk.ardc.edu.au`; this server
+currently refuses HTTPS. CVMFS verifies signatures with the reviewed repository
+key in `cvmfs/neurodesk.ardc.edu.au.pub` and verifies catalog hashes. The probe
+requires each exact container directory and its regular `commands.txt` completion
+marker, checks the signed revision and root before and after inspection, and
+never opens image payloads. This confirms committed records, not executable
+payload availability or vulnerability policy. Some deliberately disabled legacy
+records retain their completion marker after payload removal; the gate preserves
+that policy and does not reinstall them. A fresh check runs before committing metadata and
+immediately before each merge attempt, including rebuilt candidates.
+
+Missing containers defer publication, printing their exact IDs and the observed
+public revision in logs and the Actions summary. The candidate apps blob and age
+are also reported. `CVMFS_METADATA_LAG_SECONDS` defaults to 21600 (six hours);
+a missing inventory older than that fails the job. Age uses the latest
+`apps.json` commit, so another apps edit resets this coarse clock. Scheduled runs
+apply the same deadline when object uploads are still missing. Client startup,
+transport, signature, catalog, and cleanup errors fail immediately. Each probe
+has a 180-second deadline and bounded client transfer retries.
+
+The GitHub job installs the client using a pinned CVMFS setup action. Running the
+publisher elsewhere requires `cvmfs2`, `fusermount`, and working FUSE access.
+There is no production verification bypass.
 
 #### CVMFS Stratum 0
 - `cvmfs/sync_containers_to_cvmfs.sh` resets its `~/neurocommand` checkout to `origin/main` on every run and never commits or pushes
 - It regenerates `cvmfs/log.txt` locally from `apps.json` and installs from that, as before. It does not wait for the published inventory, because syncing from an older inventory would disable newer installations
+- Retirement protects the union of committed public inventory, this run's desired inventory, and freshly fetched public and desired inventories just before cleanup. It also preserves existing module references. The committed inventory is read with `git show`, so a previous run's regenerated worktree log cannot erase protection
+- A failed fetch or invalid protection inventory stops retirement. Installation, abort, and publication failures stop the run before retirement. Updating the sync script on Stratum 0 is a separate deployment; this change does not install currently missing images
+- The refresh is not a distributed lock against all concurrent catalog edits; it protects public entries during publication lag
 - The checkout must carry no local work. Local commits, including metadata commits rejected by branch protection before this design, are discarded with a warning
 
 ### 3. Storage Locations

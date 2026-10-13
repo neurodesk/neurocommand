@@ -1,6 +1,8 @@
 name: Update neurocontainers
 
 on:
+  schedule:
+    - cron: '*/30 * * * *'
   workflow_dispatch:
   push:
     branches:
@@ -11,9 +13,12 @@ on:
       - '.github/workflows/scripts/publish_cvmfs_metadata.sh'
       - 'neurodesk/apps.json'
       - 'cvmfs/generate_metadata.py'
+      - 'cvmfs/check_publication.py'
+      - 'cvmfs/neurodesk.ardc.edu.au.pub'
 
 jobs:
   upload_containers_simg:
+    if: github.event_name != 'schedule'
     # A newer apps.json supersedes an older upload. This is job-level so that
     # re-running an older run's publish job cannot cancel a newer upload.
     concurrency:
@@ -61,11 +66,9 @@ jobs:
         rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true region us-east-2 no_check_bucket true
         /bin/bash .github/workflows/upload_containers_simg.sh
 
-  # cvmfs/log.txt is the published inventory read by the CVMFS Stratum 0, the
-  # website and object-storage checks, so it only advances once every image it
-  # lists has been uploaded.
   publish_metadata:
     needs: upload_containers_simg
+    if: always() && (github.event_name == 'schedule' || needs.upload_containers_simg.result == 'success')
     # No concurrency group: a queued publisher could be replaced by an older
     # rerun. Publishers of a superseded apps.json exit, and the current one
     # rebuilds the shared branch if another publisher replaced it.
@@ -84,10 +87,17 @@ jobs:
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: "3.12"
+    - name: Install the CVMFS client
+      uses: cvmfs-contrib/github-action-cvmfs@72f2a8d366043978d6aebee154bc9ed321c2f2a8
+      with:
+        cvmfs_repositories: ''
+        cvmfs_public_key: ${{ github.workspace }}/cvmfs/neurodesk.ardc.edu.au.pub
+        cvmfs_server_url: http://stratum0.neurodesk.cloud.edu.au/cvmfs/@fqrn@
+        cvmfs_auto_update: 'no'
     - name: Publish CVMFS metadata for the uploaded revision
       env:
         GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        TRIGGER_SHA: ${{ github.sha }}
+        TRIGGER_SHA: ${{ github.event_name != 'schedule' && github.sha || '' }}
       # Publishes main's inventory after confirming every image is uploaded,
       # so no revision passes between jobs. A job output could not carry one:
       # GitHub drops outputs that contain a masked secret value.

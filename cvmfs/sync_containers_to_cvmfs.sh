@@ -37,7 +37,11 @@ publish_cvmfs_transaction() {
         echo "[ERROR] Unable to switch to $HOME before publishing $repo."
         exit 2
     }
-    sudo cvmfs_server publish -m "$message" "$repo"
+    if ! sudo cvmfs_server publish -m "$message" "$repo"; then
+        echo "[ERROR] CVMFS publication failed; stopping before retirement."
+        abort_cvmfs_transaction "$repo"
+        exit 2
+    fi
 }
 
 abort_cvmfs_transaction() {
@@ -50,7 +54,7 @@ abort_cvmfs_transaction() {
     # -f keeps this non-interactive: without it the y/N prompt reads from this
     # script's stdin (log.txt inside the sync loop), eating a container line
     # and leaving the transaction open.
-    sudo cvmfs_server abort -f "$repo"
+    sudo cvmfs_server abort -f "$repo" || exit 2
 }
 
 ensure_nested_catalog_markers_for_container() {
@@ -258,8 +262,19 @@ cd "$NEUROCOMMAND_LOCAL_REPO" || exit
 # apps.json describes rather than the published cvmfs/log.txt, which the upload
 # workflow advances later: syncing from an older inventory would disable newer
 # installations. The regenerated log is local and discarded by the next reset.
+CLEANUP_ALLOWED=1
+declare -A KEEP_IMAGES=()
 if ! sync_checkout_to_origin "$NEUROCOMMAND_LOCAL_REPO"; then
+    CLEANUP_ALLOWED=0
     echo "[WARNING] Continuing with the current checkout because fetching origin failed."
+fi
+if PUBLIC_PROTECTION=$(python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/retention_inventory.py" \
+    --repo "$NEUROCOMMAND_LOCAL_REPO" --revision HEAD); then
+    while IFS= read -r image; do
+        KEEP_IMAGES["$image"]=1
+    done <<< "$PUBLIC_PROTECTION"
+else
+    CLEANUP_ALLOWED=0
 fi
 if ! python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/generate_metadata.py"; then
     echo "[ERROR] Failed to generate cvmfs/log.txt from neurodesk/apps.json."
@@ -281,7 +296,7 @@ fi;
 # export IMAGENAME_BUILDDATE=spm12_r7219_20201120
 # export LINE='fsl_6.0.4_20210105 categories:functional imaging,structural imaging,diffusion imaging,image segmentation,image registration,'
 
-declare -A KEEP_IMAGES
+INSTALL_FAILED=0
 
 
 while IFS= read -r LINE
@@ -304,6 +319,7 @@ do
         # this publisher before opening a transaction or downloading the SIF.
         if ! "$NEUROCOMMAND_LOCAL_REPO/cvmfs/ensure_binfmt.sh" "$IMAGENAME_BUILDDATE"; then
             echo "[ERROR] Cannot deploy $IMAGENAME_BUILDDATE without working QEMU/binfmt support."
+            INSTALL_FAILED=1
             continue
         fi
 
@@ -314,6 +330,7 @@ do
         if ! cd /cvmfs/neurodesk.ardc.edu.au/containers/; then
             echo "[ERROR] Cannot enter the CVMFS containers directory. Aborting transaction."
             abort_cvmfs_transaction neurodesk.ardc.edu.au
+            INSTALL_FAILED=1
             continue
         fi
 
@@ -330,6 +347,7 @@ do
            ! cp -a "$NEUROCOMMAND_LOCAL_REPO/neurodesk/transparent-singularity/." "$IMAGENAME_BUILDDATE/"; then
             echo "[ERROR] Failed to stage transparent-singularity for $IMAGENAME_BUILDDATE. Aborting transaction."
             abort_cvmfs_transaction neurodesk.ardc.edu.au
+            INSTALL_FAILED=1
             continue
         fi
 
@@ -338,6 +356,7 @@ do
             if ! cd "$IMAGENAME_BUILDDATE"; then
                 echo "[ERROR] Cannot enter container directory: $IMAGENAME_BUILDDATE. Aborting transaction."
                 abort_cvmfs_transaction neurodesk.ardc.edu.au
+                INSTALL_FAILED=1
                 continue
             fi
             export SINGULARITY_BINDPATH=/cvmfs
@@ -358,6 +377,7 @@ do
         if [ $retVal -ne 0 ]; then
             echo "Error in Transparent singularity. Check the log. Aborting!"
             abort_cvmfs_transaction neurodesk.ardc.edu.au
+            INSTALL_FAILED=1
         else
             publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
         fi
@@ -377,6 +397,11 @@ do
     # fi
 
 done < "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt"
+
+if [[ $INSTALL_FAILED -ne 0 ]]; then
+    echo "[ERROR] Installation failed; stopping before reconciliation and retirement."
+    exit 2
+fi
 
 echo "[INFO] Checking that module files point to the latest kept container builds."
 if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_module_files.py" \
@@ -425,6 +450,19 @@ if [[ $BUNDLE_STATUS -eq 1 ]]; then
         exit 2
     fi
 elif [[ $BUNDLE_STATUS -ne 0 ]]; then
+    exit 2
+fi
+
+UPSTREAM=$(git -C "$NEUROCOMMAND_LOCAL_REPO" rev-parse --abbrev-ref --symbolic-full-name '@{u}') || CLEANUP_ALLOWED=0
+if [[ $CLEANUP_ALLOWED -eq 1 ]] &&
+    GIT_TERMINAL_PROMPT=0 git -C "$NEUROCOMMAND_LOCAL_REPO" fetch --prune "${UPSTREAM%%/*}" &&
+    PUBLIC_PROTECTION=$(python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/retention_inventory.py" \
+        --repo "$NEUROCOMMAND_LOCAL_REPO" --revision "$UPSTREAM"); then
+    while IFS= read -r image; do
+        KEEP_IMAGES["$image"]=1
+    done <<< "$PUBLIC_PROTECTION"
+else
+    echo "[ERROR] Cannot refresh public inventory; retirement skipped."
     exit 2
 fi
 

@@ -26,13 +26,17 @@ case "$1 $2" in
     "pr close") rm -f "$GH_STATE/open" ;;
     "pr merge")
         head="$6"
-        for mode in pending advance stale clobber; do
+        for mode in pending advance advance_apps stale clobber withdrawn; do
             if [[ -f "$GH_STATE/$mode" ]]; then
                 rm "$GH_STATE/$mode"
                 case "$mode" in
                     pending) exit 1 ;;
-                    advance)
-                        git -C "$GH_SEED" commit --quiet --allow-empty -m docs
+                    withdrawn) echo 3 > "$GH_STATE/publication-status"; exit 1 ;;
+                    advance|advance_apps)
+                        if [[ "$mode" == advance_apps ]]; then
+                            python3 -c 'import json, pathlib, sys; p = pathlib.Path(sys.argv[1]); data = json.loads(p.read_text()); data["tool"]["apps"]["tool 1.0"]["version"] = "20261012"; p.write_text(json.dumps(data))' "$GH_SEED/neurodesk/apps.json"
+                        fi
+                        git -C "$GH_SEED" commit --quiet --allow-empty -am docs
                         git -C "$GH_SEED" push --quiet origin HEAD:main
                         exit 1
                         ;;
@@ -93,6 +97,15 @@ def _fixture(tmp_path):
     (seed / "cvmfs").mkdir()
     for name in ("generate_metadata.py", "json_gen.py"):
         shutil.copy(ROOT / "cvmfs" / name, seed / "cvmfs" / name)
+    (seed / "cvmfs/check_publication.py").write_text(
+        "import os, pathlib, sys\n"
+        "state = pathlib.Path(os.environ['GH_STATE'])\n"
+        "with (state/'probes').open('a') as output: output.write(pathlib.Path('cvmfs/log.txt').read_text())\n"
+        "reject = state/'reject-id'\n"
+        "if reject.exists() and reject.read_text() in pathlib.Path('cvmfs/log.txt').read_text(): sys.exit(3)\n"
+        "status = state/'publication-status'\n"
+        "sys.exit(int(status.read_text()) if status.exists() else 0)\n"
+    )
     for store in ("nectar", "aws"):
         (tmp_path / store).mkdir()
     _upload(seed, "20250628")
@@ -342,3 +355,70 @@ def test_up_to_date_metadata_closes_a_stale_pr_without_pushing(tmp_path):
     assert "pr close 17" in (tmp_path / "gh.log").read_text()
     assert _merges(tmp_path) == []
     assert _git(origin, "branch", "--list", "bot/cvmfs-metadata") == ""
+
+
+def test_publication_pending_does_not_push_then_retry_promotes(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "publication-status").write_text("3")
+    result = _publish(work, uploaded, env)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "publication deferred" in result.stdout
+    assert _git(origin, "branch", "--list", "bot/cvmfs-metadata") == ""
+    assert _merges(tmp_path) == []
+    (state / "publication-status").unlink()
+    result = _publish(work, "", env)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
+
+
+def test_publication_error_and_prolonged_lag_fail_without_pushing(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    for status in (2, 3):
+        (state / "publication-status").write_text(str(status))
+        result = _publish(work, uploaded, {**env, "CVMFS_METADATA_LAG_SECONDS": "0"})
+        assert result.returncode == 1, result.stdout + result.stderr
+        assert _git(origin, "branch", "--list", "bot/cvmfs-metadata") == ""
+    assert _merges(tmp_path) == []
+
+
+def test_every_merge_and_rebuild_rechecks_publication(tmp_path):
+    _, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "advance").touch()
+    result = _publish(work, uploaded, env)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (state / "probes").read_text().splitlines() == [
+        "tool_1.0_20261010 categories:a,"
+    ] * 4
+
+
+def test_ready_snapshot_is_not_reused_while_waiting_for_checks(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    (state / "withdrawn").touch()
+    result = _publish(work, uploaded, env)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert len(_merges(tmp_path)) == 1
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
+    assert (state / "probes").read_text().splitlines() == [
+        "tool_1.0_20261010 categories:a,"
+    ] * 3
+
+
+def test_new_candidate_after_base_race_must_pass_its_own_probe(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    _upload(seed, "20261012")
+    (state / "advance_apps").touch()
+    (state / "reject-id").write_text("tool_1.0_20261012")
+    result = _publish(work, uploaded, env)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
+    assert (state / "probes").read_text().splitlines() == [
+        "tool_1.0_20261010 categories:a,",
+        "tool_1.0_20261010 categories:a,",
+        "tool_1.0_20261012 categories:a,",
+    ]
+    assert len(_merges(tmp_path)) == 1

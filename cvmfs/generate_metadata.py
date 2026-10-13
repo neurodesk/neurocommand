@@ -4,7 +4,7 @@
 cvmfs/log.txt lists one ``<container>_<version>_<builddate> categories:...``
 entry per primary container app. cvmfs/applist.json is derived from it for the
 website. The upload workflow publishes both files only after every listed image
-is available in object storage; other tools use the same generator to compute
+is available in object storage and committed public CVMFS; other tools use the same generator to compute
 the inventory that apps.json currently describes.
 """
 
