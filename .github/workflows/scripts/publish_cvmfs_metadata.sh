@@ -14,23 +14,13 @@ MERGE_ATTEMPTS="${CVMFS_METADATA_MERGE_ATTEMPTS:-80}"
 MERGE_RETRY_DELAY="${CVMFS_METADATA_MERGE_RETRY_DELAY:-30}"
 METADATA_FILES=(cvmfs/log.txt cvmfs/applist.json)
 TITLE="Publish CVMFS metadata for uploaded containers"
-TRAILER="Uploaded-Revision: ${SOURCE_SHA}"
 
 apps_json="$(mktemp)"
 trap 'rm -f "$apps_json"' EXIT
 
 git fetch --no-tags origin "$BASE"
 git show "${SOURCE_SHA}:neurodesk/apps.json" > "$apps_json"
-
-# A rerun of an older upload must not roll back metadata already published for
-# a later revision.
-published_sha="$(git log "origin/$BASE" -1 --grep '^Uploaded-Revision: ' \
-    --format='%(trailers:key=Uploaded-Revision,valueonly)' | tr -d '[:space:]')"
-if [[ -n "$published_sha" && "$published_sha" != "$SOURCE_SHA" ]] &&
-    git merge-base --is-ancestor "$SOURCE_SHA" "$published_sha" 2>/dev/null; then
-    echo "[INFO] ${SOURCE_SHA} is superseded by published revision ${published_sha}."
-    exit 0
-fi
+source_apps="$(git rev-parse "${SOURCE_SHA}:neurodesk/apps.json")"
 
 open_pr() {
     gh pr list --base "$BASE" --head "$BRANCH" --state open --json number --jq '.[0].number // empty'
@@ -42,6 +32,13 @@ open_pr() {
 build_branch() {
     git fetch --no-tags origin "$BASE" || exit 1
     base_sha="$(git rev-parse "origin/$BASE")" || exit 1
+    # Every apps.json change on the base starts an upload run that publishes
+    # its own inventory, so this one only publishes while it is current. This
+    # also stops a rerun of an older upload from rolling metadata back.
+    if [[ "$(git rev-parse "${base_sha}:neurodesk/apps.json")" != "$source_apps" ]]; then
+        echo "[INFO] $BASE has a newer neurodesk/apps.json than ${SOURCE_SHA}; its upload run publishes it."
+        exit 0
+    fi
     git checkout --quiet -B "$BRANCH" "$base_sha" || exit 1
     python3 cvmfs/generate_metadata.py \
         --apps-json "$apps_json" \
@@ -52,7 +49,7 @@ build_branch() {
     fi
     git -c user.name="github-actions[bot]" \
         -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-        commit --quiet -m "$TITLE" -m "$TRAILER" -- "${METADATA_FILES[@]}" || exit 1
+        commit --quiet -m "$TITLE" -m "Generated from neurodesk/apps.json at ${SOURCE_SHA}." -- "${METADATA_FILES[@]}" || exit 1
     git push --quiet --force origin "HEAD:refs/heads/$BRANCH" || exit 1
     head_sha="$(git rev-parse HEAD)"
 }
@@ -80,8 +77,8 @@ for ((attempt = 1; attempt <= MERGE_ATTEMPTS; attempt++)); do
         pr="$(open_pr)"
     fi
 
-    if gh pr merge "$pr" --squash --match-head-commit "$head_sha" \
-        --subject "$TITLE" --body "$TRAILER" && base_publishes_head; then
+    if gh pr merge "$pr" --squash --match-head-commit "$head_sha" &&
+        base_publishes_head; then
         echo "[INFO] Merged CVMFS metadata PR #${pr} for ${SOURCE_SHA}."
         exit 0
     fi

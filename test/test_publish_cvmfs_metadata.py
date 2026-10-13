@@ -126,11 +126,9 @@ def _merges(tmp_path):
     return [call for call in calls if call.startswith("pr merge")]
 
 
-def test_publishes_the_uploaded_revision_not_a_newer_main(tmp_path):
+def test_publishes_the_uploaded_revision_once_checks_pass(tmp_path):
     origin, seed, work, state, env = _fixture(tmp_path)
     uploaded = _bump(seed, "20261010")
-    # main moves on to an image the upload job has not handled yet.
-    _bump(seed, "20261012")
     (state / "pending").touch()
 
     result = _publish(work, uploaded, env)
@@ -172,17 +170,32 @@ def test_merge_reported_for_a_stale_pr_is_not_success(tmp_path):
     assert _main_log(origin) == "tool_1.0_20261010 categories:a,"
 
 
+def test_newer_apps_json_on_main_supersedes_the_upload(tmp_path):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010")
+    # main moves on to an image the upload job has not handled yet.
+    _bump(seed, "20261012")
+
+    result = _publish(work, uploaded, env)
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    assert "its upload run publishes it" in result.stdout
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
+    assert _merges(tmp_path) == []
+
+
 def test_rerun_of_an_older_upload_does_not_roll_back(tmp_path):
     origin, seed, work, state, env = _fixture(tmp_path)
     older = _bump(seed, "20261010")
-    newer = _bump(seed, "20261012")
-    assert _publish(work, newer, env).returncode == 0
+    # A later upload restores the published inventory, so it publishes nothing.
+    restored = _bump(seed, "20250628")
+    assert _publish(work, restored, env).returncode == 0
 
     result = _publish(work, older, env)
 
     assert result.returncode == 0, result.stderr + result.stdout
-    assert "superseded" in result.stdout
-    assert _main_log(origin) == "tool_1.0_20261012 categories:a,"
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
+    assert _merges(tmp_path) == []
 
 
 def test_unmerged_metadata_pr_fails_the_job(tmp_path):

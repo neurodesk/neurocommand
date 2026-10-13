@@ -289,7 +289,7 @@ bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$UPLOADED_SHA"
 - Regenerates `cvmfs/log.txt` and `cvmfs/applist.json` from `apps.json` at the uploaded revision, not from a newer `main`
 - Opens or updates the `bot/cvmfs-metadata` pull request and squash-merges it once the required `quality required` check passes on that head. It rebuilds the branch when `main` advances, confirms that `main` contains the generated files, and fails if the PR is not merged within its retry window
 - `cvmfs/log.txt` on `main` is therefore the published inventory: every entry is in Nectar and AWS object storage. The website reads `applist.json`, and the Neurodesktop object-storage check verifies it
-- A rerun of an older upload never replaces metadata published for a later revision; the merge commit records `Uploaded-Revision: <sha>`
+- The job publishes only while `main` still has the uploaded `apps.json`. A newer `apps.json` starts its own upload run, which publishes that inventory, so a rerun of an older upload never rolls the metadata back
 - Stale-object cleanup never deletes an image that the published inventory lists
 
 #### CVMFS Stratum 0
