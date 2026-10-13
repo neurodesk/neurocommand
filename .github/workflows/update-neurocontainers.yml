@@ -12,15 +12,13 @@ on:
       - 'neurodesk/apps.json'
       - 'cvmfs/generate_metadata.py'
 
-# Prevent race conditions when multiple PRs are merged in quick succession.
-# This ensures only one instance of this workflow runs at a time.
-# If a second trigger occurs while the first is running, the older run is cancelled.
-concurrency:
-  group: update-neurocontainers
-  cancel-in-progress: true
-
 jobs:
   upload_containers_simg:
+    # A newer apps.json supersedes an older upload. This is job-level so that
+    # re-running an older run's publish job cannot cancel a newer upload.
+    concurrency:
+      group: update-neurocontainers
+      cancel-in-progress: true
     runs-on: self-hosted
     timeout-minutes: 360
     permissions:
@@ -73,6 +71,9 @@ jobs:
   # lists has been uploaded.
   publish_metadata:
     needs: upload_containers_simg
+    concurrency:
+      group: publish-cvmfs-metadata
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:

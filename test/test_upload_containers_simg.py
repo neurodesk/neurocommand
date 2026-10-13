@@ -50,6 +50,16 @@ def test_update_neurocontainers_has_explicit_timeouts():
     assert "timeout-minutes: 330" in workflow
 
 
+def test_publish_rerun_cannot_cancel_a_newer_upload():
+    workflow = WORKFLOW.read_text()
+    jobs = workflow[workflow.index("\njobs:") :]
+    publish = jobs[jobs.index("  publish_metadata:") :]
+
+    assert "concurrency:" not in workflow[: workflow.index("\njobs:")]
+    assert "group: update-neurocontainers" not in publish
+    assert "group: publish-cvmfs-metadata\n      cancel-in-progress: false" in publish
+
+
 def test_workflows_install_the_pinned_toolchain_on_python_3_12():
     for workflow in (
         TEST_WORKFLOW,
