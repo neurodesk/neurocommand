@@ -5059,7 +5059,19 @@
                 "apptainer_args": []
             },
             "rapidtide 3.2.0": {
-                "version": "20261008",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
+    "rapidtide_arm64": {
+        "apps": {
+            "rapidtide_arm64 3.2.0": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
