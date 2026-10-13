@@ -178,9 +178,15 @@ def test_restores_the_branch_after_another_publisher_replaces_it(tmp_path):
 
 def test_identical_publications_build_the_same_commit(tmp_path):
     origin, seed, work, state, env = _fixture(tmp_path)
-    uploaded = _bump(seed, "20261010")
+    first_upload = _bump(seed, "20261010")
+    # A workflow change uploads again with the same apps.json.
+    (seed / "workflow.txt").write_text("changed")
+    _git(seed, "add", "workflow.txt")
+    _git(seed, "commit", "-m", "workflow change")
+    _git(seed, "push", "origin", "HEAD:main")
+    second_upload = _git(seed, "rev-parse", "HEAD")
     heads = []
-    for second in range(2):
+    for second, uploaded in enumerate((first_upload, second_upload)):
         (state / "pending").touch()
         clock = f"2026-10-13T00:00:0{second}Z"
         result = _publish(

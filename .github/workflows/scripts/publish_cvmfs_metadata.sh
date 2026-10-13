@@ -48,12 +48,13 @@ build_branch() {
         return 1
     fi
     # Publishers of the same inventory on the same base build the same commit,
-    # so concurrent runs never displace each other's PR head.
+    # whatever their source revision, so concurrent runs never displace each
+    # other's PR head.
     GIT_AUTHOR_DATE="$(git show -s --format=%cI "$base_sha")" \
         GIT_COMMITTER_DATE="$(git show -s --format=%cI "$base_sha")" \
         git -c user.name="github-actions[bot]" \
         -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-        commit --quiet -m "$TITLE" -m "Generated from neurodesk/apps.json at ${SOURCE_SHA}." -- "${METADATA_FILES[@]}" || exit 1
+        commit --quiet -m "$TITLE" -- "${METADATA_FILES[@]}" || exit 1
     git push --quiet --force origin "HEAD:refs/heads/$BRANCH" || exit 1
     head_sha="$(git rev-parse HEAD)"
 }
