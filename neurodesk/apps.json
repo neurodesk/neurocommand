@@ -2307,7 +2307,20 @@
     "flames": {
         "apps": {
             "flames 1.0.0": {
-                "version": "20260612",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
+        ]
+    },
+    "flames_arm64": {
+        "apps": {
+            "flames_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2451,7 +2464,7 @@
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
-                "version": "20261009",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3273,7 +3286,19 @@
     "lesionquantificationtoolkit": {
         "apps": {
             "lesionquantificationtoolkit 0.1.0": {
-                "version": "20260727",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "lesionquantificationtoolkit_arm64": {
+        "apps": {
+            "lesionquantificationtoolkit_arm64 0.1.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4957,7 +4982,7 @@
                 "apptainer_args": []
             },
             "qsmbly 0.29.0": {
-                "version": "20261006",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -4973,6 +4998,18 @@
             },
             "qsmbly 0.8.4": {
                 "version": "20260218",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "qsmbly_arm64": {
+        "apps": {
+            "qsmbly_arm64 0.29.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5082,7 +5119,7 @@
                 "apptainer_args": []
             },
             "qsmxt 9.22.0": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -5303,6 +5340,23 @@
             "romeo 3.2.8": {
                 "version": "20220224",
                 "exec": ""
+            },
+            "romeo 4.9.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "phase processing"
+        ]
+    },
+    "romeo_arm64": {
+        "apps": {
+            "romeo_arm64 4.9.0": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5941,6 +5995,23 @@
                 "version": "20251216",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "syncro 0.2.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ]
+    },
+    "syncro_arm64": {
+        "apps": {
+            "syncro_arm64 0.2.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5950,7 +6021,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261010",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -5974,7 +6045,20 @@
                 "apptainer_args": []
             },
             "synthstrip 8.2.0": {
-                "version": "20261012",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "structural imaging"
+        ]
+    },
+    "synthstrip_arm64": {
+        "apps": {
+            "synthstrip_arm64 8.2.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6336,7 +6420,20 @@
     "wftfi": {
         "apps": {
             "wftfi 1.0.0": {
-                "version": "20260629",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "phase processing",
+            "quantitative imaging"
+        ]
+    },
+    "wftfi_arm64": {
+        "apps": {
+            "wftfi_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
