@@ -3608,7 +3608,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20260926",
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6344,6 +6344,19 @@
         "categories": [
             "phase processing",
             "quantitative imaging"
+        ]
+    },
+    "whitematterlesions": {
+        "apps": {
+            "whitematterlesions 0.2.20261009": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning"
         ]
     },
     "workshopdemo": {
