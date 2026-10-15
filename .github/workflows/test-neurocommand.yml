@@ -73,6 +73,10 @@ jobs:
   test_neurocommand:
     name: test (CVMFS=${{ matrix.cvmfs }})
     runs-on: ubuntu-24.04
+    env:
+      # neurocontainers' neurocommand recipe now publishes :latest to the same
+      # package, so pin this repository's Jupyter-based image.
+      NEUROCOMMAND_IMAGE: ghcr.io/neurodesk/neurocommand@sha256:74ecb5f8e3d61b8d7adf939167cbf502959ea1923c1ae86f33cb57e696989dba
     strategy:
       fail-fast: false
       matrix:
@@ -86,7 +90,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull neurocommand image
-        run: docker pull ghcr.io/neurodesk/neurocommand:latest
+        run: docker pull "$NEUROCOMMAND_IMAGE"
       - name: Run neurocommand fetch test inside image
         run: |
           CVMFS_ENV=()
@@ -97,7 +101,7 @@ jobs:
             -e NB_UID="$(id -u)" -e NB_GID="$(id -g)" \
             -v "${{ github.workspace }}:/work" -w /work \
             -v "${{ github.workspace }}/docker/before-notebook.d/01-cvmfs-mount.sh:/usr/local/bin/before-notebook.d/01-cvmfs-mount.sh:ro" \
-            ghcr.io/neurodesk/neurocommand:latest \
+            "$NEUROCOMMAND_IMAGE" \
             bash -lc '
               set -e
               container_root="${NEURODESKTOP_LOCAL_CONTAINERS:-local/containers}"
