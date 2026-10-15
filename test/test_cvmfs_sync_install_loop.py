@@ -3,7 +3,7 @@ import subprocess
 
 from test.support.paths import ROOT
 
-IMAGE = "demo_1.0_20261012"
+IMAGE = "demo_1.0_beta_20261012"
 
 
 def git(repo, *args):
@@ -60,7 +60,8 @@ def sync(tmp_path, repo):
             'sudo() { "$@"; }',
             "declare -A KEEP_IMAGES=()",
             loop.replace("/cvmfs/neurodesk.ardc.edu.au", str(root)),
-            'echo "failed=$INSTALL_FAILED tools=${!FAILED_TOOLS[*]}"',
+            'echo "failed=$INSTALL_FAILED deferred=$INSTALL_DEFERRED"',
+            'echo "tools=${!FAILED_TOOLS[*]}"',
         ]
     )
     result = subprocess.run(["bash", "-c", script], capture_output=True, text=True)
@@ -75,12 +76,12 @@ def test_failed_install_is_not_retried_until_the_installer_changes(tmp_path):
 
     output, attempts, _ = sync(tmp_path, repo)
     assert attempts == [IMAGE]
-    assert "failed=1 tools=demo" in output
+    assert "failed=1 deferred=0\ntools=demo\n" in output
 
     output, attempts, _ = sync(tmp_path, repo)
     assert attempts == [IMAGE]
     assert "Skipping " + IMAGE in output
-    assert "failed=1 tools=demo" in output
+    assert "failed=0 deferred=1\ntools=demo\n" in output
 
     installer = (
         repo / "neurodesk/transparent-singularity/run_transparent_singularity.sh"
@@ -90,8 +91,26 @@ def test_failed_install_is_not_retried_until_the_installer_changes(tmp_path):
 
     output, attempts, installed = sync(tmp_path, repo)
     assert attempts == [IMAGE, IMAGE]
-    assert "failed=0" in output
+    assert "failed=0 deferred=0\ntools=\n" in output
     assert (installed / (IMAGE + ".simg")).exists()
     assert not (
         tmp_path / "home/.cache/neurodesk-sync/failed-installs" / IMAGE
     ).exists()
+
+
+def test_failed_build_with_underscored_version_protects_its_recipe(tmp_path):
+    source = (ROOT / "cvmfs/sync_containers_to_cvmfs.sh").read_text()
+    helpers = source[
+        source.index("# A failed install is retried") : source.index("LOCKFILE=")
+    ]
+    script = "\n".join(
+        [
+            "declare -A FAILED_TOOLS=()",
+            helpers,
+            "mark_install_failed kul-vbg_0.61.0_23112021_beta_20261004",
+            "STALE_IMAGE=kul-vbg_0.5_20200101",
+            'echo "${FAILED_TOOLS[${STALE_IMAGE%%_*}]+protected}"',
+        ]
+    )
+    result = subprocess.run(["bash", "-c", script], capture_output=True, text=True)
+    assert result.stdout == "protected\n", result.stdout + result.stderr

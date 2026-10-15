@@ -246,11 +246,16 @@ install_recently_failed() {
 }
 
 # Keep earlier builds of a tool whose new build is not installed: retiring them
-# could leave the tool with no working version.
+# could leave the tool with no working version. Versions may contain
+# underscores but recipe names cannot, so key on the recipe name. This also
+# protects named variants such as <recipe>_arm64, which only delays retirement.
+protect_tool_builds() {
+    FAILED_TOOLS["${1%%_*}"]=1
+}
+
 mark_install_failed() {
-    local tool="${1%_*}"
     INSTALL_FAILED=1
-    FAILED_TOOLS["${tool%_*}"]=1
+    protect_tool_builds "$1"
 }
 
 record_install_failure() {
@@ -325,6 +330,7 @@ fi;
 # export LINE='fsl_6.0.4_20210105 categories:functional imaging,structural imaging,diffusion imaging,image segmentation,image registration,'
 
 INSTALL_FAILED=0
+INSTALL_DEFERRED=0
 declare -A FAILED_TOOLS=()
 
 
@@ -342,7 +348,8 @@ do
         echo "$IMAGENAME_BUILDDATE exists on cvmfs"
     elif install_recently_failed "$IMAGENAME_BUILDDATE"; then
         echo "[WARNING] Skipping $IMAGENAME_BUILDDATE: its install failed less than $INSTALL_RETRY_MINUTES minutes ago with the current transparent-singularity scripts."
-        mark_install_failed "$IMAGENAME_BUILDDATE"
+        protect_tool_builds "$IMAGENAME_BUILDDATE"
+        INSTALL_DEFERRED=1
     else
         echo "$IMAGENAME_BUILDDATE is not yet on cvmfs."
 
@@ -533,8 +540,7 @@ else
             echo "[INFO] Preserving stale container referenced by a module: $STALE_IMAGE"
             continue
         fi
-        STALE_TOOL="${STALE_IMAGE%_*}"
-        if [[ -n "${FAILED_TOOLS[${STALE_TOOL%_*}]+x}" ]]; then
+        if [[ -n "${FAILED_TOOLS[${STALE_IMAGE%%_*}]+x}" ]]; then
             echo "[INFO] Preserving stale container while a newer build failed to install: $STALE_IMAGE"
             continue
         fi
@@ -681,9 +687,13 @@ if ! cleanup_lockfile; then
     exit 2
 fi
 trap - EXIT
+# Runs that only skip backed-off installs keep the failed attempt's log.
 if [[ $INSTALL_FAILED -ne 0 ]]; then
     echo "[ERROR] At least one container failed to install; see the errors above."
     mv ~/cronjob.log ~/cronjob_failed_run.log
     exit 2
 fi
 mv ~/cronjob.log ~/cronjob_previous_run.log
+if [[ $INSTALL_DEFERRED -ne 0 ]]; then
+    exit 2
+fi
