@@ -29,7 +29,7 @@ def module(root, relative, content):
     return path
 
 
-def cleanup(root, *, fail_scan=False, retained=()):
+def cleanup(root, *, fail_scan=False, retained=(), failed_tools=()):
     source = (ROOT / "cvmfs/sync_containers_to_cvmfs.sh").read_text()
     block = source.split(
         "# disable unpacked container versions that no longer exist in log.txt:\n", 1
@@ -44,6 +44,8 @@ def cleanup(root, *, fail_scan=False, retained=()):
             f"NEUROCOMMAND_LOCAL_REPO={shlex.quote(str(ROOT))}",
             "declare -A KEEP_IMAGES=([kept]=1)",
             *[f"KEEP_IMAGES[{shlex.quote(name)}]=1" for name in retained],
+            "declare -A FAILED_TOOLS=()",
+            *[f"FAILED_TOOLS[{shlex.quote(name)}]=1" for name in failed_tools],
             f"open_cvmfs_transaction() {{ echo open >> {shlex.quote(str(root / 'transactions'))}; }}",
             "publish_cvmfs_transaction() { :; }",
             'sudo() { "$@"; }',
@@ -175,6 +177,17 @@ def test_cleanup_preserves_committed_public_only_container(tmp_path):
     assert not (other / (OTHER + ".simg")).exists()
 
 
+def test_cleanup_preserves_builds_of_a_tool_whose_new_build_failed(tmp_path):
+    old = container(tmp_path, OLD)
+    other = container(tmp_path, OTHER)
+    before = (old / "recon-all").read_bytes()
+    result = cleanup(tmp_path, failed_tools={"freesurfer"})
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (old / "recon-all").read_bytes() == before
+    assert (old / (OLD + ".simg")).exists()
+    assert not (other / (OTHER + ".simg")).exists()
+
+
 @pytest.mark.parametrize("fetch_fails", [False, True])
 def test_refresh_protects_public_and_latest_desired_or_stops_cleanup(
     tmp_path, fetch_fails
@@ -203,6 +216,7 @@ def test_refresh_protects_public_and_latest_desired_or_stops_cleanup(
             f"NEUROCOMMAND_LOCAL_REPO={shlex.quote(str(work))}",
             "CLEANUP_ALLOWED=1",
             "declare -A KEEP_IMAGES=([kept]=1)",
+            "declare -A FAILED_TOOLS=()",
             "open_cvmfs_transaction() { :; }",
             "publish_cvmfs_transaction() { :; }",
             'sudo() { "$@"; }',
