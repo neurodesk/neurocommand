@@ -106,6 +106,24 @@
             ]
         },
         {
+            "application": "aidamri_3.0.0_20261014",
+            "categories": [
+                "diffusion imaging",
+                "functional imaging",
+                "rodent imaging",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "aidamri_arm64_3.0.0_20261014",
+            "categories": [
+                "diffusion imaging",
+                "functional imaging",
+                "rodent imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "alpaca_1.1.4_20260929",
             "categories": [
                 "image segmentation",
@@ -1028,7 +1046,13 @@
             ]
         },
         {
-            "application": "code_240320_20261011",
+            "application": "code_240320_20261014",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
+            "application": "code_arm64_240320_20261014",
             "categories": [
                 "programming"
             ]
@@ -1678,7 +1702,14 @@
             ]
         },
         {
-            "application": "flames_1.0.0_20260612",
+            "application": "flames_1.0.0_20261014",
+            "categories": [
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "flames_arm64_1.0.0_20261014",
             "categories": [
                 "image segmentation",
                 "machine learning"
@@ -1818,7 +1849,7 @@
             ]
         },
         {
-            "application": "frisgo_2.10.0_20261009",
+            "application": "frisgo_2.10.0_20261013",
             "categories": [
                 "functional imaging",
                 "image reconstruction"
@@ -2350,7 +2381,13 @@
             ]
         },
         {
-            "application": "lesionquantificationtoolkit_0.1.0_20260727",
+            "application": "lesionquantificationtoolkit_0.1.0_20261014",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "lesionquantificationtoolkit_arm64_0.1.0_20261014",
             "categories": [
                 "structural imaging"
             ]
@@ -2554,7 +2591,7 @@
             ]
         },
         {
-            "application": "meica_4.0.1_20260926",
+            "application": "meica_4.0.1_20261013",
             "categories": [
                 "functional imaging",
                 "image reconstruction",
@@ -3349,7 +3386,7 @@
             ]
         },
         {
-            "application": "qsmbly_0.29.0_20261006",
+            "application": "qsmbly_0.29.0_20261014",
             "categories": [
                 "structural imaging"
             ]
@@ -3368,6 +3405,12 @@
         },
         {
             "application": "qsmbly_0.8.4_20260218",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "qsmbly_arm64_0.29.0_20261014",
             "categories": [
                 "structural imaging"
             ]
@@ -3583,7 +3626,7 @@
             ]
         },
         {
-            "application": "qsmxt_9.22.0_20261013",
+            "application": "qsmxt_9.22.0_20261014",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -3733,6 +3776,18 @@
         },
         {
             "application": "romeo_3.2.8_20220224",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
+            "application": "romeo_4.9.0_20261013",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
+            "application": "romeo_arm64_4.9.0_20261013",
             "categories": [
                 "phase processing"
             ]
@@ -4130,7 +4185,19 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20261010",
+            "application": "syncro_0.2.0_20261014",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "syncro_arm64_0.2.0_20261014",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "synthseg_8.2.0_20261013",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -4153,7 +4220,14 @@
             ]
         },
         {
-            "application": "synthstrip_8.2.0_20261012",
+            "application": "synthstrip_8.2.0_20261014",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "synthstrip_arm64_8.2.0_20261014",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -4392,10 +4466,24 @@
             ]
         },
         {
-            "application": "wftfi_1.0.0_20260629",
+            "application": "wftfi_1.0.0_20261014",
             "categories": [
                 "phase processing",
                 "quantitative imaging"
+            ]
+        },
+        {
+            "application": "wftfi_arm64_1.0.0_20261014",
+            "categories": [
+                "phase processing",
+                "quantitative imaging"
+            ]
+        },
+        {
+            "application": "whitematterlesions_0.2.20261009_20261013",
+            "categories": [
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
@@ -4411,7 +4499,13 @@
             ]
         },
         {
-            "application": "xnat_1.9.2.1_20250805",
+            "application": "xnat_1.9.2.1_20261014",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "xnat_arm64_1.9.2.1_20261014",
             "categories": [
                 "data organisation"
             ]
