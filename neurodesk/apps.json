@@ -108,6 +108,16 @@
                 "version": "20261010",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.04": {
+                "version": "20261015",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.04": {
+                "version": "20261015",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1444,10 +1454,6 @@
     },
     "connectomeworkbench": {
         "apps": {
-            "connectomeworkbench 1.4.2": {
-                "version": "20201119",
-                "exec": ""
-            },
             "connectomeworkbench 1.5.0": {
                 "version": "20220919",
                 "exec": ""
@@ -1911,11 +1917,6 @@
     },
     "dicompare": {
         "apps": {
-            "dicompare 0.1.2": {
-                "version": "20260127",
-                "exec": "",
-                "apptainer_args": []
-            },
             "dicompare 0.1.3": {
                 "version": "20260211",
                 "exec": "",
@@ -2208,19 +2209,6 @@
             "electrophysiology"
         ]
     },
-    "exploreasl": {
-        "apps": {
-            "exploreasl 1.11.0": {
-                "version": "20260514",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "arterial spin labelling",
-            "workflows"
-        ]
-    },
     "ezbids": {
         "apps": {
             "ezbids 1.1.0": {
@@ -2298,7 +2286,21 @@
     "fetalsynthseg": {
         "apps": {
             "fetalsynthseg 1.0.0": {
-                "version": "20260722",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "fetal imaging",
+            "image segmentation",
+            "machine learning"
+        ]
+    },
+    "fetalsynthseg_arm64": {
+        "apps": {
+            "fetalsynthseg_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2615,14 +2617,6 @@
                 "version": "20261013",
                 "exec": "fsleyes",
                 "apptainer_args": []
-            },
-            "fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": ""
-            },
-            "fsleyesGUI-fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": "fsleyes"
             },
             "fsl 6.0.7.8": {
                 "version": "20240913",
@@ -3341,6 +3335,11 @@
     },
     "lesymap": {
         "apps": {
+            "lesymap 0.0.0.9221": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            },
             "lesymap 0.0.0.9222": {
                 "version": "20250730",
                 "exec": ""
@@ -3586,7 +3585,19 @@
     "mede": {
         "apps": {
             "mede 0.0.12": {
-                "version": "20260521",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "mede_arm64": {
+        "apps": {
+            "mede_arm64 0.0.12": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3665,7 +3676,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3766,14 +3777,6 @@
     },
     "minc": {
         "apps": {
-            "minc 1.9.17": {
-                "version": "20210105",
-                "exec": ""
-            },
-            "registerGUI-minc 1.9.17": {
-                "version": "20210105",
-                "exec": "register"
-            },
             "minc 1.9.18": {
                 "version": "20230208",
                 "exec": ""
@@ -4346,13 +4349,46 @@
     "networkcorrespondancetoolkit": {
         "apps": {
             "networkcorrespondancetoolkit 0.3.3": {
-                "version": "20250826",
-                "exec": ""
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
             "data organisation",
             "image registration"
+        ]
+    },
+    "neurocommand": {
+        "apps": {
+            "neurocommand 1.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [
+                    "--bind",
+                    "/dev/fuse"
+                ]
+            }
+        },
+        "categories": [
+            "programming",
+            "workflows"
+        ]
+    },
+    "neurocommand_arm64": {
+        "apps": {
+            "neurocommand_arm64 1.0.0": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": [
+                    "--bind",
+                    "/dev/fuse"
+                ]
+            }
+        },
+        "categories": [
+            "programming",
+            "workflows"
         ]
     },
     "neurodesktop-lite": {
@@ -4629,7 +4665,19 @@
     "openadscpu": {
         "apps": {
             "openadscpu 1.0.0": {
-                "version": "20260518",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "openadscpu_arm64": {
+        "apps": {
+            "openadscpu_arm64 1.0.0": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4781,7 +4829,19 @@
     "pals": {
         "apps": {
             "pals 2.0.1": {
-                "version": "20260518",
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "pals_arm64": {
+        "apps": {
+            "pals_arm64 2.0.1": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5052,10 +5112,6 @@
     },
     "qsmxt": {
         "apps": {
-            "qsmxt 5.1.0": {
-                "version": "20230905",
-                "exec": ""
-            },
             "qsmxt 6.3.2": {
                 "version": "20231101",
                 "exec": ""
@@ -6053,7 +6109,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261013",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -6479,6 +6535,11 @@
         "apps": {
             "whitematterlesions 0.2.20261009": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "whitematterlesions 0.3.20261015": {
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": []
             }
