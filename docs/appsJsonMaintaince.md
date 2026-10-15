@@ -323,7 +323,10 @@ There is no production verification bypass.
 - `cvmfs/sync_containers_to_cvmfs.sh` resets its `~/neurocommand` checkout to `origin/main` on every run and never commits or pushes
 - It regenerates `cvmfs/log.txt` locally from `apps.json` and installs from that, as before. It does not wait for the published inventory, because syncing from an older inventory would disable newer installations
 - Retirement protects the union of committed public inventory, this run's desired inventory, and freshly fetched public and desired inventories just before cleanup. It also preserves existing module references. The committed inventory is read with `git show`, so a previous run's regenerated worktree log cannot erase protection
-- A failed fetch or invalid protection inventory stops retirement. Installation, abort, and publication failures stop the run before retirement. Updating the sync script on Stratum 0 is a separate deployment; this change does not install currently missing images
+- A failed fetch or invalid protection inventory stops retirement. Abort and publication failures stop the run before retirement
+- A failed container install does not stop the run. Module reconciliation, bundles, retirement, wrapper reconciliation, and the menu rebuild still run, and the script exits 2 at the end with the log in `~/cronjob_failed_run.log`. Retirement keeps every build of a tool whose new build failed, so the tool keeps a working version
+- A failed install is recorded in `~/.cache/neurodesk-sync/failed-installs/<image>` and retried after six hours, or on the next run once `neurodesk/transparent-singularity` changes on `main`. Delete the marker to retry sooner
+- Explicit `DEPLOY_BINS` entries are always exposed, even when they match `ts_binaryFinderExcludes.txt`. The exclude list only filters executables discovered in `DEPLOY_PATH`
 - The refresh is not a distributed lock against all concurrent catalog edits; it protects public entries during publication lag
 - The checkout must carry no local work. Local commits, including metadata commits rejected by branch protection before this design, are discarded with a warning
 

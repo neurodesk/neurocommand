@@ -6,7 +6,7 @@
 #sudo vi /etc/cron.d/sync_containers_to_cvmfs
 #*/5 * * * * ec2-user cd ~ && bash /home/rocky/neurocommand/cvmfs/sync_containers_to_cvmfs.sh
 
-#The cronjob logfile gets cleared after every successful run
+#The cronjob logfile is rotated after every run that reaches the end
 
 open_cvmfs_transaction() {
     local repo="$1"
@@ -229,6 +229,34 @@ git_pull_rebase_non_interactive() {
     return 0
 }
 
+# A failed install is retried after INSTALL_RETRY_MINUTES, or sooner when the
+# transparent-singularity scripts change, instead of on every cron run.
+INSTALL_FAILURE_DIR="$HOME/.cache/neurodesk-sync/failed-installs"
+INSTALL_RETRY_MINUTES=360
+
+installer_revision() {
+    git -C "$NEUROCOMMAND_LOCAL_REPO" rev-parse HEAD:neurodesk/transparent-singularity
+}
+
+install_recently_failed() {
+    local marker="$INSTALL_FAILURE_DIR/$1"
+    [[ -f "$marker" ]] &&
+        [[ -z "$(find "$marker" -mmin +"$INSTALL_RETRY_MINUTES")" ]] &&
+        [[ "$(cat "$marker")" == "$(installer_revision)" ]]
+}
+
+# Keep earlier builds of a tool whose new build is not installed: retiring them
+# could leave the tool with no working version.
+mark_install_failed() {
+    local tool="${1%_*}"
+    INSTALL_FAILED=1
+    FAILED_TOOLS["${tool%_*}"]=1
+}
+
+record_install_failure() {
+    mark_install_failed "$1"
+    mkdir -p "$INSTALL_FAILURE_DIR" && installer_revision > "$INSTALL_FAILURE_DIR/$1"
+}
 
 LOCKFILE=~/ISRUNNING.lock
 if [[ -f $LOCKFILE ]]; then
@@ -297,6 +325,7 @@ fi;
 # export LINE='fsl_6.0.4_20210105 categories:functional imaging,structural imaging,diffusion imaging,image segmentation,image registration,'
 
 INSTALL_FAILED=0
+declare -A FAILED_TOOLS=()
 
 
 while IFS= read -r LINE
@@ -311,6 +340,9 @@ do
     if [[ -f "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE/commands.txt" ]]
     then
         echo "$IMAGENAME_BUILDDATE exists on cvmfs"
+    elif install_recently_failed "$IMAGENAME_BUILDDATE"; then
+        echo "[WARNING] Skipping $IMAGENAME_BUILDDATE: its install failed less than $INSTALL_RETRY_MINUTES minutes ago with the current transparent-singularity scripts."
+        mark_install_failed "$IMAGENAME_BUILDDATE"
     else
         echo "$IMAGENAME_BUILDDATE is not yet on cvmfs."
 
@@ -319,7 +351,7 @@ do
         # this publisher before opening a transaction or downloading the SIF.
         if ! "$NEUROCOMMAND_LOCAL_REPO/cvmfs/ensure_binfmt.sh" "$IMAGENAME_BUILDDATE"; then
             echo "[ERROR] Cannot deploy $IMAGENAME_BUILDDATE without working QEMU/binfmt support."
-            INSTALL_FAILED=1
+            mark_install_failed "$IMAGENAME_BUILDDATE"
             continue
         fi
 
@@ -330,7 +362,7 @@ do
         if ! cd /cvmfs/neurodesk.ardc.edu.au/containers/; then
             echo "[ERROR] Cannot enter the CVMFS containers directory. Aborting transaction."
             abort_cvmfs_transaction neurodesk.ardc.edu.au
-            INSTALL_FAILED=1
+            mark_install_failed "$IMAGENAME_BUILDDATE"
             continue
         fi
 
@@ -347,7 +379,7 @@ do
            ! cp -a "$NEUROCOMMAND_LOCAL_REPO/neurodesk/transparent-singularity/." "$IMAGENAME_BUILDDATE/"; then
             echo "[ERROR] Failed to stage transparent-singularity for $IMAGENAME_BUILDDATE. Aborting transaction."
             abort_cvmfs_transaction neurodesk.ardc.edu.au
-            INSTALL_FAILED=1
+            mark_install_failed "$IMAGENAME_BUILDDATE"
             continue
         fi
 
@@ -356,7 +388,7 @@ do
             if ! cd "$IMAGENAME_BUILDDATE"; then
                 echo "[ERROR] Cannot enter container directory: $IMAGENAME_BUILDDATE. Aborting transaction."
                 abort_cvmfs_transaction neurodesk.ardc.edu.au
-                INSTALL_FAILED=1
+                mark_install_failed "$IMAGENAME_BUILDDATE"
                 continue
             fi
             export SINGULARITY_BINDPATH=/cvmfs
@@ -377,9 +409,10 @@ do
         if [ $retVal -ne 0 ]; then
             echo "Error in Transparent singularity. Check the log. Aborting!"
             abort_cvmfs_transaction neurodesk.ardc.edu.au
-            INSTALL_FAILED=1
+            record_install_failure "$IMAGENAME_BUILDDATE"
         else
             publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
+            rm -f "$INSTALL_FAILURE_DIR/$IMAGENAME_BUILDDATE"
         fi
     fi
 
@@ -397,11 +430,6 @@ do
     # fi
 
 done < "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt"
-
-if [[ $INSTALL_FAILED -ne 0 ]]; then
-    echo "[ERROR] Installation failed; stopping before reconciliation and retirement."
-    exit 2
-fi
 
 echo "[INFO] Checking that module files point to the latest kept container builds."
 if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/reconcile_module_files.py" \
@@ -503,6 +531,11 @@ else
     for STALE_IMAGE in "${STALE_IMAGES[@]}"; do
         if [[ -n "${REFERENCED_CONTAINERS[$STALE_IMAGE]+x}" ]]; then
             echo "[INFO] Preserving stale container referenced by a module: $STALE_IMAGE"
+            continue
+        fi
+        STALE_TOOL="${STALE_IMAGE%_*}"
+        if [[ -n "${FAILED_TOOLS[${STALE_TOOL%_*}]+x}" ]]; then
+            echo "[INFO] Preserving stale container while a newer build failed to install: $STALE_IMAGE"
             continue
         fi
         STALE_CONTAINER_PATH="$CONTAINERS_ROOT/$STALE_IMAGE"
@@ -648,4 +681,9 @@ if ! cleanup_lockfile; then
     exit 2
 fi
 trap - EXIT
+if [[ $INSTALL_FAILED -ne 0 ]]; then
+    echo "[ERROR] At least one container failed to install; see the errors above."
+    mv ~/cronjob.log ~/cronjob_failed_run.log
+    exit 2
+fi
 mv ~/cronjob.log ~/cronjob_previous_run.log

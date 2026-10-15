@@ -5,9 +5,6 @@ for i in $DEPLOY_PATH; \
    find "$i" -maxdepth 1 -executable -type l -exec basename {} \;;
    done > commands_raw.txt
 
-for i in $DEPLOY_BINS; \
-   do echo "$i"; done >> commands_raw.txt
-
 # if $DEBUG
 #    export DEPLOY_ENV_FSLDIR="BASEPATH/opt/fsl-5.0.2"
 #    export DEPLOY_ENV_SPMMCRCMD="BASEPATH/opt/spm12/run_spm12.sh BASEPATH/opt/mcr/v97/ script"
@@ -25,6 +22,11 @@ for i in $DEPLOY_BINS; \
 
 # Remove system applications, because they cause problems:
 grep -vxf ts_binaryFinderExcludes.txt commands_raw.txt > commands.txt
+
+# Recipes name DEPLOY_BINS explicitly, so keep them even when they share a
+# name with an excluded system command (e.g. condaenvs deploys conda).
+for i in $DEPLOY_BINS; \
+   do echo "$i"; done >> commands.txt
 
 env | grep '^DEPLOY_ENV_' > env.txt
 grep_status=$?
