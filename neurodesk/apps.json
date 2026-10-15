@@ -1444,10 +1444,6 @@
     },
     "connectomeworkbench": {
         "apps": {
-            "connectomeworkbench 1.4.2": {
-                "version": "20201119",
-                "exec": ""
-            },
             "connectomeworkbench 1.5.0": {
                 "version": "20220919",
                 "exec": ""
@@ -1911,11 +1907,6 @@
     },
     "dicompare": {
         "apps": {
-            "dicompare 0.1.2": {
-                "version": "20260127",
-                "exec": "",
-                "apptainer_args": []
-            },
             "dicompare 0.1.3": {
                 "version": "20260211",
                 "exec": "",
@@ -2206,19 +2197,6 @@
         },
         "categories": [
             "electrophysiology"
-        ]
-    },
-    "exploreasl": {
-        "apps": {
-            "exploreasl 1.11.0": {
-                "version": "20260514",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "arterial spin labelling",
-            "workflows"
         ]
     },
     "ezbids": {
@@ -2615,14 +2593,6 @@
                 "version": "20261013",
                 "exec": "fsleyes",
                 "apptainer_args": []
-            },
-            "fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": ""
-            },
-            "fsleyesGUI-fsl 6.0.7.4": {
-                "version": "20231005",
-                "exec": "fsleyes"
             },
             "fsl 6.0.7.8": {
                 "version": "20240913",
@@ -3766,14 +3736,6 @@
     },
     "minc": {
         "apps": {
-            "minc 1.9.17": {
-                "version": "20210105",
-                "exec": ""
-            },
-            "registerGUI-minc 1.9.17": {
-                "version": "20210105",
-                "exec": "register"
-            },
             "minc 1.9.18": {
                 "version": "20230208",
                 "exec": ""
@@ -5052,10 +5014,6 @@
     },
     "qsmxt": {
         "apps": {
-            "qsmxt 5.1.0": {
-                "version": "20230905",
-                "exec": ""
-            },
             "qsmxt 6.3.2": {
                 "version": "20231101",
                 "exec": ""
