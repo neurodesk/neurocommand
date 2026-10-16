@@ -923,6 +923,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "brainles-preprocessing 0.6.14": {
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
             "brainles-preprocessing 0.8.0": {
                 "version": "20260916",
                 "exec": "",
@@ -6554,7 +6559,7 @@
                 "apptainer_args": []
             },
             "whitematterlesions 0.3.20261015": {
-                "version": "20261015",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
