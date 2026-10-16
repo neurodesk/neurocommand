@@ -107,12 +107,14 @@ def test_failed_install_is_not_retried_until_the_installer_changes(tmp_path):
 
 
 def test_failed_build_with_underscored_version_protects_its_recipe(tmp_path):
+    # mark_install_failed records the failure under $HOME.
     source = (ROOT / "cvmfs/sync_containers_to_cvmfs.sh").read_text()
     helpers = source[
         source.index("# A failed install is retried") : source.index("LOCKFILE=")
     ]
     script = "\n".join(
         [
+            f"HOME={shlex.quote(str(tmp_path))}",
             "declare -A FAILED_TOOLS=()",
             helpers,
             "mark_install_failed kul-vbg_0.61.0_23112021_beta_20261004",
