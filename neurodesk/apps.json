@@ -2495,24 +2495,6 @@
             "structural imaging"
         ]
     },
-    "freesurfer6": {
-        "apps": {
-            "freesurfer6 6.0.0": {
-                "version": "20261016",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "Freeview (FreeSurfer 6)-freesurfer6 6.0.0": {
-                "version": "20261016",
-                "exec": "freeview",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image segmentation",
-            "structural imaging"
-        ]
-    },
     "frisgo": {
         "apps": {
             "frisgo 2.10.0": {
