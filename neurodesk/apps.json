@@ -2431,6 +2431,16 @@
                 "exec": "freeview",
                 "apptainer_args": []
             },
+            "freesurfer 6.0.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "freeviewGUI-freesurfer 6.0.0": {
+                "version": "20261016",
+                "exec": "freeview",
+                "apptainer_args": []
+            },
             "freesurfer 7.1.1": {
                 "version": "20211216",
                 "exec": ""
