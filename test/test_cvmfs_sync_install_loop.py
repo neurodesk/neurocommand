@@ -77,6 +77,12 @@ def test_failed_install_is_not_retried_until_the_installer_changes(tmp_path):
     output, attempts, _ = sync(tmp_path, repo)
     assert attempts == [IMAGE]
     assert "failed=1 deferred=0\ntools=demo\n" in output
+    failures = tmp_path / "home/sync-failures"
+    (failed_log,) = failures.glob(IMAGE + "_*.log")
+    assert (failures / "failures.tsv").read_text().split("\t")[1:] == [
+        IMAGE,
+        str(failed_log) + "\n",
+    ]
 
     output, attempts, _ = sync(tmp_path, repo)
     assert attempts == [IMAGE]
@@ -93,6 +99,8 @@ def test_failed_install_is_not_retried_until_the_installer_changes(tmp_path):
     assert attempts == [IMAGE, IMAGE]
     assert "failed=0 deferred=0\ntools=\n" in output
     assert (installed / (IMAGE + ".simg")).exists()
+    # Only the failed attempt's output is kept.
+    assert list(failures.glob("*.log")) == [failed_log]
     assert not (
         tmp_path / "home/.cache/neurodesk-sync/failed-installs" / IMAGE
     ).exists()

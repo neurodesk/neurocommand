@@ -234,6 +234,13 @@ git_pull_rebase_non_interactive() {
 INSTALL_FAILURE_DIR="$HOME/.cache/neurodesk-sync/failed-installs"
 INSTALL_RETRY_MINUTES=360
 
+# cronjob.log is replaced after the next successful run, and a deferred retry
+# only prints a "Skipping" warning, so keep every failure and its installer
+# output where it outlives the run.
+INSTALL_LOG_DIR="$HOME/sync-failures"
+INSTALL_LOG_RETENTION_DAYS=90
+INSTALL_LOG=""
+
 installer_revision() {
     git -C "$NEUROCOMMAND_LOCAL_REPO" rev-parse HEAD:neurodesk/transparent-singularity
 }
@@ -256,6 +263,10 @@ protect_tool_builds() {
 mark_install_failed() {
     INSTALL_FAILED=1
     protect_tool_builds "$1"
+    mkdir -p "$INSTALL_LOG_DIR" &&
+        printf '%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$1" \
+            "${INSTALL_LOG:-no installer output; see cronjob.log}" \
+            >> "$INSTALL_LOG_DIR/failures.tsv"
 }
 
 record_install_failure() {
@@ -333,11 +344,14 @@ INSTALL_FAILED=0
 INSTALL_DEFERRED=0
 declare -A FAILED_TOOLS=()
 
+mkdir -p "$INSTALL_LOG_DIR" &&
+    find "$INSTALL_LOG_DIR" -name '*.log' -mtime +"$INSTALL_LOG_RETENTION_DAYS" -delete
 
 while IFS= read -r LINE
 do
     # echo "LINE: $LINE"
     IMAGENAME_BUILDDATE="$(cut -d' ' -f1 <<< "${LINE}")"
+    INSTALL_LOG=""
     # echo "IMAGENAME_BUILDDATE: $IMAGENAME_BUILDDATE"
 
     KEEP_IMAGES["$IMAGENAME_BUILDDATE"]=1
@@ -402,8 +416,10 @@ do
             echo "$PATH"
             export PATH=$PATH:/usr/sbin/
             # stdin is log.txt inside this loop; keep child processes from consuming it
-            ./run_transparent_singularity.sh "$IMAGENAME_BUILDDATE" --unpack true < /dev/null
-            retVal=$?
+            INSTALL_LOG="$INSTALL_LOG_DIR/${IMAGENAME_BUILDDATE}_$(date -u +%Y%m%dT%H%M%SZ).log"
+            ./run_transparent_singularity.sh "$IMAGENAME_BUILDDATE" --unpack true < /dev/null 2>&1 |
+                tee "$INSTALL_LOG"
+            retVal=${PIPESTATUS[0]}
 
             if [[ $retVal -eq 0 ]]; then
                 ensure_nested_catalog_markers_for_container "/cvmfs/neurodesk.ardc.edu.au/containers/$IMAGENAME_BUILDDATE" || retVal=$?
@@ -419,7 +435,7 @@ do
             record_install_failure "$IMAGENAME_BUILDDATE"
         else
             publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
-            rm -f "$INSTALL_FAILURE_DIR/$IMAGENAME_BUILDDATE"
+            rm -f "$INSTALL_FAILURE_DIR/$IMAGENAME_BUILDDATE" "$INSTALL_LOG"
         fi
     fi
 
