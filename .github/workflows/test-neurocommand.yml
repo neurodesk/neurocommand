@@ -74,8 +74,10 @@ jobs:
     name: test (CVMFS=${{ matrix.cvmfs }})
     runs-on: ubuntu-24.04
     env:
-      # neurocontainers' neurocommand recipe now publishes :latest to the same
-      # package, so pin this repository's Jupyter-based image.
+      # This repository's Jupyter-based image, built before build-image.yml moved
+      # to ghcr.io/neurodesk/neurocommand-cli. The neurocommand package now
+      # belongs to neurocontainers' recipe; switch this pin to neurocommand-cli
+      # after its first build.
       NEUROCOMMAND_IMAGE: ghcr.io/neurodesk/neurocommand@sha256:74ecb5f8e3d61b8d7adf939167cbf502959ea1923c1ae86f33cb57e696989dba
     strategy:
       fail-fast: false
