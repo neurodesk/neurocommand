@@ -46,9 +46,10 @@ jobs:
           ref: ${{ github.ref }}
       - name: Set environment variables
         run: |
-          IMAGENAME="neurocommand"
+          # neurocontainers' neurocommand recipe owns ghcr.io/neurodesk/neurocommand.
+          IMAGENAME="neurocommand-cli"
           BUILDDATE=$(date +%Y-%m-%d)
-          IMAGEID=ghcr.io/$GITHUB_REPOSITORY
+          IMAGEID=ghcr.io/$GITHUB_REPOSITORY_OWNER/$IMAGENAME
           IMAGEID=$(echo "$IMAGEID" | tr '[:upper:]' '[:lower:]')
           {
             echo "BUILDDATE=$BUILDDATE"
@@ -116,9 +117,10 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          IMAGENAME="neurocommand"
+          # neurocontainers' neurocommand recipe owns ghcr.io/neurodesk/neurocommand.
+          IMAGENAME="neurocommand-cli"
           BUILDDATE=$(date +%Y-%m-%d)
-          IMAGEID=ghcr.io/$GITHUB_REPOSITORY
+          IMAGEID=ghcr.io/$GITHUB_REPOSITORY_OWNER/$IMAGENAME
           IMAGEID=$(echo "$IMAGEID" | tr '[:upper:]' '[:lower:]')
           {
             echo "BUILDDATE=$BUILDDATE"
