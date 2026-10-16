@@ -79,6 +79,12 @@
             ]
         },
         {
+            "application": "afni_26.3.04_20261015",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "aidamri_1.1_20210708",
             "categories": [
                 "diffusion imaging",
@@ -1098,13 +1104,6 @@
             ]
         },
         {
-            "application": "connectomeworkbench_1.4.2_20201119",
-            "categories": [
-                "data organisation",
-                "functional imaging"
-            ]
-        },
-        {
             "application": "connectomeworkbench_1.5.0_20220919",
             "categories": [
                 "data organisation",
@@ -1438,13 +1437,6 @@
             ]
         },
         {
-            "application": "dicompare_0.1.2_20260127",
-            "categories": [
-                "data organisation",
-                "quality control"
-            ]
-        },
-        {
             "application": "dicompare_0.1.3_20260211",
             "categories": [
                 "data organisation",
@@ -1621,13 +1613,6 @@
             ]
         },
         {
-            "application": "exploreasl_1.11.0_20260514",
-            "categories": [
-                "arterial spin labelling",
-                "workflows"
-            ]
-        },
-        {
             "application": "ezbids_1.1.0_20260717",
             "categories": [
                 "bids apps",
@@ -1676,7 +1661,15 @@
             ]
         },
         {
-            "application": "fetalsynthseg_1.0.0_20260722",
+            "application": "fetalsynthseg_1.0.0_20261014",
+            "categories": [
+                "fetal imaging",
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "fetalsynthseg_arm64_1.0.0_20261014",
             "categories": [
                 "fetal imaging",
                 "image segmentation",
@@ -1973,17 +1966,6 @@
         },
         {
             "application": "fsl_6.0.7.23_20261013",
-            "categories": [
-                "arterial spin labelling",
-                "diffusion imaging",
-                "functional imaging",
-                "image registration",
-                "image segmentation",
-                "structural imaging"
-            ]
-        },
-        {
-            "application": "fsl_6.0.7.4_20231005",
             "categories": [
                 "arterial spin labelling",
                 "diffusion imaging",
@@ -2393,6 +2375,13 @@
             ]
         },
         {
+            "application": "lesymap_0.0.0.9221_20261014",
+            "categories": [
+                "statistics",
+                "workflows"
+            ]
+        },
+        {
             "application": "lesymap_0.0.0.9222_20250730",
             "categories": [
                 "statistics",
@@ -2535,7 +2524,13 @@
             ]
         },
         {
-            "application": "mede_0.0.12_20260521",
+            "application": "mede_0.0.12_20261013",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "mede_arm64_0.0.12_20261013",
             "categories": [
                 "data organisation"
             ]
@@ -2591,7 +2586,7 @@
             ]
         },
         {
-            "application": "meica_4.0.1_20261013",
+            "application": "meica_4.0.1_20261014",
             "categories": [
                 "functional imaging",
                 "image reconstruction",
@@ -2651,14 +2646,6 @@
             "application": "mimosa_0.5.8_20260629",
             "categories": [
                 "image segmentation"
-            ]
-        },
-        {
-            "application": "minc_1.9.17_20210105",
-            "categories": [
-                "image registration",
-                "image segmentation",
-                "structural imaging"
             ]
         },
         {
@@ -2993,10 +2980,24 @@
             ]
         },
         {
-            "application": "networkcorrespondancetoolkit_0.3.3_20250826",
+            "application": "networkcorrespondancetoolkit_0.3.3_20261014",
             "categories": [
                 "data organisation",
                 "image registration"
+            ]
+        },
+        {
+            "application": "neurocommand_1.0.0_20261014",
+            "categories": [
+                "programming",
+                "workflows"
+            ]
+        },
+        {
+            "application": "neurocommand_arm64_1.0.0_20261014",
+            "categories": [
+                "programming",
+                "workflows"
             ]
         },
         {
@@ -3150,7 +3151,13 @@
             ]
         },
         {
-            "application": "openadscpu_1.0.0_20260518",
+            "application": "openadscpu_1.0.0_20261014",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "openadscpu_arm64_1.0.0_20261014",
             "categories": [
                 "image segmentation"
             ]
@@ -3231,7 +3238,13 @@
             ]
         },
         {
-            "application": "pals_2.0.1_20260518",
+            "application": "pals_2.0.1_20261014",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "pals_arm64_2.0.1_20261014",
             "categories": [
                 "image segmentation"
             ]
@@ -3416,7 +3429,7 @@
             ]
         },
         {
-            "application": "qsmxt_5.1.0_20230905",
+            "application": "qsmxt_10.0.0_20261014",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -4197,7 +4210,7 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20261013",
+            "application": "synthseg_8.2.0_20261015",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -4332,7 +4345,7 @@
             ]
         },
         {
-            "application": "topofit_0.6.0_20261010",
+            "application": "topofit_0.6.0_20261015",
             "categories": [
                 "machine learning",
                 "shape analysis",
@@ -4481,6 +4494,13 @@
         },
         {
             "application": "whitematterlesions_0.2.20261009_20261013",
+            "categories": [
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "whitematterlesions_0.3.20261015_20261015",
             "categories": [
                 "image segmentation",
                 "machine learning"
