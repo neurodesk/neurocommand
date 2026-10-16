@@ -416,7 +416,8 @@ do
             echo "$PATH"
             export PATH=$PATH:/usr/sbin/
             # stdin is log.txt inside this loop; keep child processes from consuming it
-            INSTALL_LOG="$INSTALL_LOG_DIR/${IMAGENAME_BUILDDATE}_$(date -u +%Y%m%dT%H%M%SZ).log"
+            INSTALL_LOG="$(mktemp --suffix=.log \
+                "$INSTALL_LOG_DIR/${IMAGENAME_BUILDDATE}_$(date -u +%Y%m%dT%H%M%SZ)_XXXXXX")"
             ./run_transparent_singularity.sh "$IMAGENAME_BUILDDATE" --unpack true < /dev/null 2>&1 |
                 tee "$INSTALL_LOG"
             retVal=${PIPESTATUS[0]}
