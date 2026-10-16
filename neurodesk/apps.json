@@ -3923,7 +3923,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3935,7 +3935,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261013",
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6129,7 +6129,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261015",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -6381,6 +6381,11 @@
                 "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "vertexwiser 1.5.4": {
+                "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -6392,6 +6397,11 @@
         "apps": {
             "vertexwiser_arm64 1.5.1": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vertexwiser_arm64 1.5.4": {
+                "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
             }
