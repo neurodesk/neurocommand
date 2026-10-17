@@ -78,19 +78,19 @@ RUN ln -sf /opt/apptainer/bin/apptainer /usr/local/bin/apptainer \
 # (or override at build time) to fetch a known-good snapshot.
 ARG NEURODESKTOP_CVMFS_REF=main
 ARG NEURODESKTOP_RAW=https://raw.githubusercontent.com/neurodesk/neurodesktop/${NEURODESKTOP_CVMFS_REF}/config/cvmfs
+ARG NEURODESKTOP_JUPYTER_RAW=https://raw.githubusercontent.com/neurodesk/neurodesktop/${NEURODESKTOP_CVMFS_REF}/config/jupyter
 
 ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.pub                  /etc/cvmfs/keys/ardc.edu.au/neurodesk.ardc.edu.au.pub
 ADD ${NEURODESKTOP_RAW}/default.local                              /etc/cvmfs/default.local
-ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf.cdn.america     /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.cdn.america
-ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf.cdn.asia        /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.cdn.asia
-ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf.cdn.europe      /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.cdn.europe
-ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf.direct.america  /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.direct.america
-ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf.direct.asia     /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.direct.asia
-ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf.direct.europe   /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.direct.europe
+ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf                 /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf
+ADD ${NEURODESKTOP_JUPYTER_RAW}/cvmfs_server_select.sh             /opt/neurodesktop/cvmfs_server_select.sh
+ADD ${NEURODESKTOP_JUPYTER_RAW}/cvmfs_server_select.py             /opt/neurodesktop/cvmfs_server_select.py
 
 RUN chmod 0644 /etc/cvmfs/keys/ardc.edu.au/neurodesk.ardc.edu.au.pub \
               /etc/cvmfs/default.local \
-              /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.*
+              /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf \
+              /opt/neurodesktop/cvmfs_server_select.py \
+    && chmod 0755 /opt/neurodesktop/cvmfs_server_select.sh
 
 # Storage volume. World-writable to match neurodesktop's HPC-friendly default
 # (UID inside container may not be 1000 under Apptainer).

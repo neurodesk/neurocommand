@@ -74,11 +74,8 @@ jobs:
     name: test (CVMFS=${{ matrix.cvmfs }})
     runs-on: ubuntu-24.04
     env:
-      # This repository's Jupyter-based image, built before build-image.yml moved
-      # to ghcr.io/neurodesk/neurocommand-cli. The neurocommand package now
-      # belongs to neurocontainers' recipe; switch this pin to neurocommand-cli
-      # after its first build.
-      NEUROCOMMAND_IMAGE: ghcr.io/neurodesk/neurocommand@sha256:74ecb5f8e3d61b8d7adf939167cbf502959ea1923c1ae86f33cb57e696989dba
+      # This repository's Jupyter-based image, built by build-image.yml.
+      NEUROCOMMAND_IMAGE: ghcr.io/neurodesk/neurocommand-cli@sha256:289d50126e10887f1ad633c4228e9101130754692593de840f47e5c59d341697
     strategy:
       fail-fast: false
       matrix:
@@ -93,6 +90,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull neurocommand image
         run: docker pull "$NEUROCOMMAND_IMAGE"
+      # The image runs Apptainer with setuid disabled, as neurodesktop does, so
+      # it needs user namespaces. Ubuntu 24.04 denies them to unconfined
+      # processes, including those in privileged containers.
+      - name: Allow unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Run neurocommand fetch test inside image
         run: |
           CVMFS_ENV=()

@@ -27,7 +27,6 @@ def startup(tmp_path):
     config = tmp_path / "etc/cvmfs/config.d"
     config.mkdir(parents=True)
     (config / "neurodesk.ardc.edu.au.conf").write_text("bundled default")
-    (config / "neurodesk.ardc.edu.au.conf.cdn.america").write_text("cdn america")
     autofs = tmp_path / "etc/init.d/autofs"
     autofs.parent.mkdir(parents=True)
     write_executable(autofs, "#!/bin/bash\nexit 0\n")
@@ -36,22 +35,14 @@ def startup(tmp_path):
     calls = tmp_path / "calls"
     write_executable(bin_dir / "chown", "#!/bin/bash\nexit 0\n")
     write_executable(bin_dir / "service", "#!/bin/bash\nexit 1\n")
+    select = tmp_path / "opt/neurodesktop/cvmfs_server_select.sh"
+    select.parent.mkdir(parents=True)
     write_executable(
-        bin_dir / "nslookup",
-        '#!/bin/bash\necho nslookup >> "$CALLS"\nexit 1\n',
-    )
-    write_executable(
-        bin_dir / "curl",
-        """#!/bin/bash
-echo curl >> "$CALLS"
-if [[ ${OFFLINE:-0} == 1 ]]; then
-    echo "0.000 000"
-    exit 6
-fi
-case "${@: -1}" in
-    *jetstream*|*cvmfs.neurodesk.org*) echo "0.100 200";;
-    *) echo "0.200 200";;
-esac
+        select,
+        f"""#!/bin/bash
+echo select >> "$CALLS"
+[[ ${{OFFLINE:-0}} == 1 ]] && exit 1
+echo selected > {config / "neurodesk.ardc.edu.au.conf"}
 """,
     )
     write_executable(
@@ -69,6 +60,7 @@ mkdir -p "${@: -1}/neurodesk-modules"
         "NB_USER": "jovyan",
         "NEURODESK_CVMFS_DISABLE": "0",
         "NEURODESK_SKIP_REGION_PROBE": "0",
+        "NEURODESK_CVMFS_SERVER_SELECT": str(select),
     }
 
     def run(**overrides):
@@ -85,23 +77,35 @@ mkdir -p "${@: -1}/neurodesk-modules"
     return run, tmp_path
 
 
-def test_unrelated_dns_failure_does_not_prevent_mount(startup):
+def test_server_selection_writes_config_before_mount(startup):
     run, root = startup
     result, calls = run()
 
-    assert "mount" in calls
+    assert calls == ["select", "mount"]
     assert "CVMFS ready (manual mount)" in result.stdout
     assert (
         root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
-    ).read_text() == "cdn america"
+    ).read_text() == "selected\n"
 
 
-def test_offline_probes_still_reach_local_container_fallback(startup):
+def test_failed_server_selection_still_reaches_local_container_fallback(startup):
     run, root = startup
     result, calls = run(OFFLINE="1")
 
-    assert "mount" in calls
+    assert calls == ["select", "mount"]
+    assert "no CVMFS server measurable" in result.stdout
     assert "Falling back to local containers" in result.stdout
+    assert (
+        root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
+    ).read_text() == "bundled default"
+
+
+def test_missing_server_selection_keeps_bundled_config(startup):
+    run, root = startup
+    result, calls = run(NEURODESK_CVMFS_SERVER_SELECT=str(root / "missing.sh"))
+
+    assert calls == ["mount"]
+    assert "not found, keeping the bundled config" in result.stdout
     assert (
         root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
     ).read_text() == "bundled default"
@@ -132,22 +136,3 @@ def test_skipping_region_probe_uses_bundled_config(startup):
     assert (
         root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
     ).read_text() == "bundled default"
-
-
-@pytest.mark.parametrize("mode", ["offline", "skip-probe"])
-def test_fresh_image_gets_default_config_without_successful_probes(startup, mode):
-    run, root = startup
-    config = root / "etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf"
-    config.unlink()
-
-    overrides = (
-        {"OFFLINE": "1"} if mode == "offline" else {"NEURODESK_SKIP_REGION_PROBE": "1"}
-    )
-    result, calls = run(**overrides)
-
-    assert "mount" in calls
-    assert config.read_text() == "cdn america"
-    if mode == "offline":
-        assert "Falling back to local containers" in result.stdout
-    else:
-        assert "CVMFS ready (manual mount)" in result.stdout
