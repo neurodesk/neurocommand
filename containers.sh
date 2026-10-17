@@ -52,7 +52,6 @@ while read -r identity categories; do
     builddate=${identity##*_}
     name_version=${identity%_*}
     name=${name_version%%_*}
-    # Catalog names disambiguate variants from versions containing underscores.
     for tool_name in "${tool_names[@]}"; do
         if [[ $name_version == "${tool_name}_"* ]]; then
             name=$tool_name
