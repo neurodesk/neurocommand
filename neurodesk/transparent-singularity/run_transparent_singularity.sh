@@ -24,31 +24,33 @@ fail() {
 # signed URL, the CDN resets the stream and apptainer dies with:
 #   FATAL: ... stream error: stream ID 1; PROTOCOL_ERROR; received from peer
 # The registry entry itself is fine - the same pull succeeds on a faster link.
-# Nectar object-storage URLs do not expire mid-download and curl retries, so
-# after a failed ORAS pull we fall back to Nectar instead of aborting.
-download_container_from_nectar() {
+# Public object-storage URLs do not expire mid-download and curl retries, so
+# after a failed ORAS pull we try the Nectar and AWS mirrors.
+download_container_from_object_storage() {
    local fallback_container="$1"
-   local nectar_url
-   local nectar_urls=(
+   local fallback_url
+   local fallback_urls=(
       "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/temporary-builds-new/"
       "https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/"
+      "https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/"
+      "https://neurocontainers.s3.us-east-2.amazonaws.com/"
    )
 
    if ! command -v curl >/dev/null 2>&1; then
-      echo "[WARN] curl is not available; cannot use Nectar fallback for '${fallback_container}'." >&2
+      echo "[WARN] curl is not available; cannot use object-storage fallback for '${fallback_container}'." >&2
       return 1
    fi
 
-   for nectar_url in "${nectar_urls[@]}"; do
-      echo "checking Nectar fallback: ${nectar_url}${fallback_container}"
-      if ! curl --output /dev/null --silent --head --fail "${nectar_url}${fallback_container}"; then
+   for fallback_url in "${fallback_urls[@]}"; do
+      echo "checking object-storage fallback: ${fallback_url}${fallback_container}"
+      if ! curl --output /dev/null --silent --head --fail "${fallback_url}${fallback_container}"; then
          continue
       fi
 
-      echo "downloading from Nectar fallback: ${nectar_url}${fallback_container}"
+      echo "downloading from object-storage fallback: ${fallback_url}${fallback_container}"
       rm -f "$fallback_container"
       if curl --fail --location --retry 5 --retry-delay 10 \
-            --output "$fallback_container" "${nectar_url}${fallback_container}"; then
+            --output "$fallback_container" "${fallback_url}${fallback_container}"; then
          return 0
       fi
       rm -f "$fallback_container"
@@ -74,11 +76,11 @@ run_container_pull_with_fallback() {
       return 0
    fi
    if [[ "$storage" = "quay-v2" ]] || [[ "$storage" = "ghcr-v2" ]]; then
-      echo "[WARN] ORAS pull failed for '${container}'. Trying Nectar object-storage fallback." >&2
-      if download_container_from_nectar "$container"; then
+      echo "[WARN] ORAS pull failed for '${container}'. Trying Nectar and AWS object-storage fallback." >&2
+      if download_container_from_object_storage "$container"; then
          return 0
       fi
-      echo "[ERROR] ORAS pull failed with status ${pull_status}, and Nectar fallback did not retrieve '${container}'." >&2
+      echo "[ERROR] ORAS pull failed with status ${pull_status}, and object-storage fallback did not retrieve '${container}'." >&2
    fi
 
    return "$pull_status"
