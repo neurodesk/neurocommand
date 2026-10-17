@@ -101,6 +101,7 @@ def test_toolchain_requirements_extend_the_runtime_set_with_ci_tools():
         "cairosvg",
         "pytest",
         "python-swiftclient",
+        "python-keystoneclient",
         "keystoneauth1",
     }
 
@@ -262,6 +263,7 @@ IMAGE_HOME={shlex.quote(str(tmp_path))}
 url_exists() {{
     return 1
 }}
+url_size() {{ return 1; }}
 
 ensure_valid_local_image() {{
     return 1
@@ -293,6 +295,11 @@ def test_transient_head_failure_does_not_trigger_large_recovery_download(tmp_pat
         missing_attempts = 0
 
         def do_HEAD(self):
+            if self.path.startswith("/empty/"):
+                self.send_response(200)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             if self.path.startswith("/missing/"):
                 type(self).missing_attempts += 1
                 self.send_response(404)
@@ -307,6 +314,7 @@ def test_transient_head_failure_does_not_trigger_large_recovery_download(tmp_pat
                     return
 
             self.send_response(200)
+            self.send_header("Content-Length", "123")
             self.end_headers()
 
         def log_message(self, format, *args):
@@ -348,6 +356,9 @@ ensure_released() {{
 
 if url_exists {shlex.quote(base_url + "/missing/image.simg")}; then
     exit 91
+fi
+if url_exists {shlex.quote(base_url + "/empty/image.simg")}; then
+    exit 92
 fi
 
 process_container_line "neurodesktop-lite_arm64_20260428_20260808 categories:programming,"
@@ -423,6 +434,7 @@ def test_main_processes_generated_inventory_without_writing_published_metadata(
 set -euo pipefail
 source {shlex.quote(str(SCRIPT))}
 IMAGE_HOME={shlex.quote(str(tmp_path / "images"))}
+swift_client() {{ return 0; }}
 process_container_line() {{
     echo "$1" >> {shlex.quote(str(processed))}
 }}
