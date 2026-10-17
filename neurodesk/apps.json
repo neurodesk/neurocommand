@@ -648,6 +648,11 @@
                 "version": "20260927",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "bidsmanager 1.5.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -674,6 +679,11 @@
             },
             "bidsmanager_arm64 1.4.1": {
                 "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bidsmanager_arm64 1.5.0": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1368,7 +1378,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1380,7 +1390,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2169,6 +2179,11 @@
         "apps": {
             "enigma-pd-wml 1.1.1": {
                 "version": "20260901",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "enigma-pd-wml 1.2.0": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3195,6 +3210,21 @@
                 "exec": "julia",
                 "apptainer_args": []
             },
+            "julia 1.13.2": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vscodeGUI-julia 1.13.2": {
+                "version": "20261016",
+                "exec": "code",
+                "apptainer_args": []
+            },
+            "REPLGUI-julia 1.13.2": {
+                "version": "20261016",
+                "exec": "julia",
+                "apptainer_args": []
+            },
             "julia 1.4.1": {
                 "version": "20210105",
                 "exec": ""
@@ -3230,6 +3260,21 @@
             },
             "REPLGUI-julia_arm64 1.13.1": {
                 "version": "20261012",
+                "exec": "julia",
+                "apptainer_args": []
+            },
+            "julia_arm64 1.13.2": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vscodeGUI-julia_arm64 1.13.2": {
+                "version": "20261016",
+                "exec": "code",
+                "apptainer_args": []
+            },
+            "REPLGUI-julia_arm64 1.13.2": {
+                "version": "20261016",
                 "exec": "julia",
                 "apptainer_args": []
             }
@@ -4709,7 +4754,7 @@
                 "apptainer_args": []
             },
             "openmsk 0.2.0": {
-                "version": "20261004",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5059,6 +5104,11 @@
                 "version": "20261007",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "qsiprep 26.1.0": {
+                "version": "20261015",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5128,7 +5178,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -5430,7 +5480,7 @@
                 "apptainer_args": []
             },
             "relion 5.1.1": {
-                "version": "20261012",
+                "version": "20261015",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5568,6 +5618,16 @@
             },
             "rstudioGUI-rstudio 2026.09.0": {
                 "version": "20261009",
+                "exec": "rstudio",
+                "apptainer_args": []
+            },
+            "rstudio 2026.10.0": {
+                "version": "20261015",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "rstudioGUI-rstudio 2026.10.0": {
+                "version": "20261015",
                 "exec": "rstudio",
                 "apptainer_args": []
             }
@@ -6419,6 +6479,11 @@
             },
             "vesselboost 2.0.1": {
                 "version": "20260309",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vesselboost 2.0.2": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             },
