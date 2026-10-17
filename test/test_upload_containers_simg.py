@@ -50,6 +50,12 @@ def test_update_neurocontainers_has_explicit_timeouts():
     assert "timeout-minutes: 330" in workflow
 
 
+def test_update_neurocontainers_installs_the_swift_client():
+    workflow = WORKFLOW.read_text()
+    assert "python -m pip install -r maintenance/upload-requirements.txt" in workflow
+    assert "'maintenance/upload-requirements.txt'" in workflow
+
+
 def test_publish_needs_no_revision_from_the_upload_job():
     workflow = WORKFLOW.read_text()
     jobs = workflow[workflow.index("\njobs:") :]
@@ -91,7 +97,12 @@ def test_toolchain_requirements_extend_the_runtime_set_with_ci_tools():
     toolchain = requirement_names(TOOLCHAIN_REQUIREMENTS)
 
     assert runtime < toolchain
-    assert toolchain - runtime == {"cairosvg", "pytest"}
+    assert toolchain - runtime == {
+        "cairosvg",
+        "pytest",
+        "python-swiftclient",
+        "keystoneauth1",
+    }
 
 
 def test_unit_test_workflow_builds_the_slim_image():

@@ -10,6 +10,7 @@ on:
     paths:
       - '.github/workflows/update-neurocontainers.yml'
       - '.github/workflows/upload_containers_simg.sh'
+      - 'maintenance/upload-requirements.txt'
       - '.github/workflows/scripts/publish_cvmfs_metadata.sh'
       - 'neurodesk/apps.json'
       - 'cvmfs/generate_metadata.py'
@@ -38,6 +39,8 @@ jobs:
     - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
       with:
         python-version: "3.12"
+    - name: Install the Swift upload client
+      run: python -m pip install -r maintenance/upload-requirements.txt
     - name: Configure AWS Credentials 1
       id: creds
       uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
@@ -62,7 +65,6 @@ jobs:
         OS_AUTH_VERSION: ${{ secrets.OS_AUTH_VERSION }}
         OS_IDENTITY_API_VERSION: ${{ secrets.OS_IDENTITY_API_VERSION }}
       run: |
-        rclone config create nectar swift env_auth true
         rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true region us-east-2 no_check_bucket true
         /bin/bash .github/workflows/upload_containers_simg.sh
 
