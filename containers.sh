@@ -40,32 +40,50 @@ fi
 echo "--------------------------------------"
 echo
 
-while read -r appsh; do
+catalog_names=$(python3 -c '
+import json, sys
+with open(sys.argv[1]) as catalog:
+    print("\n".join(sorted(json.load(catalog), key=len, reverse=True)))
+' "${_base}/neurodesk/apps.json") || exit $?
+mapfile -t tool_names <<< "$catalog_names"
 
-    read -r -a arrayIn <<< "${appsh//_/ }"
-    if [ "$pattern" != "all" ] && [[ ${arrayIn[0]} != *${pattern}* ]]; then
+while read -r identity categories; do
+
+    builddate=${identity##*_}
+    name_version=${identity%_*}
+    name=${name_version%%_*}
+    for tool_name in "${tool_names[@]}"; do
+        if [[ $name_version == "${tool_name}_"* ]]; then
+            name=$tool_name
+            break
+        fi
+    done
+    version=${name_version#"${name}_"}
+    if [ "$pattern" != "all" ] && [[ $name != *${pattern}* ]]; then
         continue
     fi
-    appcat=${arrayIn[*]:3}
-    appcat_clean=${appcat:11:-1}
-    apphead="| ${arrayIn[0]} | ${arrayIn[1]} | ${arrayIn[2]} | ${appcat_clean} | Run:"
+    categories=${categories#categories:}
+    categories=${categories%,}
+    apphead="| ${name} | ${version} | ${builddate} | ${categories} | Run:"
     # Configuration keys are assigned dynamically by sourced configparser.sh.
     # shellcheck disable=SC2154
-    appfetch="${neurodesk_installdir}/fetch_containers.sh ${arrayIn[0]} ${arrayIn[1]} ${arrayIn[2]}"
+    appfetch=("${neurodesk_installdir}/fetch_containers.sh" "$name" "$version" "$builddate")
 
     printf '%*s' "${#apphead}" '' | tr ' ' '-'
     echo
     echo "$apphead"
     printf '%*s' "${#apphead}" '' | tr ' ' '-'
     echo
-    echo "$appfetch"
+    printf '%q' "${appfetch[0]}"
+    printf ' %q' "${appfetch[@]:1}"
+    echo
     echo
 
     if [ "$install" = "true" ]; then
-        eval "$appfetch"
+        "${appfetch[@]}"
         err=$?
         if [ $err -eq 0 ] ; then
-            installmsg="| SUCCESS | ${arrayIn[0]} ${arrayIn[1]} ${arrayIn[2]} | $(date)"
+            installmsg="| SUCCESS | ${name} ${version} ${builddate} | $(date)"
             printf '%*s' "${#installmsg}" '' | tr ' ' '-'
             echo
             echo "$installmsg"
@@ -74,7 +92,7 @@ while read -r appsh; do
             echo
             echo
         else
-            installmsg="| FAILED | ${arrayIn[0]} ${arrayIn[1]} ${arrayIn[2]} | $(date)"
+            installmsg="| FAILED | ${name} ${version} ${builddate} | $(date)"
             printf '%*s' "${#installmsg}" '' | tr ' ' '-'
             echo
             echo "$installmsg"
