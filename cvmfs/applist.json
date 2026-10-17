@@ -575,6 +575,13 @@
             ]
         },
         {
+            "application": "bidsmanager_1.5.0_20261016",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidsmanager_arm64_1.2.6.1_20260912",
             "categories": [
                 "bids apps",
@@ -597,6 +604,13 @@
         },
         {
             "application": "bidsmanager_arm64_1.4.1_20260927",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsmanager_arm64_1.5.0_20261016",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -755,6 +769,13 @@
             ]
         },
         {
+            "application": "brainles-preprocessing_0.6.14_20261013",
+            "categories": [
+                "image registration",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "brainles-preprocessing_0.8.0_20260916",
             "categories": [
                 "image registration",
@@ -772,7 +793,7 @@
             ]
         },
         {
-            "application": "brainlesion_1.1.0_20260916",
+            "application": "brainlesion_1.1.0_20261016",
             "categories": [
                 "data organisation",
                 "image segmentation",
@@ -932,6 +953,14 @@
             ]
         },
         {
+            "application": "cat12_26.0.0_20261016",
+            "categories": [
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "cat12_26.0.rc3_20260521",
             "categories": [
                 "image registration",
@@ -1052,13 +1081,13 @@
             ]
         },
         {
-            "application": "code_240320_20261014",
+            "application": "code_240320_20261016",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261014",
+            "application": "code_arm64_240320_20261016",
             "categories": [
                 "programming"
             ]
@@ -1144,7 +1173,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261012",
+            "application": "cryosparc_1.0.0_20261017",
             "categories": [
                 "cryo EM"
             ]
@@ -1458,6 +1487,13 @@
             ]
         },
         {
+            "application": "dicompare_0.15.4_20261017",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
             "application": "dicompare_0.5.4_20260506",
             "categories": [
                 "data organisation",
@@ -1473,6 +1509,13 @@
         },
         {
             "application": "dicompare_arm64_0.15.3_20261006",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
+            "application": "dicompare_arm64_0.15.4_20261017",
             "categories": [
                 "data organisation",
                 "quality control"
@@ -1589,6 +1632,13 @@
         },
         {
             "application": "enigma-pd-wml_1.1.1_20260901",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "enigma-pd-wml_1.2.0_20261016",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -1786,7 +1836,21 @@
             ]
         },
         {
+            "application": "fmriprep_25.2.7_20261016",
+            "categories": [
+                "functional imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "freesurfer_5.3.0_20260818",
+            "categories": [
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "freesurfer_6.0.0_20261016",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -2284,6 +2348,12 @@
             ]
         },
         {
+            "application": "julia_1.13.2_20261016",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
             "application": "julia_1.4.1_20210105",
             "categories": [
                 "programming"
@@ -2297,6 +2367,12 @@
         },
         {
             "application": "julia_arm64_1.13.1_20261012",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
+            "application": "julia_arm64_1.13.2_20261016",
             "categories": [
                 "programming"
             ]
@@ -2586,7 +2662,7 @@
             ]
         },
         {
-            "application": "meica_4.0.1_20261014",
+            "application": "meica_4.0.1_20261016",
             "categories": [
                 "functional imaging",
                 "image reconstruction",
@@ -2723,13 +2799,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261013",
+            "application": "mne_1.13.2_20261017",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261013",
+            "application": "mne_arm64_1.13.2_20261017",
             "categories": [
                 "electrophysiology"
             ]
@@ -2742,14 +2818,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261013",
+            "application": "mneextended_1.2.0_20261017",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261013",
+            "application": "mneextended_arm64_1.2.0_20261017",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -2849,7 +2925,19 @@
             ]
         },
         {
+            "application": "mritools_4.9.1_20261016",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
             "application": "mritools_arm64_4.9.0_20261013",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
+            "application": "mritools_arm64_4.9.1_20261016",
             "categories": [
                 "phase processing"
             ]
@@ -2918,7 +3006,7 @@
             ]
         },
         {
-            "application": "mrtrix3src_latest_20260527",
+            "application": "mrtrix3src_latest_20261017",
             "categories": [
                 "diffusion imaging"
             ]
@@ -3170,7 +3258,7 @@
             ]
         },
         {
-            "application": "openmsk_0.2.0_20261004",
+            "application": "openmsk_0.2.0_20261015",
             "categories": [
                 "image segmentation",
                 "quantitative imaging"
@@ -3381,6 +3469,12 @@
             ]
         },
         {
+            "application": "qsiprep_26.1.0_20261015",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "qsirecon_1.1.0_20250423",
             "categories": [
                 "diffusion imaging"
@@ -3429,7 +3523,7 @@
             ]
         },
         {
-            "application": "qsmxt_10.0.0_20261014",
+            "application": "qsmxt_10.0.0_20261017",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -3776,7 +3870,7 @@
             ]
         },
         {
-            "application": "relion_5.1.1_20261012",
+            "application": "relion_5.1.1_20261015",
             "categories": [
                 "cryo EM"
             ]
@@ -3863,6 +3957,12 @@
         },
         {
             "application": "rstudio_2026.09.0_20261009",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
+            "application": "rstudio_2026.10.0_20261015",
             "categories": [
                 "statistics"
             ]
@@ -4141,6 +4241,13 @@
             ]
         },
         {
+            "application": "spm25_26.10.01_20261016",
+            "categories": [
+                "functional imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "spmpython_25.1.2.post2_20261010",
             "categories": [
                 "functional imaging",
@@ -4210,7 +4317,7 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20261015",
+            "application": "synthseg_8.2.0_20261016",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -4377,13 +4484,32 @@
             ]
         },
         {
+            "application": "tractseg_2.10.0_20261016",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "tractseg_2.9_20250702",
             "categories": [
                 "diffusion imaging"
             ]
         },
         {
+            "application": "tractseg_arm64_2.10.0_20261016",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "vertexwiser_1.5.1_20261013",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "vertexwiser_1.5.4_20261014",
             "categories": [
                 "structural imaging",
                 "workflows"
@@ -4397,6 +4523,13 @@
             ]
         },
         {
+            "application": "vertexwiser_arm64_1.5.4_20261014",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "vesselboost_1.0.0_20240815",
             "categories": [
                 "image segmentation"
@@ -4404,6 +4537,12 @@
         },
         {
             "application": "vesselboost_2.0.1_20260309",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "vesselboost_2.0.2_20261016",
             "categories": [
                 "image segmentation"
             ]
@@ -4500,7 +4639,7 @@
             ]
         },
         {
-            "application": "whitematterlesions_0.3.20261015_20261015",
+            "application": "whitematterlesions_0.3.20261015_20261016",
             "categories": [
                 "image segmentation",
                 "machine learning"
