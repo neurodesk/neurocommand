@@ -2,6 +2,8 @@ name: Consolidate apps.json queue
 
 on:
   workflow_dispatch:
+  repository_dispatch:
+    types: [webapps-update]
   schedule:
     # Merge the consolidated PR a few times a day; between ticks the queue
     # only accumulates updates, which keeps notification volume low.
@@ -73,6 +75,7 @@ jobs:
           --repo "${{ github.repository }}" \
           --base-ref main \
           --target-file neurodesk/apps.json \
+          --webapps-file neurodesk/webapps.json \
           --consolidated-branch bot/appsjson-consolidated \
           --source-branch update-apps-json \
           --neurocontainers-path neurocontainers \

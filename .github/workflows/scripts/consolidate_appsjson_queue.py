@@ -2,6 +2,8 @@
 """Consolidate pending neurodesk/apps.json updates into a single queue PR.
 
 Rules implemented:
+- Generate webapps.json against the consolidated catalog on the same branch.
+- Reuse the single queue PR for webapp-only changes and repeated release events.
 - Process queue sources in created_at order. A source is either an open PR
   that touches neurodesk/apps.json or the PR-less bot branch that the
   neurocontainers release automation force-pushes (``--source-branch``).
@@ -42,6 +44,7 @@ from urllib.request import Request, urlopen
 # Reuse the recipe icon sync so apps.json updates carry their icons inline.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sync_neurocontainer_icons import sync_icons  # noqa: E402
+from sync_webapps import generate_webapps, select_available_webapps  # noqa: E402
 
 DIFF_COMMENT_MARKER = "<!-- appsjson-consolidation-diff -->"
 UNIT_TEST_COMMENT_MARKER = "<!-- appsjson-consolidation-unit-tests -->"
@@ -98,6 +101,7 @@ class ConsolidationPlan:
     active: bool
     should_have_pr: bool
     needs_branch_push: bool
+    webapps: Optional[Dict[str, Any]] = None
 
     def sources_landed(self, merge_status: Optional[str]) -> bool:
         return (self.active and not self.should_have_pr) or merge_status == "merged"
@@ -112,6 +116,9 @@ def build_consolidation_plan(
     target_file: str,
     icons_prefix: str,
     existing_branch_outdated: bool = False,
+    base_webapps: Optional[Dict[str, Any]] = None,
+    existing_webapps: Optional[Dict[str, Any]] = None,
+    generated_webapps: Optional[Dict[str, Any]] = None,
 ) -> ConsolidationPlan:
     """Apply merge-base tool changes in queue order without doing any I/O."""
     ordered = sorted(
@@ -143,12 +150,18 @@ def build_consolidation_plan(
         and changed_by_source[snapshot.source.label]
         and snapshot.source.pr.consolidatable(target_file, icons_prefix)
     )
-    should_have_pr = active and payload != base_payload
+    webapps = None
+    if generated_webapps is not None:
+        webapps = select_available_webapps(generated_webapps, base_webapps, payload)
+    webapps_changed = webapps is not None and webapps != base_webapps
+    active = active or webapps_changed
+    should_have_pr = active and (payload != base_payload or webapps_changed)
     needs_branch_push = should_have_pr and (
         not has_existing_pr
         or payload != existing_payload
         or existing_has_non_target_files
         or existing_branch_outdated
+        or (webapps is not None and webapps != existing_webapps)
     )
     return ConsolidationPlan(
         sources=tuple(snapshot.source for snapshot in ordered),
@@ -158,6 +171,7 @@ def build_consolidation_plan(
         active=active,
         should_have_pr=should_have_pr,
         needs_branch_push=needs_branch_push,
+        webapps=webapps,
     )
 
 
@@ -169,6 +183,10 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--base-ref", default="main")
     parser.add_argument("--target-file", default="neurodesk/apps.json")
+    parser.add_argument(
+        "--webapps-file",
+        help="Generate this webapp catalog alongside apps.json on the same branch.",
+    )
     parser.add_argument("--consolidated-branch", default="bot/appsjson-consolidated")
     parser.add_argument(
         "--source-branch",
@@ -392,26 +410,31 @@ def sort_top_level_keys(payload: Dict[str, Any]) -> Dict[str, Any]:
     return {key: payload[key] for key in sorted(payload)}
 
 
-def write_json(path: str, payload: Dict[str, Any]) -> None:
+def write_json(path: str, payload: Dict[str, Any], indent: int = 4) -> None:
     out = Path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
     # No trailing newline: the neurocontainers generator emits the file with a
     # bare ``json.dump(..., indent=4)`` and gates its PRs on ``git diff --quiet``,
     # so matching it byte-for-byte (top-level sorted, no final newline) is what
     # keeps generator PRs free of reorder/newline-only churn.
-    out.write_text(json.dumps(sort_top_level_keys(payload), indent=4), encoding="utf-8")
+    out.write_text(
+        json.dumps(sort_top_level_keys(payload), indent=indent), encoding="utf-8"
+    )
 
 
 def render_appsjson_diff(
     target_file: str,
     base_payload: Dict[str, Any],
     consolidated_payload: Dict[str, Any],
+    indent: int = 4,
 ) -> str:
     # Match write_json's canonical form (top-level keys sorted, no trailing
     # newline) so the diff shown in the PR body reflects what is actually
     # committed to the consolidated branch.
-    base_text = json.dumps(sort_top_level_keys(base_payload), indent=4)
-    consolidated_text = json.dumps(sort_top_level_keys(consolidated_payload), indent=4)
+    base_text = json.dumps(sort_top_level_keys(base_payload), indent=indent)
+    consolidated_text = json.dumps(
+        sort_top_level_keys(consolidated_payload), indent=indent
+    )
     diff_lines = difflib.unified_diff(
         base_text.splitlines(),
         consolidated_text.splitlines(),
@@ -443,6 +466,7 @@ def build_consolidation_pr_body(
     closed_prs: Sequence[PullRequest],
     should_have_consolidated_pr: bool,
     appsjson_diff: str,
+    webapps_diff: str = "",
 ) -> str:
     lines: List[str] = []
     lines.append("# apps.json Queue Consolidation")
@@ -500,6 +524,17 @@ def build_consolidation_pr_body(
     else:
         lines.append("- No net changes.")
 
+    if webapps_diff:
+        lines.extend(
+            [
+                "",
+                "## Proposed webapp changes",
+                "Webapp versions are selected against the catalog in this PR.",
+                "```diff",
+                truncate_diff(webapps_diff, MAX_PR_BODY_DIFF_CHARS)[0],
+                "```",
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 
@@ -894,6 +929,10 @@ def main() -> int:
 
     base_ref = f"refs/remotes/origin/{args.base_ref}"
     base_payload = read_json_from_git(base_ref, args.target_file)
+    base_webapps = (
+        read_json_from_git(base_ref, args.webapps_file) if args.webapps_file else None
+    )
+    existing_webapps = base_webapps
     existing_consolidated_pr = find_open_head_pr(
         args.api_url,
         args.repo,
@@ -916,7 +955,8 @@ def main() -> int:
         # Icons synced alongside apps.json are expected on the consolidated
         # branch and must not be treated as stray files that force a re-push.
         existing_consolidated_has_non_target_files = any(
-            file_path != args.target_file and not file_path.startswith(icons_prefix)
+            file_path not in {args.target_file, args.webapps_file}
+            and not file_path.startswith(icons_prefix)
             for file_path in existing_pr_files
         )
 
@@ -931,6 +971,10 @@ def main() -> int:
             check=False,
         )
         if fetch_consolidated.returncode == 0:
+            if args.webapps_file:
+                existing_webapps = read_json_from_git(
+                    consolidated_ref, args.webapps_file
+                )
             existing_branch_outdated = branch_needs_refresh(base_ref, consolidated_ref)
             existing_consolidated_payload = read_json_from_git(
                 consolidated_ref, args.target_file
@@ -974,8 +1018,19 @@ def main() -> int:
         target_file=args.target_file,
         icons_prefix=icons_prefix,
         existing_branch_outdated=existing_branch_outdated,
+        base_webapps=base_webapps,
+        existing_webapps=existing_webapps,
+        generated_webapps=(
+            generate_webapps(args.neurocontainers_path) if args.webapps_file else None
+        ),
     )
     write_json(args.target_file, plan.payload)
+    webapps_diff = ""
+    if plan.webapps is not None:
+        write_json(args.webapps_file, plan.webapps, indent=2)
+        webapps_diff = render_appsjson_diff(
+            args.webapps_file, base_webapps, plan.webapps, indent=2
+        )
 
     appsjson_diff = render_appsjson_diff(
         args.target_file,
@@ -990,6 +1045,7 @@ def main() -> int:
         plan.source_prs,
         plan.should_have_pr,
         appsjson_diff,
+        webapps_diff,
     )
 
     synced_icon_files: List[str] = []
@@ -1003,11 +1059,15 @@ def main() -> int:
         stage_and_push_branch(
             base_ref=args.base_ref,
             head_branch=args.consolidated_branch,
-            files=[args.target_file, *synced_icon_files],
+            files=[
+                args.target_file,
+                *([args.webapps_file] if args.webapps_file else []),
+                *synced_icon_files,
+            ],
             commit_message="Consolidate pending neurodesk/apps.json updates",
         )
 
-    consolidated_pr_title = "Consolidate pending apps.json updates"
+    consolidated_pr_title = "Consolidate pending app and webapp updates"
     consolidated_pr_number = upsert_consolidated_pr(
         api_url=args.api_url,
         repo=args.repo,
