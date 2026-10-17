@@ -957,7 +957,7 @@
                 "apptainer_args": []
             },
             "brainlesion 1.1.0": {
-                "version": "20260916",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1204,6 +1204,16 @@
             "cat12 12.9": {
                 "version": "20250307",
                 "exec": ""
+            },
+            "cat12 26.0.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "cat12GUI-cat12 26.0.0": {
+                "version": "20261016",
+                "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": []
             },
             "cat12 26.0.rc3": {
                 "version": "20260521",
@@ -2430,6 +2440,11 @@
             },
             "fmriprep 25.2.6": {
                 "version": "20260930",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fmriprep 25.2.7": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3736,7 +3751,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20261014",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4159,6 +4174,11 @@
                 "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "mritools 4.9.1": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4169,6 +4189,11 @@
         "apps": {
             "mritools_arm64 4.9.0": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "mritools_arm64 4.9.1": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4461,7 +4486,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261012",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4482,7 +4507,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261012",
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5178,7 +5203,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261016",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -6049,6 +6074,11 @@
         "apps": {
             "spm25 25.01.02": {
                 "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "spm25 26.10.01": {
+                "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
             }
