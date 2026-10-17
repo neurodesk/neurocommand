@@ -1539,7 +1539,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261012",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1957,6 +1957,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "dicompare 0.15.4": {
+                "version": "20261017",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -1977,6 +1982,11 @@
             },
             "dicompare_arm64 0.15.3": {
                 "version": "20261006",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dicompare_arm64 0.15.4": {
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3983,7 +3993,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261014",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3995,7 +4005,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261014",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4012,7 +4022,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261013",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4025,7 +4035,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261013",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4297,7 +4307,7 @@
     "mrtrix3src": {
         "apps": {
             "mrtrix3src latest": {
-                "version": "20260527",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6456,9 +6466,26 @@
     },
     "tractseg": {
         "apps": {
+            "tractseg 2.10.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
+            },
             "tractseg 2.9": {
                 "version": "20250702",
                 "exec": ""
+            }
+        },
+        "categories": [
+            "diffusion imaging"
+        ]
+    },
+    "tractseg_arm64": {
+        "apps": {
+            "tractseg_arm64 2.10.0": {
+                "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
