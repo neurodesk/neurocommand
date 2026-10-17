@@ -11,6 +11,9 @@ SINGULARITY_BUILD_TIMEOUT="${SINGULARITY_BUILD_TIMEOUT:-2h}"
 RCLONE_COPY_RETRIES="${RCLONE_COPY_RETRIES:-3}"
 RCLONE_COPY_RETRY_DELAY="${RCLONE_COPY_RETRY_DELAY:-30}"
 RCLONE_LOW_LEVEL_RETRIES="${RCLONE_LOW_LEVEL_RETRIES:-20}"
+SWIFT_UPLOAD_RETRIES="${SWIFT_UPLOAD_RETRIES:-3}"
+SWIFT_UPLOAD_RETRY_DELAY="${SWIFT_UPLOAD_RETRY_DELAY:-30}"
+SWIFT_SEGMENT_SIZE="${SWIFT_SEGMENT_SIZE:-1073741824}"
 DOWNLOAD_RETRIES="${DOWNLOAD_RETRIES:-3}"
 DOWNLOAD_RETRY_DELAY="${DOWNLOAD_RETRY_DELAY:-30}"
 URL_CHECK_RETRIES="${URL_CHECK_RETRIES:-5}"
@@ -243,6 +246,22 @@ rclone_copy_image() {
         "$remote_path"
 }
 
+upload_nectar_image() {
+    local image_path="$1"
+    local -a auth_options=()
+    if [[ -n "${OS_APPLICATION_CREDENTIAL_ID:-}" && -n "${OS_APPLICATION_CREDENTIAL_SECRET:-}" ]]; then
+        auth_options=(--os-auth-type v3applicationcredential)
+    fi
+
+    # DLO sizes depend on eventually consistent segment listings. SLO checks
+    # each segment's size and checksum before publishing a complete manifest.
+    # Keep segments in the public container so anonymous downloads can read them.
+    run_with_retries "upload ${image_path##*/} to Nectar" "$SWIFT_UPLOAD_RETRIES" "$SWIFT_UPLOAD_RETRY_DELAY" \
+        swift "${auth_options[@]}" upload --use-slo \
+        --segment-size "$SWIFT_SEGMENT_SIZE" --segment-container neurodesk \
+        --object-name "${image_path##*/}" neurodesk "$image_path"
+}
+
 ensure_released() {
     local image_builddate="$1"
     local image_path="$IMAGE_HOME/${image_builddate}.simg"
@@ -250,7 +269,7 @@ ensure_released() {
     local aws_url="${AWS_BASE_URL}/${image_builddate}.simg"
 
     if ! url_exists "$nectar_url"; then
-        rclone_copy_image "$image_path" nectar:/neurodesk/ "upload ${image_builddate}.simg to Nectar"
+        upload_nectar_image "$image_path"
     fi
 
     if ! url_exists "$aws_url"; then

@@ -1,0 +1,2 @@
+python-swiftclient==4.11.0
+keystoneauth1==5.18.1
