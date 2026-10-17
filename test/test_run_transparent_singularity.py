@@ -3,6 +3,8 @@ import os
 import shutil
 import subprocess
 
+import pytest
+
 from test.support.shell import write_executable
 from test.support.wrappers import assert_gpu_environment
 
@@ -10,7 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 TRANSPARENT_SINGULARITY = ROOT / "neurodesk" / "transparent-singularity"
 
 
-def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
+@pytest.mark.parametrize(
+    "fallback_source", ["nectar", "aws-temporary", "aws-final", None]
+)
+def test_oras_pull_failure_falls_back_to_object_storage(tmp_path, fallback_source):
     workdir = tmp_path / "demo_arm64_1.0_20260629"
     shutil.copytree(TRANSPARENT_SINGULARITY, workdir)
     (workdir / "manual_module_files/demo_arm64").write_text(
@@ -61,7 +66,15 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
             exit 0
         fi
 
-        if [[ "$args" == *"object-store.rc.nectar.org.au"* ]]; then
+        if [[ "$args" == *"neurocontainers.s3.us-east-2.amazonaws.com"* && "$args" == *"--head"* ]]; then
+            if [[ "$FALLBACK_SOURCE" == aws-temporary && "$args" == *"temporary-builds-new"* ]] ||
+               [[ "$FALLBACK_SOURCE" == aws-final && "$args" != *"temporary-builds-new"* ]]; then
+                exit 0
+            fi
+            exit 22
+        fi
+
+        if [[ "$args" == *"object-store.rc.nectar.org.au"* || "$args" == *"neurocontainers.s3.us-east-2.amazonaws.com"* ]]; then
             output=""
             previous=""
             for arg in "$@"; do
@@ -73,7 +86,12 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
             if [[ -z "$output" ]]; then
                 exit 1
             fi
-            echo "nectar-download $output ${{@: -1}}" >> {calls}
+            if [[ "$args" == *"object-store.rc.nectar.org.au"* && "$FALLBACK_SOURCE" != nectar ]]; then
+                echo "partial download" > "$output"
+                echo 'curl: (22) The requested URL returned error: 409' >&2
+                exit 22
+            fi
+            echo "object-download $output ${{@: -1}}" >> {calls}
             echo "sif" > "$output"
             exit 0
         fi
@@ -110,6 +128,7 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
         fi
 
         if [[ "$1" = "build" ]]; then
+            [[ $(cat "$4") == sif ]] || exit 99
             mkdir -p "$3"
             exit 0
         fi
@@ -138,6 +157,7 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
 
     env = os.environ.copy()
     env["PATH"] = f"{bin_dir}:{env['PATH']}"
+    env["FALLBACK_SOURCE"] = fallback_source or "unavailable"
 
     result = subprocess.run(
         [
@@ -153,16 +173,25 @@ def test_oras_pull_failure_falls_back_to_nectar(tmp_path):
         text=True,
     )
 
-    assert result.returncode == 0, result.stdout + result.stderr
     call_log = calls.read_text()
+    if fallback_source is None:
+        assert result.returncode != 0
+        assert not (workdir / container).exists()
+        assert "singularity build" not in call_log
+        assert "Failed to retrieve container" in result.stderr
+        return
+
+    assert result.returncode == 0, result.stdout + result.stderr
     assert (
         "apptainer pull --name demo_arm64_1.0_20260629.simg "
         "oras://ghcr.io/neurodesk/demo_arm64@sha256:sif"
     ) in call_log
-    assert (
-        "nectar-download demo_arm64_1.0_20260629.simg "
-        "https://object-store.rc.nectar.org.au/v1/"
-    ) in call_log
+    fallback_url = {
+        "nectar": "https://object-store.rc.nectar.org.au/v1/",
+        "aws-temporary": "https://neurocontainers.s3.us-east-2.amazonaws.com/temporary-builds-new/",
+        "aws-final": "https://neurocontainers.s3.us-east-2.amazonaws.com/",
+    }[fallback_source]
+    assert f"object-download {container} {fallback_url}" in call_log
     assert (workdir / "demo_arm64_1.0_20260629.simg").is_dir()
     assert "singularity exec demo_arm64_1.0_20260629.simg /bin/true" in call_log
     wrapper = workdir / "demo"
