@@ -934,12 +934,25 @@
                 "apptainer_args": []
             },
             "brainles-preprocessing 0.6.14": {
-                "version": "20261013",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             },
             "brainles-preprocessing 0.8.0": {
                 "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "structural imaging"
+        ]
+    },
+    "brainles-preprocessing_arm64": {
+        "apps": {
+            "brainles-preprocessing_arm64 0.6.14": {
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3761,7 +3774,7 @@
     "meica": {
         "apps": {
             "meica 4.0.1": {
-                "version": "20261016",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6691,7 +6704,7 @@
                 "apptainer_args": []
             },
             "whitematterlesions 0.3.20261015": {
-                "version": "20261016",
+                "version": "20261017",
                 "exec": "",
                 "apptainer_args": []
             }
