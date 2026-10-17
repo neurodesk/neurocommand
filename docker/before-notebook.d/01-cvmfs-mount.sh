@@ -7,11 +7,13 @@
 #
 # Env knobs:
 #   NEURODESK_CVMFS_DISABLE=1       skip CVMFS entirely (offline / local-only)
-#   NEURODESK_SKIP_REGION_PROBE=1   use the bundled default config without probing
+#   NEURODESK_SKIP_REGION_PROBE=1   use the bundled static config without ranking servers
 
 set -e
 
 NB_USER="${NB_USER:-jovyan}"
+# neurodesktop's server ranking writes the best servers into the repository config.
+SERVER_SELECT="${NEURODESK_CVMFS_SERVER_SELECT:-/opt/neurodesktop/cvmfs_server_select.sh}"
 
 setup_cvmfs() {
     if [ "${NEURODESK_CVMFS_DISABLE:-0}" = "1" ]; then
@@ -34,13 +36,12 @@ setup_cvmfs() {
     chown -R cvmfs:root "$CACHE_DIR" 2>/dev/null || true
     chmod 755 "/home/${NB_USER}"
 
-    if [ ! -f /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf ]; then
-        cp /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.cdn.america \
-            /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf
-    fi
-
     if [ "${NEURODESK_SKIP_REGION_PROBE:-0}" != "1" ]; then
-        probe_and_select_region
+        if [ -x "$SERVER_SELECT" ]; then
+            "$SERVER_SELECT" || echo "[neurocommand] WARN: no CVMFS server measurable, using the fallback server list."
+        else
+            echo "[neurocommand] WARN: $SERVER_SELECT not found, keeping the bundled config."
+        fi
     fi
 
     echo "[neurocommand] Mounting CVMFS..."
@@ -63,55 +64,6 @@ mount_cvmfs_manually() {
             || echo "[neurocommand] WARN: CVMFS mounted but modules dir not visible yet."
     else
         echo "[neurocommand] WARN: manual CVMFS mount failed. Falling back to local containers."
-    fi
-}
-
-probe_and_select_region() {
-    # Median of 3 latency probes against .cvmfspublished.
-    get_latency() {
-        local url="$1" probes=3 out t s
-        local latencies=()
-        for _ in $(seq 1 "$probes"); do
-            out=$(curl --no-keepalive --connect-timeout 3 --max-time 5 -s -w "%{time_total} %{http_code}" -o /dev/null "$url" || true)
-            t=$(echo "$out" | awk '{print $1}')
-            s=$(echo "$out" | awk '{print $2}')
-            if [ "$s" = "200" ]; then latencies+=("$t"); else latencies+=("999"); fi
-        done
-        printf '%s\n' "${latencies[@]}" | sort -n | sed -n "$(( (probes + 1) / 2 ))p"
-    }
-
-    local tmpdir; tmpdir=$(mktemp -d)
-    (get_latency "http://cvmfs-frankfurt.neurodesk.org/cvmfs/neurodesk.ardc.edu.au/.cvmfspublished" > "$tmpdir/europe") &
-    (get_latency "http://cvmfs-jetstream.neurodesk.org/cvmfs/neurodesk.ardc.edu.au/.cvmfspublished" > "$tmpdir/america") &
-    (get_latency "http://cvmfs-brisbane.neurodesk.org/cvmfs/neurodesk.ardc.edu.au/.cvmfspublished" > "$tmpdir/asia") &
-    wait
-
-    local eu am as
-    eu=$(cat "$tmpdir/europe"); am=$(cat "$tmpdir/america"); as=$(cat "$tmpdir/asia")
-    rm -rf "$tmpdir"
-    echo "[neurocommand] Latencies (s): europe=$eu america=$am asia=$as"
-
-    if [ "$eu" = "999" ] && [ "$am" = "999" ] && [ "$as" = "999" ]; then
-        echo "[neurocommand] WARN: CVMFS region probes failed, keeping default config."
-        return 0
-    fi
-
-    local fastest_region
-    fastest_region=$(printf "%s europe\n%s america\n%s asia\n" "$eu" "$am" "$as" \
-        | sort -n | awk 'NR==1{print $2}')
-
-    local direct_lat cdn_lat fastest_mode
-    direct_lat=$(get_latency "http://cvmfs-geoproximity.neurodesk.org/cvmfs/neurodesk.ardc.edu.au/.cvmfspublished")
-    cdn_lat=$(get_latency "http://cvmfs.neurodesk.org/cvmfs/neurodesk.ardc.edu.au/.cvmfspublished")
-    fastest_mode=$(printf "%s direct\n%s cdn\n" "$direct_lat" "$cdn_lat" \
-        | sort -n | awk 'NR==1{print $2}')
-
-    echo "[neurocommand] Selected region=${fastest_region} mode=${fastest_mode}"
-    local src="/etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf.${fastest_mode}.${fastest_region}"
-    if [ -f "$src" ]; then
-        cp "$src" /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf
-    else
-        echo "[neurocommand] WARN: $src not found, keeping default config."
     fi
 }
 
