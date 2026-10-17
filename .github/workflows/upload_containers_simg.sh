@@ -14,6 +14,7 @@ RCLONE_LOW_LEVEL_RETRIES="${RCLONE_LOW_LEVEL_RETRIES:-20}"
 SWIFT_UPLOAD_RETRIES="${SWIFT_UPLOAD_RETRIES:-3}"
 SWIFT_UPLOAD_RETRY_DELAY="${SWIFT_UPLOAD_RETRY_DELAY:-30}"
 SWIFT_SEGMENT_SIZE="${SWIFT_SEGMENT_SIZE:-1073741824}"
+SWIFT_REQUEST_TIMEOUT="${SWIFT_REQUEST_TIMEOUT:-60}"
 DOWNLOAD_RETRIES="${DOWNLOAD_RETRIES:-3}"
 DOWNLOAD_RETRY_DELAY="${DOWNLOAD_RETRY_DELAY:-30}"
 URL_CHECK_RETRIES="${URL_CHECK_RETRIES:-5}"
@@ -46,31 +47,34 @@ run_with_retries() {
     return "$exit_code"
 }
 
-url_exists_once() {
+url_size() {
     local url="$1"
-    curl --output /dev/null --silent --head --fail \
-        --connect-timeout "$CURL_CONNECT_TIMEOUT" \
-        "$url"
-}
-
-url_exists() {
-    local url="$1"
-    local retry_count
+    local retry_count headers size
     retry_count=$((URL_CHECK_RETRIES > 0 ? URL_CHECK_RETRIES - 1 : 0))
 
     # Let curl retry transient network and HTTP failures (for example 503),
     # while still returning immediately for a genuine missing object (404).
-    curl --output /dev/null --silent --head --fail \
+    headers="$(curl --silent --head --fail \
         --connect-timeout "$CURL_CONNECT_TIMEOUT" \
+        --max-time "$SWIFT_REQUEST_TIMEOUT" \
         --retry "$retry_count" \
         --retry-delay "$URL_CHECK_RETRY_DELAY" \
         --retry-connrefused \
-        "$url"
+        "$url")" || return 1
+    size="$(awk 'tolower($1) == "content-length:" {gsub("\r", "", $2); size=$2} END {print size}' <<< "$headers")"
+    [[ "$size" =~ ^[1-9][0-9]*$ ]] || return 1
+    echo "$size"
 }
 
-url_exists_with_retries() {
+url_exists() {
+    url_size "$1" >/dev/null
+}
+
+url_matches_size() {
     local url="$1"
-    run_with_retries "confirm URL exists: ${url}" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" url_exists_once "$url"
+    local expected_size="$2" actual_size
+    actual_size="$(url_size "$url")" || return 1
+    [[ "$actual_size" == "$expected_size" ]]
 }
 
 # Image validation needs "sif list" (Singularity 3.3+, every Apptainer).
@@ -246,18 +250,22 @@ rclone_copy_image() {
         "$remote_path"
 }
 
-upload_nectar_image() {
-    local image_path="$1"
+swift_client() {
     local -a auth_options=()
     if [[ -n "${OS_APPLICATION_CREDENTIAL_ID:-}" && -n "${OS_APPLICATION_CREDENTIAL_SECRET:-}" ]]; then
         auth_options=(--os-auth-type v3applicationcredential)
     fi
+    swift "${auth_options[@]}" --timeout "$SWIFT_REQUEST_TIMEOUT" "$@"
+}
+
+upload_nectar_image() {
+    local image_path="$1"
 
     # DLO sizes depend on eventually consistent segment listings. SLO checks
     # each segment's size and checksum before publishing a complete manifest.
     # Keep segments in the public container so anonymous downloads can read them.
     run_with_retries "upload ${image_path##*/} to Nectar" "$SWIFT_UPLOAD_RETRIES" "$SWIFT_UPLOAD_RETRY_DELAY" \
-        swift "${auth_options[@]}" upload --use-slo \
+        swift_client upload --use-slo \
         --segment-size "$SWIFT_SEGMENT_SIZE" --segment-container neurodesk \
         --object-name "${image_path##*/}" neurodesk "$image_path"
 }
@@ -267,17 +275,21 @@ ensure_released() {
     local image_path="$IMAGE_HOME/${image_builddate}.simg"
     local nectar_url="${NECTAR_BASE_URL}/${image_builddate}.simg"
     local aws_url="${AWS_BASE_URL}/${image_builddate}.simg"
+    local image_size
+    image_size="$(stat -c %s "$image_path")"
 
-    if ! url_exists "$nectar_url"; then
+    if ! url_matches_size "$nectar_url" "$image_size"; then
         upload_nectar_image "$image_path"
     fi
 
-    if ! url_exists "$aws_url"; then
+    if ! url_matches_size "$aws_url" "$image_size"; then
         rclone_copy_image "$image_path" aws-neurocontainers-new:/neurocontainers/ "upload ${image_builddate}.simg to AWS"
     fi
 
-    url_exists_with_retries "$nectar_url"
-    url_exists_with_retries "$aws_url"
+    run_with_retries "confirm Nectar image size" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" \
+        url_matches_size "$nectar_url" "$image_size"
+    run_with_retries "confirm AWS image size" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" \
+        url_matches_size "$aws_url" "$image_size"
     echo "[DEBUG] ${image_builddate}.simg is released in Nectar and AWS"
 }
 
@@ -298,12 +310,15 @@ process_container_line() {
     echo "[DEBUG] IMAGENAME: $image_name"
     echo "[DEBUG] BUILDDATE: $build_date"
 
-    if url_exists "$nectar_url" && url_exists "$aws_url"; then
+    local nectar_size aws_size
+    nectar_size="$(url_size "$nectar_url")" || nectar_size=
+    aws_size="$(url_size "$aws_url")" || aws_size=
+    if [[ -n "$aws_size" && "$nectar_size" == "$aws_size" ]]; then
         echo "[DEBUG] ${image_builddate}.simg exists in Nectar and AWS"
         return 0
     fi
 
-    echo "[DEBUG] ${image_builddate}.simg is missing from one or more object stores"
+    echo "[DEBUG] ${image_builddate}.simg is missing or has inconsistent sizes across object stores"
     if ! ensure_valid_local_image "$image_path"; then
         if url_exists "$aws_url"; then
             echo "[DEBUG] ${image_builddate}.simg exists in AWS; downloading to local cache"
@@ -325,6 +340,9 @@ process_container_line() {
 
 main() {
     echo "checking if containers are built"
+
+    run_with_retries "check Nectar credentials" "$SWIFT_UPLOAD_RETRIES" "$SWIFT_UPLOAD_RETRY_DELAY" \
+        swift_client stat neurodesk >/dev/null
 
     local inventory
     inventory="$(mktemp)"

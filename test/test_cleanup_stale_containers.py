@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime, timezone
 import json
 
 import pytest
@@ -10,6 +11,60 @@ SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "cleanup_stale_containers.
 
 
 cleanup = load_script("cleanup_stale_containers", SCRIPT)
+
+
+@pytest.mark.parametrize("dry_run", [False, True])
+@pytest.mark.parametrize("legacy_available", [False, True])
+def test_orphan_cleanup_protects_current_recent_and_published_slo_segments(
+    monkeypatch, capsys, dry_run, legacy_available
+):
+    remote = "nectar:/neurodesk/"
+    old = "2026-10-01T00:00:00Z"
+    recent = "2026-10-16T00:00:00Z"
+    objects = [
+        {"Path": "published.simg", "ModTime": old},
+        {"Path": "published.simg/slo/1/12/4/00000000", "ModTime": old},
+        {"Path": "protected.simg/slo/1/12/4/00000000", "ModTime": old},
+        {"Path": "recent.simg/slo/1/12/4/00000000", "ModTime": recent},
+        {"Path": "unknown.simg/slo/1/12/4/00000000"},
+        {"Path": "other/slo/1/12/4/00000000", "ModTime": old},
+        {"Path": "abandoned.simg/slo/1/12/4/00000000", "ModTime": old},
+    ]
+    legacy = [
+        {"Path": "legacy.simg/1/00000000"},
+        {"Path": "published.simg/1/00000000"},
+    ]
+    monkeypatch.setattr(
+        cleanup,
+        "list_nectar_objects_optional",
+        lambda source: (
+            objects if source == remote else (legacy if legacy_available else None)
+        ),
+    )
+    calls = []
+    monkeypatch.setattr(
+        cleanup.subprocess, "run", lambda command, **kw: calls.append(command)
+    )
+
+    cleanup.check_orphaned_segments(
+        remote, dry_run, {"protected.simg"}, datetime(2026, 10, 10, tzinfo=timezone.utc)
+    )
+
+    target = "nectar:/neurodesk/abandoned.simg/slo/1/12/4/00000000"
+    if dry_run:
+        assert calls == []
+        assert f"Would delete orphaned segment: {target}" in capsys.readouterr().out
+    else:
+        expected = [["rclone", "deletefile", target]]
+        if legacy_available:
+            expected.append(
+                [
+                    "rclone",
+                    "deletefile",
+                    "nectar:/neurodesk_segments/legacy.simg/1/00000000",
+                ]
+            )
+        assert calls == expected
 
 
 def test_release_metadata_protects_named_and_legacy_images(tmp_path):
