@@ -100,6 +100,7 @@ def test_toolchain_requirements_extend_the_runtime_set_with_ci_tools():
     assert toolchain - runtime == {
         "cairosvg",
         "pytest",
+        "pyyaml",
         "python-swiftclient",
         "python-keystoneclient",
         "keystoneauth1",
