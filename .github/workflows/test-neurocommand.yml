@@ -90,6 +90,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull neurocommand image
         run: docker pull "$NEUROCOMMAND_IMAGE"
+      # The image runs Apptainer with setuid disabled, as neurodesktop does, so
+      # it needs user namespaces. Ubuntu 24.04 denies them to unconfined
+      # processes, including those in privileged containers.
+      - name: Allow unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Run neurocommand fetch test inside image
         run: |
           CVMFS_ENV=()
