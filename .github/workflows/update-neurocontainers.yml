@@ -1,106 +1,37 @@
-name: Update neurocontainers
+name: Repair Nectar download for issue 997
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/update-neurocontainers.yml'
-      - '.github/workflows/upload_containers_simg.sh'
-      - 'maintenance/upload-requirements.txt'
-      - '.github/workflows/scripts/publish_cvmfs_metadata.sh'
-      - 'neurodesk/apps.json'
-      - 'cvmfs/generate_metadata.py'
-      - 'cvmfs/check_publication.py'
-      - 'cvmfs/neurodesk.ardc.edu.au.pub'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repair-nectar-997
+  cancel-in-progress: false
 
 jobs:
-  upload_containers_simg:
-    if: github.event_name != 'schedule'
-    # A newer apps.json supersedes an older upload. This is job-level so that
-    # re-running an older run's publish job cannot cancel a newer upload.
-    concurrency:
-      group: update-neurocontainers
-      cancel-in-progress: true
+  repair_nectar:
     runs-on: self-hosted
-    timeout-minutes: 360
-    permissions:
-      id-token: write
-      contents: read
+    timeout-minutes: 90
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        token: ${{ secrets.ACCESS_TOKEN }}
-        ref: main
-        fetch-depth: 0
-    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
-      with:
-        python-version: "3.12"
-    - name: Install the Swift upload client
-      run: python -m pip install -r maintenance/upload-requirements.txt
-    - name: Configure AWS Credentials 1
-      id: creds
-      uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
-      with:
-        aws-region: us-east-2
-        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-        output-credentials: true
-        role-duration-seconds: 28800 # 8 hours
-    - name : Check if singularity container files exist in nectar cloud and build & upload if not there
-      timeout-minutes: 330
-      env:
-        AWS_ACCESS_KEY_ID: ${{ env.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        AWS_SESSION_TOKEN: ${{ env.AWS_SESSION_TOKEN }}
-        OS_AUTH_URL: ${{ secrets.OS_AUTH_URL }}
-        OS_PROJECT_NAME: ${{ secrets.OS_PROJECT_NAME }}
-        OS_PROJECT_ID: ${{ secrets.OS_PROJECT_ID }}
-        OS_USERNAME: ${{ secrets.OS_USERNAME }}
-        OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
-        OS_APPLICATION_CREDENTIAL_ID: ${{ secrets.OS_APPLICATION_CREDENTIAL_ID }}
-        OS_APPLICATION_CREDENTIAL_SECRET: ${{ secrets.OS_APPLICATION_CREDENTIAL_SECRET }}
-        OS_AUTH_VERSION: ${{ secrets.OS_AUTH_VERSION }}
-        OS_IDENTITY_API_VERSION: ${{ secrets.OS_IDENTITY_API_VERSION }}
-      run: |
-        rclone config create aws-neurocontainers-new s3 config_is_local false provider AWS env_auth true region us-east-2 no_check_bucket true
-        /bin/bash .github/workflows/upload_containers_simg.sh
-
-  publish_metadata:
-    needs: upload_containers_simg
-    if: always() && (github.event_name == 'schedule' || needs.upload_containers_simg.result == 'success')
-    # No concurrency group: a queued publisher could be replaced by an older
-    # rerun. Publishers of a superseded apps.json exit, and the current one
-    # rebuilds the shared branch if another publisher replaced it.
-    runs-on: ubuntu-24.04
-    timeout-minutes: 60
-    permissions:
-      contents: read
-    steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      with:
-        # Pushes and merges with the PAT trigger the required PR checks and
-        # the push workflows on main.
-        token: ${{ secrets.ACCESS_TOKEN }}
-        ref: main
-        fetch-depth: 0
-    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
-      with:
-        python-version: "3.12"
-    - name: Install the CVMFS client
-      uses: cvmfs-contrib/github-action-cvmfs@72f2a8d366043978d6aebee154bc9ed321c2f2a8
-      with:
-        cvmfs_repositories: ''
-        cvmfs_public_key: ${{ github.workspace }}/cvmfs/neurodesk.ardc.edu.au.pub
-        cvmfs_server_url: http://stratum0.neurodesk.cloud.edu.au/cvmfs/@fqrn@
-        cvmfs_auto_update: 'no'
-    - name: Publish CVMFS metadata for the uploaded revision
-      env:
-        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        TRIGGER_SHA: ${{ github.event_name != 'schedule' && github.sha || '' }}
-      # Publishes main's inventory after confirming every image is uploaded,
-      # so no revision passes between jobs. A job output could not carry one:
-      # GitHub drops outputs that contain a masked secret value.
-      run: bash .github/workflows/scripts/publish_cvmfs_metadata.sh "$TRIGGER_SHA"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+      - name: Install the pinned Swift client
+        run: python -m pip install -r maintenance/upload-requirements.txt
+      - name: Repair the object and verify its complete public download
+        env:
+          OS_AUTH_URL: ${{ secrets.OS_AUTH_URL }}
+          OS_PROJECT_NAME: ${{ secrets.OS_PROJECT_NAME }}
+          OS_PROJECT_ID: ${{ secrets.OS_PROJECT_ID }}
+          OS_USERNAME: ${{ secrets.OS_USERNAME }}
+          OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
+          OS_APPLICATION_CREDENTIAL_ID: ${{ secrets.OS_APPLICATION_CREDENTIAL_ID }}
+          OS_APPLICATION_CREDENTIAL_SECRET: ${{ secrets.OS_APPLICATION_CREDENTIAL_SECRET }}
+          OS_AUTH_VERSION: ${{ secrets.OS_AUTH_VERSION }}
+          OS_IDENTITY_API_VERSION: ${{ secrets.OS_IDENTITY_API_VERSION }}
+        run: bash maintenance/repair_nectar_997.sh
