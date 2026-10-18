@@ -769,7 +769,7 @@
             ]
         },
         {
-            "application": "brainles-preprocessing_0.6.14_20261013",
+            "application": "brainles-preprocessing_0.6.14_20261017",
             "categories": [
                 "image registration",
                 "structural imaging"
@@ -777,6 +777,13 @@
         },
         {
             "application": "brainles-preprocessing_0.8.0_20260916",
+            "categories": [
+                "image registration",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "brainles-preprocessing_arm64_0.6.14_20261017",
             "categories": [
                 "image registration",
                 "structural imaging"
@@ -2662,7 +2669,7 @@
             ]
         },
         {
-            "application": "meica_4.0.1_20261016",
+            "application": "meica_4.0.1_20261017",
             "categories": [
                 "functional imaging",
                 "image reconstruction",
@@ -4639,7 +4646,7 @@
             ]
         },
         {
-            "application": "whitematterlesions_0.3.20261015_20261016",
+            "application": "whitematterlesions_0.3.20261015_20261017",
             "categories": [
                 "image segmentation",
                 "machine learning"
