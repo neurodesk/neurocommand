@@ -1552,7 +1552,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261017",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4659,6 +4659,11 @@
                 "version": "20261004",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "niimath 1.0.20261016": {
+                "version": "20261018",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4674,6 +4679,11 @@
             },
             "niimath_arm64 1.0.20260924": {
                 "version": "20261004",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "niimath_arm64 1.0.20261016": {
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5157,6 +5167,11 @@
                 "version": "20261015",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "qsiprep 26.1.1": {
+                "version": "20261018",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5528,7 +5543,7 @@
                 "apptainer_args": []
             },
             "relion 5.1.1": {
-                "version": "20261015",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
             }
