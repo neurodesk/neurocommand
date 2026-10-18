@@ -655,6 +655,27 @@ else
     exit 2
 fi
 
+# Reconcile startup bundles even for images installed by an earlier sync.
+prefetch_args=(--repo-root /cvmfs/neurodesk.ardc.edu.au
+    --log "$NEUROCOMMAND_LOCAL_REPO/cvmfs/log.txt")
+if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/prefetch_filebundles.py" "${prefetch_args[@]}" --check; then
+    PREFETCH_STATUS=0
+else
+    PREFETCH_STATUS=$?
+fi
+if [[ $PREFETCH_STATUS -eq 1 ]]; then
+    open_cvmfs_transaction neurodesk.ardc.edu.au
+    if python3 "$NEUROCOMMAND_LOCAL_REPO/cvmfs/prefetch_filebundles.py" "${prefetch_args[@]}"; then
+        publish_cvmfs_transaction neurodesk.ardc.edu.au "published FSL startup file bundle"
+    else
+        echo "[ERROR] Startup bundle publication failed. Aborting CVMFS transaction."
+        abort_cvmfs_transaction neurodesk.ardc.edu.au
+        exit 2
+    fi
+elif [[ $PREFETCH_STATUS -ne 0 ]]; then
+    exit 2
+fi
+
 # update neurocommand installation for the lxde menus:
 
 # to get this to work I manually created these on the CVMFS stratum 0 server:

@@ -30,6 +30,10 @@ jobs:
           python-version: "3.12"
       - name: Install test dependencies
         run: python -m pip install -r test/requirements.txt
+      - name: Install GUI profiling test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y strace xvfb xauth x11-utils
       - name: Run unit tests
         run: python maintenance/check.py tests
 
@@ -48,7 +52,7 @@ jobs:
       - name: Install module engine and test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ${{ matrix.package }}
+          sudo apt-get install -y ${{ matrix.package }} strace xvfb xauth x11-utils
           python -m pip install -r test/requirements.txt
       - name: Run complete suite with installed engine
         env:

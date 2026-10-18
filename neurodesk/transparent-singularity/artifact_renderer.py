@@ -21,6 +21,10 @@ class ModuleId:
     version: str
 
 
+CVMFS_STARTUP_MODULE = ModuleId("fsl", "6.0.7.23")
+CVMFS_STARTUP_TRIGGER = ".neurodesk-startup"
+
+
 _REVIEWED_LEGACY_MODULE_SHA256: dict[tuple[ModuleId, str], str] = {
     (
         ModuleId("mrtrix3src", "latest"),
@@ -259,6 +263,20 @@ def render_module(spec: ContainerSpec | BundleSpec, *, format: str) -> bytes:
                 f"setenv {tcl(key)} [string map [list BASEPATH $image] {tcl(value)}]"
             )
         snippet, marker = spec.manual_tcl, "#"
+    if spec.module == CVMFS_STARTUP_MODULE:
+        if format == "lua":
+            lines += [
+                'if mode() == "load" then',
+                f'    local trigger = io.open(pathJoin(container_dir, {lua(CVMFS_STARTUP_TRIGGER)}), "rb")',
+                "    if trigger then trigger:close() end",
+                "end",
+            ]
+        else:
+            lines += [
+                "if {[module-info mode load]} {",
+                f"    catch {{set trigger [open [file join $container_dir {tcl(CVMFS_STARTUP_TRIGGER)}] rb]; close $trigger}}",
+                "}",
+            ]
     if snippet:
         lines += [
             f"{marker} neurodesk-manual-module-begin",
