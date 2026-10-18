@@ -4,6 +4,9 @@ import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.request import urlopen
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -290,12 +293,98 @@ process_container_line "neurodesktop-lite_arm64_20260428_20260808 categories:pro
     )
 
 
-def test_transient_head_failure_does_not_trigger_large_recovery_download(tmp_path):
-    class TransientHeadHandler(BaseHTTPRequestHandler):
+@pytest.mark.parametrize("repair_succeeds", [True, False])
+def test_broken_public_get_is_repaired_from_aws(tmp_path, repair_succeeds):
+    payload = b"complete image"
+    uploaded = tmp_path / "uploaded"
+    validated = tmp_path / "validated"
+    image = tmp_path / "mrtrix3src_latest_20261017.simg"
+    downloads = []
+
+    class ObjectHandler(BaseHTTPRequestHandler):
+        def do_HEAD(self):
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+
+        def do_GET(self):
+            if self.path.startswith("/nectar/") and not (
+                repair_succeeds and uploaded.exists()
+            ):
+                self.send_response(409)
+                self.end_headers()
+                return
+            if self.headers.get("Range") == "bytes=0-0":
+                self.send_response(206)
+                self.send_header("Content-Range", f"bytes 0-0/{len(payload)}")
+                body = payload[:1]
+            else:
+                downloads.append(self.path)
+                self.send_response(200)
+                body = payload
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, format, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), ObjectHandler)
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    base = f"http://127.0.0.1:{server.server_port}"
+    script = f"""
+source {shlex.quote(str(SCRIPT))}
+IMAGE_HOME={shlex.quote(str(tmp_path))}
+NECTAR_BASE_URL={shlex.quote(base + "/nectar")}
+AWS_BASE_URL={shlex.quote(base + "/aws")}
+URL_CHECK_RETRIES=1
+DOWNLOAD_RETRIES=1
+SWIFT_UPLOAD_RETRIES=1
+singularity() {{
+    [[ "$*" == 'sif list --help' ]] && return 0
+    [[ "$1 $2" == 'sif list' ]] || return 99
+    [[ "$(cat "$3")" == 'complete image' ]] || return 98
+    touch {shlex.quote(str(validated))}
+    echo '1 | 1 | NONE | 0-{len(payload)} | FS'
+}}
+swift() {{
+    [[ -f {shlex.quote(str(validated))} ]] || return 97
+    cmp {shlex.quote(str(image))} <(printf 'complete image') || return 96
+    touch {shlex.quote(str(uploaded))}
+}}
+rclone() {{ return 95; }}
+process_container_line "{image.stem} categories:imaging,"
+"""
+    try:
+        result = subprocess.run(
+            ["bash", "-c", script], capture_output=True, text=True, timeout=10
+        )
+        assert uploaded.exists(), result.stdout + result.stderr
+        assert downloads == ["/aws/" + image.name]
+        if repair_succeeds:
+            assert result.returncode == 0, result.stdout + result.stderr
+            with urlopen(base + "/nectar/" + image.name) as response:
+                assert response.read() == payload
+            assert not image.exists()
+        else:
+            assert result.returncode != 0, result.stdout + result.stderr
+            assert image.read_bytes() == payload
+            assert "is released" not in result.stdout
+    finally:
+        server.shutdown()
+        server.server_close()
+        worker.join()
+
+
+def test_transient_get_failure_does_not_trigger_large_recovery_download(tmp_path):
+    class TransientGetHandler(BaseHTTPRequestHandler):
         nectar_attempts = 0
         missing_attempts = 0
+        ranges = []
 
-        def do_HEAD(self):
+        def do_GET(self):
+            type(self).ranges.append(self.headers.get("Range"))
             if self.path.startswith("/empty/"):
                 self.send_response(200)
                 self.send_header("Content-Length", "0")
@@ -311,17 +400,21 @@ def test_transient_head_failure_does_not_trigger_large_recovery_download(tmp_pat
                 type(self).nectar_attempts += 1
                 if type(self).nectar_attempts == 1:
                     self.send_response(503)
+                    self.send_header("Content-Length", "23")
                     self.end_headers()
+                    self.wfile.write(b"temporarily unavailable")
                     return
 
-            self.send_response(200)
-            self.send_header("Content-Length", "123")
+            self.send_response(206)
+            self.send_header("Content-Range", "bytes 0-0/123")
+            self.send_header("Content-Length", "1")
             self.end_headers()
+            self.wfile.write(b"x")
 
         def log_message(self, format, *args):
             pass
 
-    server = ThreadingHTTPServer(("127.0.0.1", 0), TransientHeadHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", 0), TransientGetHandler)
     server_thread = threading.Thread(target=server.serve_forever, daemon=True)
     server_thread.start()
     recovery_calls = tmp_path / "recovery.log"
@@ -372,9 +465,80 @@ process_container_line "neurodesktop-lite_arm64_20260428_20260808 categories:pro
         server_thread.join()
 
     assert result.returncode == 0, result.stderr + result.stdout
-    assert TransientHeadHandler.missing_attempts == 1
-    assert TransientHeadHandler.nectar_attempts == 2
+    assert TransientGetHandler.missing_attempts == 1
+    assert TransientGetHandler.nectar_attempts == 2
+    assert TransientGetHandler.ranges == ["bytes=0-0"] * 5
     assert not recovery_calls.exists()
+
+
+@pytest.mark.parametrize(
+    ("status", "content_range", "content_length", "body"),
+    [
+        (206, None, "1", b"x"),
+        (206, "bytes 1-1/123", "1", b"x"),
+        (206, "bytes 0-1/123", "1", b"x"),
+        (206, "bytes 0-0/0", "1", b"x"),
+        (206, "bytes 0-0/*", "1", b"x"),
+        (206, "bytes 0-0/123", None, b""),
+        (206, "bytes 0-0/123", "1", b""),
+        (206, "bytes 0-0/123", "2", b"xx"),
+        (200, "bytes 0-0/123", "1", b"x"),
+        (200, None, "8589934592", None),
+        (200, None, None, None),
+    ],
+)
+def test_readiness_rejects_invalid_or_unbounded_get(
+    status, content_range, content_length, body
+):
+    sent = 0
+    stream_size = 8 * 1024 * 1024
+
+    class InvalidRangeHandler(BaseHTTPRequestHandler):
+        def do_HEAD(self):
+            self.send_response(200)
+            self.send_header("Content-Length", "123")
+            self.end_headers()
+
+        def do_GET(self):
+            nonlocal sent
+            self.send_response(status)
+            if content_range is not None:
+                self.send_header("Content-Range", content_range)
+            if content_length is not None:
+                self.send_header("Content-Length", content_length)
+            self.end_headers()
+            try:
+                if body is not None:
+                    self.wfile.write(body)
+                else:
+                    while sent < stream_size:
+                        self.wfile.write(b"x" * 65536)
+                        sent += 65536
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+
+        def log_message(self, format, *args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), InvalidRangeHandler)
+    worker = threading.Thread(target=server.serve_forever, daemon=True)
+    worker.start()
+    script = f"""
+source {shlex.quote(str(SCRIPT))}
+URL_CHECK_RETRIES=1
+url_size http://127.0.0.1:{server.server_port}/image.simg
+"""
+    try:
+        result = subprocess.run(
+            ["bash", "-c", script], capture_output=True, text=True, timeout=5
+        )
+        assert result.returncode != 0, result.stdout + result.stderr
+        assert not result.stdout
+        assert sent < stream_size
+    finally:
+        server.shutdown()
+        server.server_close()
+        worker.join()
 
 
 def test_rclone_copy_uses_retry_flags_and_retries_failures(tmp_path):

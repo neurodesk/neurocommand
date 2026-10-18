@@ -49,20 +49,36 @@ run_with_retries() {
 
 url_size() {
     local url="$1"
-    local retry_count headers size
+    local retry_count probe size received_size
     retry_count=$((URL_CHECK_RETRIES > 0 ? URL_CHECK_RETRIES - 1 : 0))
+    probe="$(mktemp -d)" || return 1
 
-    # Let curl retry transient network and HTTP failures (for example 503),
-    # while still returning immediately for a genuine missing object (404).
-    headers="$(curl --silent --head --fail \
+    # HEAD can succeed for a Swift manifest whose public GET fails. Sample the
+    # first byte; this does not verify every segment of a large object.
+    # Cap ignored ranges with head; --max-filesize also rejects 503 error
+    # bodies before curl can retry them.
+    if ! curl --silent --fail --range 0-0 \
         --connect-timeout "$CURL_CONNECT_TIMEOUT" \
         --max-time "$SWIFT_REQUEST_TIMEOUT" \
         --retry "$retry_count" \
         --retry-delay "$URL_CHECK_RETRY_DELAY" \
         --retry-connrefused \
-        "$url")" || return 1
-    size="$(awk 'tolower($1) == "content-length:" {gsub("\r", "", $2); size=$2} END {print size}' <<< "$headers")"
-    [[ "$size" =~ ^[1-9][0-9]*$ ]] || return 1
+        --dump-header "$probe/headers" \
+        "$url" | head -c 2 > "$probe/body"; then
+        rm -rf "$probe"
+        return 1
+    fi
+    received_size="$(stat -c %s "$probe/body")"
+    size="$(awk '
+        /^HTTP\// {status=$2; size=""}
+        tolower($1) == "content-range:" && $2 == "bytes" {
+            gsub("\r", "", $3)
+            if ($3 ~ /^0-0\/[1-9][0-9]*$/) {size=substr($3, 5)}
+        }
+        END {if (status == 206) print size}
+    ' "$probe/headers")"
+    rm -rf "$probe"
+    [[ "$received_size" == 1 && "$size" =~ ^[1-9][0-9]*$ ]] || return 1
     echo "$size"
 }
 
@@ -265,7 +281,7 @@ upload_nectar_image() {
     # each segment's size and checksum before publishing a complete manifest.
     # Keep segments in the public container so anonymous downloads can read them.
     run_with_retries "upload ${image_path##*/} to Nectar" "$SWIFT_UPLOAD_RETRIES" "$SWIFT_UPLOAD_RETRY_DELAY" \
-        swift_client upload --use-slo \
+        swift_client upload --use-slo --leave-segments \
         --segment-size "$SWIFT_SEGMENT_SIZE" --segment-container neurodesk \
         --object-name "${image_path##*/}" neurodesk "$image_path"
 }
@@ -286,9 +302,9 @@ ensure_released() {
         rclone_copy_image "$image_path" aws-neurocontainers-new:/neurocontainers/ "upload ${image_builddate}.simg to AWS"
     fi
 
-    run_with_retries "confirm Nectar image size" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" \
+    run_with_retries "confirm Nectar image download" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" \
         url_matches_size "$nectar_url" "$image_size"
-    run_with_retries "confirm AWS image size" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" \
+    run_with_retries "confirm AWS image download" "$URL_CHECK_RETRIES" "$URL_CHECK_RETRY_DELAY" \
         url_matches_size "$aws_url" "$image_size"
     echo "[DEBUG] ${image_builddate}.simg is released in Nectar and AWS"
 }
@@ -318,7 +334,7 @@ process_container_line() {
         return 0
     fi
 
-    echo "[DEBUG] ${image_builddate}.simg is missing or has inconsistent sizes across object stores"
+    echo "[DEBUG] ${image_builddate}.simg is unavailable or has inconsistent sizes across object stores"
     if ! ensure_valid_local_image "$image_path"; then
         if url_exists "$aws_url"; then
             echo "[DEBUG] ${image_builddate}.simg exists in AWS; downloading to local cache"

@@ -76,8 +76,16 @@ def test_nectar_upload_publishes_only_complete_objects(
                     ).encode(),
                     **{"Content-Type": "application/json"},
                 )
-            elif path in objects:
-                self.respond(200, objects[path])
+            elif path == "/aws/" + image.name or path in objects:
+                body = payload if path.startswith("/aws/") else objects[path]
+                if self.headers.get("Range") == "bytes=0-0":
+                    self.respond(
+                        206,
+                        body[:1],
+                        **{"Content-Range": f"bytes 0-0/{len(body)}"},
+                    )
+                else:
+                    self.respond(200, body)
             else:
                 # Newly uploaded segments are absent from container listings.
                 self.respond(200, b"[]", **{"Content-Type": "application/json"})
@@ -271,7 +279,7 @@ upload_nectar_image /cache/image.simg
     assert result.returncode == 7, result.stdout + result.stderr
     arguments = calls.read_text().splitlines()
     expected = (
-        "--timeout 60 upload --use-slo --segment-size 1073741824 --segment-container neurodesk "
+        "--timeout 60 upload --use-slo --leave-segments --segment-size 1073741824 --segment-container neurodesk "
         "--object-name image.simg neurodesk /cache/image.simg"
     )
     if application_credentials:
