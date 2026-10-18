@@ -4509,7 +4509,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261016",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4530,7 +4530,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261016",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5226,7 +5226,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261017",
+                "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
             },
