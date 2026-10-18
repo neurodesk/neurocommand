@@ -86,9 +86,12 @@ ADD ${NEURODESKTOP_RAW}/neurodesk.ardc.edu.au.conf                 /etc/cvmfs/co
 ADD ${NEURODESKTOP_JUPYTER_RAW}/cvmfs_server_select.sh             /opt/neurodesktop/cvmfs_server_select.sh
 ADD ${NEURODESKTOP_JUPYTER_RAW}/cvmfs_server_select.py             /opt/neurodesktop/cvmfs_server_select.py
 
+COPY cvmfs/neurodesk.ardc.edu.au.local /etc/cvmfs/config.d/neurodesk.ardc.edu.au.local
+
 RUN chmod 0644 /etc/cvmfs/keys/ardc.edu.au/neurodesk.ardc.edu.au.pub \
               /etc/cvmfs/default.local \
               /etc/cvmfs/config.d/neurodesk.ardc.edu.au.conf \
+              /etc/cvmfs/config.d/neurodesk.ardc.edu.au.local \
               /opt/neurodesktop/cvmfs_server_select.py \
     && chmod 0755 /opt/neurodesktop/cvmfs_server_select.sh
 

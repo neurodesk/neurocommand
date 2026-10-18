@@ -48,6 +48,11 @@ CVMFS discovery, default `/cvmfs/neurodesk.ardc.edu.au`; local and copied module
 trees retain their own root. Loading and running an existing deployment never
 regenerates files or downloads an image.
 
+For `fsl/6.0.7.23`, loading the module also opens an optional startup trigger.
+On a client with CVMFS file bundles enabled, this starts asynchronous prefetching
+of FSL GUI and FSLeyes startup files. The publisher records and publishes that
+bundle separately; see [FSL startup bundle publication](../../docs/cvmfs-prefetch.md).
+
 Offline `--refresh` reads saved inventories and requires no runtime. Recognized
 historical wrappers migrate; custom, disabled, symlink and non-executable targets
 remain intact. Generated modulefiles carry a content checksum. Custom edits are

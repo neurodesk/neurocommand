@@ -1,0 +1,2 @@
+# Read once at mount time. CVMFS 2.14.1 fixes asynchronous bundle prefetching.
+CVMFS_PREFETCH_FILEBUNDLES=yes
