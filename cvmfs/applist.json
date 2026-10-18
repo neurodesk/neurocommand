@@ -1180,7 +1180,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261017",
+            "application": "cryosparc_1.0.0_20261018",
             "categories": [
                 "cryo EM"
             ]
@@ -3184,6 +3184,12 @@
             ]
         },
         {
+            "application": "niimath_1.0.20261016_20261018",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "niimath_arm64_1.0.20260703_20260909",
             "categories": [
                 "data organisation"
@@ -3191,6 +3197,12 @@
         },
         {
             "application": "niimath_arm64_1.0.20260924_20261004",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "niimath_arm64_1.0.20261016_20261018",
             "categories": [
                 "data organisation"
             ]
@@ -3477,6 +3489,12 @@
         },
         {
             "application": "qsiprep_26.1.0_20261015",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "qsiprep_26.1.1_20261018",
             "categories": [
                 "diffusion imaging"
             ]
@@ -3877,7 +3895,7 @@
             ]
         },
         {
-            "application": "relion_5.1.1_20261015",
+            "application": "relion_5.1.1_20261018",
             "categories": [
                 "cryo EM"
             ]
