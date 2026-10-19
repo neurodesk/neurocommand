@@ -2164,7 +2164,19 @@
                 "exec": ""
             },
             "elastix 5.3.1": {
-                "version": "20260925",
+                "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration"
+        ]
+    },
+    "elastix_arm64": {
+        "apps": {
+            "elastix_arm64 5.3.1": {
+                "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2198,7 +2210,20 @@
     "emuses": {
         "apps": {
             "emuses 1.3.0": {
-                "version": "20260526",
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning",
+            "statistics"
+        ]
+    },
+    "emuses_arm64": {
+        "apps": {
+            "emuses_arm64 1.3.0": {
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2548,12 +2573,12 @@
                 "apptainer_args": []
             },
             "freesurfer 8.2.0": {
-                "version": "20261005",
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             },
             "freeviewGUI-freesurfer 8.2.0": {
-                "version": "20261005",
+                "version": "20261019",
                 "exec": "freeview",
                 "apptainer_args": []
             }
@@ -2895,6 +2920,23 @@
             "glmsingle 1.2": {
                 "version": "20240520",
                 "exec": ""
+            },
+            "glmsingle 1.2.0": {
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "functional imaging"
+        ]
+    },
+    "glmsingle_arm64": {
+        "apps": {
+            "glmsingle_arm64 1.2.0": {
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4509,7 +4551,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261018",
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4530,7 +4572,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261018",
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4555,8 +4597,22 @@
     "nftsim": {
         "apps": {
             "nftsim 1.0.2": {
-                "version": "20250725",
-                "exec": ""
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "hippocampus",
+            "programming"
+        ]
+    },
+    "nftsim_arm64": {
+        "apps": {
+            "nftsim_arm64 1.0.2": {
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5097,7 +5153,19 @@
                 "apptainer_args": []
             },
             "pydeface 2.1.0": {
-                "version": "20261006",
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation"
+        ]
+    },
+    "pydeface_arm64": {
+        "apps": {
+            "pydeface_arm64 2.1.0": {
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5566,6 +5634,11 @@
                 "version": "20261013",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "romeo 4.9.1": {
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5576,6 +5649,11 @@
         "apps": {
             "romeo_arm64 4.9.0": {
                 "version": "20261013",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "romeo_arm64 4.9.1": {
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6531,6 +6609,11 @@
                 "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "vertexwiser 1.5.5": {
+                "version": "20261019",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -6547,6 +6630,11 @@
             },
             "vertexwiser_arm64 1.5.4": {
                 "version": "20261014",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vertexwiser_arm64 1.5.5": {
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6579,6 +6667,11 @@
             },
             "vesselboost 2.0.23": {
                 "version": "20260415",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vesselboost 2.0.5": {
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -6658,6 +6751,11 @@
         "apps": {
             "vmtk 1.5.0": {
                 "version": "20260604",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vmtk 1.5.2": {
+                "version": "20261019",
                 "exec": "",
                 "apptainer_args": []
             }
