@@ -1619,7 +1619,13 @@
             ]
         },
         {
-            "application": "elastix_5.3.1_20260925",
+            "application": "elastix_5.3.1_20261013",
+            "categories": [
+                "image registration"
+            ]
+        },
+        {
+            "application": "elastix_arm64_5.3.1_20261013",
             "categories": [
                 "image registration"
             ]
@@ -1631,7 +1637,14 @@
             ]
         },
         {
-            "application": "emuses_1.3.0_20260526",
+            "application": "emuses_1.3.0_20261019",
+            "categories": [
+                "machine learning",
+                "statistics"
+            ]
+        },
+        {
+            "application": "emuses_arm64_1.3.0_20261019",
             "categories": [
                 "machine learning",
                 "statistics"
@@ -1906,7 +1919,7 @@
             ]
         },
         {
-            "application": "freesurfer_8.2.0_20261005",
+            "application": "freesurfer_8.2.0_20261019",
             "categories": [
                 "image segmentation",
                 "structural imaging"
@@ -2153,6 +2166,18 @@
         },
         {
             "application": "glmsingle_1.2_20240520",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "glmsingle_1.2.0_20261019",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "glmsingle_arm64_1.2.0_20261019",
             "categories": [
                 "functional imaging"
             ]
@@ -3102,7 +3127,14 @@
             ]
         },
         {
-            "application": "nftsim_1.0.2_20250725",
+            "application": "nftsim_1.0.2_20261019",
+            "categories": [
+                "hippocampus",
+                "programming"
+            ]
+        },
+        {
+            "application": "nftsim_arm64_1.0.2_20261019",
             "categories": [
                 "hippocampus",
                 "programming"
@@ -3437,7 +3469,13 @@
             ]
         },
         {
-            "application": "pydeface_2.1.0_20261006",
+            "application": "pydeface_2.1.0_20261019",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "pydeface_arm64_2.1.0_20261019",
             "categories": [
                 "image segmentation"
             ]
@@ -3919,7 +3957,19 @@
             ]
         },
         {
+            "application": "romeo_4.9.1_20261019",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
             "application": "romeo_arm64_4.9.0_20261013",
+            "categories": [
+                "phase processing"
+            ]
+        },
+        {
+            "application": "romeo_arm64_4.9.1_20261019",
             "categories": [
                 "phase processing"
             ]
@@ -4541,6 +4591,13 @@
             ]
         },
         {
+            "application": "vertexwiser_1.5.5_20261019",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "vertexwiser_arm64_1.5.1_20261013",
             "categories": [
                 "structural imaging",
@@ -4549,6 +4606,13 @@
         },
         {
             "application": "vertexwiser_arm64_1.5.4_20261014",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "vertexwiser_arm64_1.5.5_20261019",
             "categories": [
                 "structural imaging",
                 "workflows"
@@ -4580,6 +4644,12 @@
         },
         {
             "application": "vesselboost_2.0.23_20260415",
+            "categories": [
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "vesselboost_2.0.5_20261019",
             "categories": [
                 "image segmentation"
             ]
@@ -4630,6 +4700,14 @@
         },
         {
             "application": "vmtk_1.5.0_20260604",
+            "categories": [
+                "image segmentation",
+                "shape analysis",
+                "visualization"
+            ]
+        },
+        {
+            "application": "vmtk_1.5.2_20261019",
             "categories": [
                 "image segmentation",
                 "shape analysis",
