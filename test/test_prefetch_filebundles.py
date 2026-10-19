@@ -177,7 +177,7 @@ def test_missing_latest_install_defers_without_falling_back(repository):
 def test_profiles_real_gui_windows_and_records_their_opened_files(
     repository, monkeypatch, tmp_path
 ):
-    for program in ("xvfb-run", "xauth", "xwininfo", "xmessage", "strace"):
+    for program in ("xvfb-run", "xauth", "xwininfo", "xprop", "xmessage", "strace"):
         if not shutil.which(program):
             pytest.skip(f"GUI profiling test requires {program}")
     repo, directory, image, fsl, log = repository
@@ -186,7 +186,12 @@ def test_profiles_real_gui_windows_and_records_their_opened_files(
     # Use real X11 windows and strace, with a runtime adapter for the test image.
     runtime = tmp_path / "runtime"
     runtime.write_text("""#!/usr/bin/env python3
-import os, pathlib, sys
+import os, pathlib, subprocess, sys
+# The display must survive gaps between the window probe and GUI clients.
+subprocess.run(['xprop', '-root', '-f', 'NEURODESK_PROFILE_READY', '8s',
+                '-set', 'NEURODESK_PROFILE_READY', 'ready'], check=True)
+state = subprocess.check_output(['xprop', '-root', 'NEURODESK_PROFILE_READY'], text=True)
+assert state.strip() == 'NEURODESK_PROFILE_READY(STRING) = "ready"', state
 args = sys.argv[1:]
 binding = args[args.index('--bind') + 1].split(':')[0]
 index = args.index('strace')

@@ -211,7 +211,9 @@ def capture_startup(image: Path) -> set[Path]:
                 "xvfb-run",
                 "--auto-servernum",
                 "--error-file=" + str(traces / "xvfb.log"),
-                "--server-args=-screen 0 1280x1024x24 +extension GLX",
+                # Window probes disconnect before the GUI connects; keep Xvfb
+                # from resetting during those gaps and rejecting new clients.
+                "--server-args=-screen 0 1280x1024x24 +extension GLX -noreset",
                 sys.executable,
                 str(Path(__file__).resolve()),
                 "--record-guis",
