@@ -5145,6 +5145,19 @@
             "quality control"
         ]
     },
+    "prostatefiducialseg": {
+        "apps": {
+            "prostatefiducialseg 8.0.1": {
+                "version": "20261020",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image segmentation"
+        ]
+    },
     "pydeface": {
         "apps": {
             "pydeface 2.0.2": {
@@ -5309,7 +5322,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261018",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             },
