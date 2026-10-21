@@ -1665,6 +1665,13 @@
             ]
         },
         {
+            "application": "ep3d_1.0.0_20261020",
+            "categories": [
+                "image reconstruction",
+                "phase processing"
+            ]
+        },
+        {
             "application": "epirecon_0.0.4_20260908",
             "categories": [
                 "image reconstruction"
