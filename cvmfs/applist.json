@@ -3466,6 +3466,13 @@
             ]
         },
         {
+            "application": "prostatefiducialseg_8.0.3_20261021",
+            "categories": [
+                "body",
+                "image segmentation"
+            ]
+        },
+        {
             "application": "pydeface_2.0.2_20260417",
             "categories": [
                 "image segmentation"
