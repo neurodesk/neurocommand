@@ -1,26 +1,4 @@
 {
-    "acsrss": {
-        "apps": {
-            "acsrss 0.1.1": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "acsrss 0.1.2": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "acsrss 0.1.4": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
     "afni": {
         "apps": {
             "afni 21.2.00": {
@@ -2254,7 +2232,7 @@
     "ep3d": {
         "apps": {
             "ep3d 1.0.0": {
-                "version": "20261020",
+                "version": "20261021",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5164,6 +5142,11 @@
                 "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "prostatefiducialseg 8.0.2": {
+                "version": "20261021",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5335,7 +5318,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261020",
+                "version": "20261021",
                 "exec": "",
                 "apptainer_args": []
             },
