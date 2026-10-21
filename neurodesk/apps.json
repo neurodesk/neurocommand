@@ -5147,6 +5147,11 @@
                 "version": "20261021",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "prostatefiducialseg 8.0.3": {
+                "version": "20261021",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
