@@ -380,12 +380,6 @@
             ]
         },
         {
-            "application": "bcbtoolkit_5.3.0_20261002",
-            "categories": [
-                "structural imaging"
-            ]
-        },
-        {
             "application": "bcbtoolkit_5.4.1_20261012",
             "categories": [
                 "structural imaging"
