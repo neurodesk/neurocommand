@@ -441,11 +441,6 @@
                 "exec": "",
                 "apptainer_args": []
             },
-            "bcbtoolkit 5.3.0": {
-                "version": "20261002",
-                "exec": "",
-                "apptainer_args": []
-            },
             "bcbtoolkit 5.4.1": {
                 "version": "20261012",
                 "exec": "",
