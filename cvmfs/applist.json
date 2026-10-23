@@ -558,6 +558,13 @@
             ]
         },
         {
+            "application": "bidsmanager_1.5.1_20261021",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidsmanager_arm64_1.2.6.1_20260912",
             "categories": [
                 "bids apps",
@@ -587,6 +594,13 @@
         },
         {
             "application": "bidsmanager_arm64_1.5.0_20261016",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsmanager_arm64_1.5.1_20261021",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -950,6 +964,14 @@
             ]
         },
         {
+            "application": "cat12_26.0.1_20261022",
+            "categories": [
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "cat12_26.0.rc3_20260521",
             "categories": [
                 "image registration",
@@ -1070,13 +1092,13 @@
             ]
         },
         {
-            "application": "code_240320_20261016",
+            "application": "code_240320_20261020",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261016",
+            "application": "code_arm64_240320_20261020",
             "categories": [
                 "programming"
             ]
@@ -2160,13 +2182,13 @@
             ]
         },
         {
-            "application": "glmsingle_1.2.0_20261019",
+            "application": "glmsingle_1.2.0_20261020",
             "categories": [
                 "functional imaging"
             ]
         },
         {
-            "application": "glmsingle_arm64_1.2.0_20261019",
+            "application": "glmsingle_arm64_1.2.0_20261020",
             "categories": [
                 "functional imaging"
             ]
@@ -2846,13 +2868,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261017",
+            "application": "mne_1.13.2_20261022",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261017",
+            "application": "mne_arm64_1.13.2_20261022",
             "categories": [
                 "electrophysiology"
             ]
@@ -3116,6 +3138,13 @@
         },
         {
             "application": "networkcorrespondancetoolkit_0.3.3_20261014",
+            "categories": [
+                "data organisation",
+                "image registration"
+            ]
+        },
+        {
+            "application": "networkcorrespondancetoolkit_0.4.1_20261023",
             "categories": [
                 "data organisation",
                 "image registration"
@@ -3492,7 +3521,7 @@
             ]
         },
         {
-            "application": "prostatefiducialseg_8.0.3_20261021",
+            "application": "prostatefiducialseg_8.0.3_20261023",
             "categories": [
                 "body",
                 "image segmentation"
@@ -4812,13 +4841,31 @@
             ]
         },
         {
+            "application": "xcpd_26.2.0_20261023",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "xmipp_6.0.0_20261012",
             "categories": [
                 "cryo EM"
             ]
         },
         {
+            "application": "xnat_1.10.0_20261023",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "xnat_1.9.2.1_20261014",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "xnat_arm64_1.10.0_20261023",
             "categories": [
                 "data organisation"
             ]
