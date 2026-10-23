@@ -697,6 +697,12 @@
             ]
         },
         {
+            "application": "blender_5.2.3_20261023",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
             "application": "blochsiegertb1mapping_1.1.0_20260915",
             "categories": [
                 "image reconstruction"
@@ -2184,7 +2190,19 @@
             ]
         },
         {
+            "application": "globus_3.3.2_20261023",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "globus_arm64_3.3.1_20261013",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "globus_arm64_3.3.2_20261023",
             "categories": [
                 "data organisation"
             ]
@@ -2683,6 +2701,20 @@
                 "image reconstruction",
                 "quality control",
                 "workflows"
+            ]
+        },
+        {
+            "application": "meica-rs_0.1.20261021_20261023",
+            "categories": [
+                "functional imaging",
+                "quality control"
+            ]
+        },
+        {
+            "application": "meica-rs_arm64_0.1.20261021_20261023",
+            "categories": [
+                "functional imaging",
+                "quality control"
             ]
         },
         {
@@ -4004,7 +4036,21 @@
             ]
         },
         {
+            "application": "rshrf_1.8.0_20261023",
+            "categories": [
+                "bids apps",
+                "functional imaging"
+            ]
+        },
+        {
             "application": "rshrf_arm64_1.7.0_20261013",
+            "categories": [
+                "bids apps",
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "rshrf_arm64_1.8.0_20261023",
             "categories": [
                 "bids apps",
                 "functional imaging"
@@ -4747,6 +4793,13 @@
         },
         {
             "application": "whitematterlesions_0.3.20261015_20261017",
+            "categories": [
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "whitematterlesions_0.5.20261022_20261023",
             "categories": [
                 "image segmentation",
                 "machine learning"
