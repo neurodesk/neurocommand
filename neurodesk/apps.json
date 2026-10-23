@@ -626,6 +626,11 @@
                 "version": "20261016",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "bidsmanager 1.5.1": {
+                "version": "20261021",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -657,6 +662,11 @@
             },
             "bidsmanager_arm64 1.5.0": {
                 "version": "20261016",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "bidsmanager_arm64 1.5.1": {
+                "version": "20261021",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1211,6 +1221,16 @@
                 "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
                 "apptainer_args": []
             },
+            "cat12 26.0.1": {
+                "version": "20261022",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "cat12GUI-cat12 26.0.1": {
+                "version": "20261022",
+                "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": []
+            },
             "cat12 26.0.rc3": {
                 "version": "20260521",
                 "exec": "",
@@ -1384,7 +1404,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261016",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1396,7 +1416,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261016",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2918,7 +2938,7 @@
                 "exec": ""
             },
             "glmsingle 1.2.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2930,7 +2950,7 @@
     "glmsingle_arm64": {
         "apps": {
             "glmsingle_arm64 1.2.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4090,7 +4110,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261017",
+                "version": "20261022",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4102,7 +4122,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261017",
+                "version": "20261022",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4544,6 +4564,11 @@
                 "version": "20261014",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "networkcorrespondancetoolkit 0.4.1": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4593,7 +4618,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite 20260428.1.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4614,7 +4639,7 @@
                 "apptainer_args": []
             },
             "neurodesktop-lite_arm64 20260428.1.0": {
-                "version": "20261019",
+                "version": "20261020",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5200,7 +5225,7 @@
                 "apptainer_args": []
             },
             "prostatefiducialseg 8.0.3": {
-                "version": "20261021",
+                "version": "20261023",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6943,6 +6968,11 @@
                 "version": "20260608",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "xcpd 26.2.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -6963,6 +6993,11 @@
     },
     "xnat": {
         "apps": {
+            "xnat 1.10.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": []
+            },
             "xnat 1.9.2.1": {
                 "version": "20261014",
                 "exec": "",
@@ -6975,6 +7010,11 @@
     },
     "xnat_arm64": {
         "apps": {
+            "xnat_arm64 1.10.0": {
+                "version": "20261023",
+                "exec": "",
+                "apptainer_args": []
+            },
             "xnat_arm64 1.9.2.1": {
                 "version": "20261014",
                 "exec": "",
