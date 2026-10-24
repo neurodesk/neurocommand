@@ -96,6 +96,16 @@
                 "version": "20261015",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.05": {
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.05": {
+                "version": "20261024",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1404,7 +1414,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261020",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1416,7 +1426,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261020",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4110,7 +4120,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261022",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4122,7 +4132,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261022",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5399,7 +5409,7 @@
     "qsmxt": {
         "apps": {
             "qsmxt 10.0.0": {
-                "version": "20261021",
+                "version": "20261023",
                 "exec": "",
                 "apptainer_args": []
             },
