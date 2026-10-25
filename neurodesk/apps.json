@@ -283,6 +283,30 @@
             "programming"
         ]
     },
+    "arfimapping": {
+        "apps": {
+            "arfimapping 1.0.12": {
+                "version": "20261025",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "arfirecon": {
+        "apps": {
+            "arfirecon 1.0.1": {
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "ashs": {
         "apps": {
             "ashs 2.0.0": {
@@ -862,7 +886,7 @@
     "blochsiegertb1mapping": {
         "apps": {
             "blochsiegertb1mapping 1.1.0": {
-                "version": "20260915",
+                "version": "20261025",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -874,7 +898,7 @@
     "braid": {
         "apps": {
             "braid 1.0.0": {
-                "version": "20260722",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -904,7 +928,7 @@
     "brainles-aurora": {
         "apps": {
             "brainles-aurora 0.2.7": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -918,7 +942,7 @@
     "brainles-aurora_arm64": {
         "apps": {
             "brainles-aurora_arm64 0.2.7": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1143,7 +1167,7 @@
                 "apptainer_args": []
             },
             "brats 0.1.13": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -1785,7 +1809,7 @@
     "deep-quality-estimation": {
         "apps": {
             "deep-quality-estimation 0.0.3": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1799,7 +1823,7 @@
     "deep-quality-estimation_arm64": {
         "apps": {
             "deep-quality-estimation_arm64 0.0.3": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1929,7 +1953,7 @@
     "deepsif": {
         "apps": {
             "deepsif 0.0.1": {
-                "version": "20260629",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2280,7 +2304,7 @@
     "epirecon": {
         "apps": {
             "epirecon 0.0.4": {
-                "version": "20260908",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2305,6 +2329,11 @@
         "apps": {
             "esilpd 0.0.1": {
                 "version": "20260629",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "esilpd 0.1.0": {
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2930,7 +2959,21 @@
     "gliomoda": {
         "apps": {
             "gliomoda 0.0.4": {
-                "version": "20260824",
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
+    "gliomoda_arm64": {
+        "apps": {
+            "gliomoda_arm64 0.0.4": {
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3445,7 +3488,7 @@
                 "exec": ""
             },
             "lashis 2.0.0": {
-                "version": "20260508",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4149,7 +4192,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261017",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4162,7 +4205,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261017",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4467,7 +4510,7 @@
                 "apptainer_args": []
             },
             "musclemap 1.4.0": {
-                "version": "20260827",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4945,7 +4988,7 @@
                 "apptainer_args": []
             },
             "openmsk 0.2.0": {
-                "version": "20261015",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4959,6 +5002,18 @@
         "apps": {
             "openreconacsrss 0.1.0": {
                 "version": "20260916",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "openreconexample": {
+        "apps": {
+            "openreconexample 1.0.0": {
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5063,12 +5118,12 @@
                 "exec": "palmettobug"
             },
             "palmettobug 0.2.11": {
-                "version": "20260911",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             },
             "palmettobugGUI-palmettobug 0.2.11": {
-                "version": "20260911",
+                "version": "20261024",
                 "exec": "palmettobug",
                 "apptainer_args": []
             }
@@ -5139,7 +5194,7 @@
                 "exec": ""
             },
             "pcntoolkit 1.3.0": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5151,7 +5206,7 @@
     "pcntoolkit_arm64": {
         "apps": {
             "pcntoolkit_arm64 1.3.0": {
-                "version": "20261012",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5181,7 +5236,21 @@
     "petu": {
         "apps": {
             "petu 0.0.7": {
-                "version": "20260822",
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "structural imaging"
+        ]
+    },
+    "petu_arm64": {
+        "apps": {
+            "petu_arm64 0.0.7": {
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5212,7 +5281,7 @@
     "prequal": {
         "apps": {
             "prequal 1.1.0": {
-                "version": "20260604",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5964,12 +6033,12 @@
     "sigviewer": {
         "apps": {
             "sigviewer 0.6.4": {
-                "version": "20261013",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             },
             "sigviewerGUI-sigviewer 0.6.4": {
-                "version": "20261013",
+                "version": "20261024",
                 "exec": "sigviewer",
                 "apptainer_args": []
             }
@@ -5981,12 +6050,12 @@
     "sigviewer_arm64": {
         "apps": {
             "sigviewer_arm64 0.6.4": {
-                "version": "20261013",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             },
             "sigviewerGUI-sigviewer_arm64 0.6.4": {
-                "version": "20261013",
+                "version": "20261024",
                 "exec": "sigviewer",
                 "apptainer_args": []
             }
@@ -6101,10 +6170,34 @@
             "structural imaging"
         ]
     },
+    "sodiumgridding": {
+        "apps": {
+            "sodiumgridding 0.1.6": {
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
     "sodiumgriddingptpi": {
         "apps": {
             "sodiumgriddingptpi 0.1.10": {
-                "version": "20260803",
+                "version": "20261024",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
+        ]
+    },
+    "sodiumnufft": {
+        "apps": {
+            "sodiumnufft 0.1.10": {
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6445,7 +6538,7 @@
     "synthseg": {
         "apps": {
             "synthseg 8.2.0": {
-                "version": "20261016",
+                "version": "20261025",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -6781,7 +6874,7 @@
                 "apptainer_args": []
             },
             "vesselboost 2.0.5": {
-                "version": "20261019",
+                "version": "20261024",
                 "exec": "",
                 "apptainer_args": []
             },
