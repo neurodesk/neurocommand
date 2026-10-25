@@ -21,7 +21,9 @@ METADATA_FILES=(cvmfs/log.txt cvmfs/applist.json)
 TITLE="Publish CVMFS metadata for uploaded containers"
 
 verified_apps=""
-LAG_SECONDS="${CVMFS_METADATA_LAG_SECONDS:-21600}"
+# Consolidated batches install sequentially, including publication and garbage
+# collection per container. A healthy rollout can take longer than six hours.
+LAG_SECONDS="${CVMFS_METADATA_LAG_SECONDS:-86400}"
 [[ "$LAG_SECONDS" =~ ^[0-9]+$ ]] || { echo "[ERROR] Invalid CVMFS_METADATA_LAG_SECONDS"; exit 1; }
 
 report() {

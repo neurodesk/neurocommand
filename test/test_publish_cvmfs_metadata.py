@@ -5,6 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / ".github" / "workflows" / "scripts" / "publish_cvmfs_metadata.sh"
 
@@ -380,6 +382,43 @@ def test_publication_error_and_prolonged_lag_fail_without_pushing(tmp_path):
         result = _publish(work, uploaded, {**env, "CVMFS_METADATA_LAG_SECONDS": "0"})
         assert result.returncode == 1, result.stdout + result.stderr
         assert _git(origin, "branch", "--list", "bot/cvmfs-metadata") == ""
+    assert _merges(tmp_path) == []
+
+
+@pytest.mark.parametrize("missing", ["object", "cvmfs"])
+@pytest.mark.parametrize(
+    ("age", "lag_override", "expected_status"),
+    [
+        (8 * 3600, None, 0),
+        (24 * 3600 - 1, None, 0),
+        (24 * 3600, None, 1),
+        (8 * 3600, "21600", 1),
+    ],
+)
+def test_large_batch_publication_deadline(
+    tmp_path, missing, age, lag_override, expected_status
+):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    uploaded = _bump(seed, "20261010", uploaded=missing != "object")
+    if missing == "cvmfs":
+        (state / "publication-status").write_text("3")
+    changed = int(_git(seed, "show", "-s", "--format=%ct", uploaded))
+    clock = tmp_path / "bin" / "date"
+    clock.write_text(f"#!/bin/sh\necho {changed + age}\n")
+    clock.chmod(0o755)
+    env.pop("CVMFS_METADATA_LAG_SECONDS", None)
+    if lag_override is not None:
+        env["CVMFS_METADATA_LAG_SECONDS"] = lag_override
+
+    result = _publish(work, "", env)
+
+    assert result.returncode == expected_status, result.stdout + result.stderr
+    assert "publication deferred" in result.stdout
+    assert ("Inventory publication lag exceeds" in result.stdout) == bool(
+        expected_status
+    )
+    assert _git(origin, "branch", "--list", "bot/cvmfs-metadata") == ""
+    assert _main_log(origin) == "tool_1.0_20250628 categories:a,"
     assert _merges(tmp_path) == []
 
 
