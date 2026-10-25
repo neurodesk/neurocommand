@@ -308,8 +308,11 @@ immediately before each merge attempt, including rebuilt candidates.
 
 Missing containers defer publication, printing their exact IDs and the observed
 public revision in logs and the Actions summary. The candidate apps blob and age
-are also reported. `CVMFS_METADATA_LAG_SECONDS` defaults to 21600 (six hours);
-a missing inventory older than that fails the job. Age uses the latest
+are also reported. `CVMFS_METADATA_LAG_SECONDS` defaults to 86400 (24 hours);
+a missing inventory older than that fails the job. Consolidated batches install
+sequentially, with a CVMFS publish and garbage collection per container, so a
+healthy rollout can exceed six hours. Set `CVMFS_METADATA_LAG_SECONDS` to use a
+different deadline. Age uses the latest
 `apps.json` commit, so another apps edit resets this coarse clock. Scheduled runs
 apply the same deadline when object uploads are still missing. Client startup,
 transport, signature, catalog, and cleanup errors fail immediately. Each probe
