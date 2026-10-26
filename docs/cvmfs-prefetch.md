@@ -13,6 +13,23 @@ Python 3, Apptainer or Singularity, `xvfb-run`, `Xvfb`, `xauth`, and `xwininfo`.
 The FSL image must contain `strace`, as the `6.0.7.23` recipe does.
 `NEURODESK_CONTAINER_RUNTIME` can select an explicit runtime executable.
 
+On publishers without the X11 tools, including the Rocky Linux 10 publisher,
+install the isolated profiling toolkit before running sync:
+
+```bash
+sudo bash cvmfs/install_prefetch_tools.sh
+```
+
+The installer builds a small Apptainer image from `cvmfs/prefetch_x11.def`,
+using a Debian base pinned by digest and packages from the dated Debian snapshot
+in the definition. It installs and tests Xvfb, X11 utilities,
+and software OpenGL under `/opt/neurodesk-prefetch`. Host packages are unchanged.
+The publisher automatically uses this toolkit when native tools are missing.
+`NEURODESK_PREFETCH_TOOLS` can select another toolkit prefix. The host still runs
+Python and the scientific container runtime; only X11 tools run inside the
+toolkit image. Re-running the installer reuses the image for the same definition
+and checks OpenGL again. A missing toolkit produces an explicit repair command.
+
 The installed image must be an unpacked directory with `commands.txt`,
 `env.txt`, and the generated `fsl`, `fsleyes`, and `container_runtime.sh`
 wrappers. The version comes from the published inventory. The publisher uses

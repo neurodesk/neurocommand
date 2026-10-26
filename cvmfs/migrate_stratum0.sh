@@ -53,6 +53,9 @@ sudo chown -R cvmfs:cvmfs /srv/cvmfs/neurodesk.ardc.edu.au/
 # migrate homedirectory and scripts of old server
 rsync -aHvz --progress --rsync-path="sudo rsync" ~ rocky@203.101.224.225:~
 
+# On the new publisher, after copying the checkout, prepare GUI profiling.
+sudo bash ~/neurocommand/cvmfs/install_prefetch_tools.sh
+
 # Install Apache
 sudo dnf install -y httpd
 

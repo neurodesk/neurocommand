@@ -33,6 +33,29 @@ from cvmfs.reconcile_module_files import parse_log
 MAX_BUNDLE_BYTES = 1024 * 1024 * 1024
 
 
+def profiling_environment() -> dict[str, str]:
+    environment = os.environ.copy()
+    environment.setdefault("PATH", os.defpath)
+    required = ("xvfb-run", "Xvfb", "xauth", "xwininfo")
+    if "NEURODESK_PREFETCH_TOOLS" in environment or not all(
+        shutil.which(name, path=environment["PATH"]) for name in required
+    ):
+        prefix = Path(
+            environment.get("NEURODESK_PREFETCH_TOOLS", "/opt/neurodesk-prefetch")
+        )
+        environment["PATH"] = str(prefix / "bin") + os.pathsep + environment["PATH"]
+    missing = [
+        name for name in required if not shutil.which(name, path=environment["PATH"])
+    ]
+    if missing:
+        raise ValueError(
+            "Missing FSL profiling tools: "
+            + ", ".join(missing)
+            + "; run sudo bash cvmfs/install_prefetch_tools.sh on the publisher"
+        )
+    return environment
+
+
 def image_path(image: Path, path: str | Path) -> Path:
     """Resolve container symlinks without following absolute links onto the host."""
     pending = deque(PurePosixPath(path).parts)
@@ -204,6 +227,7 @@ def record_guis(image: Path, traces: Path) -> None:
 
 
 def capture_startup(image: Path) -> set[Path]:
+    environment = profiling_environment()
     with tempfile.TemporaryDirectory(prefix="neurodesk-fsl-profile-") as temporary:
         traces = Path(temporary)
         process = subprocess.Popen(
@@ -224,6 +248,7 @@ def capture_startup(image: Path) -> set[Path]:
             stderr=subprocess.PIPE,
             text=True,
             start_new_session=True,
+            env=environment,
         )
         try:
             stdout, stderr = process.communicate(timeout=120)
