@@ -208,6 +208,18 @@
             ]
         },
         {
+            "application": "arfimapping_1.0.12_20261025",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "arfirecon_1.0.1_20261024",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "ashs_2.0.0_20210105",
             "categories": [
                 "image segmentation"
@@ -334,7 +346,7 @@
             ]
         },
         {
-            "application": "b0mapromeo_1.4.3_20261009",
+            "application": "b0mapromeo_1.4.3_20261025",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -723,13 +735,13 @@
             ]
         },
         {
-            "application": "blochsiegertb1mapping_1.1.0_20260915",
+            "application": "blochsiegertb1mapping_1.1.0_20261025",
             "categories": [
                 "image reconstruction"
             ]
         },
         {
-            "application": "braid_1.0.0_20260722",
+            "application": "braid_1.0.0_20261024",
             "categories": [
                 "diffusion imaging",
                 "machine learning"
@@ -748,7 +760,7 @@
             ]
         },
         {
-            "application": "brainles-aurora_0.2.7_20261012",
+            "application": "brainles-aurora_0.2.7_20261024",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -756,7 +768,7 @@
             ]
         },
         {
-            "application": "brainles-aurora_arm64_0.2.7_20261012",
+            "application": "brainles-aurora_arm64_0.2.7_20261024",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -837,7 +849,7 @@
             ]
         },
         {
-            "application": "brainstemnavigator_1.0.0_20261004",
+            "application": "brainstemnavigator_1.0.0_20261025",
             "categories": [
                 "image registration",
                 "structural imaging"
@@ -906,7 +918,7 @@
             ]
         },
         {
-            "application": "brats_0.1.13_20261012",
+            "application": "brats_0.1.13_20261024",
             "categories": [
                 "image segmentation",
                 "structural imaging",
@@ -1370,7 +1382,7 @@
             ]
         },
         {
-            "application": "deep-quality-estimation_0.0.3_20261012",
+            "application": "deep-quality-estimation_0.0.3_20261024",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -1378,7 +1390,7 @@
             ]
         },
         {
-            "application": "deep-quality-estimation_arm64_0.0.3_20261012",
+            "application": "deep-quality-estimation_arm64_0.0.3_20261024",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -1461,7 +1473,7 @@
             ]
         },
         {
-            "application": "deepsif_0.0.1_20260629",
+            "application": "deepsif_0.0.1_20261024",
             "categories": [
                 "electrophysiology"
             ]
@@ -1682,7 +1694,7 @@
             ]
         },
         {
-            "application": "epirecon_0.0.4_20260908",
+            "application": "epirecon_0.0.4_20261024",
             "categories": [
                 "image reconstruction"
             ]
@@ -1695,6 +1707,12 @@
         },
         {
             "application": "esilpd_0.0.1_20260629",
+            "categories": [
+                "electrophysiology"
+            ]
+        },
+        {
+            "application": "esilpd_0.1.0_20261024",
             "categories": [
                 "electrophysiology"
             ]
@@ -2174,7 +2192,15 @@
             ]
         },
         {
-            "application": "gliomoda_0.0.4_20260824",
+            "application": "gliomoda_0.0.4_20261024",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "gliomoda_arm64_0.0.4_20261024",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -2468,7 +2494,7 @@
             ]
         },
         {
-            "application": "lashis_2.0.0_20260508",
+            "application": "lashis_2.0.0_20261024",
             "categories": [
                 "hippocampus",
                 "image segmentation",
@@ -2893,14 +2919,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261017",
+            "application": "mneextended_1.2.0_20261024",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261017",
+            "application": "mneextended_arm64_1.2.0_20261024",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -3105,7 +3131,7 @@
             ]
         },
         {
-            "application": "musclemap_1.4.0_20260827",
+            "application": "musclemap_1.4.0_20261024",
             "categories": [
                 "body"
             ]
@@ -3359,7 +3385,7 @@
             ]
         },
         {
-            "application": "openmsk_0.2.0_20261015",
+            "application": "openmsk_0.2.0_20261024",
             "categories": [
                 "image segmentation",
                 "quantitative imaging"
@@ -3367,6 +3393,12 @@
         },
         {
             "application": "openreconacsrss_0.1.0_20260916",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "openreconexample_1.0.0_20261024",
             "categories": [
                 "image reconstruction"
             ]
@@ -3421,7 +3453,7 @@
             ]
         },
         {
-            "application": "palmettobug_0.2.11_20260911",
+            "application": "palmettobug_0.2.11_20261024",
             "categories": [
                 "molecular biology"
             ]
@@ -3466,13 +3498,13 @@
             ]
         },
         {
-            "application": "pcntoolkit_1.3.0_20261012",
+            "application": "pcntoolkit_1.3.0_20261024",
             "categories": [
                 "statistics"
             ]
         },
         {
-            "application": "pcntoolkit_arm64_1.3.0_20261012",
+            "application": "pcntoolkit_arm64_1.3.0_20261024",
             "categories": [
                 "statistics"
             ]
@@ -3492,7 +3524,15 @@
             ]
         },
         {
-            "application": "petu_0.0.7_20260822",
+            "application": "petu_0.0.7_20261024",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "structural imaging"
+            ]
+        },
+        {
+            "application": "petu_arm64_0.0.7_20261024",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -3506,7 +3546,7 @@
             ]
         },
         {
-            "application": "prequal_1.1.0_20260604",
+            "application": "prequal_1.1.0_20261024",
             "categories": [
                 "diffusion imaging",
                 "quality control"
@@ -4164,7 +4204,7 @@
             ]
         },
         {
-            "application": "shim-toolbox_1.5.0_20261009",
+            "application": "shim-toolbox_1.5.0_20261025",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -4172,13 +4212,13 @@
             ]
         },
         {
-            "application": "sigviewer_0.6.4_20261013",
+            "application": "sigviewer_0.6.4_20261024",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "sigviewer_arm64_0.6.4_20261013",
+            "application": "sigviewer_arm64_0.6.4_20261024",
             "categories": [
                 "electrophysiology"
             ]
@@ -4250,7 +4290,19 @@
             ]
         },
         {
-            "application": "sodiumgriddingptpi_0.1.10_20260803",
+            "application": "sodiumgridding_0.1.6_20261024",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "sodiumgriddingptpi_0.1.10_20261024",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "sodiumnufft_0.1.10_20261024",
             "categories": [
                 "image reconstruction"
             ]
@@ -4477,7 +4529,7 @@
             ]
         },
         {
-            "application": "synthseg_8.2.0_20261016",
+            "application": "synthseg_8.2.0_20261025",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -4734,7 +4786,7 @@
             ]
         },
         {
-            "application": "vesselboost_2.0.5_20261019",
+            "application": "vesselboost_2.0.5_20261024",
             "categories": [
                 "image segmentation"
             ]
