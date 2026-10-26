@@ -174,12 +174,54 @@ def test_missing_latest_install_defers_without_falling_back(repository):
     assert not (directory / TRIGGER).exists()
 
 
+def test_missing_profiling_tools_report_the_publisher_repair(repository, tmp_path):
+    repo, directory, image, fsl, log = repository
+    environment = os.environ.copy()
+    environment["PATH"] = str(tmp_path / "empty-bin")
+    environment["NEURODESK_PREFETCH_TOOLS"] = str(tmp_path / "missing-toolkit")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "cvmfs/prefetch_filebundles.py"),
+            "--repo-root",
+            str(repo),
+            "--log",
+            str(log),
+        ],
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    assert result.returncode == 2
+    assert (
+        "Missing FSL profiling tools: xvfb-run, Xvfb, xauth, xwininfo" in result.stderr
+    )
+    assert "sudo bash cvmfs/install_prefetch_tools.sh" in result.stderr
+    assert not (directory / TRIGGER).exists()
+    assert not (directory / (".cvmfsbundle-" + TRIGGER)).exists()
+
+
+@pytest.mark.parametrize("use_toolkit", [False, True])
 def test_profiles_real_gui_windows_and_records_their_opened_files(
-    repository, monkeypatch, tmp_path
+    repository, monkeypatch, tmp_path, use_toolkit
 ):
     for program in ("xvfb-run", "xauth", "xwininfo", "xprop", "xmessage", "strace"):
         if not shutil.which(program):
             pytest.skip(f"GUI profiling test requires {program}")
+    tool_calls = tmp_path / "tool-calls"
+    if use_toolkit:
+        toolkit = tmp_path / "profile toolkit"
+        (toolkit / "bin").mkdir(parents=True)
+        for name in ("xvfb-run", "Xvfb", "xauth", "xwininfo"):
+            target = toolkit / "bin" / name
+            target.write_text(
+                "#!/bin/sh\n"
+                + f"echo {name} >> {shlex.quote(str(tool_calls))}\n"
+                + f'exec {shlex.quote(shutil.which(name))} "$@"\n'
+            )
+            target.chmod(0o755)
+        monkeypatch.setenv("NEURODESK_PREFETCH_TOOLS", str(toolkit))
     repo, directory, image, fsl, log = repository
     for name in ("fsl", "fsleyes"):
         (fsl / (name + ".conf")).write_text(f"{name} startup resource\n")
@@ -205,6 +247,13 @@ os.execvp('strace', ['strace', *trace_args, 'xmessage', '-title', title, '-file'
     runtime.chmod(0o755)
     monkeypatch.setenv("NEURODESK_CONTAINER_RUNTIME", str(runtime))
     assert prefetch.capture_startup(image) == {fsl / "fsl.conf", fsl / "fsleyes.conf"}
+    if use_toolkit:
+        assert set(tool_calls.read_text().splitlines()) == {
+            "xvfb-run",
+            "Xvfb",
+            "xauth",
+            "xwininfo",
+        }
     monkeypatch.setenv("NEURODESK_CONTAINER_RUNTIME", "/bin/false")
     with pytest.raises(ValueError, match="exited before GUI startup"):
         prefetch.capture_startup(image)
