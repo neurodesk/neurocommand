@@ -21,7 +21,8 @@ sudo bash cvmfs/install_prefetch_tools.sh
 ```
 
 The installer builds a small Apptainer image from `cvmfs/prefetch_x11.def`,
-using a Debian base pinned by digest. It installs and tests Xvfb, X11 utilities,
+using a Debian base pinned by digest and packages from the dated Debian snapshot
+in the definition. It installs and tests Xvfb, X11 utilities,
 and software OpenGL under `/opt/neurodesk-prefetch`. Host packages are unchanged.
 The publisher automatically uses this toolkit when native tools are missing.
 `NEURODESK_PREFETCH_TOOLS` can select another toolkit prefix. The host still runs
