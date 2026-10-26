@@ -399,7 +399,7 @@
                 "apptainer_args": []
             },
             "b0mapromeo 1.4.3": {
-                "version": "20261009",
+                "version": "20261025",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1057,7 +1057,7 @@
     "brainstemnavigator": {
         "apps": {
             "brainstemnavigator 1.0.0": {
-                "version": "20261004",
+                "version": "20261025",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6019,7 +6019,7 @@
     "shim-toolbox": {
         "apps": {
             "shim-toolbox 1.5.0": {
-                "version": "20261009",
+                "version": "20261025",
                 "exec": "",
                 "apptainer_args": []
             }
