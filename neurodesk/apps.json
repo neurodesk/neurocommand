@@ -6477,12 +6477,12 @@
                 "exec": "surfice"
             },
             "surfice 1.0.20211006": {
-                "version": "20261011",
+                "version": "20261027",
                 "exec": "",
                 "apptainer_args": []
             },
             "surficeGUI-surfice 1.0.20211006": {
-                "version": "20261011",
+                "version": "20261027",
                 "exec": "surfice",
                 "apptainer_args": []
             }
