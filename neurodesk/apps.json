@@ -3920,7 +3920,7 @@
     "meica-rs": {
         "apps": {
             "meica-rs 0.1.20261021": {
-                "version": "20261023",
+                "version": "20261027",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3933,7 +3933,7 @@
     "meica-rs_arm64": {
         "apps": {
             "meica-rs_arm64 0.1.20261021": {
-                "version": "20261023",
+                "version": "20261027",
                 "exec": "",
                 "apptainer_args": []
             }
