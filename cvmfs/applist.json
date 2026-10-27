@@ -2758,14 +2758,14 @@
             ]
         },
         {
-            "application": "meica-rs_0.1.20261021_20261023",
+            "application": "meica-rs_0.1.20261021_20261027",
             "categories": [
                 "functional imaging",
                 "quality control"
             ]
         },
         {
-            "application": "meica-rs_arm64_0.1.20261021_20261023",
+            "application": "meica-rs_arm64_0.1.20261021_20261027",
             "categories": [
                 "functional imaging",
                 "quality control"
