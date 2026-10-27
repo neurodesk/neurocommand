@@ -420,6 +420,9 @@ do
         else
             publish_cvmfs_transaction neurodesk.ardc.edu.au "added $IMAGENAME_BUILDDATE"
             rm -f "$INSTALL_FAILURE_DIR/$IMAGENAME_BUILDDATE"
+            # The pulled OCI layers are not needed once the image is published;
+            # without this the cache can grow by >100 GB between scheduled cleans.
+            apptainer cache clean -f || echo "[WARNING] apptainer cache clean failed for $IMAGENAME_BUILDDATE"
         fi
     fi
 
