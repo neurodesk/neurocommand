@@ -6468,14 +6468,6 @@
     },
     "surfice": {
         "apps": {
-            "surfice 1.0.20210730": {
-                "version": "20211218",
-                "exec": ""
-            },
-            "surficeGUI-surfice 1.0.20210730": {
-                "version": "20211218",
-                "exec": "surfice"
-            },
             "surfice 1.0.20211006": {
                 "version": "20261027",
                 "exec": "",
