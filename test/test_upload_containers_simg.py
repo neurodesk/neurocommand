@@ -104,6 +104,8 @@ def test_toolchain_requirements_extend_the_runtime_set_with_ci_tools():
         "cairosvg",
         "pytest",
         "pyyaml",
+        "requests",
+        "tqdm",
         "python-swiftclient",
         "python-keystoneclient",
         "keystoneauth1",

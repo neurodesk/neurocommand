@@ -47,12 +47,13 @@ jobs:
           - name: Install dependencies
             run: |
               python -m pip install --upgrade pip
-              pip install requests pyyaml>=6.0.2 tqdm
+              pip install requests 'pyyaml>=6.0.2' tqdm
           - name : Publish singularity files in batch
             shell: bash
             run: |
               echo "Apps to process: ${{ toJson(matrix.app_batches.apps) }}"
               apps_json='${{ toJson(matrix.app_batches.apps) }}'
+              failed_apps=()
 
               for app in $(echo "$apps_json" | jq -r '.[]'); do
                 echo "  Processing app: $app with ${#app[@]} apps"
@@ -64,9 +65,14 @@ jobs:
                     echo "DOI_URL: $DOI_URL"
                   else
                     echo "Failed to publish ${app} to Zenodo"
-                    exit 1
+                    failed_apps+=("$app")
                   fi
                 else
                   echo "Container https://object-store.rc.nectar.org.au/v1/AUTH_dead991e1fa847e3afcca2d3a7041f5d/neurodesk/${app}.simg not found. Skipping..."
                 fi
               done
+
+              if (( ${#failed_apps[@]} )); then
+                printf 'Failed to publish: %s\n' "${failed_apps[@]}"
+                exit 1
+              fi
