@@ -583,6 +583,13 @@
             ]
         },
         {
+            "application": "bidsmanager_1.5.2_20261029",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
             "application": "bidsmanager_arm64_1.2.6.1_20260912",
             "categories": [
                 "bids apps",
@@ -619,6 +626,13 @@
         },
         {
             "application": "bidsmanager_arm64_1.5.1_20261021",
+            "categories": [
+                "bids apps",
+                "data organisation"
+            ]
+        },
+        {
+            "application": "bidsmanager_arm64_1.5.2_20261029",
             "categories": [
                 "bids apps",
                 "data organisation"
@@ -849,7 +863,7 @@
             ]
         },
         {
-            "application": "brainstemnavigator_1.0.0_20261025",
+            "application": "brainstemnavigator_1.0.0_20261029",
             "categories": [
                 "image registration",
                 "structural imaging"
@@ -919,6 +933,14 @@
         },
         {
             "application": "brats_0.1.13_20261024",
+            "categories": [
+                "image segmentation",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "brats_0.1.14_20261029",
             "categories": [
                 "image segmentation",
                 "structural imaging",
@@ -1202,7 +1224,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261018",
+            "application": "cryosparc_1.0.0_20261029",
             "categories": [
                 "cryo EM"
             ]
@@ -1304,6 +1326,12 @@
             ]
         },
         {
+            "application": "datalad_1.7.2_20261029",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -1341,6 +1369,12 @@
         },
         {
             "application": "datalad_arm64_1.7.1_20261007",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.7.2_20261029",
             "categories": [
                 "data organisation"
             ]
@@ -1687,7 +1721,7 @@
             ]
         },
         {
-            "application": "ep3d_1.0.0_20261021",
+            "application": "ep3d_1.0.0_20261029",
             "categories": [
                 "image reconstruction",
                 "phase processing"
@@ -2441,6 +2475,12 @@
             ]
         },
         {
+            "application": "julia_1.13.3_20261029",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
             "application": "julia_1.4.1_20210105",
             "categories": [
                 "programming"
@@ -2460,6 +2500,12 @@
         },
         {
             "application": "julia_arm64_1.13.2_20261016",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
+            "application": "julia_arm64_1.13.3_20261029",
             "categories": [
                 "programming"
             ]
@@ -2919,14 +2965,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261024",
+            "application": "mneextended_1.2.0_20261029",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261024",
+            "application": "mneextended_arm64_1.2.0_20261029",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -3131,7 +3177,7 @@
             ]
         },
         {
-            "application": "musclemap_1.4.0_20261024",
+            "application": "musclemap_1.4.0_20261029",
             "categories": [
                 "body"
             ]
@@ -3504,7 +3550,19 @@
             ]
         },
         {
+            "application": "pcntoolkit_1.4.0_20261029",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
             "application": "pcntoolkit_arm64_1.3.0_20261024",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
+            "application": "pcntoolkit_arm64_1.4.0_20261029",
             "categories": [
                 "statistics"
             ]
@@ -3991,6 +4049,12 @@
         },
         {
             "application": "rabies_0.6.2_20261010",
+            "categories": [
+                "rodent imaging"
+            ]
+        },
+        {
+            "application": "rabies_0.6.3_20261029",
             "categories": [
                 "rodent imaging"
             ]
@@ -4894,6 +4958,12 @@
         },
         {
             "application": "xcpd_26.2.0_20261023",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "xcpd_26.3.0_20261029",
             "categories": [
                 "functional imaging"
             ]
