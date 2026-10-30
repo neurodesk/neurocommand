@@ -1453,7 +1453,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1465,7 +1465,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3420,17 +3420,17 @@
                 "apptainer_args": []
             },
             "julia 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             },
             "vscodeGUI-julia 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "code",
                 "apptainer_args": []
             },
             "REPLGUI-julia 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "julia",
                 "apptainer_args": []
             },
@@ -3488,17 +3488,17 @@
                 "apptainer_args": []
             },
             "julia_arm64 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             },
             "vscodeGUI-julia_arm64 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "code",
                 "apptainer_args": []
             },
             "REPLGUI-julia_arm64 1.13.3": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "julia",
                 "apptainer_args": []
             }
@@ -4218,7 +4218,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4230,7 +4230,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261024",
+                "version": "20261029",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4938,7 +4938,7 @@
     "nipype": {
         "apps": {
             "nipype 1.11.0": {
-                "version": "20261005",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             },
@@ -6295,7 +6295,7 @@
                 "exec": ""
             },
             "sovabids 0.4.7": {
-                "version": "20261013",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6308,7 +6308,7 @@
     "sovabids_arm64": {
         "apps": {
             "sovabids_arm64 0.4.7": {
-                "version": "20261013",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             }
