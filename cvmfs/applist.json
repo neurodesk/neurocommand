@@ -863,6 +863,15 @@
             ]
         },
         {
+            "application": "brainqcnet_1.0.1_20261031",
+            "categories": [
+                "bids apps",
+                "machine learning",
+                "quality control",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "brainstemnavigator_1.0.0_20261029",
             "categories": [
                 "image registration",
@@ -1132,13 +1141,13 @@
             ]
         },
         {
-            "application": "code_240320_20261024",
+            "application": "code_240320_20261029",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261024",
+            "application": "code_arm64_240320_20261029",
             "categories": [
                 "programming"
             ]
@@ -2475,7 +2484,7 @@
             ]
         },
         {
-            "application": "julia_1.13.3_20261029",
+            "application": "julia_1.13.3_20261030",
             "categories": [
                 "programming"
             ]
@@ -2505,7 +2514,7 @@
             ]
         },
         {
-            "application": "julia_arm64_1.13.3_20261029",
+            "application": "julia_arm64_1.13.3_20261030",
             "categories": [
                 "programming"
             ]
@@ -2946,13 +2955,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261024",
+            "application": "mne_1.13.2_20261029",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261024",
+            "application": "mne_arm64_1.13.2_20261029",
             "categories": [
                 "electrophysiology"
             ]
@@ -3368,7 +3377,7 @@
             ]
         },
         {
-            "application": "nipype_1.11.0_20261005",
+            "application": "nipype_1.11.0_20261030",
             "categories": [
                 "workflows"
             ]
@@ -4385,14 +4394,14 @@
             ]
         },
         {
-            "application": "sovabids_0.4.7_20261013",
+            "application": "sovabids_0.4.7_20261030",
             "categories": [
                 "bids apps",
                 "electrophysiology"
             ]
         },
         {
-            "application": "sovabids_arm64_0.4.7_20261013",
+            "application": "sovabids_arm64_0.4.7_20261030",
             "categories": [
                 "bids apps",
                 "electrophysiology"
@@ -4624,7 +4633,7 @@
             ]
         },
         {
-            "application": "synthstroke_0.0.0_20260518",
+            "application": "synthstroke_0.0.0_20261031",
             "categories": [
                 "image segmentation"
             ]
