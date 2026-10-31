@@ -1064,6 +1064,21 @@
             "visualization"
         ]
     },
+    "brainqcnet": {
+        "apps": {
+            "brainqcnet 1.0.1": {
+                "version": "20261031",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "machine learning",
+            "quality control",
+            "structural imaging"
+        ]
+    },
     "brainstemnavigator": {
         "apps": {
             "brainstemnavigator 1.0.0": {
@@ -6650,7 +6665,7 @@
     "synthstroke": {
         "apps": {
             "synthstroke 0.0.0": {
-                "version": "20260518",
+                "version": "20261031",
                 "exec": "",
                 "apptainer_args": []
             }
