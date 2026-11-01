@@ -1,5 +1,5 @@
 -r ../neurodesk/requirements.txt
 -r ../maintenance/upload-requirements.txt
 cairosvg==2.9.1
-pytest==9.1.1
+pytest==9.2.0
 pyyaml==6.0.3
