@@ -51,7 +51,7 @@ jobs:
       with:
         repository: NeuroDesk/neurocontainers
         path: neurocontainers
-    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
       with:
         python-version: "3.12"
     - name: Install icon conversion and unit test dependencies
