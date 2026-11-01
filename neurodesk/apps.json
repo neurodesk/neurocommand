@@ -1619,7 +1619,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261029",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2093,7 +2093,7 @@
                 "exec": ""
             },
             "dicomtools 1.1.0": {
-                "version": "20261012",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2105,7 +2105,7 @@
     "dicomtools_arm64": {
         "apps": {
             "dicomtools_arm64 1.1.0": {
-                "version": "20261012",
+                "version": "20261030",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3688,6 +3688,93 @@
             },
             "libreofficeMathGUI-libreoffice 26.2.4": {
                 "version": "20260613",
+                "exec": "lomath",
+                "apptainer_args": []
+            },
+            "libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "libreofficeGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "libreoffice",
+                "apptainer_args": []
+            },
+            "libreofficeWriterGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lowriter",
+                "apptainer_args": []
+            },
+            "libreofficeCalcGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "localc",
+                "apptainer_args": []
+            },
+            "libreofficeImpressGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "loimpress",
+                "apptainer_args": []
+            },
+            "libreofficeDrawGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lodraw",
+                "apptainer_args": []
+            },
+            "libreofficeBaseGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lobase",
+                "apptainer_args": []
+            },
+            "libreofficeMathGUI-libreoffice 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lomath",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation"
+        ]
+    },
+    "libreoffice_arm64": {
+        "apps": {
+            "libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "libreofficeGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "libreoffice",
+                "apptainer_args": []
+            },
+            "libreofficeWriterGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lowriter",
+                "apptainer_args": []
+            },
+            "libreofficeCalcGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "localc",
+                "apptainer_args": []
+            },
+            "libreofficeImpressGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "loimpress",
+                "apptainer_args": []
+            },
+            "libreofficeDrawGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lodraw",
+                "apptainer_args": []
+            },
+            "libreofficeBaseGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
+                "exec": "lobase",
+                "apptainer_args": []
+            },
+            "libreofficeMathGUI-libreoffice_arm64 26.8.2.2": {
+                "version": "20261031",
                 "exec": "lomath",
                 "apptainer_args": []
             }
