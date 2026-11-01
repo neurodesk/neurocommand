@@ -73,6 +73,12 @@
             ]
         },
         {
+            "application": "afni_26.3.07_20261101",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "aidamri_1.1_20210708",
             "categories": [
                 "diffusion imaging",
@@ -687,7 +693,7 @@
             ]
         },
         {
-            "application": "bidstools_1.3.0_20260919",
+            "application": "bidstools_1.3.0_20261030",
             "categories": [
                 "data organisation"
             ]
@@ -699,7 +705,7 @@
             ]
         },
         {
-            "application": "bidstools_arm64_1.3.0_20260919",
+            "application": "bidstools_arm64_1.3.0_20261030",
             "categories": [
                 "data organisation"
             ]
@@ -1021,6 +1027,14 @@
             ]
         },
         {
+            "application": "cat12_26.0.2_20261031",
+            "categories": [
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "cat12_26.0.rc3_20260521",
             "categories": [
                 "image registration",
@@ -1233,7 +1247,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261029",
+            "application": "cryosparc_1.0.0_20261030",
             "categories": [
                 "cryo EM"
             ]
@@ -1341,6 +1355,12 @@
             ]
         },
         {
+            "application": "datalad_1.7.3_20261101",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -1389,6 +1409,12 @@
             ]
         },
         {
+            "application": "datalad_arm64_1.7.3_20261101",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "dcm2bids_3.2.0_20260527",
             "categories": [
                 "data organisation"
@@ -1419,7 +1445,19 @@
             ]
         },
         {
+            "application": "dcm2niix_v1.0.20261029_20261101",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "dcm2niix_arm64_v1.0.20260724_20260920",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "dcm2niix_arm64_v1.0.20261029_20261101",
             "categories": [
                 "data organisation"
             ]
@@ -1600,13 +1638,13 @@
             ]
         },
         {
-            "application": "dicomtools_1.1.0_20261012",
+            "application": "dicomtools_1.1.0_20261030",
             "categories": [
                 "data organisation"
             ]
         },
         {
-            "application": "dicomtools_arm64_1.1.0_20261012",
+            "application": "dicomtools_arm64_1.1.0_20261030",
             "categories": [
                 "data organisation"
             ]
@@ -2257,13 +2295,13 @@
             ]
         },
         {
-            "application": "glmsingle_1.2.0_20261020",
+            "application": "glmsingle_1.2.0_20261029",
             "categories": [
                 "functional imaging"
             ]
         },
         {
-            "application": "glmsingle_arm64_1.2.0_20261020",
+            "application": "glmsingle_arm64_1.2.0_20261029",
             "categories": [
                 "functional imaging"
             ]
@@ -2613,6 +2651,18 @@
             ]
         },
         {
+            "application": "libreoffice_26.8.2.2_20261031",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "libreoffice_arm64_26.8.2.2_20261031",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "linda_0.5.1_20260508",
             "categories": [
                 "structural imaging"
@@ -2839,7 +2889,7 @@
             ]
         },
         {
-            "application": "metabody_1.0.5_20260910",
+            "application": "metabody_1.0.5_20261101",
             "categories": [
                 "functional imaging"
             ]
@@ -2955,13 +3005,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261029",
+            "application": "mne_1.13.2_20261031",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261029",
+            "application": "mne_arm64_1.13.2_20261031",
             "categories": [
                 "electrophysiology"
             ]
@@ -2974,14 +3024,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261029",
+            "application": "mneextended_1.2.0_20261031",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261029",
+            "application": "mneextended_arm64_1.2.0_20261031",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -3192,6 +3242,14 @@
             ]
         },
         {
+            "application": "napari_0.10.0_20261101",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
+            ]
+        },
+        {
             "application": "napari_0.8.0_20260814",
             "categories": [
                 "image segmentation",
@@ -3201,6 +3259,14 @@
         },
         {
             "application": "napari_0.9.2_20261013",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
+            ]
+        },
+        {
+            "application": "napari_arm64_0.10.0_20261101",
             "categories": [
                 "image segmentation",
                 "machine learning",
@@ -4241,6 +4307,12 @@
             ]
         },
         {
+            "application": "rstudio_2026.10.1_20261101",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
             "application": "samri_0.5_20260608",
             "categories": [
                 "functional imaging",
@@ -4569,7 +4641,7 @@
             ]
         },
         {
-            "application": "svrtk_20260626_20260718",
+            "application": "svrtk_20260626_20261101",
             "categories": [
                 "body",
                 "fetal imaging",
