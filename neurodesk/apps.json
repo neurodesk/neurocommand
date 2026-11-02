@@ -5551,7 +5551,7 @@
                 "apptainer_args": []
             },
             "prostatefiducialseg 8.0.3": {
-                "version": "20261023",
+                "version": "20261102",
                 "exec": "",
                 "apptainer_args": []
             }
