@@ -4412,6 +4412,20 @@
             "programming"
         ]
     },
+    "mobstr3d": {
+        "apps": {
+            "mobstr3d 1.0.5": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image segmentation",
+            "phase processing"
+        ]
+    },
     "modsort": {
         "apps": {
             "modsort 0.0.2": {
@@ -7053,6 +7067,28 @@
         },
         "categories": [
             "diffusion imaging"
+        ]
+    },
+    "uhcfire": {
+        "apps": {
+            "uhcfire 1.0.0": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "uhcfire 1.1.0": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "uhcfire 1.1.1": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction"
         ]
     },
     "vertexwiser": {
