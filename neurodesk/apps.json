@@ -5568,6 +5568,11 @@
                 "version": "20261102",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "prostatefiducialseg 8.0.4": {
+                "version": "20261103",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -7067,28 +7072,6 @@
         },
         "categories": [
             "diffusion imaging"
-        ]
-    },
-    "uhcfire": {
-        "apps": {
-            "uhcfire 1.0.0": {
-                "version": "20261103",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "uhcfire 1.1.0": {
-                "version": "20261103",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "uhcfire 1.1.1": {
-                "version": "20261103",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
         ]
     },
     "vertexwiser": {
