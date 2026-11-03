@@ -3038,6 +3038,14 @@
             ]
         },
         {
+            "application": "mobstr3d_1.0.5_20261103",
+            "categories": [
+                "body",
+                "image segmentation",
+                "phase processing"
+            ]
+        },
+        {
             "application": "modsort_0.0.2_20261012",
             "categories": [
                 "data organisation"
@@ -3701,6 +3709,13 @@
         },
         {
             "application": "prostatefiducialseg_8.0.3_20261102",
+            "categories": [
+                "body",
+                "image segmentation"
+            ]
+        },
+        {
+            "application": "prostatefiducialseg_8.0.4_20261103",
             "categories": [
                 "body",
                 "image segmentation"
