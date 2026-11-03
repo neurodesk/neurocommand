@@ -75,7 +75,8 @@ jobs:
     # rerun. Publishers of a superseded apps.json exit, and the current one
     # rebuilds the shared branch if another publisher replaced it.
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    # Allow the initial and pre-merge cold probes plus merge retry delays.
+    timeout-minutes: 180
     permissions:
       contents: read
     steps:

@@ -1,5 +1,6 @@
 import os
 import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -193,3 +194,30 @@ def test_client_exit_racing_cleanup_does_not_invalidate_snapshot(client, monkeyp
 
     monkeypatch.setattr(publication.os, "killpg", exited)
     assert publication.inspect_publication(client).missing == ("missing",)
+
+
+def test_inspection_has_separate_deadline(client, tmp_path, monkeypatch):
+    monkeypatch.setattr(publication, "PROBE_SECONDS", 1)
+    monkeypatch.setattr(publication, "INVENTORY_PROBE_SECONDS", 10)
+    inspect = publication._inspect_snapshot
+
+    def slow_inspect(root, ids):
+        time.sleep(2)
+        return inspect(root, ids)
+
+    monkeypatch.setattr(publication, "_inspect_snapshot", slow_inspect)
+    assert publication.inspect_publication(client).missing == ("missing",)
+    monkeypatch.setattr(publication, "INVENTORY_PROBE_SECONDS", 1)
+    with pytest.raises(
+        publication.PublicationUnavailable, match="inventory inspection"
+    ):
+        publication.inspect_publication(client)
+    assert not Path((tmp_path / "root").read_text()).exists()
+
+
+def test_mount_timeout_reports_phase(client, tmp_path, monkeypatch):
+    monkeypatch.setenv("CLIENT_HANG", "1")
+    monkeypatch.setattr(publication, "PROBE_SECONDS", 1)
+    with pytest.raises(publication.PublicationUnavailable, match="mount startup"):
+        publication.inspect_publication(client)
+    assert not Path((tmp_path / "root").read_text()).exists()

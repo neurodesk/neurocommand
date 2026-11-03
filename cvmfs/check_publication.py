@@ -20,6 +20,8 @@ ORIGIN = f"http://stratum0.neurodesk.cloud.edu.au/cvmfs/{REPOSITORY}"
 PUBLIC_KEY = Path(__file__).with_name(f"{REPOSITORY}.pub")
 MAX_LOG_BYTES = 4 * 1024 * 1024
 PROBE_SECONDS = 180
+# Cold catalog inspection needs a separate budget from mount startup.
+INVENTORY_PROBE_SECONDS = 45 * 60
 
 
 class PublicationUnavailable(Exception):
@@ -121,8 +123,12 @@ def inspect_publication(log_path: Path) -> PublishedInventory:
         )
         process = None
 
+        phase = "mount startup"
+
         def timeout(_signal, _frame):
-            raise PublicationUnavailable("CVMFS publication probe timed out")
+            raise PublicationUnavailable(
+                f"CVMFS publication probe timed out during {phase}"
+            )
 
         def cancelled(_signal, _frame):
             raise PublicationUnavailable("CVMFS publication probe cancelled")
@@ -151,6 +157,8 @@ def inspect_publication(log_path: Path) -> PublishedInventory:
                         )
                     time.sleep(0.1)
                 before = _identity(root)
+                signal.alarm(INVENTORY_PROBE_SECONDS)
+                phase = "inventory inspection"
                 missing = _inspect_snapshot(root, ids)
                 if before != _identity(root):
                     raise PublicationUnavailable(
