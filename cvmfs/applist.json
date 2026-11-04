@@ -1155,13 +1155,13 @@
             ]
         },
         {
-            "application": "code_240320_20261029",
+            "application": "code_240320_20261103",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261029",
+            "application": "code_arm64_240320_20261103",
             "categories": [
                 "programming"
             ]
@@ -1361,6 +1361,12 @@
             ]
         },
         {
+            "application": "datalad_1.8.0_20261103",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "datalad_arm64_1.1.5_20260911",
             "categories": [
                 "data organisation"
@@ -1410,6 +1416,12 @@
         },
         {
             "application": "datalad_arm64_1.7.3_20261101",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "datalad_arm64_1.8.0_20261103",
             "categories": [
                 "data organisation"
             ]
@@ -3005,13 +3017,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261031",
+            "application": "mne_1.13.2_20261103",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261031",
+            "application": "mne_arm64_1.13.2_20261103",
             "categories": [
                 "electrophysiology"
             ]
@@ -3024,14 +3036,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261031",
+            "application": "mneextended_1.2.0_20261103",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261031",
+            "application": "mneextended_arm64_1.2.0_20261103",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -5041,6 +5053,13 @@
         },
         {
             "application": "whitematterlesions_0.5.20261022_20261023",
+            "categories": [
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "whitematterlesions_0.5.20261103_20261104",
             "categories": [
                 "image segmentation",
                 "machine learning"
