@@ -1488,7 +1488,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261029",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1500,7 +1500,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261029",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4370,7 +4370,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4382,7 +4382,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4399,7 +4399,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4412,7 +4412,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261031",
+                "version": "20261103",
                 "exec": "",
                 "apptainer_args": []
             }
