@@ -3076,6 +3076,12 @@
             ]
         },
         {
+            "application": "mp2ragedenoise_0.1.0_20261106",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
             "application": "mricrogl_1.2.20211006_20220111",
             "categories": [
                 "visualization"
