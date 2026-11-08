@@ -116,6 +116,16 @@
                 "version": "20261101",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.09": {
+                "version": "20261106",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.09": {
+                "version": "20261106",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1315,6 +1325,16 @@
                 "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
                 "apptainer_args": []
             },
+            "cat12 26.0.3": {
+                "version": "20261105",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "cat12GUI-cat12 26.0.3": {
+                "version": "20261105",
+                "exec": "bash run_spm.sh {{ context.matlab_mcr_root }}/",
+                "apptainer_args": []
+            },
             "cat12 26.0.rc3": {
                 "version": "20260521",
                 "exec": "",
@@ -1488,7 +1508,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1500,7 +1520,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2102,6 +2122,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "dicompare 0.15.6": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -2127,6 +2152,11 @@
             },
             "dicompare_arm64 0.15.4": {
                 "version": "20261017",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dicompare_arm64 0.15.6": {
+                "version": "20261107",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4370,7 +4400,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4382,7 +4412,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261103",
+                "version": "20261105",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4485,7 +4515,7 @@
     "mp2ragedenoise": {
         "apps": {
             "mp2ragedenoise 0.1.0": {
-                "version": "20261106",
+                "version": "20261107",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4568,6 +4598,16 @@
             "mriqc 24.0.2": {
                 "version": "20241108",
                 "exec": ""
+            },
+            "mriqc 26.0.0": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "mriqc 26.1.0": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -5770,6 +5810,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "qsmxt 11.0.0": {
+                "version": "20261107",
+                "exec": "",
+                "apptainer_args": []
+            },
             "qsmxt 6.3.2": {
                 "version": "20231101",
                 "exec": ""
@@ -6297,6 +6342,11 @@
         "apps": {
             "scipion 3.8.3": {
                 "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "scipion 3.9.0": {
+                "version": "20261106",
                 "exec": "",
                 "apptainer_args": []
             }
