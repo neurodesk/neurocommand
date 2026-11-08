@@ -4429,7 +4429,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261103",
+                "version": "20261106",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4442,7 +4442,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261103",
+                "version": "20261106",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6118,7 +6118,7 @@
                 "apptainer_args": []
             },
             "relion 5.1.1": {
-                "version": "20261028",
+                "version": "20261107",
                 "exec": "",
                 "apptainer_args": []
             }
