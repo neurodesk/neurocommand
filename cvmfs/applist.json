@@ -79,6 +79,12 @@
             ]
         },
         {
+            "application": "afni_26.3.09_20261106",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "aidamri_1.1_20210708",
             "categories": [
                 "diffusion imaging",
@@ -1035,6 +1041,14 @@
             ]
         },
         {
+            "application": "cat12_26.0.3_20261105",
+            "categories": [
+                "image registration",
+                "image segmentation",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "cat12_26.0.rc3_20260521",
             "categories": [
                 "image registration",
@@ -1155,13 +1169,13 @@
             ]
         },
         {
-            "application": "code_240320_20261103",
+            "application": "code_240320_20261105",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261103",
+            "application": "code_arm64_240320_20261105",
             "categories": [
                 "programming"
             ]
@@ -1616,6 +1630,13 @@
             ]
         },
         {
+            "application": "dicompare_0.15.6_20261107",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
             "application": "dicompare_0.5.4_20260506",
             "categories": [
                 "data organisation",
@@ -1638,6 +1659,13 @@
         },
         {
             "application": "dicompare_arm64_0.15.4_20261017",
+            "categories": [
+                "data organisation",
+                "quality control"
+            ]
+        },
+        {
+            "application": "dicompare_arm64_0.15.6_20261107",
             "categories": [
                 "data organisation",
                 "quality control"
@@ -3017,13 +3045,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261103",
+            "application": "mne_1.13.2_20261105",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261103",
+            "application": "mne_arm64_1.13.2_20261105",
             "categories": [
                 "electrophysiology"
             ]
@@ -3076,7 +3104,7 @@
             ]
         },
         {
-            "application": "mp2ragedenoise_0.1.0_20261106",
+            "application": "mp2ragedenoise_0.1.0_20261107",
             "categories": [
                 "image reconstruction"
             ]
@@ -3137,6 +3165,24 @@
         },
         {
             "application": "mriqc_24.0.2_20241108",
+            "categories": [
+                "data organisation",
+                "functional imaging",
+                "quality control",
+                "workflows"
+            ]
+        },
+        {
+            "application": "mriqc_26.0.0_20261107",
+            "categories": [
+                "data organisation",
+                "functional imaging",
+                "quality control",
+                "workflows"
+            ]
+        },
+        {
+            "application": "mriqc_26.1.0_20261107",
             "categories": [
                 "data organisation",
                 "functional imaging",
@@ -3873,6 +3919,16 @@
             ]
         },
         {
+            "application": "qsmxt_11.0.0_20261107",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "qsmxt_6.3.2_20231101",
             "categories": [
                 "image reconstruction",
@@ -4369,6 +4425,13 @@
         },
         {
             "application": "scipion_3.8.3_20261012",
+            "categories": [
+                "cryo EM",
+                "workflows"
+            ]
+        },
+        {
+            "application": "scipion_3.9.0_20261106",
             "categories": [
                 "cryo EM",
                 "workflows"
