@@ -67,6 +67,75 @@ def test_json_visibility_keeps_launchers_and_visible_submenus(tmp_path, cli):
         assert desktop["Desktop Entry"]["Terminal"] == "false"
 
 
+@pytest.mark.parametrize(
+    ("machine", "expected"),
+    [
+        ("x86_64", ["tool-1_0.desktop"]),
+        ("aarch64", ["tool-1_0.desktop", "tool_arm64-1_0.desktop"]),
+        ("arm64", ["tool-1_0.desktop", "tool_arm64-1_0.desktop"]),
+    ],
+)
+def test_arm64_menu_entries_follow_host_architecture(
+    tmp_path, monkeypatch, machine, expected
+):
+    monkeypatch.setattr("neurodesk.build_menu.platform.machine", lambda: machine)
+    menu = menu_install(tmp_path)
+    (tmp_path / "applications").mkdir()
+    stale_entry = tmp_path / "applications/tool_arm64-1_0.desktop"
+    stale_entry.write_text("stale")
+    apps = tmp_path / "apps.json"
+    apps.write_text(
+        json.dumps(
+            {
+                "tool": {"apps": {"tool 1.0": {}}},
+                "tool_arm64": {"apps": {"tool_arm64 1.0": {"show_in_menu": True}}},
+            }
+        )
+    )
+    apps_from_json(False, "lxde", tmp_path, apps)
+    assert (
+        sorted(path.name for path in (tmp_path / "applications").iterdir()) == expected
+    )
+    assert sorted(path.name for path in (tmp_path / "bin").iterdir()) == [
+        "tool-1_0.sh",
+        "tool_arm64-1_0.sh",
+    ]
+    assert [
+        node.findtext("Name") for node in et.parse(menu).findall("Menu/Menu/Menu")
+    ] == ["Tool"]
+
+
+def test_arm64_entries_are_labelled_inside_the_x86_64_submenu(tmp_path, monkeypatch):
+    monkeypatch.setattr("neurodesk.build_menu.platform.machine", lambda: "aarch64")
+    menu_install(tmp_path)
+    apps = tmp_path / "apps.json"
+    apps.write_text(
+        json.dumps(
+            {
+                "tool_arm64": {
+                    "apps": {
+                        "tool_arm64 1.0": {},
+                        "viewerGUI-tool_arm64 1.0": {"exec": "viewer"},
+                    }
+                },
+            }
+        )
+    )
+    apps_from_json(False, "lxde", tmp_path, apps)
+
+    def desktop_entry(name):
+        desktop = configparser.ConfigParser(interpolation=None)
+        desktop.read(tmp_path / "applications" / name)
+        return desktop["Desktop Entry"]
+
+    cli_entry = desktop_entry("tool_arm64-1_0.desktop")
+    assert cli_entry["Name"] == "tool 1.0 arm64"
+    assert cli_entry["Categories"] == "tool"
+    assert cli_entry["Exec"].endswith("tool_arm64-1_0.sh")
+    gui_entry = desktop_entry("viewergui-tool_arm64-1_0.desktop")
+    assert gui_entry["Name"] == "viewerGUI 1.0 arm64"
+
+
 def test_runtime_copy_merges_dereferenced_links_and_preserves_file_metadata(tmp_path):
     source, destination = tmp_path / "source", tmp_path / "destination"
     source.mkdir()
