@@ -3692,9 +3692,15 @@
             "lcmodel 6.3": {
                 "version": "20220222",
                 "exec": ""
+            },
+            "lcmodel 6.3.0": {
+                "version": "20261109",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
+            "image reconstruction",
             "spectroscopy"
         ]
     },
