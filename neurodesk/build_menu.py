@@ -3,6 +3,7 @@
 import configparser
 import json
 import os
+import platform
 import sys
 from pathlib import Path
 import re
@@ -19,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "transparent-singularit
 from artifact_renderer import load_bundles, bundle_menu_entries, publish_bundles
 
 APP_MENU_KWARGS = {"version", "terminal", "apptainer_args"}
+ARM64_SUFFIX = "_arm64"
 
 # MIME types claimed by document-editing executables, keyed by the app's exec
 # name. Entries here get a MimeType= declaration and a %F field code in their
@@ -214,6 +216,19 @@ def visibility_flag(data: dict, name: Text, default: bool = True) -> bool:
     return data.get(name, default) is not False
 
 
+def shown_in_menu(menu_name: Text, menu_data: dict, app_data: dict) -> bool:
+    # arm64 hosts list both variants: the _arm64 entry runs natively and the
+    # plain entry runs x86_64 under emulation. arm64 images cannot be assumed
+    # to run on other hosts, so their entries are hidden there.
+    if menu_name.endswith(ARM64_SUFFIX) and platform.machine().lower() not in {
+        "aarch64",
+        "arm64",
+    }:
+        return False
+    default = visibility_flag(menu_data, "show_in_menu")
+    return visibility_flag(app_data, "show_in_menu", default)
+
+
 @dataclass(frozen=True)
 class NeurodeskApp:
     """Complete application specification, independent of artifact writes."""
@@ -249,8 +264,10 @@ class NeurodeskApp:
     @property
     def display_name(self) -> str:
         if self.command:
-            return f"{self.name.split('-', 1)[0]} {self.container_version}"
-        return self.name
+            label = f"{self.name.split('-', 1)[0]} {self.container_version}"
+        else:
+            label = self.name.replace(ARM64_SUFFIX, "")
+        return f"{label} arm64" if self.container_name.endswith(ARM64_SUFFIX) else label
 
     @property
     def sh_path(self) -> Path:
@@ -354,34 +371,38 @@ def apps_from_json(
                 dict.fromkeys(group.get("categories", []) + bundle_group["categories"])
             )
 
+    added_submenus = set()
     for menu_name, menu_data in menu_entries.items():
-        default_show_in_menu = visibility_flag(menu_data, "show_in_menu")
         apps = menu_data.get("apps", {})
-        menu_apps = [
-            app_data
-            for app_data in apps.values()
-            if visibility_flag(app_data, "show_in_menu", default_show_in_menu)
-        ]
+        # arm64 variants share the submenu of their x86_64 container
+        submenu = menu_name.removesuffix(ARM64_SUFFIX)
         # Add submenu
-        if not cli and menu_apps:
-            add_menu(installdir, menu_name, "all applications")
-            for category in menu_data.get("categories") or []:
-                add_menu(installdir, menu_name, category)
+        if not cli and any(
+            shown_in_menu(menu_name, menu_data, app_data) for app_data in apps.values()
+        ):
+            categories = ["all applications"] + (menu_data.get("categories") or [])
+            for category in categories:
+                if (submenu, category) not in added_submenus:
+                    add_menu(installdir, submenu, category)
+                    added_submenus.add((submenu, category))
         for app_name, app_data in apps.items():
-            show_in_menu = visibility_flag(
-                app_data, "show_in_menu", default_show_in_menu
-            )
             app = NeurodeskApp(
                 deskenv=deskenv,
                 installdir=installdir,
                 sh_prefix=sh_prefix,
                 name=app_name,
-                category=menu_name.replace(" ", "-"),
+                category=submenu.replace(" ", "-"),
                 **app_menu_data(app_data),
             )
             write_app_sh(app)
-            if not cli and show_in_menu:
+            if cli:
+                continue
+            if shown_in_menu(menu_name, menu_data, app_data):
                 write_app_menu(app)
+            else:
+                # Rebuilds do not clear this directory, and a leftover entry
+                # would still appear under its category menus.
+                app.desktop_path.unlink(missing_ok=True)
 
 
 def neurodesk_xml(xml: Path, newxml: Path) -> None:

@@ -75,7 +75,7 @@ The `apps.json` file at `/neurodesk/apps.json` serves as the master registry con
 ### Field Definitions
 
 #### Container Level
-- **Key**: Container name (e.g., "afni", "fsl", "freesurfer")
+- **Key**: Container name (e.g., "afni", "fsl", "freesurfer"). Containers named `<name>_arm64` are only shown in desktop menus on arm64 hosts, where they appear in the `<name>` submenu as `<name> <version> arm64`, alongside the x86_64 entries that run under emulation.
 - **apps**: Object containing all versions/variants of the container
 - **categories**: Array of category strings for organization
 - **show_in_menu**: Optional. Set to `false` to keep this container published but hide all of its app entries from generated desktop menus.
