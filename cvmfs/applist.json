@@ -2661,6 +2661,14 @@
         {
             "application": "lcmodel_6.3_20220222",
             "categories": [
+                "image reconstruction",
+                "spectroscopy"
+            ]
+        },
+        {
+            "application": "lcmodel_6.3.0_20261109",
+            "categories": [
+                "image reconstruction",
                 "spectroscopy"
             ]
         },
