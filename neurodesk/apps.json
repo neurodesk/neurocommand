@@ -136,6 +136,16 @@
                 "version": "20261108",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.11": {
+                "version": "20261111",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.11": {
+                "version": "20261111",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
