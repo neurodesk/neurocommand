@@ -12,6 +12,7 @@ import re
 import shlex
 import tempfile
 import os
+import platform
 import sys
 
 
@@ -463,6 +464,25 @@ def catalog_builddate(catalog: dict, module: ModuleId) -> str:
     return ""
 
 
+ARM64_SUFFIX = "_arm64"
+
+
+def host_is_arm64() -> bool:
+    # NEURODESK_ARCH=x86_64 makes an arm64 host run the x86_64 builds under
+    # emulation; it also lets x86_64 hosts preview the arm64 menu.
+    machine = os.environ.get("NEURODESK_ARCH") or platform.machine()
+    return machine.lower() in {"aarch64", "arm64"}
+
+
+def native_module(catalog: dict, module: ModuleId) -> ModuleId:
+    """Return the arm64 build of module on arm64 hosts when the catalog has one."""
+    if host_is_arm64() and not module.name.endswith(ARM64_SUFFIX):
+        arm64 = ModuleId(module.name + ARM64_SUFFIX, module.version)
+        if catalog_builddate(catalog, arm64):
+            return arm64
+    return module
+
+
 def load_bundles(path: Path, catalog: dict) -> tuple[BundleSpec, ...]:
     if not isinstance(catalog, dict):
         raise ValueError("Container catalog must be an object")
@@ -743,6 +763,8 @@ def bundle_cli(argv: list[str]) -> None:
         if args.resolve:
             module = ModuleId(*args.resolve)
             selected = next((b for b in bundles if b.module == module), None)
+            if not selected:
+                module = native_module(catalog, module)
             print("bundle" if selected else "container")
             for dep in selected.dependencies if selected else [module]:
                 print(

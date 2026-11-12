@@ -1,5 +1,6 @@
 import configparser
 import json
+import shlex
 import xml.etree.ElementTree as et
 
 import pytest
@@ -68,21 +69,24 @@ def test_json_visibility_keeps_launchers_and_visible_submenus(tmp_path, cli):
 
 
 @pytest.mark.parametrize(
-    ("machine", "expected"),
+    ("machine", "entries"),
     [
-        ("x86_64", ["tool-1_0.desktop"]),
-        ("aarch64", ["tool-1_0.desktop", "tool_arm64-1_0.desktop"]),
-        ("arm64", ["tool-1_0.desktop", "tool_arm64-1_0.desktop"]),
+        ("x86_64", ["tool-1_0"]),
+        ("aarch64", ["tool-1_0", "tool_arm64-1_0"]),
+        ("arm64", ["tool-1_0", "tool_arm64-1_0"]),
     ],
 )
 def test_arm64_menu_entries_follow_host_architecture(
-    tmp_path, monkeypatch, machine, expected
+    tmp_path, monkeypatch, machine, entries
 ):
-    monkeypatch.setattr("neurodesk.build_menu.platform.machine", lambda: machine)
+    monkeypatch.setenv("NEURODESK_ARCH", machine)
     menu = menu_install(tmp_path)
-    (tmp_path / "applications").mkdir()
-    stale_entry = tmp_path / "applications/tool_arm64-1_0.desktop"
-    stale_entry.write_text("stale")
+    for directory, stale in [
+        ("applications", "tool_arm64-1_0.desktop"),
+        ("bin", "tool_arm64-1_0.sh"),
+    ]:
+        (tmp_path / directory).mkdir()
+        (tmp_path / directory / stale).write_text("stale")
     apps = tmp_path / "apps.json"
     apps.write_text(
         json.dumps(
@@ -93,20 +97,25 @@ def test_arm64_menu_entries_follow_host_architecture(
         )
     )
     apps_from_json(False, "lxde", tmp_path, apps)
-    assert (
-        sorted(path.name for path in (tmp_path / "applications").iterdir()) == expected
-    )
+    assert sorted(path.name for path in (tmp_path / "applications").iterdir()) == [
+        f"{entry}.desktop" for entry in entries
+    ]
     assert sorted(path.name for path in (tmp_path / "bin").iterdir()) == [
-        "tool-1_0.sh",
-        "tool_arm64-1_0.sh",
+        f"{entry}.sh" for entry in entries
     ]
     assert [
         node.findtext("Name") for node in et.parse(menu).findall("Menu/Menu/Menu")
     ] == ["Tool"]
 
 
+def desktop_entry(installdir, name):
+    desktop = configparser.ConfigParser(interpolation=None)
+    desktop.read(installdir / "applications" / name)
+    return desktop["Desktop Entry"]
+
+
 def test_arm64_entries_are_labelled_inside_the_x86_64_submenu(tmp_path, monkeypatch):
-    monkeypatch.setattr("neurodesk.build_menu.platform.machine", lambda: "aarch64")
+    monkeypatch.setenv("NEURODESK_ARCH", "aarch64")
     menu_install(tmp_path)
     apps = tmp_path / "apps.json"
     apps.write_text(
@@ -123,17 +132,56 @@ def test_arm64_entries_are_labelled_inside_the_x86_64_submenu(tmp_path, monkeypa
     )
     apps_from_json(False, "lxde", tmp_path, apps)
 
-    def desktop_entry(name):
-        desktop = configparser.ConfigParser(interpolation=None)
-        desktop.read(tmp_path / "applications" / name)
-        return desktop["Desktop Entry"]
-
-    cli_entry = desktop_entry("tool_arm64-1_0.desktop")
+    cli_entry = desktop_entry(tmp_path, "tool_arm64-1_0.desktop")
     assert cli_entry["Name"] == "tool 1.0 arm64"
+    assert cli_entry["Comment"] == "tool_arm64 1.0"
     assert cli_entry["Categories"] == "tool"
     assert cli_entry["Exec"].endswith("tool_arm64-1_0.sh")
-    gui_entry = desktop_entry("viewergui-tool_arm64-1_0.desktop")
+    gui_entry = desktop_entry(tmp_path, "viewergui-tool_arm64-1_0.desktop")
     assert gui_entry["Name"] == "viewerGUI 1.0 arm64"
+
+
+@pytest.mark.parametrize(
+    ("machine", "comment"),
+    [
+        ("x86_64", "tool 1.0"),
+        ("aarch64", "tool 1.0 (x86_64 build, runs under emulation)"),
+    ],
+)
+def test_x86_64_entries_run_the_x86_64_build_on_arm64(
+    tmp_path, monkeypatch, machine, comment
+):
+    monkeypatch.setenv("NEURODESK_ARCH", machine)
+    menu_install(tmp_path)
+    apps = tmp_path / "apps.json"
+    apps.write_text(
+        json.dumps(
+            {
+                "tool": {"apps": {"tool 1.0": {}}},
+                "tool_arm64": {"apps": {"tool_arm64 1.0": {}}},
+            }
+        )
+    )
+    apps_from_json(False, "lxde", tmp_path, apps)
+    entry = desktop_entry(tmp_path, "tool-1_0.desktop")
+    assert entry["Name"] == "tool 1.0"
+    assert entry["Comment"] == comment
+    launcher = shlex.split((tmp_path / "bin/tool-1_0.sh").read_text().splitlines()[1])
+    forced = ["NEURODESK_ARCH=x86_64"] if machine == "aarch64" else []
+    assert launcher == [
+        *forced,
+        str(tmp_path / "fetch_and_run.sh"),
+        "tool",
+        "1.0",
+        "$@",
+    ]
+    if machine == "aarch64":
+        native = (tmp_path / "bin/tool_arm64-1_0.sh").read_text()
+        assert "NEURODESK_ARCH" not in native
+        assert (
+            "emulation"
+            not in (tmp_path / "applications/tool_arm64-1_0.desktop").read_text()
+        )
 
 
 def test_runtime_copy_merges_dereferenced_links_and_preserves_file_metadata(tmp_path):

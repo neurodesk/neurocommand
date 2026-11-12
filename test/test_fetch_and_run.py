@@ -1,8 +1,11 @@
+import json
 import os
 import shutil
 import shlex
 import subprocess
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -270,3 +273,48 @@ CVMFS_DISABLE=true bash {shlex.quote(str(install / SCRIPT.name))} first 1.0 true
 """)
     assert result.returncode == 2
     assert "EXACT_MISSING" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("machine", "module", "builddate"),
+    [
+        ("x86_64", "demo", "20260101"),
+        ("aarch64", "demo_arm64", "20260202"),
+    ],
+)
+def test_fetch_and_run_launches_the_native_build(tmp_path, machine, module, builddate):
+    directory = tmp_path / "neurodesk"
+    directory.mkdir()
+    shutil.copytree(
+        ROOT / "neurodesk/transparent-singularity",
+        directory / "transparent-singularity",
+    )
+    (directory / "bundles.json").write_text('{"schema_version": 1, "bundles": []}')
+    (directory / "apps.json").write_text(
+        json.dumps(
+            {
+                "demo": {"apps": {"demo 1.0": {"version": "20260101"}}},
+                "demo_arm64": {"apps": {"demo_arm64 1.0": {"version": "20260202"}}},
+            }
+        )
+    )
+    (directory / "fetch_and_run.sh").write_text(SCRIPT.read_text())
+    (directory / "configparser.sh").write_text("return 0\n")
+    calls = tmp_path / "calls.log"
+    (directory / "fetch_containers.sh").write_text(
+        f'printf "fetch %s %s %s\\n" "$@" >> {shlex.quote(str(calls))}\n'
+    )
+    script = f"""
+export CVMFS_DISABLE=true NEURODESK_ARCH={machine}
+module() {{
+    printf '%s\\n' "$*" >> {shlex.quote(str(calls))}
+    [[ $1 != avail ]]
+}}
+export -f module
+bash {shlex.quote(str(directory / "fetch_and_run.sh"))} demo 1.0 true
+"""
+    result = run_bash(script)
+    assert result.returncode == 0, result.stdout + result.stderr
+    lines = calls.read_text().splitlines()
+    assert f"fetch {module} 1.0 {builddate}" in lines
+    assert f"load {module}/1.0" in lines

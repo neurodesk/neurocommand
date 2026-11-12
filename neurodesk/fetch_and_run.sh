@@ -72,6 +72,8 @@ resolved=$(python3 "$_neurodesk_base/transparent-singularity/artifact_renderer.p
     --manifest "$_neurodesk_base/bundles.json" --catalog "$_neurodesk_base/apps.json" --resolve "$name" "$version") || exit 2
 mapfile -t records <<< "$resolved"
 kind=${records[0]}
+# On arm64 hosts the resolver swaps in the native NAME_arm64 build when one exists.
+if [[ $kind == container ]]; then IFS=$'\t' read -r name _ _ <<< "${records[1]}"; fi
 if [[ $kind == bundle && ( -n $builddate || $isolated == true ) ]]; then
     echo '[ERROR] A bundle has no container image or build date. Launch its host shell or a named executable.' >&2
     exit 2
