@@ -1,6 +1,7 @@
 import configparser
 import json
-import shlex
+import os
+import subprocess
 import xml.etree.ElementTree as et
 
 import pytest
@@ -162,19 +163,23 @@ def test_x86_64_entries_run_the_x86_64_build_on_arm64(
             }
         )
     )
-    apps_from_json(False, "lxde", tmp_path, apps)
+    # sh_prefix may be a command that does not accept variable assignments
+    apps_from_json(False, "lxde", tmp_path, apps, sh_prefix="nice -n 10")
     entry = desktop_entry(tmp_path, "tool-1_0.desktop")
     assert entry["Name"] == "tool 1.0"
     assert entry["Comment"] == comment
-    launcher = shlex.split((tmp_path / "bin/tool-1_0.sh").read_text().splitlines()[1])
-    forced = ["NEURODESK_ARCH=x86_64"] if machine == "aarch64" else []
-    assert launcher == [
-        *forced,
-        str(tmp_path / "fetch_and_run.sh"),
-        "tool",
-        "1.0",
-        "$@",
-    ]
+    fetch_and_run = tmp_path / "fetch_and_run.sh"
+    fetch_and_run.write_text('#!/bin/bash\necho "${NEURODESK_ARCH:-unset} $*"\n')
+    fetch_and_run.chmod(0o755)
+    launched = subprocess.run(
+        ["bash", str(tmp_path / "bin/tool-1_0.sh"), "--flag"],
+        env={k: v for k, v in os.environ.items() if k != "NEURODESK_ARCH"},
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    arch = "x86_64" if machine == "aarch64" else "unset"
+    assert launched.stdout == f"{arch} tool 1.0 --flag\n"
     if machine == "aarch64":
         native = (tmp_path / "bin/tool_arm64-1_0.sh").read_text()
         assert "NEURODESK_ARCH" not in native

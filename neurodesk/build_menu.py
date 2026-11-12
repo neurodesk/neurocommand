@@ -284,17 +284,17 @@ class NeurodeskApp:
 def render_app_sh(app: NeurodeskApp) -> str:
     command = app.launcher_command
     if not command:
-        # The x86_64 entry must not be swapped for its arm64 twin.
-        arch = ["NEURODESK_ARCH=x86_64"] if app.emulated else []
         arguments = [
-            *arch,
             str(app.installdir / "fetch_and_run.sh"),
             app.container_name,
             app.container_version,
             *shlex.split(app.command),
         ]
         command = " ".join(shlex.quote(argument) for argument in arguments) + ' "$@"'
-    return f"#!/usr/bin/env bash\n{app.sh_prefix} {command}\n"
+    # The x86_64 entry must not be swapped for its arm64 twin. Exported on its
+    # own line because sh_prefix may be a command such as `nice -n 10`.
+    arch = "export NEURODESK_ARCH=x86_64\n" if app.emulated else ""
+    return f"#!/usr/bin/env bash\n{arch}{app.sh_prefix} {command}\n"
 
 
 def write_app_sh(app: NeurodeskApp) -> None:
