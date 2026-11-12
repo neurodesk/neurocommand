@@ -1,4 +1,4 @@
 [codespell]
-skip = .git,*.pdf,*.svg,requirements.txt
+skip = .git,*.pdf,*.svg,requirements.txt,./neurodesk/apps.json
 #
 ignore-words-list = mede
