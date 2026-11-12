@@ -91,6 +91,12 @@
             ]
         },
         {
+            "application": "afni_26.3.11_20261111",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "aidamri_1.1_20210708",
             "categories": [
                 "diffusion imaging",
@@ -705,7 +711,7 @@
             ]
         },
         {
-            "application": "bidstools_1.3.0_20261030",
+            "application": "bidstools_1.3.0_20261111",
             "categories": [
                 "data organisation"
             ]
@@ -717,7 +723,7 @@
             ]
         },
         {
-            "application": "bidstools_arm64_1.3.0_20261030",
+            "application": "bidstools_arm64_1.3.0_20261111",
             "categories": [
                 "data organisation"
             ]
@@ -762,6 +768,12 @@
         },
         {
             "application": "blender_5.2.3_20261023",
+            "categories": [
+                "visualization"
+            ]
+        },
+        {
+            "application": "blender_5.3.0_20261111",
             "categories": [
                 "visualization"
             ]
@@ -1175,13 +1187,13 @@
             ]
         },
         {
-            "application": "code_240320_20261108",
+            "application": "code_240320_20261111",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261108",
+            "application": "code_arm64_240320_20261111",
             "categories": [
                 "programming"
             ]
@@ -1781,6 +1793,12 @@
         },
         {
             "application": "eman2_2.99.85_20261012",
+            "categories": [
+                "cryo EM"
+            ]
+        },
+        {
+            "application": "eman2_2.99.86_20261111",
             "categories": [
                 "cryo EM"
             ]
@@ -3078,14 +3096,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261106",
+            "application": "mneextended_1.2.0_20261109",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261106",
+            "application": "mneextended_arm64_1.2.0_20261109",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -4984,6 +5002,13 @@
             ]
         },
         {
+            "application": "vertexwiser_1.6.0_20261110",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
             "application": "vertexwiser_arm64_1.5.1_20261013",
             "categories": [
                 "structural imaging",
@@ -4999,6 +5024,13 @@
         },
         {
             "application": "vertexwiser_arm64_1.5.5_20261019",
+            "categories": [
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "vertexwiser_arm64_1.6.0_20261110",
             "categories": [
                 "structural imaging",
                 "workflows"
@@ -5143,6 +5175,13 @@
         },
         {
             "application": "whitematterlesions_0.5.20261103_20261104",
+            "categories": [
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "whitematterlesions_0.5.20261108_20261109",
             "categories": [
                 "image segmentation",
                 "machine learning"
