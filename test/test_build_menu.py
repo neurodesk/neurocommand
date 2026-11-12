@@ -216,7 +216,11 @@ def test_runtime_copy_merges_dereferenced_links_and_preserves_file_metadata(tmp_
     assert not (destination / ".nfs-stale").exists()
 
 
-def test_bundle_adds_launcher_and_menu_entry_from_manifest(tmp_path):
+@pytest.mark.parametrize("machine", ["x86_64", "aarch64"])
+def test_bundle_adds_launcher_and_menu_entry_from_manifest(
+    tmp_path, monkeypatch, machine
+):
+    monkeypatch.setenv("NEURODESK_ARCH", machine)
     menu = menu_install(tmp_path)
     apps = tmp_path / "apps.json"
     apps.write_text(
@@ -239,12 +243,14 @@ def test_bundle_adds_launcher_and_menu_entry_from_manifest(tmp_path):
         )
     )
     apps_from_json(False, "lxde", tmp_path, apps)
-    assert (
-        (tmp_path / "bin/suite-2026_10.sh").read_text().endswith('suite 2026.10 "$@"\n')
-    )
+    launcher = (tmp_path / "bin/suite-2026_10.sh").read_text()
+    assert launcher.endswith('suite 2026.10 "$@"\n')
+    # the bundle's host shell must keep picking native builds on arm64
+    assert "NEURODESK_ARCH" not in launcher
     desktop = configparser.ConfigParser()
     desktop.read(tmp_path / "applications/suite-2026_10.desktop")
     assert desktop["Desktop Entry"]["Categories"] == "suite"
+    assert desktop["Desktop Entry"]["Comment"] == "suite 2026.10"
     assert any(
         node.findtext("Name") == "Suite"
         for node in et.parse(menu).findall("Menu/Menu/Menu")

@@ -366,9 +366,11 @@ def apps_from_json(
     with open(appsjson, "r") as json_file:
         menu_entries = json.load(json_file)
     manifest = appsjson.parent / "bundles.json"
+    bundle_apps = set()
     if manifest.is_file():
         bundles = load_bundles(manifest, menu_entries)
         for name, bundle_group in bundle_menu_entries(bundles).items():
+            bundle_apps.update(bundle_group["apps"])
             group = menu_entries.setdefault(name, {"apps": {}, "categories": []})
             group["apps"].update(bundle_group["apps"])
             group["categories"] = list(
@@ -400,7 +402,11 @@ def apps_from_json(
                 sh_prefix=sh_prefix,
                 name=app_name,
                 category=submenu.replace(" ", "-"),
-                emulated=host_is_arm64() and not is_arm64_build,
+                # A bundle launcher opens a host shell; forcing x86_64 there
+                # would leak into every container launched from it.
+                emulated=host_is_arm64()
+                and not is_arm64_build
+                and app_name not in bundle_apps,
                 **app_menu_data(app_data),
             )
             if not runs_on_host:
