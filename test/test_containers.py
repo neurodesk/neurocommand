@@ -48,7 +48,8 @@ def test_containers_inventory(
     result = subprocess.run(
         ["bash", "containers.sh", f"--{pattern}" if install else pattern],
         cwd=tmp_path,
-        env=clean_env(CALLS=str(calls)),
+        # arm64 hosts list both kinds of build
+        env=clean_env(CALLS=str(calls), NEURODESK_ARCH="aarch64"),
         capture_output=True,
         text=True,
         check=True,
@@ -87,3 +88,47 @@ def test_containers_inventory(
         assert f"| SUCCESS | {name} {version} 20261014 |" in result.stdout
     else:
         assert not calls.exists()
+
+
+@pytest.mark.parametrize(
+    ("machine", "expected"),
+    [
+        ("x86_64", ["| ants | 2.6.0 |", "| ants | 2.6.5 |"]),
+        (
+            "aarch64",
+            ["| ants | 2.6.0 |", "| ants | 2.6.5 |", "| ants_arm64 | 2.6.5 |"],
+        ),
+    ],
+)
+def test_containers_lists_the_builds_the_host_runs(tmp_path, machine, expected):
+    shutil.copy(ROOT / "containers.sh", tmp_path)
+    (tmp_path / "neurodesk").mkdir()
+    shutil.copy(ROOT / "neurodesk/configparser.sh", tmp_path / "neurodesk")
+    (tmp_path / "neurodesk/apps.json").write_text('{"ants": {}, "ants_arm64": {}}')
+    destination = tmp_path / "installed"
+    destination.mkdir()
+    (tmp_path / "config.ini").write_text(f"installdir={destination}\n")
+    (tmp_path / "cvmfs").mkdir()
+    (tmp_path / "cvmfs/log.txt").write_text(
+        "ants_2.6.0_20250424 categories:structural imaging,\n"
+        "ants_2.6.5_20261012 categories:structural imaging,\n"
+        "ants_arm64_2.6.5_20261012 categories:structural imaging,\n"
+    )
+    calls = tmp_path / "calls.log"
+    write_executable(
+        destination / "fetch_containers.sh",
+        '#!/bin/bash\nprintf "%s\\n" "$1" >> "$CALLS"\n',
+    )
+
+    result = subprocess.run(
+        ["bash", "containers.sh", "--all"],
+        cwd=tmp_path,
+        env=clean_env(CALLS=str(calls), NEURODESK_ARCH=machine),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    rows = [line for line in result.stdout.splitlines() if line.endswith(" | Run:")]
+    assert [row[: row.index(" | 20")] + " |" for row in rows] == expected
+    assert calls.read_text().split() == [row.split()[1] for row in expected]

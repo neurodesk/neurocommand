@@ -3,7 +3,6 @@
 import configparser
 import json
 import os
-import platform
 import sys
 from pathlib import Path
 import re
@@ -17,10 +16,15 @@ from dataclasses import dataclass
 from io import StringIO
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "transparent-singularity"))
-from artifact_renderer import load_bundles, bundle_menu_entries, publish_bundles
+from artifact_renderer import (
+    ARM64_SUFFIX,
+    bundle_menu_entries,
+    host_is_arm64,
+    load_bundles,
+    publish_bundles,
+)
 
 APP_MENU_KWARGS = {"version", "terminal", "apptainer_args"}
-ARM64_SUFFIX = "_arm64"
 
 # MIME types claimed by document-editing executables, keyed by the app's exec
 # name. Entries here get a MimeType= declaration and a %F field code in their
@@ -218,13 +222,7 @@ def visibility_flag(data: dict, name: Text, default: bool = True) -> bool:
 
 def shown_in_menu(menu_name: Text, menu_data: dict, app_data: dict) -> bool:
     # arm64 hosts list both variants: the _arm64 entry runs natively and the
-    # plain entry runs x86_64 under emulation. arm64 images cannot be assumed
-    # to run on other hosts, so their entries are hidden there.
-    if menu_name.endswith(ARM64_SUFFIX) and platform.machine().lower() not in {
-        "aarch64",
-        "arm64",
-    }:
-        return False
+    # plain entry runs x86_64 under emulation.
     default = visibility_flag(menu_data, "show_in_menu")
     return visibility_flag(app_data, "show_in_menu", default)
 
@@ -243,6 +241,7 @@ class NeurodeskApp:
     terminal: bool = True
     apptainer_args: tuple[str, ...] = ()
     launcher_command: str = ""
+    emulated: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "apptainer_args", tuple(self.apptainer_args or ()))
@@ -292,7 +291,10 @@ def render_app_sh(app: NeurodeskApp) -> str:
             *shlex.split(app.command),
         ]
         command = " ".join(shlex.quote(argument) for argument in arguments) + ' "$@"'
-    return f"#!/usr/bin/env bash\n{app.sh_prefix} {command}\n"
+    # The x86_64 entry must not be swapped for its arm64 twin. Exported on its
+    # own line because sh_prefix may be a command such as `nice -n 10`.
+    arch = "export NEURODESK_ARCH=x86_64\n" if app.emulated else ""
+    return f"#!/usr/bin/env bash\n{arch}{app.sh_prefix} {command}\n"
 
 
 def write_app_sh(app: NeurodeskApp) -> None:
@@ -316,7 +318,9 @@ def render_app_menu(app: NeurodeskApp) -> str:
     desktop = {
         "Name": app.display_name,
         "GenericName": app.display_name,
-        "Comment": app.name,
+        "Comment": f"{app.name} (x86_64 build, runs under emulation)"
+        if app.emulated
+        else app.name,
         "Exec": f"/bin/bash {desktop_argument(str(app.sh_path))}",
         "Icon": str(app.icon_path),
         "Type": "Application",
@@ -362,9 +366,11 @@ def apps_from_json(
     with open(appsjson, "r") as json_file:
         menu_entries = json.load(json_file)
     manifest = appsjson.parent / "bundles.json"
+    bundle_apps = set()
     if manifest.is_file():
         bundles = load_bundles(manifest, menu_entries)
         for name, bundle_group in bundle_menu_entries(bundles).items():
+            bundle_apps.update(bundle_group["apps"])
             group = menu_entries.setdefault(name, {"apps": {}, "categories": []})
             group["apps"].update(bundle_group["apps"])
             group["categories"] = list(
@@ -374,12 +380,16 @@ def apps_from_json(
     added_submenus = set()
     for menu_name, menu_data in menu_entries.items():
         apps = menu_data.get("apps", {})
+        is_arm64_build = menu_name.endswith(ARM64_SUFFIX)
         # arm64 variants share the submenu of their x86_64 container
         submenu = menu_name.removesuffix(ARM64_SUFFIX)
-        # Add submenu
-        if not cli and any(
-            shown_in_menu(menu_name, menu_data, app_data) for app_data in apps.values()
-        ):
+        runs_on_host = host_is_arm64() or not is_arm64_build
+        shown = {
+            app_name
+            for app_name, app_data in apps.items()
+            if runs_on_host and shown_in_menu(menu_name, menu_data, app_data)
+        }
+        if not cli and shown:
             categories = ["all applications"] + (menu_data.get("categories") or [])
             for category in categories:
                 if (submenu, category) not in added_submenus:
@@ -392,16 +402,26 @@ def apps_from_json(
                 sh_prefix=sh_prefix,
                 name=app_name,
                 category=submenu.replace(" ", "-"),
+                # A bundle launcher opens a host shell; forcing x86_64 there
+                # would leak into every container launched from it.
+                emulated=host_is_arm64()
+                and not is_arm64_build
+                and app_name not in bundle_apps,
                 **app_menu_data(app_data),
             )
+            if not runs_on_host:
+                # Rebuilds do not clear these directories, so remove launchers
+                # left over from a build on another architecture.
+                app.sh_path.unlink(missing_ok=True)
+                app.desktop_path.unlink(missing_ok=True)
+                continue
             write_app_sh(app)
             if cli:
                 continue
-            if shown_in_menu(menu_name, menu_data, app_data):
+            if app_name in shown:
                 write_app_menu(app)
             else:
-                # Rebuilds do not clear this directory, and a leftover entry
-                # would still appear under its category menus.
+                # A leftover entry would still appear under its category menus.
                 app.desktop_path.unlink(missing_ok=True)
 
 

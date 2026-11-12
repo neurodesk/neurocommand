@@ -47,6 +47,13 @@ with open(sys.argv[1]) as catalog:
 ' "${_base}/neurodesk/apps.json") || exit $?
 mapfile -t tool_names <<< "$catalog_names"
 
+# NAME_arm64 builds only run on arm64 hosts, which also run the x86_64 builds
+# under emulation. NEURODESK_ARCH overrides the detected machine.
+case "${NEURODESK_ARCH:-$(uname -m)}" in
+    aarch64|arm64|AARCH64|ARM64) host_is_arm64=true ;;
+    *) host_is_arm64=false ;;
+esac
+
 while read -r identity categories; do
 
     builddate=${identity##*_}
@@ -59,6 +66,7 @@ while read -r identity categories; do
         fi
     done
     version=${name_version#"${name}_"}
+    if [[ $name == *_arm64 && $host_is_arm64 == false ]]; then continue; fi
     if [ "$pattern" != "all" ] && [[ $name != *${pattern}* ]]; then
         continue
     fi
