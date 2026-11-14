@@ -4982,7 +4982,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261109",
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4997,7 +4997,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261109",
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
