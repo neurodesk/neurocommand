@@ -58,9 +58,14 @@ while read -r identity categories; do
 
     builddate=${identity##*_}
     name_version=${identity%_*}
-    name=${name_version%%_*}
+    # Numeric versions begin at the first _DIGIT boundary; their suffixes may
+    # contain underscores. This also preserves names removed from apps.json.
+    name=${name_version%%_[0-9]*}
+    if [[ $name == "$name_version" ]]; then
+        name=${name_version%_*}
+    fi
     for tool_name in "${tool_names[@]}"; do
-        if [[ $name_version == "${tool_name}_"* ]]; then
+        if [[ $name_version == "${tool_name}_"* ]] && (( ${#tool_name} > ${#name} )); then
             name=$tool_name
             break
         fi
