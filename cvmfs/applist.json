@@ -91,7 +91,7 @@
             ]
         },
         {
-            "application": "afni_26.3.11_20261111",
+            "application": "afni_26.3.11_20261113",
             "categories": [
                 "functional imaging"
             ]
@@ -162,7 +162,19 @@
             ]
         },
         {
+            "application": "amico_2.2.0_20261113",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "amico_arm64_2.1.1_20260910",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
+            "application": "amico_arm64_2.2.0_20261113",
             "categories": [
                 "diffusion imaging"
             ]
@@ -1187,13 +1199,13 @@
             ]
         },
         {
-            "application": "code_240320_20261111",
+            "application": "code_240320_20261114",
             "categories": [
                 "programming"
             ]
         },
         {
-            "application": "code_arm64_240320_20261111",
+            "application": "code_arm64_240320_20261114",
             "categories": [
                 "programming"
             ]
@@ -1279,7 +1291,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261030",
+            "application": "cryosparc_1.0.0_20261112",
             "categories": [
                 "cryo EM"
             ]
@@ -1895,6 +1907,12 @@
             ]
         },
         {
+            "application": "fastsurfer_2.6.1_20261113",
+            "categories": [
+                "structural imaging"
+            ]
+        },
+        {
             "application": "fatsegnet_1.0.gpu_20201212",
             "categories": [
                 "image segmentation",
@@ -2294,7 +2312,21 @@
             ]
         },
         {
+            "application": "gigaconnectome_0.7.0_20261114",
+            "categories": [
+                "bids apps",
+                "functional imaging"
+            ]
+        },
+        {
             "application": "gigaconnectome_arm64_0.6.0_20261012",
+            "categories": [
+                "bids apps",
+                "functional imaging"
+            ]
+        },
+        {
+            "application": "gigaconnectome_arm64_0.7.0_20261114",
             "categories": [
                 "bids apps",
                 "functional imaging"
@@ -2465,7 +2497,19 @@
             ]
         },
         {
+            "application": "heudiconv_1.6.0_20261112",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "heudiconv_arm64_1.5.1_20260927",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "heudiconv_arm64_1.6.0_20261112",
             "categories": [
                 "data organisation"
             ]
@@ -2592,6 +2636,12 @@
             ]
         },
         {
+            "application": "julia_1.13.4_20261114",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
             "application": "julia_1.4.1_20210105",
             "categories": [
                 "programming"
@@ -2617,6 +2667,12 @@
         },
         {
             "application": "julia_arm64_1.13.3_20261030",
+            "categories": [
+                "programming"
+            ]
+        },
+        {
+            "application": "julia_arm64_1.13.4_20261114",
             "categories": [
                 "programming"
             ]
@@ -2729,7 +2785,19 @@
             ]
         },
         {
+            "application": "libreoffice_26.8.3.1_20261113",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
             "application": "libreoffice_arm64_26.8.2.2_20261031",
+            "categories": [
+                "data organisation"
+            ]
+        },
+        {
+            "application": "libreoffice_arm64_26.8.3.1_20261113",
             "categories": [
                 "data organisation"
             ]
@@ -3077,13 +3145,13 @@
             ]
         },
         {
-            "application": "mne_1.13.2_20261108",
+            "application": "mne_1.13.2_20261114",
             "categories": [
                 "electrophysiology"
             ]
         },
         {
-            "application": "mne_arm64_1.13.2_20261108",
+            "application": "mne_arm64_1.13.2_20261114",
             "categories": [
                 "electrophysiology"
             ]
@@ -3096,14 +3164,14 @@
             ]
         },
         {
-            "application": "mneextended_1.2.0_20261109",
+            "application": "mneextended_1.2.0_20261114",
             "categories": [
                 "electrophysiology",
                 "programming"
             ]
         },
         {
-            "application": "mneextended_arm64_1.2.0_20261109",
+            "application": "mneextended_arm64_1.2.0_20261114",
             "categories": [
                 "electrophysiology",
                 "programming"
@@ -3136,7 +3204,7 @@
             ]
         },
         {
-            "application": "mp2ragedenoise_0.1.0_20261107",
+            "application": "mp2ragedenoise_0.1.0_20261113",
             "categories": [
                 "image reconstruction"
             ]
@@ -3617,12 +3685,6 @@
             ]
         },
         {
-            "application": "openreconacsrss_0.1.0_20260916",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
             "application": "openreconexample_1.0.0_20261024",
             "categories": [
                 "image reconstruction"
@@ -3630,12 +3692,6 @@
         },
         {
             "application": "openreconi2iexample_1.0.89_20261002",
-            "categories": [
-                "image reconstruction"
-            ]
-        },
-        {
-            "application": "openreconslicegrappa_0.1.0_20260916",
             "categories": [
                 "image reconstruction"
             ]
@@ -4695,24 +4751,6 @@
         },
         {
             "application": "spinalcordtoolbox_7.3.4_20260916",
-            "categories": [
-                "spine"
-            ]
-        },
-        {
-            "application": "spinalcordtoolbox_gpu_7.3.3_20260904",
-            "categories": [
-                "spine"
-            ]
-        },
-        {
-            "application": "spinalcordtoolbox_gpu_7.3.4_20260916",
-            "categories": [
-                "spine"
-            ]
-        },
-        {
-            "application": "spinalcordtoolbox_lite_7.3.4_20260916",
             "categories": [
                 "spine"
             ]
