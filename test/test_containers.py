@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import shlex
 import shutil
@@ -30,7 +31,18 @@ def test_containers_inventory(
     shutil.copy(ROOT / "containers.sh", tmp_path)
     (tmp_path / "neurodesk").mkdir()
     shutil.copy(ROOT / "neurodesk/configparser.sh", tmp_path / "neurodesk")
-    shutil.copy(ROOT / "neurodesk/apps.json", tmp_path / "neurodesk")
+    (tmp_path / "neurodesk/apps.json").write_text(
+        json.dumps(
+            {
+                "mne": {},
+                "mne_arm64": {},
+                "kul-vbg": {},
+                "spinalcordtoolbox": {},
+                "spinalcordtoolbox_gpu": {},
+                "spinalcordtoolbox_lite": {},
+            }
+        )
+    )
     destination = tmp_path / install_dir
     destination.mkdir()
     (tmp_path / "config.ini").write_text(f"installdir={destination}\n")
