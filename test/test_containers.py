@@ -20,29 +20,33 @@ ROOT = Path(__file__).resolve().parents[1]
         ("mne_arm64", "0.61.0_23112021_beta"),
         ("spinalcordtoolbox_gpu", "7.3.4"),
         ("spinalcordtoolbox_lite", "7.3.4"),
+        ("retired_tool", "1.2.3_20260101_rc1"),
+        ("retired_tool", "v1.2.3"),
     ],
 )
 @pytest.mark.parametrize("pattern_kind", ["all", "matching", "nonmatching"])
 @pytest.mark.parametrize("install", [False, True], ids=["list", "install"])
 @pytest.mark.parametrize("install_dir", ["installed", "installed tools"])
+@pytest.mark.parametrize("catalogued", [True, False], ids=["catalogued", "removed"])
 def test_containers_inventory(
-    tmp_path, name, version, pattern_kind, install, install_dir
+    tmp_path, name, version, pattern_kind, install, install_dir, catalogued
 ):
     shutil.copy(ROOT / "containers.sh", tmp_path)
     (tmp_path / "neurodesk").mkdir()
     shutil.copy(ROOT / "neurodesk/configparser.sh", tmp_path / "neurodesk")
-    (tmp_path / "neurodesk/apps.json").write_text(
-        json.dumps(
-            {
-                "mne": {},
-                "mne_arm64": {},
-                "kul-vbg": {},
-                "spinalcordtoolbox": {},
-                "spinalcordtoolbox_gpu": {},
-                "spinalcordtoolbox_lite": {},
-            }
-        )
-    )
+    catalog = {
+        "mne": {},
+        "mne_arm64": {},
+        "kul-vbg": {},
+        "spinalcordtoolbox": {},
+        "spinalcordtoolbox_gpu": {},
+        "spinalcordtoolbox_lite": {},
+    }
+    if catalogued:
+        catalog.setdefault(name, {})
+    else:
+        catalog.pop(name, None)
+    (tmp_path / "neurodesk/apps.json").write_text(json.dumps(catalog))
     destination = tmp_path / install_dir
     destination.mkdir()
     (tmp_path / "config.ini").write_text(f"installdir={destination}\n")
@@ -112,11 +116,17 @@ def test_containers_inventory(
         ),
     ],
 )
-def test_containers_lists_the_builds_the_host_runs(tmp_path, machine, expected):
+@pytest.mark.parametrize("catalogued", [True, False], ids=["catalogued", "removed"])
+def test_containers_lists_the_builds_the_host_runs(
+    tmp_path, machine, expected, catalogued
+):
     shutil.copy(ROOT / "containers.sh", tmp_path)
     (tmp_path / "neurodesk").mkdir()
     shutil.copy(ROOT / "neurodesk/configparser.sh", tmp_path / "neurodesk")
-    (tmp_path / "neurodesk/apps.json").write_text('{"ants": {}, "ants_arm64": {}}')
+    catalog = {"ants": {}}
+    if catalogued:
+        catalog["ants_arm64"] = {}
+    (tmp_path / "neurodesk/apps.json").write_text(json.dumps(catalog))
     destination = tmp_path / "installed"
     destination.mkdir()
     (tmp_path / "config.ini").write_text(f"installdir={destination}\n")
