@@ -1824,7 +1824,7 @@
             "functional imaging",
             "workflows"
         ],
-        "citation": "Craddock, R. C., Sikka, S., Cheung, B., Khanuja, R., Ghosh, S. S., Yan, C., ... & Milham, M. P. (2013). Towards automated analysis of connectomes: The configurable pipeline for the analysis of connectomes (C-PAC). Frontiers in Neuroinformatics, 7, 42. doi:10.3389/fninf.2013.00042."
+        "citation": "Craddock, R. C., Sikka, S., Cheung, B., Khanuja, R., Ghosh, S. S., Yan, C., ... & Milham, M. P. (2013). Towards automated analysis of connectomes: The configurable pipeline for the analysis of connectomes (C-PAC). Frontiers in Neuroinformatics, 7, 42. doi:10.3389/fninf.2013.00042.\n\nPlease also cite the Zenodo DOI for the version you're referencing."
     },
     "cryosparc": {
         "apps": {
@@ -3289,6 +3289,11 @@
                 "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "gigaconnectome 0.7.0": {
+                "version": "20261114",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3302,6 +3307,11 @@
         "apps": {
             "gigaconnectome_arm64 0.6.0": {
                 "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "gigaconnectome_arm64 0.7.0": {
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
