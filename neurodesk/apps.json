@@ -138,12 +138,12 @@
                 "apptainer_args": []
             },
             "afni 26.3.11": {
-                "version": "20261111",
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": []
             },
             "sumaGUI-afni 26.3.11": {
-                "version": "20261111",
+                "version": "20261113",
                 "exec": "suma",
                 "apptainer_args": []
             }
@@ -228,6 +228,11 @@
                 "version": "20260910",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "amico 2.2.0": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -240,6 +245,11 @@
         "apps": {
             "amico_arm64 2.1.1": {
                 "version": "20260910",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "amico_arm64 2.2.0": {
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1655,7 +1665,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261111",
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1668,7 +1678,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261111",
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1814,12 +1824,12 @@
             "functional imaging",
             "workflows"
         ],
-        "citation": "Craddock, R. C., Sikka, S., Cheung, B., Khanuja, R., Ghosh, S. S., Yan, C., ... & Milham, M. P. (2013). Towards automated analysis of connectomes: The configurable pipeline for the analysis of connectomes (C-PAC). Frontiers in Neuroinformatics, 7, 42. doi:10.3389/fninf.2013.00042.\n\nPlease also cite the Zenodo DOI for the version you're referencing."
+        "citation": "Craddock, R. C., Sikka, S., Cheung, B., Khanuja, R., Ghosh, S. S., Yan, C., ... & Milham, M. P. (2013). Towards automated analysis of connectomes: The configurable pipeline for the analysis of connectomes (C-PAC). Frontiers in Neuroinformatics, 7, 42. doi:10.3389/fninf.2013.00042."
     },
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261030",
+                "version": "20261112",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2754,6 +2764,11 @@
                 "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "fastsurfer 2.6.1": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3048,7 +3063,7 @@
             "functional imaging",
             "image reconstruction"
         ],
-        "citation": "Huber, L., Stirnberg, R., Morgan, A.T., Feinberg, D.A., Ehses, P., Knudsen, L., Gulban, O.F., Koiso, K., Gephart, I., Swegle, S., Wardle, S.G., Persichetti, A.S., Beckett, A.J.S., St\u00f6cker, T., Boulant, N., Poser, B.A., Bandettini, P.A. (2025). Short-term gradient imperfections in high-resolution EPI lead to Fuzzy Ripple artifacts. Magnetic Resonance in Medicine. https://doi.org/10.1002/mrm.30489\n\nOpenRecon notes: `recipes/frisgo/OpenReconREADME.md`.",
+        "citation": "Huber, L., Stirnberg, R., Morgan, A.T., Feinberg, D.A., Ehses, P., Knudsen, L., Gulban, O.F., Koiso, K., Gephart, I., Swegle, S., Wardle, S.G., Persichetti, A.S., Beckett, A.J.S., St\u00f6cker, T., Boulant, N., Poser, B.A., Bandettini, P.A. (2025). Short-term gradient imperfections in high-resolution EPI lead to Fuzzy Ripple artifacts. Magnetic Resonance in Medicine. https://doi.org/10.1002/mrm.30489",
         "description": "OpenRecon image-to-image Fuzzy Ripple correction for dual-polarity (3D-)EPI BOLD time series, using `LN2_FRISGO -tshift` from LayNii 2.10.0. The OpenRecon module collects every reconstructed image of the run, arranges them by slice position and repetition into a 4D NIfTI, runs `LN2_FRISGO -input timeseries.nii -tshift` and returns: - the original time series on `image_series_index = 100` (`sendoriginal`) - the FRISGO-corrected time series `<source>-frisgo` on `image_series_index = 101` (`sendfrisgo`) Both outputs keep the source 2D geometry, slice and repetition counters with `Keep_image_geometry = 1`. Corrected values are rounded to the source pixel type, so negative values clip to 0 for unsigned scanner images. The GUI selects Spline (default), Simple, Low-pass or Run-wise. Spline requires 4 repetitions; other modes require 2. Low-pass also requires at least 100 spatial voxels. Its Gaussian window defaults to 40 TRs and accepts 0.1 to 1000000 TRs, including fractional values. The window applies only to Low-pass. Invalid selections skip correction and preserve requested originals. Nondefault corrected series identify the algorithm in their suffix and processing history. Incomplete runs, repetition gaps and duplicate nonconstant counters skip correction for that source group while preserving requested originals. Echo, phase, set and average counters define independent time series. Long outputs split into new series before the 16-bit image index overflows. Simulate the OpenRecon round trip with a 4D NIfTI:"
     },
     "frisgokspace": {
@@ -3179,7 +3194,7 @@
             "image segmentation",
             "structural imaging"
         ],
-        "citation": "To quote the relevant references for FSL tools you should look in the individual tools' manual pages, and also please reference one or more of the FSL overview papers:\n\n1. M.W. Woolrich, S. Jbabdi, B. Patenaude, M. Chappell, S. Makni, T. Behrens, C. Beckmann, M. Jenkinson, S.M. Smith. Bayesian analysis of neuroimaging data in FSL. NeuroImage, 45:S173-86, 2009\n\n2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-19, 2004\n\n3. M. Jenkinson, C.F. Beckmann, T.E. Behrens, M.W. Woolrich, S.M. Smith. FSL. NeuroImage, 62:782-90, 2012\n\nIMPORTANT: Before using fsl you need to agree to this license: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence",
+        "citation": "To quote the relevant references for FSL tools you should look in the individual tools' manual pages, and also please reference one or more of the FSL overview papers:\n\n1. M.W. Woolrich, S. Jbabdi, B. Patenaude, M. Chappell, S. Makni, T. Behrens, C. Beckmann, M. Jenkinson, S.M. Smith. Bayesian analysis of neuroimaging data in FSL. NeuroImage, 45:S173-86, 2009\n\n2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-19, 2004\n\n3. M. Jenkinson, C.F. Beckmann, T.E. Behrens, M.W. Woolrich, S.M. Smith. FSL. NeuroImage, 62:782-90, 2012",
         "description": "FSL is a comprehensive library of analysis tools for FMRI, MRI and DTI brain imaging data. Most of the tools can be run both from the command line and as GUIs (\"point-and-click\" graphical user interfaces). To quote the relevant references for FSL tools you should look in the individual tools' manual pages, and also please reference one or more of the FSL overview papers: 1. M.W. Woolrich, S. Jbabdi, B. Patenaude, M. Chappell, S. Makni, T. Behrens, C. Beckmann, M. Jenkinson, S.M. Smith. Bayesian analysis of neuroimaging data in FSL. NeuroImage, 45:S173-86, 2009 2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-19, 2004 3. M. Jenkinson, C.F. Beckmann, T.E. Behrens, M.W. Woolrich, S.M. Smith. FSL. NeuroImage, 62:782-90, 2012"
     },
     "fsl_arm64": {
@@ -3203,7 +3218,7 @@
             "image segmentation",
             "structural imaging"
         ],
-        "citation": "To quote the relevant references for FSL tools you should look in the individual tools' manual pages, and also please reference one or more of the FSL overview papers:\n\n1. M.W. Woolrich, S. Jbabdi, B. Patenaude, M. Chappell, S. Makni, T. Behrens, C. Beckmann, M. Jenkinson, S.M. Smith. Bayesian analysis of neuroimaging data in FSL. NeuroImage, 45:S173-86, 2009\n\n2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-19, 2004\n\n3. M. Jenkinson, C.F. Beckmann, T.E. Behrens, M.W. Woolrich, S.M. Smith. FSL. NeuroImage, 62:782-90, 2012\n\nIMPORTANT: Before using fsl you need to agree to this license: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence",
+        "citation": "To quote the relevant references for FSL tools you should look in the individual tools' manual pages, and also please reference one or more of the FSL overview papers:\n\n1. M.W. Woolrich, S. Jbabdi, B. Patenaude, M. Chappell, S. Makni, T. Behrens, C. Beckmann, M. Jenkinson, S.M. Smith. Bayesian analysis of neuroimaging data in FSL. NeuroImage, 45:S173-86, 2009\n\n2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-19, 2004\n\n3. M. Jenkinson, C.F. Beckmann, T.E. Behrens, M.W. Woolrich, S.M. Smith. FSL. NeuroImage, 62:782-90, 2012",
         "description": "FSL is a comprehensive library of analysis tools for FMRI, MRI and DTI brain imaging data. Most of the tools can be run both from the command line and as GUIs (\"point-and-click\" graphical user interfaces). To quote the relevant references for FSL tools you should look in the individual tools' manual pages, and also please reference one or more of the FSL overview papers: 1. M.W. Woolrich, S. Jbabdi, B. Patenaude, M. Chappell, S. Makni, T. Behrens, C. Beckmann, M. Jenkinson, S.M. Smith. Bayesian analysis of neuroimaging data in FSL. NeuroImage, 45:S173-86, 2009 2. S.M. Smith, M. Jenkinson, M.W. Woolrich, C.F. Beckmann, T.E.J. Behrens, H. Johansen-Berg, P.R. Bannister, M. De Luca, I. Drobnjak, D.E. Flitney, R. Niazy, J. Saunders, J. Vickers, Y. Zhang, N. De Stefano, J.M. Brady, and P.M. Matthews. Advances in functional and structural MR image analysis and implementation as FSL. NeuroImage, 23(S1):208-19, 2004 3. M. Jenkinson, C.F. Beckmann, T.E. Behrens, M.W. Woolrich, S.M. Smith. FSL. NeuroImage, 62:782-90, 2012"
     },
     "fsqc": {
@@ -3603,6 +3618,11 @@
                 "version": "20260927",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "heudiconv 1.6.0": {
+                "version": "20261112",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3615,6 +3635,11 @@
         "apps": {
             "heudiconv_arm64 1.5.1": {
                 "version": "20260927",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "heudiconv_arm64 1.6.0": {
+                "version": "20261112",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3864,6 +3889,21 @@
                 "exec": "julia",
                 "apptainer_args": []
             },
+            "julia 1.13.4": {
+                "version": "20261114",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vscodeGUI-julia 1.13.4": {
+                "version": "20261114",
+                "exec": "code",
+                "apptainer_args": []
+            },
+            "REPLGUI-julia 1.13.4": {
+                "version": "20261114",
+                "exec": "julia",
+                "apptainer_args": []
+            },
             "julia 1.4.1": {
                 "version": "20210105",
                 "exec": ""
@@ -3930,6 +3970,21 @@
             },
             "REPLGUI-julia_arm64 1.13.3": {
                 "version": "20261030",
+                "exec": "julia",
+                "apptainer_args": []
+            },
+            "julia_arm64 1.13.4": {
+                "version": "20261114",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "vscodeGUI-julia_arm64 1.13.4": {
+                "version": "20261114",
+                "exec": "code",
+                "apptainer_args": []
+            },
+            "REPLGUI-julia_arm64 1.13.4": {
+                "version": "20261114",
                 "exec": "julia",
                 "apptainer_args": []
             }
@@ -4168,6 +4223,46 @@
                 "version": "20261031",
                 "exec": "lomath",
                 "apptainer_args": []
+            },
+            "libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "libreofficeGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "libreoffice",
+                "apptainer_args": []
+            },
+            "libreofficeWriterGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lowriter",
+                "apptainer_args": []
+            },
+            "libreofficeCalcGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "localc",
+                "apptainer_args": []
+            },
+            "libreofficeImpressGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "loimpress",
+                "apptainer_args": []
+            },
+            "libreofficeDrawGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lodraw",
+                "apptainer_args": []
+            },
+            "libreofficeBaseGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lobase",
+                "apptainer_args": []
+            },
+            "libreofficeMathGUI-libreoffice 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lomath",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4214,6 +4309,46 @@
             },
             "libreofficeMathGUI-libreoffice_arm64 26.8.2.2": {
                 "version": "20261031",
+                "exec": "lomath",
+                "apptainer_args": []
+            },
+            "libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "libreofficeGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "libreoffice",
+                "apptainer_args": []
+            },
+            "libreofficeWriterGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lowriter",
+                "apptainer_args": []
+            },
+            "libreofficeCalcGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "localc",
+                "apptainer_args": []
+            },
+            "libreofficeImpressGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "loimpress",
+                "apptainer_args": []
+            },
+            "libreofficeDrawGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lodraw",
+                "apptainer_args": []
+            },
+            "libreofficeBaseGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
+                "exec": "lobase",
+                "apptainer_args": []
+            },
+            "libreofficeMathGUI-libreoffice_arm64 26.8.3.1": {
+                "version": "20261113",
                 "exec": "lomath",
                 "apptainer_args": []
             }
@@ -4804,7 +4939,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261108",
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4818,7 +4953,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261108",
+                "version": "20261114",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4934,7 +5069,7 @@
     "mp2ragedenoise": {
         "apps": {
             "mp2ragedenoise 0.1.0": {
-                "version": "20261107",
+                "version": "20261113",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5589,7 +5724,7 @@
         "categories": [
             "structural imaging"
         ],
-        "citation": "Huntenburg, Steele & Bazin (2018). Nighres: processing tools for high-resolution neuroimaging.\nGigaScience, 7(7). https://doi.org/10.1093/gigascience/giy082\n(see also specific citations in individual python modules you use)",
+        "citation": "Huntenburg, Steele & Bazin (2018). Nighres: processing tools for high-resolution neuroimaging.\nGigaScience, 7(7). https://doi.org/10.1093/gigascience/giy082",
         "description": "Neuroimaging at high resolution is a collection of python/java tools for processing of high resolution neuroimaging data, including UHF-MRI and microscopy. The package includes many tools for quantitative MRI, brain parcellation, shape analysis optimized to scale nicely with resolution."
     },
     "niimath": {
@@ -5799,18 +5934,6 @@
         "citation": "Goyal A, Belibi F, Sahani V, et al. OpenMSK: a modular open-source framework for comprehensive analysis of imaging biomarkers in knee osteoarthritis. Osteoarthr Cartil Open. 2026;8(4):100886. doi:10.1016/j.ocarto.2026.100886",
         "description": "OpenMSK runs KneePipeline through Siemens OpenRecon for DESS knee MRI, returning bone, cartilage, and meniscus segmentation in the source geometry. Subregion segmentation, T2 maps, and metrics reports are returned when generated. Enable `computethickness` for optional mesh and thickness analysis. Models: `goyal_sagittal`, `goyal_coronal`, `goyal_axial`, and `nnunet_knee`. Tested with Siemens DESS WIP `wip_dess_CS_260902` on a MAGNETOM 3.0T X60 running Numaris/X VA61A-092T. Protocol: [PDF](https://github.com/NeuroDesk/neurocontainers/blob/main/recipes/openmsk/wip_dess_CS_260902.pdf) / [.pro](https://github.com/NeuroDesk/neurocontainers/blob/main/recipes/openmsk/wip_dess_CS_260902.pro). See the [OpenRecon guide](https://github.com/NeuroDesk/neurocontainers/blob/main/recipes/openmsk/OpenReconREADME.md) for setup, output labels, T2 assumptions, and compatibility details. Direct DICOM usage (T2 requires DESS timing and spoiler metadata expected by DOSMA):"
     },
-    "openreconacsrss": {
-        "apps": {
-            "openreconacsrss 0.1.0": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
-    },
     "openreconexample": {
         "apps": {
             "openreconexample 1.0.0": {
@@ -5835,18 +5958,6 @@
             "image reconstruction"
         ],
         "description": "Minimal OpenRecon image-to-image reference. Receives reconstructed MRD image messages and sends outputs according to the enabled output options. The scanner label defaults enable original pass-through, inversion, and segmentation. Inversion is also the runtime default when no parameter payload is provided. Enable `sendoriginal` to pass the original 2D image stream through on `image_series_index = 100`. Inverted magnitude images are returned as `<source>-inverted` on `image_series_index = 99`; disable `invert` to omit them. Enable `segment` to extract the brightest foreground object and send `<source>-segment` outputs starting on `image_series_index = 101`. Segment output handling is controlled by `segmentheadergeometry`: `explicit_volume_derived_header` sends segmentation as an explicit derived volume, `3d_series_segment_header` sends 3D source-geometry masks with segmentation header identity, `2d_segment_header` sends 2D source-geometry masks with segmentation header identity, `2d_segment_header_originals` sends the same masks without scanner postprocessing child-role metadata, `2d_derived_image_header` sends 2D source-geometry masks with derived image header identity, and `2d_source_image_header` sends 2D source-geometry masks with source image header identity. When originals and segments are both enabled, originals are sent first and segment outputs are sent after them. Multi-contrast inputs with repeated slice positions are split into one segmentation output per source volume group. Enable `segmentationcolormap` with `segment` to add `MicroDeltaHotMetal.pal` LUT metadata to segmentation outputs. Enable `upsampled` to send one double-slice-count `<source>-upsampled` volume on `image_series_index = 102`. Enable `sendreformatsagittal` or `sendreformatcoronal` to send explicit sagittal/coronal 3D reformat volumes of the segment data starting on `image_series_index = 121`. Enable `sendcomputedmip` to send one `<source>-mip` maximum intensity projection image on `image_series_index = 103`. Enable `sendmetrics` to send segmented-region volume in image comments and a `<source>-metrics` DICOM image table on `image_series_index = 120`. The metrics table is sent as a standalone explicit derived output so scanner inline postprocessing does not attach to it. The rendered pixels are pre-oriented for scanner display and use standalone identity geometry instead of inheriting scan orientation. Original copies are normally sent first as source-native 2D images with `Keep_image_geometry = 1`. The pass-through keeps the source protocol, sequence, image-type, MiniHead, and slice metadata as intact as possible while assigning new returned-series UIDs. Returned originals use a one-based per-series `image_index`. Meta and MiniHead storage counters are restamped from the returned stream so `NumberInSeries`, `ChronSliceNo`, and `SliceNo` remain consistent with the MRD header; valid source partition counters are preserved for multi-partition inputs such as wholebody Dixon. If a source group cannot be sent safely as a 2D stream, the job fails before send rather than packing the originals, because scanner MIP/MPR postprocessing depends on the original stream. When `sendoriginal` is paired with `segmentheadergeometry = explicit_volume_derived_header`, the returned originals are sorted by projected physical slice position so their frame order matches the returned explicit segment volume. With `segmentheadergeometry = explicit_volume_derived_header`, segmentation outputs are sent as one explicit derived volume per source group with `Keep_image_geometry = 0`, `DataRole = Image`, and `SegmentExplicitVolume = 1`. These outputs are batched separately from originals. With `segmentheadergeometry = 3d_series_segment_header`, segmentation outputs are sent as one returned 3D-derived series per source group with one MRD image per source slice. The slices use `Keep_image_geometry = 1`, `DataRole = Segmentation`, `SegmentSourceGeometry = 1`, `SegmentOutputGeometry = 3d`, unique returned `slice` / `image_index` counters, source physical positions, and restamped Meta and MiniHead storage fields. With `segmentheadergeometry = 2d_segment_header`, masks keep source physical geometry, use `Keep_image_geometry = 1`, `DataRole = Segmentation`, `SegmentSourceGeometry = 1`, and the explicit segmentation `ImageType`. With `segmentheadergeometry = 2d_segment_header_originals`, masks use the same source-geometry segmentation header identity, but do not set `SegmentPostProcessingChildRole` or restamp `ExamDataRole` on the segment stream so scanner postprocessing can remain on the original stream. With `segmentheadergeometry = 2d_derived_image_header`, masks use the same source-geometry 2D header path but keep `DataRole = Image` and use a derived segment `ImageType`. With `segmentheadergeometry = 2d_source_image_header`, masks use the same source-geometry 2D header path but keep `DataRole = Image` and source `ImageType`, `DicomImageType`, and `ImageTypeValue4` identity. Segment reformats are packed explicit 3D volumes with centered slab geometry, `Keep_image_geometry = 0`, no `IceMiniHead`, `image_index = 1`, `slice = 0`, and matching `slice_count`, `NumberOfSlices`, and `ImagesInAcquisition`. When originals and segments are both enabled, segment outputs are sent after original outputs in a separate MRD image message. Returned outputs strip scanner `ImageTypeValue3` metadata and `IceMiniHead` `ImageTypeValue3` entries because some sequences reject that protocol field during OpenRecon conversion. Original pass-through preserves Dixon subtype identity. 2D source-image-header mask outputs preserve source identity, including Dixon subtype tokens. OpenRecon runtime notes and scanner option-combination tables: `recipes/openreconi2iexample/OpenReconREADME.md`. Scanner logs include an `openreconi2iexample runtime version=...` marker, `OPENRECONI2I_POSTPROCESSING target=...`, the independent segment controls in the configured-output line, and one `OPENRECONI2I_BATCH ...` marker before every MRD image send. Build and validate:"
-    },
-    "openreconslicegrappa": {
-        "apps": {
-            "openreconslicegrappa 0.1.0": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "image reconstruction"
-        ]
     },
     "openrefine": {
         "apps": {
@@ -6970,7 +7081,7 @@
             "image segmentation",
             "structural imaging"
         ],
-        "citation": "Gulban, O. F., Schneider, M., Marquardt, I., Haast, R., & De Martino, F. (2023). A scalable method to improve gray matter segmentation at ultra high field MRI. In (Version v{{ context.version }}) Zenodo.\nGulban, O. F., Schneider, M., Marquardt, I., Haast, R. A. M., & De Martino, F. (2018). A scalable method to improve gray matter segmentation at ultra high field MRI. PLoS One, 13(6), e0198335. https://doi.org/10.1371/journal.pone.0198335",
+        "citation": "Gulban, O. F., Schneider, M., Marquardt, I., Haast, R., & De Martino, F. (2023). A scalable method to improve gray matter segmentation at ultra high field MRI. In (Version v1.6.1) Zenodo.\nGulban, O. F., Schneider, M., Marquardt, I., Haast, R. A. M., & De Martino, F. (2018). A scalable method to improve gray matter segmentation at ultra high field MRI. PLoS One, 13(6), e0198335. https://doi.org/10.1371/journal.pone.0198335",
         "description": "Segmentator is a free and open-source package for multi-dimensional data exploration and segmentation of 3D images, mainly developed and tested with ultra-high-field MRI brain data."
     },
     "shim-toolbox": {
@@ -7309,37 +7420,6 @@
         ],
         "citation": "De Leener B, L\u00e9vy S, Dupont SM, et al. SCT: Spinal Cord Toolbox, an open-source software for processing spinal cord MRI data. NeuroImage. 2017;145(Pt A):24-43. doi:10.1016/j.neuroimage.2016.10.009",
         "description": "This packages upstream SCT 7.3. This is the CPU-only variant. Use spinalcordtoolbox_gpu for CUDA support. SCT tools process MRI data (NIfTI files) and can do fully automatic tasks such as: - Segmentation of the spinal cord and gray matter - Segmentation of pathologies (eg. multiple sclerosis lesions) - Detection of anatomical highlights (eg. ponto-medullary junction, spinal cord centerline, vertebral levels) - Registration to template, and deformation (eg. straightening) - Motion correction for diffusion and functional MRI time series Computation of quantitative MRI metrics (eg. diffusion tensor imaging, magnetization transfer) - Texture analysis (eg. grey level co-occurrence matrix) - Extraction of metrics within anatomical regions (eg. white matter tracts) SCT also has low-level tools: - Help out with manual labeling and segmentation with a Graphical User Interface (GUI) - GUI plugin for FSLeyes - Warping field creation and application - NIFTI volume manipulation tools for common operations"
-    },
-    "spinalcordtoolbox_gpu": {
-        "apps": {
-            "spinalcordtoolbox_gpu 7.3.3": {
-                "version": "20260904",
-                "exec": "",
-                "apptainer_args": []
-            },
-            "spinalcordtoolbox_gpu 7.3.4": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "spine"
-        ]
-    },
-    "spinalcordtoolbox_lite": {
-        "apps": {
-            "spinalcordtoolbox_lite 7.3.4": {
-                "version": "20260916",
-                "exec": "",
-                "apptainer_args": []
-            }
-        },
-        "categories": [
-            "spine"
-        ],
-        "citation": "De Leener B, L\u00e9vy S, Dupont SM, et al. SCT: Spinal Cord Toolbox, an open-source software for processing spinal cord MRI data. NeuroImage. 2017;145(Pt A):24-43. doi:10.1016/j.neuroimage.2016.10.009",
-        "description": "This packages upstream SCT 7.3. This CPU-only lite variant includes spinalcord, graymatter, and all three lesion tasks. It retains the standard SCT assets for vertebral labelling. SCT tools process MRI data (NIfTI files) and can do fully automatic tasks such as: - Segmentation of the spinal cord and gray matter - Segmentation of pathologies (eg. multiple sclerosis lesions) - Detection of anatomical highlights (eg. ponto-medullary junction, spinal cord centerline, vertebral levels) - Registration to template, and deformation (eg. straightening) - Motion correction for diffusion and functional MRI time series Computation of quantitative MRI metrics (eg. diffusion tensor imaging, magnetization transfer) - Texture analysis (eg. grey level co-occurrence matrix) - Extraction of metrics within anatomical regions (eg. white matter tracts) SCT also has low-level tools: - Help out with manual labeling and segmentation with a Graphical User Interface (GUI) - GUI plugin for FSLeyes - Warping field creation and application - NIFTI volume manipulation tools for common operations"
     },
     "spm12": {
         "apps": {
@@ -8097,7 +8177,7 @@
             "image segmentation",
             "machine learning"
         ],
-        "citation": "Dereskewicz E, La Rosa F, dos Santos Silva J, et al. FLAMeS: a robust deep\nlearning model for automated multiple sclerosis lesion segmentation. medRxiv.\n2025. doi:10.1101/2025.05.19.25327707\nHoopes A, Mora JS, Dalca AV, Fischl B, Hoffmann M. SynthStrip: skull-stripping\nfor any brain image. NeuroImage 260 (2022): 119474.\n\nMore information: https://github.com/neurodesk/webapps/tree/white-matter-lesions-v0.5.20261108/packages/white-matter-lesions",
+        "citation": "Dereskewicz E, La Rosa F, dos Santos Silva J, et al. FLAMeS: a robust deep\nlearning model for automated multiple sclerosis lesion segmentation. medRxiv.\n2025. doi:10.1101/2025.05.19.25327707\nHoopes A, Mora JS, Dalca AV, Fischl B, Hoffmann M. SynthStrip: skull-stripping\nfor any brain image. NeuroImage 260 (2022): 119474.",
         "description": "FLAMeS white matter lesion segmentation from one FLAIR image, as the Neurodesk White matter lesions web app runs it. SynthStrip finds the brain, then FLAMeS (nnU-Net, converted to ONNX) segments the lesions on the CPU. It needs no GPU and no network connection. Segment a FLAIR:"
     },
     "workshopdemo": {
