@@ -5179,6 +5179,11 @@
                 "version": "20261107",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "mriqc 26.1.1": {
+                "version": "20261115",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -6613,7 +6618,7 @@
             "workflows"
         ],
         "citation": "Stewart AW, Robinson SD, O\u2019Brien K, Jin J, Widhalm G, Hangel G, Walls A, Goodwin J, Eckstein K, Tourell M, Morgan C, Narayanan A, Barth M, Bollmann S. \u201cQSMxT: Robust masking and artifact reduction for quantitative susceptibility mapping\u201d. Magnetic resonance in medicine 87.3 (2022): 1289-1300. https://doi.org/10.1002/mrm.29048",
-        "description": "QSMxT is an end-to-end software toolbox for Quantitative Susceptibility Mapping (QSM), rebuilt in Rust as a single self-contained binary. This container packages upstream QSMxT 11.0.0. It reconstructs QSM from BIDS datasets, converts DICOMs to BIDS, and provides an interactive TUI."
+        "description": "QSMxT is an end-to-end software toolbox for Quantitative Susceptibility Mapping (QSM), rebuilt in Rust as a single self-contained binary. This container packages upstream QSMxT 12.0.0. It reconstructs QSM from BIDS datasets, converts DICOMs to BIDS, and provides an interactive TUI."
     },
     "quantiphyse": {
         "apps": {
@@ -7015,6 +7020,16 @@
             },
             "rstudioGUI-rstudio 2026.10.1": {
                 "version": "20261101",
+                "exec": "rstudio",
+                "apptainer_args": []
+            },
+            "rstudio 2026.11.0": {
+                "version": "20261115",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "rstudioGUI-rstudio 2026.11.0": {
+                "version": "20261115",
                 "exec": "rstudio",
                 "apptainer_args": []
             }
