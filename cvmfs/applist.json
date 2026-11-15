@@ -3291,6 +3291,15 @@
             ]
         },
         {
+            "application": "mriqc_26.1.1_20261115",
+            "categories": [
+                "data organisation",
+                "functional imaging",
+                "quality control",
+                "workflows"
+            ]
+        },
+        {
             "application": "mritools_3.3.0_20220224",
             "categories": [
                 "phase processing"
@@ -3640,6 +3649,12 @@
             ]
         },
         {
+            "application": "noddi_1.0.0_20261115",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "nomis_20220225_20261012",
             "categories": [
                 "statistics",
@@ -3963,6 +3978,12 @@
             ]
         },
         {
+            "application": "qsiprep_26.2.0_20261115",
+            "categories": [
+                "diffusion imaging"
+            ]
+        },
+        {
             "application": "qsirecon_1.1.0_20250423",
             "categories": [
                 "diffusion imaging"
@@ -4022,6 +4043,16 @@
         },
         {
             "application": "qsmxt_11.0.0_20261107",
+            "categories": [
+                "image reconstruction",
+                "phase processing",
+                "quantitative imaging",
+                "structural imaging",
+                "workflows"
+            ]
+        },
+        {
+            "application": "qsmxt_12.0.0_20261115",
             "categories": [
                 "image reconstruction",
                 "phase processing",
@@ -4499,6 +4530,12 @@
         },
         {
             "application": "rstudio_2026.10.1_20261101",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
+            "application": "rstudio_2026.11.0_20261115",
             "categories": [
                 "statistics"
             ]
