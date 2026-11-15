@@ -5858,6 +5858,11 @@
                 "version": "20260520",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "noddi 1.0.0": {
+                "version": "20261115",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -6421,6 +6426,11 @@
                 "version": "20261018",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "qsiprep 26.2.0": {
+                "version": "20261115",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -6502,6 +6512,11 @@
             },
             "qsmxt 11.0.0": {
                 "version": "20261107",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "qsmxt 12.0.0": {
+                "version": "20261115",
                 "exec": "",
                 "apptainer_args": []
             },
