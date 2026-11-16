@@ -1829,7 +1829,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261112",
+                "version": "20261116",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5012,7 +5012,7 @@
     "mobstr3d": {
         "apps": {
             "mobstr3d 1.0.5": {
-                "version": "20261103",
+                "version": "20261116",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5079,7 +5079,7 @@
     "mp2ragedenoise": {
         "apps": {
             "mp2ragedenoise 0.1.0": {
-                "version": "20261113",
+                "version": "20261116",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -7039,12 +7039,12 @@
                 "apptainer_args": []
             },
             "rstudio 2026.11.0": {
-                "version": "20261115",
+                "version": "20261116",
                 "exec": "",
                 "apptainer_args": []
             },
             "rstudioGUI-rstudio 2026.11.0": {
-                "version": "20261115",
+                "version": "20261116",
                 "exec": "rstudio",
                 "apptainer_args": []
             }
@@ -7571,6 +7571,11 @@
         "apps": {
             "stir 6.4.0": {
                 "version": "20261003",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "stir 6.5.0": {
+                "version": "20261116",
                 "exec": "",
                 "apptainer_args": []
             }
