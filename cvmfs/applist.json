@@ -1291,7 +1291,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261112",
+            "application": "cryosparc_1.0.0_20261116",
             "categories": [
                 "cryo EM"
             ]
@@ -3178,7 +3178,7 @@
             ]
         },
         {
-            "application": "mobstr3d_1.0.5_20261103",
+            "application": "mobstr3d_1.0.5_20261116",
             "categories": [
                 "body",
                 "image segmentation",
@@ -3204,7 +3204,7 @@
             ]
         },
         {
-            "application": "mp2ragedenoise_0.1.0_20261113",
+            "application": "mp2ragedenoise_0.1.0_20261116",
             "categories": [
                 "image reconstruction"
             ]
@@ -4535,7 +4535,7 @@
             ]
         },
         {
-            "application": "rstudio_2026.11.0_20261115",
+            "application": "rstudio_2026.11.0_20261116",
             "categories": [
                 "statistics"
             ]
@@ -4847,6 +4847,12 @@
         },
         {
             "application": "stir_6.4.0_20261003",
+            "categories": [
+                "image reconstruction"
+            ]
+        },
+        {
+            "application": "stir_6.5.0_20261116",
             "categories": [
                 "image reconstruction"
             ]
