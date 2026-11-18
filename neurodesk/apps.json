@@ -5634,6 +5634,19 @@
         "citation": "Siddhartha Dhiman, Joshua B Teves, Kathryn E Thorn, Emilie T McKinnon,\nHunter G Moss, Vitria Adisetiyo, Benjamin Ades-Aron, Jelle Veraart, Jenny Chen,\nEls Fieremans, Andreana Benitez, Joseph A Helpern, Jens H Jensen. PyDesigner: A\nPythonic Implementation of the DESIGNER Pipeline for Diffusion Tensor and\nDiffusional Kurtosis Imaging. bioRxiv 2021.10.20.465189. doi:\nhttps://doi.org/10.1101/2021.10.20.465189```\n\nLicense: Custom license non-commerical, non-clinical care: https://github.com/muscbridge/PyDesigner?tab=License-1-ov-file#readme\n\n----------------------------------",
         "description": "PyD is an installable Python package designed to perform pre- and post- processing of dMRI acquisitions."
     },
+    "nextpyp": {
+        "apps": {
+            "nextpyp 0.7.3": {
+                "version": "20261118",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
+        ],
+        "citation": "Liu, H.-F., Zhou, Y., Huang, Q., Piland, J., Jin, W., Mandel, J.,\nDu, X., Martin, J., Bartesaghi, A. nextPYP: a comprehensive and scalable\nplatform for characterizing protein variability in situ using single-particle\ncryo-electron tomography. Nat Methods 20, 1909-1919 (2023).\nhttps://doi.org/10.1038/s41592-023-02045-0"
+    },
     "nftsim": {
         "apps": {
             "nftsim 1.0.2": {
@@ -7287,6 +7300,19 @@
             "structural imaging"
         ],
         "description": "This project will develop a comprehensive software that will allow biomedical scientists to precisely locate shape changes in their imaging studies. This software called Shape AnaLysis Toolbox (SALT), will enhance the intuitiveness and ease of use for such studies, as well as allow researchers to find shape changes with higher statistical power. Altogether this constitutes a crucial resource for the imaging field that will enable many and important new findings in biomedical imaging studies."
+    },
+    "smartscope": {
+        "apps": {
+            "smartscope 0.10.0": {
+                "version": "20261118",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM"
+        ],
+        "citation": "Bouvette J, Huang Q, Riccio AA, Copeland WC, Bartesaghi A,\nBorgnia MJ. Automated systematic evaluation of cryo-EM specimens with\nSmartScope. eLife 11, e80047 (2022). https://doi.org/10.7554/eLife.80047"
     },
     "sodiumgridding": {
         "apps": {
