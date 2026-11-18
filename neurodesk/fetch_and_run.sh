@@ -114,7 +114,7 @@ if [[ $kind == bundle ]] && ! module_is_available "$name/$version"; then
         --manifest "$_neurodesk_base/bundles.json" --catalog "$_neurodesk_base/apps.json" --module-root "$local_root/modules" || exit 2
 fi
 MODULES_PAGER=cat LMOD_PAGER=cat PAGER=cat module load "$name/$version" || exit 2
-MODULES_PAGER=cat LMOD_PAGER=cat PAGER=cat module help "$name/$version"
+MODULES_PAGER=cat LMOD_PAGER=cat PAGER=cat module help "$name/$version" >&2
 if [[ ! ${SINGULARITY_BINDPATH+x} && ! ${APPTAINER_BINDPATH+x} ]]; then
     export SINGULARITY_BINDPATH=$PWD
     if [[ -d $cvmfs_root ]]; then export SINGULARITY_BINDPATH+=,$cvmfs_root; fi

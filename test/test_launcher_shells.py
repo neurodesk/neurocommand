@@ -20,8 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize("engine", ["modules", "lmod-lua"])
+@pytest.mark.parametrize("redirect_output", ["0", "1"])
 def test_named_and_isolated_launcher_use_explicit_image_and_module_env(
-    tmp_path, engine
+    tmp_path, engine, redirect_output
 ):
     install, root, runtime = launcher_tree(tmp_path, engine)
     first = install / "containers/first_1.0_20260629"
@@ -47,6 +48,8 @@ bash {shlex.quote(str(install / "fetch_and_run.sh"))} first 1.0 --container-shel
     result = subprocess.run(
         ["bash", "-c", script],
         env=clean_env(
+            MODULES_REDIRECT_OUTPUT=redirect_output,
+            MODULES_VERBOSITY="concise",
             NEURODESKTOP_LOCAL_CONTAINERS=str(install / "containers"),
             NEURODESK_CONTAINER_RUNTIME=str(runtime),
             CVMFS_DISABLE="true",
