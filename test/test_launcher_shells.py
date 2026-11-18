@@ -66,6 +66,8 @@ bash {shlex.quote(str(install / "fetch_and_run.sh"))} first 1.0 --container-shel
     assert "/configured-bind" in named["argv"]
     assert isolated["argv"][1] == "shell"
     assert isolated["argv"][-1].endswith("/first_1.0_20260629.simg")
+    assert "Dependencies: first/1.0, second/1.0" in result.stderr
+    assert (first / "README.md").read_text().strip() in result.stderr
 
 
 @pytest.mark.parametrize("engine", ["modules", "lmod-lua"])
@@ -147,6 +149,7 @@ printf 'startup\\n' >> {shlex.quote(str(marker))}
     assert "\nSTARTUP_PATH_KEPT\n" in normalized
     assert marker.read_text() == "startup\n"
     assert "unexpected-fetch" not in transcript
+    assert normalized.count("Dependencies: first/1.0, second/1.0") == 1
 
 
 def test_bundle_isolated_shell_and_bad_mode_fail_before_fetch(tmp_path):
