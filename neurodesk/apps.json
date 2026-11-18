@@ -6533,6 +6533,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "qsmxt 12.1.0": {
+                "version": "20261118",
+                "exec": "",
+                "apptainer_args": []
+            },
             "qsmxt 6.3.2": {
                 "version": "20231101",
                 "exec": ""
@@ -6646,7 +6651,7 @@
             "workflows"
         ],
         "citation": "Stewart AW, Robinson SD, O\u2019Brien K, Jin J, Widhalm G, Hangel G, Walls A, Goodwin J, Eckstein K, Tourell M, Morgan C, Narayanan A, Barth M, Bollmann S. \u201cQSMxT: Robust masking and artifact reduction for quantitative susceptibility mapping\u201d. Magnetic resonance in medicine 87.3 (2022): 1289-1300. https://doi.org/10.1002/mrm.29048",
-        "description": "QSMxT is an end-to-end software toolbox for Quantitative Susceptibility Mapping (QSM), rebuilt in Rust as a single self-contained binary. This container packages upstream QSMxT 12.0.0. It reconstructs QSM from BIDS datasets, converts DICOMs to BIDS, and provides an interactive TUI."
+        "description": "QSMxT is an end-to-end software toolbox for Quantitative Susceptibility Mapping (QSM), rebuilt in Rust as a single self-contained binary. This container packages upstream QSMxT 12.1.0. It reconstructs QSM from BIDS datasets, converts DICOMs to BIDS, and provides an interactive TUI."
     },
     "quantiphyse": {
         "apps": {
@@ -6768,6 +6773,11 @@
             },
             "rabies 0.6.3": {
                 "version": "20261029",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "rabies 0.6.4": {
+                "version": "20261117",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -8240,6 +8250,11 @@
             },
             "whitematterlesions 0.5.20261108": {
                 "version": "20261109",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "whitematterlesions 0.5.20261111": {
+                "version": "20261117",
                 "exec": "",
                 "apptainer_args": []
             }
