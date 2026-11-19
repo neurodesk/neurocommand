@@ -312,6 +312,12 @@ def desktop_argument(value: str) -> str:
     return '"' + escaped.replace("\\", "\\\\") + '"'
 
 
+# Menu launches inherit the desktop session environment, which skips the shell
+# startup files that set APPTAINER_BINDPATH and other site paths. An interactive
+# shell reads them, as a terminal does.
+MENU_SHELL = "/bin/bash -i"
+
+
 def render_app_menu(app: NeurodeskApp) -> str:
     entry = configparser.ConfigParser(interpolation=None)
     entry.optionxform = str
@@ -321,13 +327,13 @@ def render_app_menu(app: NeurodeskApp) -> str:
         "Comment": f"{app.name} (x86_64 build, runs under emulation)"
         if app.emulated
         else app.name,
-        "Exec": f"/bin/bash {desktop_argument(str(app.sh_path))}",
+        "Exec": f"{MENU_SHELL} {desktop_argument(str(app.sh_path))}",
         "Icon": str(app.icon_path),
         "Type": "Application",
         "Categories": app.category,
     }
     if app.deskenv == "mate":
-        shell_command = f"/bin/bash {shlex.quote(str(app.sh_path))}"
+        shell_command = f"{MENU_SHELL} {shlex.quote(str(app.sh_path))}"
         desktop["Exec"] = (
             f"mate-terminal --window --title {desktop_argument(app.name)} "
             f"-e {desktop_argument(shell_command)}"
