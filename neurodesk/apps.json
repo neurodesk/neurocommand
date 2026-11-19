@@ -7912,6 +7912,16 @@
                 "version": "20261015",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "topofit 0.7.0": {
+                "version": "20261119",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "topofit 0.8.0": {
+                "version": "20261119",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
