@@ -1,3 +1,5 @@
+import os
+import subprocess
 from pathlib import Path
 import configparser
 import shlex
@@ -174,9 +176,29 @@ def test_desktop_exec_quotes_install_paths_for_both_environments(tmp_path):
         if environment == "mate":
             assert arguments[:4] == ["mate-terminal", "--window", "--title", "tool 1.2"]
             assert arguments[4] == "-e"
-            assert shlex.split(arguments[5]) == ["/bin/bash", str(app.sh_path)]
+            assert shlex.split(arguments[5]) == ["/bin/bash", "-i", str(app.sh_path)]
         else:
-            assert arguments == ["/bin/bash", str(app.sh_path)]
+            assert arguments == ["/bin/bash", "-i", str(app.sh_path)]
+
+
+def test_desktop_launch_sees_shell_startup_bind_paths(tmp_path):
+    home = tmp_path / "home"
+    home.mkdir()
+    (home / ".bashrc").write_text("export APPTAINER_BINDPATH=/data,/cvmfs\n")
+    app = NeurodeskApp(
+        "lxde",
+        tmp_path,
+        "Probe",
+        terminal=False,
+        launcher_command='printf "bind=%s\\n" "${APPTAINER_BINDPATH-}"',
+    )
+    write_app_sh(app)
+    env = {"HOME": str(home), "PATH": os.environ["PATH"]}
+    result = subprocess.run(
+        desktop_argv(app), env=env, cwd=home, capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert "bind=/data,/cvmfs" in result.stdout.splitlines()
 
 
 def test_custom_launcher_preserves_prefix_and_command(tmp_path):
