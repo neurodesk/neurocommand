@@ -4969,7 +4969,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261119",
+                "version": "20261120",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4983,7 +4983,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261119",
+                "version": "20261120",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5002,7 +5002,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261114",
+                "version": "20261120",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5017,7 +5017,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261114",
+                "version": "20261120",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -8295,6 +8295,11 @@
             },
             "whitematterlesions 0.5.20261111": {
                 "version": "20261117",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "whitematterlesions 0.5.20261119": {
+                "version": "20261120",
                 "exec": "",
                 "apptainer_args": []
             }
