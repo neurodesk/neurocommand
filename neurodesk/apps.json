@@ -146,6 +146,16 @@
                 "version": "20261113",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.12": {
+                "version": "20261119",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.12": {
+                "version": "20261119",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1675,7 +1685,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261114",
+                "version": "20261119",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1688,7 +1698,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261114",
+                "version": "20261119",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4959,7 +4969,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261114",
+                "version": "20261119",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4973,7 +4983,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261114",
+                "version": "20261119",
                 "exec": "",
                 "apptainer_args": []
             }
