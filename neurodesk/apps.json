@@ -1589,6 +1589,11 @@
                 "version": "20261012",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "clearswi 1.7.1": {
+                "version": "20261121",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1602,6 +1607,11 @@
         "apps": {
             "clearswi_arm64 1.7.0": {
                 "version": "20261012",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "clearswi_arm64 1.7.1": {
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1849,7 +1859,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261116",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2569,7 +2579,7 @@
                 "exec": ""
             },
             "elastix 5.3.1": {
-                "version": "20261013",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2583,7 +2593,7 @@
     "elastix_arm64": {
         "apps": {
             "elastix_arm64 5.3.1": {
-                "version": "20261013",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4969,7 +4979,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261120",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4983,7 +4993,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261120",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5002,7 +5012,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261120",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5017,7 +5027,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261120",
+                "version": "20261121",
                 "exec": "",
                 "apptainer_args": []
             }
