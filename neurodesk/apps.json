@@ -5787,6 +5787,25 @@
                 "version": "20260608",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "nighres 1.5.3": {
+                "version": "20261122",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "structural imaging"
+        ],
+        "citation": "Huntenburg, Steele & Bazin (2018). Nighres: processing tools for high-resolution neuroimaging.\nGigaScience, 7(7). https://doi.org/10.1093/gigascience/giy082",
+        "description": "Neuroimaging at high resolution is a collection of python/java tools for processing of high resolution neuroimaging data, including UHF-MRI and microscopy. The package includes many tools for quantitative MRI, brain parcellation, shape analysis optimized to scale nicely with resolution."
+    },
+    "nighres_arm64": {
+        "apps": {
+            "nighres_arm64 1.5.3": {
+                "version": "20261122",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
