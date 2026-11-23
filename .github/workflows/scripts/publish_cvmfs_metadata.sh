@@ -21,6 +21,7 @@ METADATA_FILES=(cvmfs/log.txt cvmfs/applist.json)
 TITLE="Publish CVMFS metadata for uploaded containers"
 
 verified_apps=""
+pending_ids=()
 # Consolidated batches install sequentially, including publication and garbage
 # collection per container. A healthy rollout can take longer than six hours.
 LAG_SECONDS="${CVMFS_METADATA_LAG_SECONDS:-86400}"
@@ -33,11 +34,98 @@ report() {
     fi
 }
 
+# Return "<epoch> [<oldest_id>]" for the earliest continuous introduction of
+# any currently pending container in base_sha's neurodesk/apps.json history.
+pending_since() {
+    local now="$1"
+    python3 - "$base_sha" "$now" "$LAG_SECONDS" "${pending_ids[@]}" <<'PY'
+import json
+import subprocess
+import sys
+
+sys.path.insert(0, ".")
+from cvmfs.generate_metadata import log_lines
+
+base_sha = sys.argv[1]
+now = int(sys.argv[2])
+lag_seconds = int(sys.argv[3])
+pending = {item for item in sys.argv[4:] if item}
+cutoff = now - lag_seconds
+
+
+def git(*args: str) -> str:
+    return subprocess.check_output(["git", *args], text=True)
+
+
+def ids_from_apps(rev: str) -> set[str]:
+    try:
+        raw = git("show", f"{rev}:neurodesk/apps.json")
+        data = json.loads(raw)
+        return {line.split()[0] for line in log_lines(data) if line.strip()}
+    except Exception:
+        return set()
+
+
+def ids_from_log(rev: str) -> set[str]:
+    try:
+        raw = git("show", f"{rev}:cvmfs/log.txt")
+        return {line.split()[0] for line in raw.splitlines() if line.strip()}
+    except Exception:
+        return set()
+
+
+if not pending:
+    pending = ids_from_apps(base_sha) - ids_from_log(base_sha)
+
+commits = [
+    line.split()
+    for line in git(
+        "log", "--first-parent", "--format=%H %ct", base_sha, "--", "neurodesk/apps.json"
+    ).splitlines()
+    if line.strip()
+]
+if not commits:
+    raise SystemExit(1)
+
+latest_ts = int(commits[0][1])
+if not pending:
+    print(f"{latest_ts}")
+    raise SystemExit(0)
+
+remaining = set(pending)
+introduced: dict[str, int] = {}
+
+for commit_sha, ts_str in commits:
+    ts = int(ts_str)
+    present = ids_from_apps(commit_sha)
+    for cid in list(remaining):
+        if cid in present:
+            introduced[cid] = min(introduced.get(cid, ts), ts)
+        else:
+            remaining.discard(cid)
+    if not remaining:
+        break
+    if introduced and ts <= cutoff and min(introduced.values()) <= cutoff:
+        break
+
+if not introduced:
+    print(f"{latest_ts}")
+else:
+    oldest_id, oldest_ts = min(introduced.items(), key=lambda kv: (kv[1], kv[0]))
+    print(f"{oldest_ts} {oldest_id}")
+PY
+}
+
 publication_pending() {
-    local changed age
-    changed="$(git log -1 --format=%ct "$base_sha" -- neurodesk/apps.json)" || exit 1
-    age=$(( $(date +%s) - changed ))
-    report "[PENDING] apps.json blob $(git rev-parse "${base_sha}:neurodesk/apps.json"), age ${age}s; publication deferred."
+    local now pending_info changed oldest_id age detail=""
+    now="$(date +%s)" || exit 1
+    pending_info="$(pending_since "$now")" || exit 1
+    read -r changed oldest_id <<< "$pending_info"
+    age=$(( now - changed ))
+    if [[ -n "$oldest_id" ]]; then
+        detail=", oldest pending ${oldest_id}"
+    fi
+    report "[PENDING] apps.json blob $(git rev-parse "${base_sha}:neurodesk/apps.json")${detail}, age ${age}s; publication deferred."
     if (( age >= LAG_SECONDS )); then
         report "[ERROR] Inventory publication lag exceeds ${LAG_SECONDS}s."
         exit 1
@@ -46,11 +134,29 @@ publication_pending() {
 }
 
 require_publication() {
-    local status=0
-    python3 cvmfs/check_publication.py --log cvmfs/log.txt || status=$?
+    local object_missing="${1:-0}"
+    local status=0 output line
+    output="$(python3 cvmfs/check_publication.py --log cvmfs/log.txt)" || status=$?
+    if [[ -n "$output" ]]; then
+        printf '%s\n' "$output"
+    fi
     case "$status" in
-        0) ;;
-        3) publication_pending ;;
+        0)
+            if (( object_missing )); then
+                publication_pending
+            fi
+            ;;
+        3)
+            if (( ! object_missing )); then
+                pending_ids=()
+            fi
+            while IFS= read -r line; do
+                if [[ "$line" == "[PENDING] Missing public container: "* ]]; then
+                    pending_ids+=("${line#"[PENDING] Missing public container: "}")
+                fi
+            done <<< "$output"
+            publication_pending
+            ;;
         *) exit 1 ;;
     esac
 }
@@ -72,8 +178,14 @@ missing_images() {
     done < cvmfs/log.txt | xargs -P 16 -I{} sh -c \
         'curl --silent --fail --head --output /dev/null --connect-timeout 15 \
             --retry 3 --retry-delay 5 "$1" || echo "$1"' _ {})
+    pending_ids=()
     if [[ ${#missing[@]} -gt 0 ]]; then
         printf '[INFO] Not in object storage: %s\n' "${missing[@]}"
+        local url name
+        for url in "${missing[@]}"; do
+            name="${url##*/}"
+            pending_ids+=("${name%.simg}")
+        done
         return 1
     fi
 }
@@ -89,7 +201,7 @@ build_branch() {
     if git diff --quiet -- "${METADATA_FILES[@]}"; then
         return 1
     fi
-    local apps
+    local apps object_missing=0
     apps="$(git rev-parse "${base_sha}:neurodesk/apps.json")" || exit 1
     if [[ "$apps" != "$verified_apps" ]]; then
         if ! missing_images; then
@@ -98,15 +210,17 @@ build_branch() {
                 echo "[INFO] $BASE has a newer neurodesk/apps.json; its upload run publishes it."
                 exit 0
             fi
-            if [[ -z "$TRIGGER_SHA" ]]; then
-                publication_pending
+            if [[ -n "$TRIGGER_SHA" ]]; then
+                echo "[ERROR] The inventory for $BASE's neurodesk/apps.json is not fully uploaded."
+                exit 1
             fi
-            echo "[ERROR] The inventory for $BASE's neurodesk/apps.json is not fully uploaded."
-            exit 1
+            object_missing=1
         fi
-        verified_apps="$apps"
+        if (( object_missing == 0 )); then
+            verified_apps="$apps"
+        fi
     fi
-    require_publication
+    require_publication "$object_missing"
     # Publishers of the same inventory on the same base build the same commit,
     # so concurrent runs never displace each other's PR head.
     GIT_AUTHOR_DATE="$(git show -s --format=%cI "$base_sha")" \
