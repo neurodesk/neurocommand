@@ -461,3 +461,266 @@ def test_new_candidate_after_base_race_must_pass_its_own_probe(tmp_path):
         "tool_1.0_20261012 categories:a,",
     ]
     assert len(_merges(tmp_path)) == 1
+
+
+@pytest.mark.parametrize("missing", ["object", "cvmfs"])
+def test_newer_apps_json_commit_does_not_reset_lag_for_older_pending_container(
+    tmp_path, missing
+):
+    origin, seed, work, state, env = _fixture(tmp_path)
+    base_ts = int(_git(seed, "show", "-s", "--format=%ct", "HEAD"))
+    first_ts = base_ts + 3600
+    second_ts = first_ts + 12 * 3600
+
+    # First commit introduces tool 1.0 (20261010) which stays pending.
+    if missing != "object":
+        _upload(seed, "20261010")
+    apps = {
+        "tool": {"apps": {"tool 1.0": {"version": "20261010"}}, "categories": ["a"]}
+    }
+    (seed / "neurodesk" / "apps.json").write_text(json.dumps(apps))
+    commit_env_1 = {
+        **os.environ,
+        "GIT_AUTHOR_DATE": f"{first_ts} +0000",
+        "GIT_COMMITTER_DATE": f"{first_ts} +0000",
+    }
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-am", "first"],
+        cwd=seed,
+        env=commit_env_1,
+        check=True,
+        capture_output=True,
+    )
+
+    # Second commit 12h later adds an already-uploaded second tool.
+    for store in ("nectar", "aws"):
+        (seed.parent / store / "other_1.0_20261011.simg").write_text("image")
+    apps["other"] = {
+        "apps": {"other 1.0": {"version": "20261011"}},
+        "categories": ["a"],
+    }
+    (seed / "neurodesk" / "apps.json").write_text(json.dumps(apps))
+    commit_env_2 = {
+        **os.environ,
+        "GIT_AUTHOR_DATE": f"{second_ts} +0000",
+        "GIT_COMMITTER_DATE": f"{second_ts} +0000",
+    }
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-am", "second"],
+        cwd=seed,
+        env=commit_env_2,
+        check=True,
+        capture_output=True,
+    )
+    _git(seed, "push", "origin", "HEAD:main")
+
+    if missing == "cvmfs":
+        (seed / "cvmfs/check_publication.py").write_text(
+            "import os, pathlib, sys\n"
+            "missing_file = pathlib.Path(os.environ['GH_STATE']) / 'missing-cvmfs'\n"
+            "items = [l.strip() for l in missing_file.read_text().splitlines() if l.strip()]\n"
+            "for item in items:\n"
+            "    print(f'[PENDING] Missing public container: {item}')\n"
+            "sys.exit(3 if items else 0)\n"
+        )
+        _git(seed, "commit", "-am", "stub cvmfs missing reporter")
+        _git(seed, "push", "origin", "HEAD:main")
+        (state / "missing-cvmfs").write_text("tool_1.0_20261010\n")
+
+    clock = tmp_path / "bin" / "date"
+    env.pop("CVMFS_METADATA_LAG_SECONDS", None)
+
+    # At first_ts + 24h - 1s, still within deadline.
+    clock.write_text(f"#!/bin/sh\necho {first_ts + 24 * 3600 - 1}\n")
+    clock.chmod(0o755)
+    before = _publish(work, "", env)
+    assert before.returncode == 0, before.stdout + before.stderr
+    assert "oldest pending tool_1.0_20261010" in before.stdout
+
+    # At first_ts + 24h, fails even though the second commit is only 12h old.
+    clock.write_text(f"#!/bin/sh\necho {first_ts + 24 * 3600}\n")
+    clock.chmod(0o755)
+    after = _publish(work, "", env)
+    assert after.returncode == 1, after.stdout + after.stderr
+    assert "oldest pending tool_1.0_20261010" in after.stdout
+    assert "Inventory publication lag exceeds" in after.stdout
+
+    # Once the older container is published and only the newer one is pending,
+    # the deadline follows the newer commit (12h < 24h -> still deferred).
+    if missing == "cvmfs":
+        (state / "missing-cvmfs").write_text("other_1.0_20261011\n")
+        newer_only = _publish(work, "", env)
+        assert newer_only.returncode == 0, newer_only.stdout + newer_only.stderr
+        assert "oldest pending other_1.0_20261011" in newer_only.stdout
+
+
+def test_newer_object_missing_does_not_hide_overdue_cvmfs_missing(tmp_path):
+    _, seed, work, state, env = _fixture(tmp_path)
+    base_ts = int(_git(seed, "show", "-s", "--format=%ct", "HEAD"))
+    old_ts = base_ts + 3600
+    new_ts = old_ts + 22 * 3600
+
+    # Old container is uploaded to object storage but stuck missing from CVMFS.
+    _upload(seed, "20261010")
+    apps = {
+        "tool": {"apps": {"tool 1.0": {"version": "20261010"}}, "categories": ["a"]}
+    }
+    (seed / "neurodesk" / "apps.json").write_text(json.dumps(apps))
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-am", "old"],
+        cwd=seed,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_DATE": f"{old_ts} +0000",
+            "GIT_COMMITTER_DATE": f"{old_ts} +0000",
+        },
+        check=True,
+        capture_output=True,
+    )
+
+    # Newer container added 22h later is still missing from object storage.
+    apps["fresh"] = {
+        "apps": {"fresh 1.0": {"version": "20261011"}},
+        "categories": ["a"],
+    }
+    (seed / "neurodesk" / "apps.json").write_text(json.dumps(apps))
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-am", "fresh"],
+        cwd=seed,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_DATE": f"{new_ts} +0000",
+            "GIT_COMMITTER_DATE": f"{new_ts} +0000",
+        },
+        check=True,
+        capture_output=True,
+    )
+    (seed / "cvmfs/check_publication.py").write_text(
+        "print('[PENDING] Missing public container: tool_1.0_20261010')\n"
+        "raise SystemExit(3)\n"
+    )
+    _git(seed, "commit", "-am", "stub cvmfs")
+    _git(seed, "push", "origin", "HEAD:main")
+
+    clock = tmp_path / "bin" / "date"
+    # 27h after old_ts (overdue) while fresh_1.0_20261011 is only 5h old.
+    clock.write_text(f"#!/bin/sh\necho {old_ts + 27 * 3600}\n")
+    clock.chmod(0o755)
+    env.pop("CVMFS_METADATA_LAG_SECONDS", None)
+
+    result = _publish(work, "", env)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "oldest pending tool_1.0_20261010" in result.stdout
+    assert "Inventory publication lag exceeds" in result.stdout
+
+
+def test_side_branch_merge_does_not_restart_lag_clock(tmp_path):
+    _, seed, work, state, env = _fixture(tmp_path)
+    base_ts = int(_git(seed, "show", "-s", "--format=%ct", "HEAD"))
+    old_ts = base_ts + 3600
+    side_ts = old_ts + 10 * 3600
+    merge_ts = old_ts + 12 * 3600
+
+    # Side branch off base modifies apps.json (so it appears in git log -- apps.json)
+    # without containing tool_1.0_20261010, and commits later than main's commit.
+    _git(seed, "checkout", "-b", "side")
+    side_apps = {
+        "tool": {"apps": {"tool 1.0": {"version": "20250628"}}, "categories": ["a"]},
+        "other": {"apps": {"other 1.0": {"version": "20261011"}}, "categories": ["a"]},
+    }
+    (seed / "neurodesk" / "apps.json").write_text(
+        json.dumps(side_apps, indent=2) + "\n"
+    )
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-am", "side"],
+        cwd=seed,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_DATE": f"{side_ts} +0000",
+            "GIT_COMMITTER_DATE": f"{side_ts} +0000",
+        },
+        check=True,
+        capture_output=True,
+    )
+
+    _git(seed, "checkout", "main")
+    _upload(seed, "20261010")
+    for store in ("nectar", "aws"):
+        (seed.parent / store / "other_1.0_20261011.simg").write_text("image")
+    main_apps = {
+        "tool": {"apps": {"tool 1.0": {"version": "20261010"}}, "categories": ["a"]},
+    }
+    (seed / "neurodesk" / "apps.json").write_text(
+        json.dumps(main_apps, indent=2) + "\n"
+    )
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-am", "main"],
+        cwd=seed,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_DATE": f"{old_ts} +0000",
+            "GIT_COMMITTER_DATE": f"{old_ts} +0000",
+        },
+        check=True,
+        capture_output=True,
+    )
+    # Merge side into main keeping both tool 20261010 and other 20261011.
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "merge",
+            "--no-ff",
+            "--no-commit",
+            "side",
+        ],
+        cwd=seed,
+        capture_output=True,
+    )
+    merged_apps = {
+        "tool": {"apps": {"tool 1.0": {"version": "20261010"}}, "categories": ["a"]},
+        "other": {"apps": {"other 1.0": {"version": "20261011"}}, "categories": ["a"]},
+    }
+    (seed / "neurodesk" / "apps.json").write_text(
+        json.dumps(merged_apps, indent=2) + "\n"
+    )
+    _git(seed, "add", "neurodesk/apps.json")
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@t",
+            "commit",
+            "-m",
+            "merge side",
+        ],
+        cwd=seed,
+        env={
+            **os.environ,
+            "GIT_AUTHOR_DATE": f"{merge_ts} +0000",
+            "GIT_COMMITTER_DATE": f"{merge_ts} +0000",
+        },
+        check=True,
+        capture_output=True,
+    )
+    (seed / "cvmfs/check_publication.py").write_text(
+        "print('[PENDING] Missing public container: tool_1.0_20261010')\n"
+        "raise SystemExit(3)\n"
+    )
+    _git(seed, "commit", "-am", "stub cvmfs")
+    _git(seed, "push", "origin", "HEAD:main")
+
+    clock = tmp_path / "bin" / "date"
+    clock.write_text(f"#!/bin/sh\necho {old_ts + 24 * 3600}\n")
+    clock.chmod(0o755)
+    env.pop("CVMFS_METADATA_LAG_SECONDS", None)
+
+    result = _publish(work, "", env)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "oldest pending tool_1.0_20261010" in result.stdout
+    assert "Inventory publication lag exceeds" in result.stdout
