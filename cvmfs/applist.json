@@ -211,6 +211,22 @@
             ]
         },
         {
+            "application": "amide_1.0.6_20261124",
+            "categories": [
+                "molecular imaging",
+                "preclinical imaging",
+                "visualization"
+            ]
+        },
+        {
+            "application": "amide_arm64_1.0.6_20261124",
+            "categories": [
+                "molecular imaging",
+                "preclinical imaging",
+                "visualization"
+            ]
+        },
+        {
             "application": "ants_2.3.1_20211204",
             "categories": [
                 "image registration",
@@ -1159,6 +1175,22 @@
             ]
         },
         {
+            "application": "cellpose_4.2.1.1_20261124",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
+            ]
+        },
+        {
+            "application": "cellpose_arm64_4.2.1.1_20261124",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
+            ]
+        },
+        {
             "application": "cellprofiler_4.2.8.1_20261123",
             "categories": [
                 "image segmentation",
@@ -1366,7 +1398,7 @@
             ]
         },
         {
-            "application": "cryosparc_1.0.0_20261121",
+            "application": "cryosparc_1.0.0_20261124",
             "categories": [
                 "cryo EM"
             ]
@@ -2641,6 +2673,18 @@
             ]
         },
         {
+            "application": "hnncore_1.0.0_20261124",
+            "categories": [
+                "electrophysiology"
+            ]
+        },
+        {
+            "application": "hnncore_arm64_1.0.0_20261124",
+            "categories": [
+                "electrophysiology"
+            ]
+        },
+        {
             "application": "hypermapp3r_0.1.0_20260821",
             "categories": [
                 "image segmentation",
@@ -2718,6 +2762,14 @@
             ]
         },
         {
+            "application": "jipipe_5.3.0_20261124",
+            "categories": [
+                "image segmentation",
+                "visualization",
+                "workflows"
+            ]
+        },
+        {
             "application": "julia_1.10.1_20240321",
             "categories": [
                 "programming"
@@ -2781,6 +2833,15 @@
             "application": "julia_arm64_1.13.4_20261114",
             "categories": [
                 "programming"
+            ]
+        },
+        {
+            "application": "kinfitr_0.9.3_20261124",
+            "categories": [
+                "molecular imaging",
+                "preclinical imaging",
+                "quantitative imaging",
+                "statistics"
             ]
         },
         {
@@ -3304,13 +3365,31 @@
             ]
         },
         {
+            "application": "moosez_3.2.2_20261124",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "molecular imaging",
+                "preclinical imaging"
+            ]
+        },
+        {
+            "application": "moosez_arm64_3.2.2_20261124",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "molecular imaging",
+                "preclinical imaging"
+            ]
+        },
+        {
             "application": "motioncor3_1.2.4_20261012",
             "categories": [
                 "cryo EM"
             ]
         },
         {
-            "application": "mp2ragedenoise_0.1.0_20261122",
+            "application": "mp2ragedenoise_0.1.0_20261124",
             "categories": [
                 "image reconstruction"
             ]
@@ -3623,6 +3702,20 @@
             ]
         },
         {
+            "application": "nextflow_26.10.7_20261124",
+            "categories": [
+                "programming",
+                "workflows"
+            ]
+        },
+        {
+            "application": "nextflow_arm64_26.10.7_20261124",
+            "categories": [
+                "programming",
+                "workflows"
+            ]
+        },
+        {
             "application": "nextpyp_0.7.3_20261118",
             "categories": [
                 "cryo EM"
@@ -3798,6 +3891,13 @@
             ]
         },
         {
+            "application": "omero_5.8.6_20261124",
+            "categories": [
+                "data organisation",
+                "visualization"
+            ]
+        },
+        {
             "application": "openads_1.0.0_20260527",
             "categories": [
                 "diffusion imaging",
@@ -3954,6 +4054,15 @@
             ]
         },
         {
+            "application": "petfit_0.2.4_20261124",
+            "categories": [
+                "bids apps",
+                "molecular imaging",
+                "preclinical imaging",
+                "quantitative imaging"
+            ]
+        },
+        {
             "application": "petprep_0.0.10_20261005",
             "categories": [
                 "molecular imaging",
@@ -3967,6 +4076,14 @@
                 "molecular imaging",
                 "quantitative imaging",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "petpvc_1.2.12_20261124",
+            "categories": [
+                "molecular imaging",
+                "preclinical imaging",
+                "quantitative imaging"
             ]
         },
         {
@@ -3989,6 +4106,14 @@
             "application": "physio_r2021a_20260702",
             "categories": [
                 "functional imaging"
+            ]
+        },
+        {
+            "application": "plantseg_2.2.0_20261124",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "visualization"
             ]
         },
         {
@@ -4036,7 +4161,7 @@
             ]
         },
         {
-            "application": "prostatefiducialseg_8.0.4_20261103",
+            "application": "prostatefiducialseg_8.0.4_20261124",
             "categories": [
                 "body",
                 "image segmentation"
@@ -4094,6 +4219,22 @@
                 "cryo EM",
                 "molecular biology",
                 "visualization"
+            ]
+        },
+        {
+            "application": "pypet2bids_1.6.0_20261124",
+            "categories": [
+                "bids apps",
+                "data organisation",
+                "molecular imaging"
+            ]
+        },
+        {
+            "application": "pypet2bids_arm64_1.6.0_20261124",
+            "categories": [
+                "bids apps",
+                "data organisation",
+                "molecular imaging"
             ]
         },
         {
@@ -4591,6 +4732,20 @@
             "application": "rapidtide_arm64_3.2.0_20261013",
             "categories": [
                 "functional imaging"
+            ]
+        },
+        {
+            "application": "rclone_1.76.0_20261124",
+            "categories": [
+                "data organisation",
+                "workflows"
+            ]
+        },
+        {
+            "application": "rclone_arm64_1.76.0_20261124",
+            "categories": [
+                "data organisation",
+                "workflows"
             ]
         },
         {
@@ -5192,6 +5347,13 @@
             ]
         },
         {
+            "application": "tissuumaps_3.2.1.14_20261124",
+            "categories": [
+                "molecular biology",
+                "visualization"
+            ]
+        },
+        {
             "application": "topaz_0.2.5_20240313",
             "categories": [
                 "cryo EM",
@@ -5306,6 +5468,22 @@
             "application": "totalsegmentator_arm64_2.18.0_20261012",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "tpcclib_0.8.2_20261124",
+            "categories": [
+                "molecular imaging",
+                "preclinical imaging",
+                "quantitative imaging"
+            ]
+        },
+        {
+            "application": "tpcclib_arm64_0.8.2_20261124",
+            "categories": [
+                "molecular imaging",
+                "preclinical imaging",
+                "quantitative imaging"
             ]
         },
         {
@@ -5492,6 +5670,13 @@
         },
         {
             "application": "webknossos_4.4.0_20261123",
+            "categories": [
+                "data organisation",
+                "visualization"
+            ]
+        },
+        {
+            "application": "webknossos_5.0.0_20261124",
             "categories": [
                 "data organisation",
                 "visualization"
