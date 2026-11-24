@@ -194,6 +194,7 @@
         "categories": [
             "diffusion imaging",
             "functional imaging",
+            "preclinical imaging",
             "rodent imaging",
             "structural imaging"
         ],
@@ -216,6 +217,7 @@
         "categories": [
             "diffusion imaging",
             "functional imaging",
+            "preclinical imaging",
             "rodent imaging",
             "structural imaging"
         ],
@@ -907,7 +909,9 @@
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "molecular imaging",
+            "preclinical imaging"
         ],
         "citation": "Halchenko YO, Goncalves M, Ghosh S, et al. HeuDiConv: flexible DICOM conversion into structured directory layouts (Zenodo). 2026. doi:10.5281/zenodo.1012598\n\nLi X, Morgan PS, Ashburner J, Smith J, Rorden C. The first step for neuroimaging data analysis: DICOM to NIfTI conversion. J Neurosci Methods. 2016;264:47-56. doi:10.1016/j.jneumeth.2016.03.001",
         "description": "Contains a collection of tools useful for DICOM to BIDS conversion Tools included:"
@@ -926,7 +930,9 @@
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "molecular imaging",
+            "preclinical imaging"
         ],
         "citation": "Halchenko YO, Goncalves M, Ghosh S, et al. HeuDiConv: flexible DICOM conversion into structured directory layouts (Zenodo). 2026. doi:10.5281/zenodo.1012598\n\nLi X, Morgan PS, Ashburner J, Smith J, Rorden C. The first step for neuroimaging data analysis: DICOM to NIfTI conversion. J Neurosci Methods. 2016;264:47-56. doi:10.1016/j.jneumeth.2016.03.001",
         "description": "Contains a collection of tools useful for DICOM to BIDS conversion Tools included:"
@@ -1411,7 +1417,8 @@
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "preclinical imaging"
         ],
         "citation": "Lee SH, Devenyi GA, Ban W, Shih YYI. BrkRaw: A modular toolkit for Bruker MRI raw-data handling (Zenodo). 2026. doi:10.5281/zenodo.3818614",
         "description": "[![DOI](https://zenodo.org/badge/245546149.svg)](https://zenodo.org/badge/latestdoi/245546149) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BrkRaw/tutorials/master)"
@@ -1425,7 +1432,8 @@
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "preclinical imaging"
         ],
         "citation": "Lee SH, Devenyi GA, Ban W, Shih YYI. BrkRaw: A modular toolkit for Bruker MRI raw-data handling (Zenodo). 2026. doi:10.5281/zenodo.3818614",
         "description": "[![DOI](https://zenodo.org/badge/245546149.svg)](https://zenodo.org/badge/latestdoi/245546149) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/BrkRaw/tutorials/master)"
@@ -1548,6 +1556,27 @@
         ],
         "description": "This open recon tool will compute a b0 map based on two magnitude images and one phasediff image from a gradien echo field mapping sequence. you can setup the builder environment with:"
     },
+    "cellprofiler": {
+        "apps": {
+            "cellprofiler 4.2.8.1": {
+                "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "CellProfiler-cellprofiler 4.2.8.1": {
+                "version": "20261123",
+                "exec": "cellprofiler",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "visualization",
+            "workflows"
+        ],
+        "citation": "Stirling, D. R., Swain-Bowden, M. J., Lucas, A. M., Carpenter, A. E.,\nCimini, B. A., & Goodman, A. (2021). CellProfiler 4: improvements in speed,\nutility and usability. BMC Bioinformatics, 22, 433.\nhttps://doi.org/10.1186/s12859-021-04344-9",
+        "description": "CellProfiler is an open-source application for quantitative high-throughput microscopy image analysis, providing both an interactive GUI pipeline builder and headless batch execution via Bio-Formats."
+    },
     "chimera-brainparcellation": {
         "apps": {
             "chimera-brainparcellation 0.4.1": {
@@ -1642,6 +1671,7 @@
             }
         },
         "categories": [
+            "molecular imaging",
             "workflows"
         ],
         "citation": "Routier, A., Burgos, N., D\u00edaz, M., Bacci, M., Bottani, S., El-Rifai O., Fontanella, S., Gori, P., Guillon, J., Guyot, A., Hassanaly, R., Jacquemont, T., Lu, P., Marcoux, A., Moreau, T., Samper-Gonz\u00e1lez, J., Teichmann, M., Thibeau-Sutre, E., Vaillant G., Wen, J., Wild, A., Habert, M.-O., Durrleman, S., and Colliot, O.: Clinica: An Open Source Software Platform for Reproducible Clinical Neuroscience Studies Frontiers in Neuroinformatics, 2021 doi:10.3389/fninf.2021.689675",
@@ -2419,7 +2449,8 @@
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "molecular imaging"
         ],
         "citation": "Li X, Morgan PS, Ashburner J, Smith J, Rorden C. The first step for neuroimaging data analysis: DICOM to NIfTI conversion. J Neurosci Methods. 2016;264:47-56. doi:10.1016/j.jneumeth.2016.03.001",
         "description": "Contains a collection of tools useful for DICOM to BIDS conversion Tools included:"
@@ -2433,7 +2464,8 @@
             }
         },
         "categories": [
-            "data organisation"
+            "data organisation",
+            "molecular imaging"
         ],
         "citation": "Li X, Morgan PS, Ashburner J, Smith J, Rorden C. The first step for neuroimaging data analysis: DICOM to NIfTI conversion. J Neurosci Methods. 2016;264:47-56. doi:10.1016/j.jneumeth.2016.03.001",
         "description": "Contains a collection of tools useful for DICOM to BIDS conversion Tools included:"
@@ -2489,7 +2521,8 @@
             }
         },
         "categories": [
-            "diffusion imaging"
+            "diffusion imaging",
+            "preclinical imaging"
         ],
         "citation": "Yeh FC. DSI Studio: an integrated tractography platform and fiber data hub for accelerating brain research. Nat Methods. 2025;22(8):1617-1619. doi:10.1038/s41592-025-02762-8",
         "description": "DSI Studio is a tractography software tool that maps brain connections and correlates findings with neuropsychological disorders. It is a collective implementation of several diffusion MRI methods, including diffusion tensor imaging (DTI), generalized q-sampling imaging (GQI), q-space diffeomorphic reconstruction (QSDR), diffusion MRI connectometry, and generalized deterministic fiber tracking. This container uses the CPU build, so registration and tractography run without a CUDA driver."
@@ -2759,7 +2792,8 @@
         },
         "categories": [
             "bids apps",
-            "data organisation"
+            "data organisation",
+            "molecular imaging"
         ],
         "citation": "Levitas, Daniel, et al. \"ezBIDS: Guided standardization of neuroimaging data\ninteroperable with major data archives and platforms.\" Nature Scientific Data\n13, no. 130 (2024).",
         "description": "ezBIDS is a secure, web-based tool for converting neuroimaging data to the Brain Imaging Data Structure (BIDS) format. This container includes the full ezBIDS web application with support for: - MRI data conversion (DICOM to BIDS) - PET imaging support (via pypet2bids) - MEG data support (via MNE-BIDS) - Automatic defacing options - BIDS validation ### Quick Start (Neurodesk) After loading the module, simply run:"
@@ -2886,6 +2920,26 @@
         ],
         "citation": "Oostenveld R, Fries P, Maris E, Schoffelen JM. FieldTrip: open source software for advanced analysis of MEG, EEG, and invasive electrophysiological data. Comput Intell Neurosci. 2011;2011:156869. doi:10.1155/2011/156869",
         "description": "Standalone (compiled) version of FieldTrip with MATLAB runtime"
+    },
+    "fiji": {
+        "apps": {
+            "fiji 20261112-1517": {
+                "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "Fiji-fiji 20261112-1517": {
+                "version": "20261123",
+                "exec": "fiji",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "visualization"
+        ],
+        "citation": "Schindelin, J., Arganda-Carreras, I., Frise, E., Kaynig, V., Longair, M.,\nPietzsch, T., Preibisch, S., Rueden, C., Saalfeld, S., Schmid, B.,\nTinevez, J.-Y., White, D. J., Hartenstein, V., Eliceiri, K., Tomancak, P.,\n& Cardona, A. (2012). Fiji: an open-source platform for biological-image\nanalysis. Nature Methods, 9(7), 676-682. https://doi.org/10.1038/nmeth.2019",
+        "description": "Fiji (Fiji Is Just ImageJ) is an open-source image processing package based on ImageJ2, bundling Bio-Formats, BigDataViewer, and scientific microscopy plugins for 2D/3D visualization, segmentation, registration, and analysis."
     },
     "fitlins": {
         "apps": {
@@ -3076,6 +3130,7 @@
         },
         "categories": [
             "image segmentation",
+            "molecular imaging",
             "structural imaging"
         ],
         "citation": "see https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferMethodsCitation",
@@ -3753,6 +3808,26 @@
         ],
         "citation": "Mojiri Forooshani P, Biparva M, Ntiri EE, Ramirez J, Boone L, Holmes MF,\nAdamo S, Gao F, Ozzoude M, Scott CJM, Dowlatshahi D, Lawrence-Dewar JM,\nKwan D, Lang AE, Marcotte K, Leonard C, Rochon E, Heyn C, Bartha R,\nStrother S, Tardif JC, Symons S, Masellis M, Swartz RH, Moody A, Black SE,\nGoubran M. (2022) Deep Bayesian networks for uncertainty estimation and\nadversarial resistance of white matter hyperintensity segmentation.\nHuman Brain Mapping 43(7):2089-2108. doi:10.1002/hbm.25784",
         "description": "HyperMapp3r is a CNN-based white matter hyperintensity (WMH) segmentation\ntool from AICONS Lab. It segments WMH from T1-weighted and FLAIR images\nusing a 3D U-Net with Monte-Carlo dropout, designed to be robust in patients\nwith large lesion burden and brain atrophy. Runs on CPU."
+    },
+    "icy": {
+        "apps": {
+            "icy 2.5.4.0": {
+                "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "Icy-icy 2.5.4.0": {
+                "version": "20261123",
+                "exec": "icy",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "visualization"
+        ],
+        "citation": "de Chaumont, F., Dallongeville, S., Chenouard, N., Herv\u00e9, N., Pop, S.,\nProvoost, T., Meas-Yedid, V., Pankajakshan, P., Lecomte, T., Le Montagner,\nY., Lagache, T., Dufour, A., & Olivo-Marin, J.-C. (2012). Icy: an open\nbioimage informatics platform for extended reproducible research. Nature\nMethods, 9(7), 690-696. https://doi.org/10.1038/nmeth.2075",
+        "description": "Icy is an open-source bioimage informatics platform developed at Institut Pasteur for 2D/3D microscopy visualization, Bio-Formats image loading, ROI measurement, and reproducible visual Protocols workflows."
     },
     "ilastik": {
         "apps": {
@@ -6263,6 +6338,7 @@
             }
         },
         "categories": [
+            "molecular imaging",
             "quantitative imaging",
             "structural imaging"
         ],
@@ -6469,6 +6545,48 @@
             "cryo EM"
         ],
         "citation": "Asarnow D, Palovcak E, Cheng Y. UCSF pyem v0.5 (Zenodo). 2019. doi:10.5281/zenodo.3576630"
+    },
+    "pymol": {
+        "apps": {
+            "pymol 3.1.0": {
+                "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "PyMOL-pymol 3.1.0": {
+                "version": "20261123",
+                "exec": "pymol",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM",
+            "molecular biology",
+            "visualization"
+        ],
+        "citation": "The PyMOL Molecular Graphics System, Version 3.1.0, Open-Source build,\nSchr\u00f6dinger, LLC. https://github.com/schrodinger/pymol-open-source",
+        "description": "Open-Source PyMOL is a molecular and volumetric 3D visualization system widely used for structural biology, cryo-EM density maps (MRC/CCP4), protein structures (PDB/mmCIF), and publication-quality ray-traced figures."
+    },
+    "pymol_arm64": {
+        "apps": {
+            "pymol_arm64 3.1.0": {
+                "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "PyMOL-pymol_arm64 3.1.0": {
+                "version": "20261123",
+                "exec": "pymol",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "cryo EM",
+            "molecular biology",
+            "visualization"
+        ],
+        "citation": "The PyMOL Molecular Graphics System, Version 3.1.0, Open-Source build,\nSchr\u00f6dinger, LLC. https://github.com/schrodinger/pymol-open-source",
+        "description": "Open-Source PyMOL is a molecular and volumetric 3D visualization system widely used for structural biology, cryo-EM density maps (MRC/CCP4), protein structures (PDB/mmCIF), and publication-quality ray-traced figures."
     },
     "qmrlab": {
         "apps": {
@@ -6877,6 +6995,7 @@
             }
         },
         "categories": [
+            "preclinical imaging",
             "rodent imaging"
         ],
         "citation": "Desrosiers-Gr\u00e9goire, et al. Nat Commun 15, 6708 (2024). https://doi.org/10.1038/s41467-024-50826-8",
@@ -7196,6 +7315,7 @@
         },
         "categories": [
             "functional imaging",
+            "preclinical imaging",
             "rodent imaging",
             "workflows"
         ],
@@ -7618,6 +7738,7 @@
             "functional imaging",
             "image registration",
             "image segmentation",
+            "molecular imaging",
             "structural imaging"
         ],
         "description": "SPM12 standalone with Matlab Compiler Runtime included"
@@ -7631,7 +7752,8 @@
             }
         },
         "categories": [
-            "functional imaging"
+            "functional imaging",
+            "molecular imaging"
         ],
         "description": "SPM12 standalone with Matlab Compiler Runtime"
     },
@@ -7650,6 +7772,7 @@
         },
         "categories": [
             "functional imaging",
+            "molecular imaging",
             "structural imaging"
         ],
         "citation": "Tierney, Tim M., Nicholas A. Alexander, John Ashburner, et al. \u201cSPM 25: Open Source Neuroimaging Analysis Software.\u201d Journal of Open Source Software 10, no. 110 (2025): 8103. https://doi.org/10.21105/joss.08103.",
@@ -7721,7 +7844,8 @@
             }
         },
         "categories": [
-            "image reconstruction"
+            "image reconstruction",
+            "molecular imaging"
         ],
         "citation": "Thielemans K, Tsoumpas C, Mustafovic S, et al. STIR: software for tomographic image reconstruction release 2. Phys Med Biol. 2012;57(4):867-883. doi:10.1088/0031-9155/57/4/867"
     },
@@ -8319,6 +8443,21 @@
         ],
         "citation": "Jennis Meyer-Spradow, Timo Ropinski, Jorg Mensmann, Klaus H. Hinrichs:\nVoreen: A Rapid-Prototyping Environment for Ray-Casting-Based Volume Visualizations. IEEE Computer Graphics and Applications 29(6): 6-13 (2009)",
         "description": "Voreen is an open source rapid application development framework for the interactive visualization and analysis of multi-modal volumetric data sets. It provides GPU-based volume rendering and data analysis techniques."
+    },
+    "webknossos": {
+        "apps": {
+            "webknossos 4.4.0": {
+                "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "visualization"
+        ],
+        "citation": "Boergens, K. M., Berning, M., Bocklisch, T., Br\u00e4unlein, D., Drawitsch, F.,\nFrohnhofen, J., Herold, T., Otto, P., Rzepka, N., Werkmeister, T., Werner,\nD., Wiese, G., Wissler, H., & Helmstaedter, M. (2017). webKnossos: efficient\nonline 3D data annotation for connectomics. Nature Methods, 14(7), 691-694.\nhttps://doi.org/10.1038/nmeth.4331",
+        "description": "WEBKNOSSOS Python library and CLI for converting, streaming, and analyzing large 3D microscopy and connectomics datasets (WKW, OME-Zarr, N5, TIFF, CZI, MRC, Imaris) and working with annotations and skeletons from local storage or a remote WEBKNOSSOS server."
     },
     "wftfi": {
         "apps": {
