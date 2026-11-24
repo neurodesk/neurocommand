@@ -282,6 +282,48 @@
         "citation": "Accelerated Microstructure Imaging via Convex Optimization (AMICO) from diffusion MRI data\nAlessandro Daducci, Erick Canales-Rodriguez, Hui Zhang, Tim Dyrby, Daniel C Alexander, Jean-Philippe Thiran\nNeuroimage 105 (2015): 32-44. https://doi.org/10.1016/j.neuroimage.2014.10.026\n\nOrientationally invariant indices of axon diameter and density from diffusion MRI\nDaniel C Alexander, Penny L Hubbard, Matt G Hall, Elizabeth A Moore, Maurice Ptito, Geoff J M Parker, Tim B Dyrby\nNeuroimage 52.4 (2010): 1374-1389. https://doi.org/10.1016/j.neuroimage.2010.05.043\n\nNODDI: practical in vivo neurite orientation dispersion and density imaging of the human brain\nHui Zhang, Torben Schneider, Claudia A Wheeler-Kingshott, Daniel C Alexander\nNeuroimage 61.4 (2012): 1000-1016. https://doi.org/10.1016/j.neuroimage.2012.03.072\n\nSANDI: A compartment-based model for non-invasive apparent soma and neurite imaging by diffusion MRI\nMarco Palombo, Andrada Ianus, Michele Guerreri, Daniel Nunes, Daniel C. Alexander, Noam Shemesh, Hui Zhang\nNeuroimage 215 (2020): 116835. https://doi.org/10.1016/j.neuroimage.2020.116835",
         "description": "Accelerated Microstructure Imaging via Convex Optimization (AMICO) from diffusion MRI data"
     },
+    "amide": {
+        "apps": {
+            "amide 1.0.6": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "AMIDE-amide 1.0.6": {
+                "version": "20261124",
+                "exec": "amide",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular imaging",
+            "preclinical imaging",
+            "visualization"
+        ],
+        "citation": "Loening AM, Gambhir SS. AMIDE: a free software tool for multimodality medical image analysis.\nMolecular Imaging. 2003;2(3):131-137. doi:10.1162/153535003322556877",
+        "description": "AMIDE (A Medical Image Data Examiner) is a tool for viewing, registering, and analyzing multimodal 3D medical imaging datasets, including clinical and preclinical microPET, microCT, SPECT, and MRI studies, with interactive ROI delineation, SUV/quantitative statistics, and volume rendering."
+    },
+    "amide_arm64": {
+        "apps": {
+            "amide_arm64 1.0.6": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "AMIDE-amide_arm64 1.0.6": {
+                "version": "20261124",
+                "exec": "amide",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular imaging",
+            "preclinical imaging",
+            "visualization"
+        ],
+        "citation": "Loening AM, Gambhir SS. AMIDE: a free software tool for multimodality medical image analysis.\nMolecular Imaging. 2003;2(3):131-137. doi:10.1162/153535003322556877",
+        "description": "AMIDE (A Medical Image Data Examiner) is a tool for viewing, registering, and analyzing multimodal 3D medical imaging datasets, including clinical and preclinical microPET, microCT, SPECT, and MRI studies, with interactive ROI delineation, SUV/quantitative statistics, and volume rendering."
+    },
     "ants": {
         "apps": {
             "ants 2.3.1": {
@@ -1556,6 +1598,58 @@
         ],
         "description": "This open recon tool will compute a b0 map based on two magnitude images and one phasediff image from a gradien echo field mapping sequence. you can setup the builder environment with:"
     },
+    "cellpose": {
+        "apps": {
+            "cellpose 4.2.1.1": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "Cellpose-cellpose 4.2.1.1": {
+                "version": "20261124",
+                "exec": "cellpose",
+                "apptainer_args": []
+            },
+            "Cellpose 3D-cellpose 4.2.1.1": {
+                "version": "20261124",
+                "exec": "cellpose-3d",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "visualization"
+        ],
+        "citation": "Pachitariu, M., Rariden, M., & Stringer, C. (2025). Cellpose-SAM:\nsuperhuman generalization for cellular segmentation. bioRxiv.\nhttps://doi.org/10.1101/2025.04.28.651001\n\nStringer, C., Wang, T., Michaelos, M., & Pachitariu, M. (2021).\nCellpose: a generalist algorithm for cellular segmentation. Nature Methods,\n18(1), 100-106. https://doi.org/10.1038/s41592-020-01018-x",
+        "description": "Cellpose 4 (Cellpose-SAM) is a generalist deep-learning algorithm and interactive Qt6 GUI for 2D and 3D cellular and nuclear segmentation in microscopy images. This container includes CUDA-enabled PyTorch on x86_64 (CPU wheels on ARM64) and covers both 2D (`cellpose`) and 3D Z-stack (`cellpose-3d` / `cellpose --Zstack`) workflows."
+    },
+    "cellpose_arm64": {
+        "apps": {
+            "cellpose_arm64 4.2.1.1": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "Cellpose-cellpose_arm64 4.2.1.1": {
+                "version": "20261124",
+                "exec": "cellpose",
+                "apptainer_args": []
+            },
+            "Cellpose 3D-cellpose_arm64 4.2.1.1": {
+                "version": "20261124",
+                "exec": "cellpose-3d",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "visualization"
+        ],
+        "citation": "Pachitariu, M., Rariden, M., & Stringer, C. (2025). Cellpose-SAM:\nsuperhuman generalization for cellular segmentation. bioRxiv.\nhttps://doi.org/10.1101/2025.04.28.651001\n\nStringer, C., Wang, T., Michaelos, M., & Pachitariu, M. (2021).\nCellpose: a generalist algorithm for cellular segmentation. Nature Methods,\n18(1), 100-106. https://doi.org/10.1038/s41592-020-01018-x",
+        "description": "Cellpose 4 (Cellpose-SAM) is a generalist deep-learning algorithm and interactive Qt6 GUI for 2D and 3D cellular and nuclear segmentation in microscopy images. This container includes CUDA-enabled PyTorch on x86_64 (CPU wheels on ARM64) and covers both 2D (`cellpose`) and 3D Z-stack (`cellpose-3d` / `cellpose --Zstack`) workflows."
+    },
     "cellprofiler": {
         "apps": {
             "cellprofiler 4.2.8.1": {
@@ -1889,7 +1983,7 @@
     "cryosparc": {
         "apps": {
             "cryosparc 1.0.0": {
-                "version": "20261121",
+                "version": "20261124",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3786,6 +3880,24 @@
             "hnncore 0.3": {
                 "version": "20231112",
                 "exec": ""
+            },
+            "hnncore 1.0.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "electrophysiology"
+        ],
+        "citation": "Jas M, Thorpe R, Tolley N, et al. HNN-core: A Python software for cellular and circuit-level interpretation of human MEG/EEG. J Open Source Softw. 2023;8(92):5848. doi:10.21105/joss.05848"
+    },
+    "hnncore_arm64": {
+        "apps": {
+            "hnncore_arm64 1.0.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -3944,6 +4056,27 @@
         ],
         "citation": "https://arxiv.org/abs/1408.3270",
         "description": "JIDT: Java Information Dynamics Toolkit for studying information-theoretic measures of computation in complex systems. JIDT provides a stand-alone, open-source code Java implementation (also usable in Matlab, Octave, Python, R, Julia and Clojure) of information-theoretic measures of distributed computation in complex systems: i.e. information storage, transfer and modification."
+    },
+    "jipipe": {
+        "apps": {
+            "jipipe 5.3.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "JIPipe-jipipe 5.3.0": {
+                "version": "20261124",
+                "exec": "jipipe",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "visualization",
+            "workflows"
+        ],
+        "citation": "Gerst, R., Cseresny\u00e9s, Z., & Figge, M. T. (2023). JIPipe: visual batch\nprocessing for ImageJ. Nature Methods, 20(2), 168-169.\nhttps://doi.org/10.1038/s41592-022-01744-4",
+        "description": "JIPipe (Java Image Processing Pipeline) is an open-source visual programming language and workflow builder for ImageJ/Fiji, enabling reproducible batch microscopy image analysis without coding."
     },
     "julia": {
         "apps": {
@@ -4108,6 +4241,23 @@
             "programming"
         ],
         "description": "Julia was designed from the beginning for high performance. Julia programs compile to efficient native code for multiple platforms via LLVM."
+    },
+    "kinfitr": {
+        "apps": {
+            "kinfitr 0.9.3": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular imaging",
+            "preclinical imaging",
+            "quantitative imaging",
+            "statistics"
+        ],
+        "citation": "Matheson, G. J. (2019). Kinfitr: Reproducible PET Pharmacokinetic Modelling in R. bioRxiv: 755751. https://doi.org/10.1101/755751\n\nTjerkaski, J., Cervenka, S., Farde, L., & Matheson, G. J. (2020). Kinfitr - an open source tool for reproducible PET modelling: Validation and evaluation of test-retest reliability. EJNMMI Research 10, 77. https://doi.org/10.1186/s13550-020-00664-8",
+        "description": "kinfitr is an R package for reproducible pharmacokinetic modeling of Positron Emission Tomography (PET) time-activity curves (TACs). It implements compartmental models (1TCM, 2TCM), graphical analyses (Logan, Patlak, MA1), and reference tissue models (SRTM, SRTM2, MRTM1, MRTM2, refLogan, refPatlak) along with arterial blood data processing utilities."
     },
     "kspacefilter": {
         "apps": {
@@ -5167,6 +5317,40 @@
         "citation": "Kofler F, Rosier M, Astaraki M, et al. BrainLesion Suite: a flexible and user-friendly framework for modular brain lesion image analysis (arXiv). 2025. doi:10.48550/arXiv.2507.09036",
         "description": "modsort sorts, identifies and tags MR sequences through a drag-and-drop desktop interface, then copies and renames the files into the structure you choose. It is a graphical tool: there is no batch or command line mode. Part of the BrainLesion Suite (BLS): https://github.com/BrainLesion ### Input format modsort is **NIfTI only**. Its drop targets are BraTS-style modality tags -- `_t1.nii.gz`, `_t1c.nii.gz`, `_t2.nii.gz`, `_fla.nii.gz`, plus `swi`, `dwi`, `adc` and `rcbv`. It does not sort DICOM; convert first with `dcm2niix` if that is what you have. ### It writes to your filesystem Sorting means copying and renaming real files into a destination you pick. Point it at a copy before running it over data you cannot regenerate. ### Example"
     },
+    "moosez": {
+        "apps": {
+            "moosez 3.2.2": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "molecular imaging",
+            "preclinical imaging"
+        ],
+        "citation": "Shiyam Sundar, L. K., Yu, J., Muzik, O., Kulterer, O., Fueger, B. J., Kifjak, D., Nakuz, T., Shin, H. M., Sima, A. K., Kitzmantl, D., Badawi, R. D., Nardo, L., Cherry, S. R., Spencer, B. A., Hacker, M., & Beyer, T. (2022). Fully-automated, semantic segmentation of whole-body 18F-FDG PET/CT images based on data-centric artificial intelligence. Journal of Nuclear Medicine. https://doi.org/10.2967/jnumed.122.264063",
+        "description": "MOOSE (Multi-Organ Objective Segmentation, moosez) is an nnU-Net v2 deep learning segmentation suite from the ENHANCE-PET initiative providing clinical whole-body CT and clinical MR segmentation models, clinical FDG-PET brain and face models, and preclinical CT leg-muscle and preclinical multi-organ MR segmentation models."
+    },
+    "moosez_arm64": {
+        "apps": {
+            "moosez_arm64 3.2.2": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "molecular imaging",
+            "preclinical imaging"
+        ],
+        "citation": "Shiyam Sundar, L. K., Yu, J., Muzik, O., Kulterer, O., Fueger, B. J., Kifjak, D., Nakuz, T., Shin, H. M., Sima, A. K., Kitzmantl, D., Badawi, R. D., Nardo, L., Cherry, S. R., Spencer, B. A., Hacker, M., & Beyer, T. (2022). Fully-automated, semantic segmentation of whole-body 18F-FDG PET/CT images based on data-centric artificial intelligence. Journal of Nuclear Medicine. https://doi.org/10.2967/jnumed.122.264063",
+        "description": "MOOSE (Multi-Organ Objective Segmentation, moosez) is an nnU-Net v2 deep learning segmentation suite from the ENHANCE-PET initiative providing clinical whole-body CT and clinical MR segmentation models, clinical FDG-PET brain and face models, and preclinical CT leg-muscle and preclinical multi-organ MR segmentation models."
+    },
     "motioncor3": {
         "apps": {
             "motioncor3 1.2.4": {
@@ -5184,7 +5368,7 @@
     "mp2ragedenoise": {
         "apps": {
             "mp2ragedenoise 0.1.0": {
-                "version": "20261122",
+                "version": "20261124",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5749,6 +5933,36 @@
         "citation": "Siddhartha Dhiman, Joshua B Teves, Kathryn E Thorn, Emilie T McKinnon,\nHunter G Moss, Vitria Adisetiyo, Benjamin Ades-Aron, Jelle Veraart, Jenny Chen,\nEls Fieremans, Andreana Benitez, Joseph A Helpern, Jens H Jensen. PyDesigner: A\nPythonic Implementation of the DESIGNER Pipeline for Diffusion Tensor and\nDiffusional Kurtosis Imaging. bioRxiv 2021.10.20.465189. doi:\nhttps://doi.org/10.1101/2021.10.20.465189```\n\nLicense: Custom license non-commerical, non-clinical care: https://github.com/muscbridge/PyDesigner?tab=License-1-ov-file#readme\n\n----------------------------------",
         "description": "PyD is an installable Python package designed to perform pre- and post- processing of dMRI acquisitions."
     },
+    "nextflow": {
+        "apps": {
+            "nextflow 26.10.7": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming",
+            "workflows"
+        ],
+        "citation": "Di Tommaso, P., Chatzou, M., Floden, E. W., Barja, P. P., Palumbo, E., &\nNotredame, C. (2017). Nextflow enables reproducible computational workflows.\nNature Biotechnology, 35(4), 316-319. https://doi.org/10.1038/nbt.3820",
+        "description": "Nextflow is a workflow management system for scalable and reproducible scientific data analysis pipelines across local, HPC, and cloud environments. This container bundles the self-contained Nextflow distribution with OpenJDK 21."
+    },
+    "nextflow_arm64": {
+        "apps": {
+            "nextflow_arm64 26.10.7": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "programming",
+            "workflows"
+        ],
+        "citation": "Di Tommaso, P., Chatzou, M., Floden, E. W., Barja, P. P., Palumbo, E., &\nNotredame, C. (2017). Nextflow enables reproducible computational workflows.\nNature Biotechnology, 35(4), 316-319. https://doi.org/10.1038/nbt.3820",
+        "description": "Nextflow is a workflow management system for scalable and reproducible scientific data analysis pipelines across local, HPC, and cloud environments. This container bundles the self-contained Nextflow distribution with OpenJDK 21."
+    },
     "nextpyp": {
         "apps": {
             "nextpyp 0.7.3": {
@@ -6032,6 +6246,26 @@
         ],
         "citation": "Potvin O, Dieumegarde L, Duchesne S. NOMIS: Quantifying morphometric deviations\nfrom normality over the lifetime of the adult human brain. bioRxiv\n2021.01.25.428063. https://doi.org/10.1101/2021.01.25.428063",
         "description": "NOMIS (NOrmative Morphometry Image Statistics) computes normative Z-scores for FreeSurfer 6.0 morphometry, adjusted for age, sex, head size and image quality, from models of 6,909 healthy adults aged 18-100."
+    },
+    "omero": {
+        "apps": {
+            "omero 5.8.6": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "OMERO.insight-omero 5.8.6": {
+                "version": "20261124",
+                "exec": "omero-insight",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "visualization"
+        ],
+        "citation": "Allan, C., Burel, J.-M., Moore, J., Blackburn, C., Linkert, M., Loynton, S.,\nMacDonald, D., Moore, W. J., Neves, C., Patterson, A., Porter, M., Tarkowska,\nA., Loranger, B., Avondo, J., Lagerstedt, I., Lianas, L., Leo, S., Hands, K.,\nHay, R. T., ... Swedlow, J. R. (2012). OMERO: flexible, model-driven data\nmanagement for experimental biology. Nature Methods, 9(3), 245-253.\nhttps://doi.org/10.1038/nmeth.1896",
+        "description": "OMERO.insight is the official desktop client for the Open Microscopy Environment (OMERO), enabling biologists and imaging facilities to browse, annotate, import, and visualize multi-dimensional microscopy image datasets managed on an OMERO server."
     },
     "openads": {
         "apps": {
@@ -6324,6 +6558,23 @@
         "citation": "de Boer, A. A. A., Bayer, J. M. M., Fraza, C., Chavanne, A., Buckova, B. R., \nTsilimparis, K., Serin, E., Bernas, A., Cirstian, R., Zabihi, M., Rutherford, S., \nAl-Khaledi, A., Wolfers, T., Beckmann, C. F., Kia, S. M., & Marquand, A. F. (2026). \nProtocol update: The Normative Modelling Paradigm for Computational Psychiatry. \nbioRxiv [Preprint]. https://doi.org/10.64898/2026.02.17.706268.",
         "description": "Toolbox for normative modelling and spatial inference of neuroimaging data. https://pcntoolkit.readthedocs.io/en/latest/"
     },
+    "petfit": {
+        "apps": {
+            "petfit 0.2.4": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "molecular imaging",
+            "preclinical imaging",
+            "quantitative imaging"
+        ],
+        "citation": "Matheson, G. J. (2019). Kinfitr: Reproducible PET Pharmacokinetic Modelling in R. bioRxiv: 755751. https://doi.org/10.1101/755751\n\nTjerkaski, J., Cervenka, S., Farde, L., & Matheson, G. J. (2020). Kinfitr - an open source tool for reproducible PET modelling: Validation and evaluation of test-retest reliability. EJNMMI Research 10, 77. https://doi.org/10.1186/s13550-020-00664-8",
+        "description": "PETFit is a BIDS App and R Shiny application suite built on kinfitr for reproducible Positron Emission Tomography (PET) pharmacokinetic modeling. It provides interactive web apps and non-interactive automatic pipelines for combining regional time-activity curves (regiondef), plasma-input compartmental and graphical modeling (1TCM, 2TCM, 2TCM_irr, Logan, MA1, Patlak), and reference-tissue modeling (SRTM, SRTM2, SUV/SUVR, refLogan, MRTM1, MRTM2, refPatlak), generating HTML quality-control reports for each processing step."
+    },
     "petprep": {
         "apps": {
             "petprep 0.0.10": {
@@ -6344,6 +6595,22 @@
         ],
         "citation": "N\u00f8rgaard M, Esteban O, Matheson GJ, et al. PETPrep: a robust preprocessing pipeline for positron emission tomography (PET) neuroimaging. 15th International Symposium on Functional Neuroreceptor Mapping of the Living Brain (NRM), Uppsala. 2026. https://github.com/nipreps/petprep/blob/main/CITATION.cff",
         "description": "PETPrep is a positron emission tomography (PET) data preprocessing pipeline that is designed to provide an easily accessible, state-of-the-art interface that is robust to variations in scan acquisition protocols and that requires minimal user input, while providing easily interpretable and comprehensive error and output reporting. It performs comprehensive processing steps\u2014such as motion correction, segmentation, registration, partial volume correction, and extraction of time activity curves, providing outputs that can be easily submitted to a variety of group level analyses, pharmacokinetic modelling, graph theory measures, and surface or volume-based statistics."
+    },
+    "petpvc": {
+        "apps": {
+            "petpvc 1.2.12": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular imaging",
+            "preclinical imaging",
+            "quantitative imaging"
+        ],
+        "citation": "Thomas BA, Cuplov V, Bousse A, Mendes A, Thielemans K, Hutton BF, Erlandsson K. PETPVC: a toolbox for performing partial volume correction techniques in positron emission tomography. Physics in Medicine and Biology. 2016;61(22):7975-7993. doi:10.1088/0031-9155/61/22/7975",
+        "description": "PETPVC (UCL) is a standalone command-line suite for partial volume correction (PVC) in positron emission tomography (PET), providing region-based and voxel-wise methods including GTM, RBV, Labbe, MTC, Iterative Yang (IY), Discrete IY, Muller-Gartner (MG), Richardson-Lucy (RL), Van Cittert (VC), and STC, along with PSF simulation and 4D mask preparation utilities."
     },
     "petu": {
         "apps": {
@@ -6395,6 +6662,27 @@
         ],
         "citation": "Kasper L, Bollmann S, Diaconescu AO, et al. The PhysIO Toolbox for Modeling Physiological Noise in fMRI Data. J Neurosci Methods. 2017;276:56-72. doi:10.1016/j.jneumeth.2016.10.019\n\nFr\u00e4ssle S, Aponte EA, Bollmann S, et al. TAPAS: An Open-Source Software Package for Translational Neuromodeling and Computational Psychiatry. Front Psychiatry. 2021;12:680811. doi:10.3389/fpsyt.2021.680811",
         "description": "SPM12+PhysIO toolbox standalone with Matlab (r2021a) Compiler Runtime (v99)"
+    },
+    "plantseg": {
+        "apps": {
+            "plantseg 2.2.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "PlantSeg (PanSeg)-plantseg 2.2.0": {
+                "version": "20261124",
+                "exec": "plantseg-gui",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "visualization"
+        ],
+        "citation": "Wolny, A., Cerrone, L., Vijayan, A., Tofanelli, R., Barro, A. V., Louveaux,\nM., Wenzl, C., Strauss, S., Wilson-S\u00e1nchez, D., Lymbouridou, R., Steigleder,\nS. S., Pape, C., Bailoni, A., Duran-Nebreda, S., Bassel, G. W., Lohmann,\nJ. U., Tsiantis, M., Hamprecht, F. A., Schneitz, K., Maizel, A., & Kreshuk,\nA. (2020). Accurate and versatile 3D segmentation of plant tissues at\ncellular resolution. eLife, 9, e57613. https://doi.org/10.7554/eLife.57613",
+        "description": "PlantSeg (renamed upstream to PanSeg as of v2.0) is an open-source deep learning pipeline and napari-based GUI for 2D and 3D instance segmentation of densely packed cells and nuclei in microscopy volumes. Both `plantseg` (with legacy `--gui` compatibility) and `panseg` commands are provided."
     },
     "postgresanalytics": {
         "apps": {
@@ -6459,7 +6747,7 @@
                 "apptainer_args": []
             },
             "prostatefiducialseg 8.0.4": {
-                "version": "20261103",
+                "version": "20261124",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6587,6 +6875,38 @@
         ],
         "citation": "The PyMOL Molecular Graphics System, Version 3.1.0, Open-Source build,\nSchr\u00f6dinger, LLC. https://github.com/schrodinger/pymol-open-source",
         "description": "Open-Source PyMOL is a molecular and volumetric 3D visualization system widely used for structural biology, cryo-EM density maps (MRC/CCP4), protein structures (PDB/mmCIF), and publication-quality ray-traced figures."
+    },
+    "pypet2bids": {
+        "apps": {
+            "pypet2bids 1.6.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "data organisation",
+            "molecular imaging"
+        ],
+        "citation": "Galassi A, Norgaard M, Thomas AG, Gonzalez-Escamilla G, Svarer C, Rorden C, Matheson GJ, Knudsen GM, Innis RB, Ganz M, Eierud C, Bilgel M, Pernet C. PET2BIDS: a library for converting Positron Emission Tomography data to BIDS. Journal of Open Source Software. 2024;9(100):6067. doi:10.21105/joss.06067\n\nLi X, Morgan PS, Ashburner J, Smith J, Rorden C. The first step for neuroimaging data analysis: DICOM to NIfTI conversion. J Neurosci Methods. 2016;264:47-56. doi:10.1016/j.jneumeth.2016.03.001",
+        "description": "pypet2bids (OpenNeuroPET/PET2BIDS) converts source Positron Emission Tomography (PET) imaging data (DICOM and ECAT) and blood radioactivity measurements into the Brain Imaging Data Structure (BIDS). It bundles a modern `dcm2niix` (v1.0.20261029) so DICOM-to-BIDS conversion works out of the box. ### Included CLI Tools"
+    },
+    "pypet2bids_arm64": {
+        "apps": {
+            "pypet2bids_arm64 1.6.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "bids apps",
+            "data organisation",
+            "molecular imaging"
+        ],
+        "citation": "Galassi A, Norgaard M, Thomas AG, Gonzalez-Escamilla G, Svarer C, Rorden C, Matheson GJ, Knudsen GM, Innis RB, Ganz M, Eierud C, Bilgel M, Pernet C. PET2BIDS: a library for converting Positron Emission Tomography data to BIDS. Journal of Open Source Software. 2024;9(100):6067. doi:10.21105/joss.06067\n\nLi X, Morgan PS, Ashburner J, Smith J, Rorden C. The first step for neuroimaging data analysis: DICOM to NIfTI conversion. J Neurosci Methods. 2016;264:47-56. doi:10.1016/j.jneumeth.2016.03.001",
+        "description": "pypet2bids (OpenNeuroPET/PET2BIDS) converts source Positron Emission Tomography (PET) imaging data (DICOM and ECAT) and blood radioactivity measurements into the Brain Imaging Data Structure (BIDS). It bundles a modern `dcm2niix` (v1.0.20261029) so DICOM-to-BIDS conversion works out of the box. ### Included CLI Tools"
     },
     "qmrlab": {
         "apps": {
@@ -7066,6 +7386,34 @@
         ],
         "citation": "Frederick, B, Salo, T, Drucker, J, Zhang, D, & Han, X. (2024).\nbbfrederick/rapidtide: Rapidtide. Zenodo. https://doi.org/10.5281/zenodo.814990\n\nErdogan S, Tong Y, Hocke L, Lindsey K, Frederick B. (2016). Correcting\nresting state fMRI-BOLD signals for blood arrival time enhances functional\nconnectivity analysis. Front. Hum. Neurosci. 10:311.\nhttps://doi.org/10.3389/fnhum.2016.00311",
         "description": "Rapidtide is a suite of Python tools for performing time delay (and similarity) analysis on fMRI and other physiological data. Its principal use is to find and remove low frequency systemic (non-neuronal) blood signals - such as those arising from respiration and the cardiac cycle - by mapping the time delay of a moving blood-borne regressor throughout the brain (the RIPTiDe algorithm). The package also includes happy, a tool for cardiac waveform extraction and cardiac cycle analysis of fMRI data, and a number of supporting time course and NIfTI utilities."
+    },
+    "rclone": {
+        "apps": {
+            "rclone 1.76.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "workflows"
+        ],
+        "description": "rclone is a command-line program to manage, synchronize, and transfer files across cloud and object storage providers (S3, WebDAV, SFTP, Google Drive, Nextcloud/ownCloud, Swift, and more), with an optional web GUI (`rclone rcd --rc-web-gui`). When running without a writable home directory, point `RCLONE_CONFIG` or `--config` to a writable path for storing remote credentials."
+    },
+    "rclone_arm64": {
+        "apps": {
+            "rclone_arm64 1.76.0": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "workflows"
+        ],
+        "description": "rclone is a command-line program to manage, synchronize, and transfer files across cloud and object storage providers (S3, WebDAV, SFTP, Google Drive, Nextcloud/ownCloud, Swift, and more), with an optional web GUI (`rclone rcd --rc-web-gui`). When running without a writable home directory, point `RCLONE_CONFIG` or `--config` to a writable path for storing remote credentials."
     },
     "relion": {
         "apps": {
@@ -8055,6 +8403,26 @@
         "citation": "Langkammer, C; Bredies, K; Poser, BA; Barth, M; Reishofer, G; Fan, AP; Bilgic, B; Fazekas, F; Mainero; C; Ropele, S\nFast Quantitative Susceptibility Mapping using 3D EPI and Total Generalized Variation.\nNeuroimage. 2015 May 1;111:622-30. doi: 10.1016/j.neuroimage.2015.02.041",
         "description": "Quantitative susceptibility mapping allows the determination magnetic susceptibility from MRI phase data. TGV QSM is a python implementation to compute this. This container also includes bet2 for brain extraction and dcm2niix to convert dicom data to NiFTI files."
     },
+    "tissuumaps": {
+        "apps": {
+            "tissuumaps 3.2.1.14": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "TissUUmaps-tissuumaps 3.2.1.14": {
+                "version": "20261124",
+                "exec": "tissuumaps",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular biology",
+            "visualization"
+        ],
+        "citation": "Pielawski, N., Andersson, A., Avenel, C., Behanova, A., Chelebian, E.,\nKlemm, A., Nysj\u00f6, F., Solorzano, L., & W\u00e4hlby, C. (2023). TissUUmaps 3:\nImprovements in interactive visualization, exploration, and quality\nassessment of large-scale spatial omics data. Heliyon, 9(5), e15306.\nhttps://doi.org/10.1016/j.heliyon.2023.e15306",
+        "description": "TissUUmaps is an open-source, browser- and QtWebEngine-based viewer for large whole-slide microscopy images and spatial omics / point-cloud annotations, supporting pyvips and OpenSlide image backends."
+    },
     "topaz": {
         "apps": {
             "topaz 0.2.5": {
@@ -8181,6 +8549,38 @@
         ],
         "citation": "Wasserthal, J., Breit, H.-C., Meyer, M.T., Pradella, M., Hinck, D., Sauter, A.W., Heye, T., Boll, D., Cyriac, J., Yang, S., Bach, M., Segeroth, M., 2023. TotalSegmentator: Robust Segmentation of 104 Anatomic Structures in CT Images. Radiology: Artificial Intelligence. https://doi.org/10.1148/ryai.230024",
         "description": "Tool for segmentation of most major anatomical structures in any CT or MR image. It was trained on a wide range of different CT and MR images (different scanners, institutions, protocols,...) and therefore works well on most images. A large part of the training dataset can be downloaded here: CT dataset (1228 subjects) and MR dataset (616 subjects). You can also try the tool online at totalsegmentator.com or as 3D Slicer extension."
+    },
+    "tpcclib": {
+        "apps": {
+            "tpcclib 0.8.2": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular imaging",
+            "preclinical imaging",
+            "quantitative imaging"
+        ],
+        "citation": "Oikonen V, Johansson J, Liukko K, Merisaari H, Alenius S, Laakkonen C, Krais R. TPCCLIB: Turku PET Centre C library and command-line tools for processing and analysing PET data. https://gitlab.utu.fi/vesoik/tpcclib",
+        "description": "TPCCLIB is the Turku PET Centre C command-line tool suite for clinical and preclinical dynamic PET analysis, time-activity curves (TACs), input functions, kinetic modeling, and parametric imaging."
+    },
+    "tpcclib_arm64": {
+        "apps": {
+            "tpcclib_arm64 0.8.2": {
+                "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "molecular imaging",
+            "preclinical imaging",
+            "quantitative imaging"
+        ],
+        "citation": "Oikonen V, Johansson J, Liukko K, Merisaari H, Alenius S, Laakkonen C, Krais R. TPCCLIB: Turku PET Centre C library and command-line tools for processing and analysing PET data. https://gitlab.utu.fi/vesoik/tpcclib",
+        "description": "TPCCLIB is the Turku PET Centre C command-line tool suite for clinical and preclinical dynamic PET analysis, time-activity curves (TACs), input functions, kinetic modeling, and parametric imaging."
     },
     "trackvis": {
         "apps": {
@@ -8448,6 +8848,11 @@
         "apps": {
             "webknossos 4.4.0": {
                 "version": "20261123",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "webknossos 5.0.0": {
+                "version": "20261124",
                 "exec": "",
                 "apptainer_args": []
             }
