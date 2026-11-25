@@ -103,6 +103,12 @@
             ]
         },
         {
+            "application": "afni_26.3.13_20261125",
+            "categories": [
+                "functional imaging"
+            ]
+        },
+        {
             "application": "aidamri_1.1_20210708",
             "categories": [
                 "diffusion imaging",
@@ -818,6 +824,22 @@
             ]
         },
         {
+            "application": "bioformats2raw_0.14.0_20261125",
+            "categories": [
+                "data organisation",
+                "digital pathology",
+                "optical imaging"
+            ]
+        },
+        {
+            "application": "bioformats2raw_arm64_0.14.0_20261125",
+            "categories": [
+                "data organisation",
+                "digital pathology",
+                "optical imaging"
+            ]
+        },
+        {
             "application": "blastct_2.0.0_20260512",
             "categories": [
                 "structural imaging"
@@ -1293,6 +1315,24 @@
             ]
         },
         {
+            "application": "cloudcompare_2.13.2_20261125",
+            "categories": [
+                "body",
+                "image registration",
+                "shape analysis",
+                "visualization"
+            ]
+        },
+        {
+            "application": "cloudcompare_arm64_2.13.2_20261125",
+            "categories": [
+                "body",
+                "image registration",
+                "shape analysis",
+                "visualization"
+            ]
+        },
+        {
             "application": "cmtk_3.4.0_20261003",
             "categories": [
                 "image registration",
@@ -1315,6 +1355,38 @@
             "application": "code_arm64_240320_20261119",
             "categories": [
                 "programming"
+            ]
+        },
+        {
+            "application": "colmap_3.12.6_20261125",
+            "categories": [
+                "body",
+                "image reconstruction",
+                "shape analysis"
+            ]
+        },
+        {
+            "application": "colmap_arm64_3.12.6_20261125",
+            "categories": [
+                "body",
+                "image reconstruction",
+                "shape analysis"
+            ]
+        },
+        {
+            "application": "colour-science_0.4.7_20261125",
+            "categories": [
+                "optical imaging",
+                "quality control",
+                "quantitative imaging"
+            ]
+        },
+        {
+            "application": "colour-science_arm64_0.4.7_20261125",
+            "categories": [
+                "optical imaging",
+                "quality control",
+                "quantitative imaging"
             ]
         },
         {
@@ -1449,6 +1521,20 @@
             "application": "dafne_arm64_2.1.1a2_20260929",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "darktable_5.4.1_20261125",
+            "categories": [
+                "optical imaging",
+                "visualization"
+            ]
+        },
+        {
+            "application": "darktable_arm64_5.4.1_20261125",
+            "categories": [
+                "optical imaging",
+                "visualization"
             ]
         },
         {
@@ -1731,11 +1817,36 @@
             ]
         },
         {
+            "application": "dentateseg_0.3.2_20261125",
+            "categories": [
+                "image segmentation",
+                "machine learning",
+                "quantitative imaging",
+                "structural imaging"
+            ]
+        },
+        {
             "application": "dhcpstructuralpipeline_1.1_20260722",
             "categories": [
                 "image segmentation",
                 "structural imaging",
                 "workflows"
+            ]
+        },
+        {
+            "application": "dicom-validator_0.9.0_20261125",
+            "categories": [
+                "data organisation",
+                "optical imaging",
+                "quality control"
+            ]
+        },
+        {
+            "application": "dicom-validator_arm64_0.9.0_20261125",
+            "categories": [
+                "data organisation",
+                "optical imaging",
+                "quality control"
             ]
         },
         {
@@ -2646,6 +2757,22 @@
             ]
         },
         {
+            "application": "histoqc_2.0.0_20261125",
+            "categories": [
+                "digital pathology",
+                "optical imaging",
+                "quality control"
+            ]
+        },
+        {
+            "application": "histoqc_arm64_2.0.0_20261125",
+            "categories": [
+                "digital pathology",
+                "optical imaging",
+                "quality control"
+            ]
+        },
+        {
             "application": "hmri_0.6.0_20230901",
             "categories": [
                 "quantitative imaging",
@@ -2693,6 +2820,22 @@
             ]
         },
         {
+            "application": "hyperspy_2.5.0_20261125",
+            "categories": [
+                "optical imaging",
+                "quantitative imaging",
+                "spectroscopy"
+            ]
+        },
+        {
+            "application": "hyperspy_arm64_2.5.0_20261125",
+            "categories": [
+                "optical imaging",
+                "quantitative imaging",
+                "spectroscopy"
+            ]
+        },
+        {
             "application": "icy_2.5.4.0_20261123",
             "categories": [
                 "image segmentation",
@@ -2709,6 +2852,36 @@
             "application": "ilastik_1.4.2_20260928",
             "categories": [
                 "image segmentation"
+            ]
+        },
+        {
+            "application": "instanseg_0.1.2_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "instanseg_arm64_0.1.2_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "isic-cli_12.8.0_20261125",
+            "categories": [
+                "data organisation",
+                "optical imaging"
+            ]
+        },
+        {
+            "application": "isic-cli_arm64_12.8.0_20261125",
+            "categories": [
+                "data organisation",
+                "optical imaging"
             ]
         },
         {
@@ -2858,6 +3031,22 @@
             ]
         },
         {
+            "application": "labelme_7.11.0_20261125",
+            "categories": [
+                "image segmentation",
+                "optical imaging",
+                "visualization"
+            ]
+        },
+        {
+            "application": "labelme_arm64_7.11.0_20261125",
+            "categories": [
+                "image segmentation",
+                "optical imaging",
+                "visualization"
+            ]
+        },
+        {
             "application": "lashis_1.0_20210105",
             "categories": [
                 "hippocampus",
@@ -2897,6 +3086,24 @@
             "application": "laynii_arm64_2.10.0_20261012",
             "categories": [
                 "functional imaging"
+            ]
+        },
+        {
+            "application": "lazyslide_0.13.0_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning",
+                "optical imaging"
+            ]
+        },
+        {
+            "application": "lazyslide_arm64_0.13.0_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning",
+                "optical imaging"
             ]
         },
         {
@@ -3181,6 +3388,22 @@
             "categories": [
                 "functional imaging",
                 "quality control"
+            ]
+        },
+        {
+            "application": "meshlab_2025.07.0_20261125",
+            "categories": [
+                "body",
+                "shape analysis",
+                "visualization"
+            ]
+        },
+        {
+            "application": "meshlab_arm64_2025.07.0_20261125",
+            "categories": [
+                "body",
+                "shape analysis",
+                "visualization"
             ]
         },
         {
@@ -3865,6 +4088,24 @@
             ]
         },
         {
+            "application": "nnunetv2_2.8.1_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning",
+                "optical imaging"
+            ]
+        },
+        {
+            "application": "nnunetv2_arm64_2.8.1_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning",
+                "optical imaging"
+            ]
+        },
+        {
             "application": "nobrainer_1.2.1_20261003",
             "categories": [
                 "image segmentation",
@@ -3891,9 +4132,35 @@
             ]
         },
         {
+            "application": "octproz_1.8.0_20261125",
+            "categories": [
+                "image reconstruction",
+                "optical imaging",
+                "visualization"
+            ]
+        },
+        {
             "application": "omero_5.8.6_20261124",
             "categories": [
                 "data organisation",
+                "visualization"
+            ]
+        },
+        {
+            "application": "open3d_0.20.0_20261125",
+            "categories": [
+                "body",
+                "image reconstruction",
+                "shape analysis",
+                "visualization"
+            ]
+        },
+        {
+            "application": "open3d_arm64_0.20.0_20261125",
+            "categories": [
+                "body",
+                "image reconstruction",
+                "shape analysis",
                 "visualization"
             ]
         },
@@ -3985,7 +4252,7 @@
             ]
         },
         {
-            "application": "palmettobug_0.2.11_20261024",
+            "application": "palmettobug_0.2.11_20261125",
             "categories": [
                 "molecular biology"
             ]
@@ -4100,6 +4367,22 @@
                 "image segmentation",
                 "machine learning",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "phasorpy_0.13.0_20261125",
+            "categories": [
+                "optical imaging",
+                "quantitative imaging",
+                "spectroscopy"
+            ]
+        },
+        {
+            "application": "phasorpy_arm64_0.13.0_20261125",
+            "categories": [
+                "optical imaging",
+                "quantitative imaging",
+                "spectroscopy"
             ]
         },
         {
@@ -4761,7 +5044,7 @@
             ]
         },
         {
-            "application": "relion_5.1.1_20261107",
+            "application": "relion_5.1.1_20261125",
             "categories": [
                 "cryo EM"
             ]
@@ -4909,6 +5192,12 @@
             ]
         },
         {
+            "application": "rstudio_2026.11.1_20261125",
+            "categories": [
+                "statistics"
+            ]
+        },
+        {
             "application": "samri_0.5_20260608",
             "categories": [
                 "functional imaging",
@@ -5040,6 +5329,15 @@
             ]
         },
         {
+            "application": "slideflow_3.0.2_20261125",
+            "categories": [
+                "digital pathology",
+                "machine learning",
+                "optical imaging",
+                "visualization"
+            ]
+        },
+        {
             "application": "smartscope_0.10.0_20261118",
             "categories": [
                 "cryo EM"
@@ -5105,6 +5403,22 @@
         {
             "application": "spant_arm64_4.5.0_20261010",
             "categories": [
+                "spectroscopy"
+            ]
+        },
+        {
+            "application": "spectral_0.26.0_20261125",
+            "categories": [
+                "optical imaging",
+                "quantitative imaging",
+                "spectroscopy"
+            ]
+        },
+        {
+            "application": "spectral_arm64_0.26.0_20261125",
+            "categories": [
+                "optical imaging",
+                "quantitative imaging",
                 "spectroscopy"
             ]
         },
@@ -5217,6 +5531,15 @@
                 "image registration",
                 "image segmentation",
                 "structural imaging"
+            ]
+        },
+        {
+            "application": "stardist_0.9.2_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning",
+                "optical imaging"
             ]
         },
         {
@@ -5344,6 +5667,22 @@
             "categories": [
                 "phase processing",
                 "quantitative imaging"
+            ]
+        },
+        {
+            "application": "tiatoolbox_2.1.3_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning"
+            ]
+        },
+        {
+            "application": "tiatoolbox_arm64_2.1.3_20261125",
+            "categories": [
+                "digital pathology",
+                "image segmentation",
+                "machine learning"
             ]
         },
         {
@@ -5508,6 +5847,14 @@
             "application": "tractseg_arm64_2.10.0_20261016",
             "categories": [
                 "diffusion imaging"
+            ]
+        },
+        {
+            "application": "valis_1.2.0_20261125",
+            "categories": [
+                "digital pathology",
+                "image registration",
+                "optical imaging"
             ]
         },
         {
@@ -5743,6 +6090,20 @@
             "categories": [
                 "image segmentation",
                 "machine learning"
+            ]
+        },
+        {
+            "application": "wsidicomizer_0.32.0_20261125",
+            "categories": [
+                "data organisation",
+                "digital pathology"
+            ]
+        },
+        {
+            "application": "wsidicomizer_arm64_0.32.0_20261125",
+            "categories": [
+                "data organisation",
+                "digital pathology"
             ]
         },
         {
