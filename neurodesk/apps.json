@@ -8008,7 +8008,7 @@
                 "apptainer_args": []
             },
             "relion 5.1.1": {
-                "version": "20261107",
+                "version": "20261125",
                 "exec": "",
                 "apptainer_args": []
             }
