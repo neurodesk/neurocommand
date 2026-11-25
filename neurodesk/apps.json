@@ -156,6 +156,16 @@
                 "version": "20261119",
                 "exec": "suma",
                 "apptainer_args": []
+            },
+            "afni 26.3.13": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "sumaGUI-afni 26.3.13": {
+                "version": "20261125",
+                "exec": "suma",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -1017,6 +1027,36 @@
         ],
         "description": "BIDSvue is a cross-platform desktop UI for creating, inspecting, and modifying BIDS neuroimaging datasets."
     },
+    "bioformats2raw": {
+        "apps": {
+            "bioformats2raw 0.14.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "digital pathology",
+            "optical imaging"
+        ],
+        "description": "`bioformats2raw` (Glencoe Software) converts proprietary whole-slide microscopy, reflectance confocal microscopy (RCM), and multiphoton acquisitions supported by Bio-Formats into cloud-native OME-Zarr (OME-NGFF) pyramids for downstream viewing and analysis in `napari`, `qupath`, and `webknossos`. ### Included CLI Tool"
+    },
+    "bioformats2raw_arm64": {
+        "apps": {
+            "bioformats2raw_arm64 0.14.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "digital pathology",
+            "optical imaging"
+        ],
+        "description": "`bioformats2raw` (Glencoe Software) converts proprietary whole-slide microscopy, reflectance confocal microscopy (RCM), and multiphoton acquisitions supported by Bio-Formats into cloud-native OME-Zarr (OME-NGFF) pyramids for downstream viewing and analysis in `napari`, `qupath`, and `webknossos`. ### Included CLI Tool"
+    },
     "blastct": {
         "apps": {
             "blastct 2.0.0": {
@@ -1795,6 +1835,48 @@
         "citation": "Thibeau-Sutre, E., D\u00edaz, M., Hassanaly, R., Routier, A., Dormont, D., Colliot, O., Burgos, N.: \u2018ClinicaDL: an open-source deep learning software for reproducible neuroimaging processing\u2018, 2021.\nRoutier, A., Burgos, N., D\u00edaz, M., Bacci, M., Bottani, S., El-Rifai O., Fontanella, S., Gori, P., Guillon, J., Guyot, A., Hassanaly, R., Jacquemont, T., Lu, P., Marcoux, A., Moreau, T., Samper-Gonz\u00e1lez, J., Teichmann, M., Thibeau-Sutre, E., Vaillant G., Wen, J., Wild, A., Habert, M.-O., Durrleman, S., and Colliot, O.: \u2018Clinica: An Open Source Software Platform for Reproducible Clinical Neuroscience Studies\u2019, 2021. doi:10.3389/fninf.2021.689675",
         "description": "Framework for the reproducible processing of neuroimaging data with deep learning methods\nClinicaDL is the deep learning extension of Clinica, a Python library to process neuroimaging data in BIDS format."
     },
+    "cloudcompare": {
+        "apps": {
+            "cloudcompare 2.13.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "CloudCompare-cloudcompare 2.13.2": {
+                "version": "20261125",
+                "exec": "CloudCompare",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image registration",
+            "shape analysis",
+            "visualization"
+        ],
+        "description": "CloudCompare is a 3D point-cloud and triangular mesh processing suite supporting ICP registration, cloud-to-mesh distance mapping, and headless batch operations (`-SILENT`) for longitudinal 3D total-body photography (3D-TBP) and 3D wound surface tracking. ### Included Tools"
+    },
+    "cloudcompare_arm64": {
+        "apps": {
+            "cloudcompare_arm64 2.13.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "CloudCompare-cloudcompare_arm64 2.13.2": {
+                "version": "20261125",
+                "exec": "CloudCompare",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image registration",
+            "shape analysis",
+            "visualization"
+        ],
+        "description": "CloudCompare is a 3D point-cloud and triangular mesh processing suite supporting ICP registration, cloud-to-mesh distance mapping, and headless batch operations (`-SILENT`) for longitudinal 3D total-body photography (3D-TBP) and 3D wound surface tracking. ### Included Tools"
+    },
     "cmtk": {
         "apps": {
             "cmtk 3.4.0": {
@@ -1841,6 +1923,76 @@
             "programming"
         ],
         "description": "Python and Julia environment with VScode and singularity"
+    },
+    "colmap": {
+        "apps": {
+            "colmap 3.12.6": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "COLMAP-colmap 3.12.6": {
+                "version": "20261125",
+                "exec": "colmap gui",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image reconstruction",
+            "shape analysis"
+        ],
+        "description": "COLMAP is a general-purpose Structure-from-Motion (SfM) and Multi-View Stereo (MVS) photogrammetry pipeline \u2014 useful for reconstructing 3D wound, scar, and body surface geometry from overlapping clinical photographs. ### Included Tool"
+    },
+    "colmap_arm64": {
+        "apps": {
+            "colmap_arm64 3.12.6": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "COLMAP-colmap_arm64 3.12.6": {
+                "version": "20261125",
+                "exec": "colmap gui",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image reconstruction",
+            "shape analysis"
+        ],
+        "description": "COLMAP is a general-purpose Structure-from-Motion (SfM) and Multi-View Stereo (MVS) photogrammetry pipeline \u2014 useful for reconstructing 3D wound, scar, and body surface geometry from overlapping clinical photographs. ### Included Tool"
+    },
+    "colour-science": {
+        "apps": {
+            "colour-science 0.4.7": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quality control",
+            "quantitative imaging"
+        ],
+        "description": "Provides `colour-science` (0.4.7) and `colour-checker-detection` (0.2.3) using the classical BSD-3-Clause segmentation detector (backed by Ubuntu's system `python3-opencv` package and excluding the optional AGPL Ultralytics extra), together with the `colour-derm` CLI for dermatology colorimetry, CIELAB/ITA skin-tone quantification, and ColorChecker reference chart detection. ### Included CLI Tool"
+    },
+    "colour-science_arm64": {
+        "apps": {
+            "colour-science_arm64 0.4.7": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quality control",
+            "quantitative imaging"
+        ],
+        "description": "Provides `colour-science` (0.4.7) and `colour-checker-detection` (0.2.3) using the classical BSD-3-Clause segmentation detector (backed by Ubuntu's system `python3-opencv` package and excluding the optional AGPL Ultralytics extra), together with the `colour-derm` CLI for dermatology colorimetry, CIELAB/ITA skin-tone quantification, and ColorChecker reference chart detection. ### Included CLI Tool"
     },
     "condaenvs": {
         "apps": {
@@ -2058,6 +2210,44 @@
         ],
         "citation": "Santini F, Wasserthal J, Agosti A, et al. Deep Anatomical Federated Network (Dafne): an open client/server framework for the continuous collaborative improvement of deep-learning-based medical image segmentation. 2023 doi: 10.48550/arXiv.2302.06352.",
         "description": "Dafne is a program for the segmentation of medical images, specifically MR images, that includes advanced deep learning models for an automatic segmentation. The user has the option of refining the automated results, and the software will learn from the improvements and modify its internal models accordingly. In order to continuously improve the performance, the deep learning modules are stored in a central server location. Dafne uses incremental learning and federated learning to continuously adapt the models to the need of our users. This means that when you perform a segmentation, initially it will not be perfect. You will then have the chance to refine it. When you are satisfied with your dataset, you will export your ROI masks (see below). During this export procedure, the software automatically learns from your refined segmentation and sends the updated model back to our servers. This is why the export procedure takes some time. We will automatically integrate your updated model with the models of our other users, so you will always receive the most accurate predictor. You can also manually perform the incremental learning from the Tools menu (see below)"
+    },
+    "darktable": {
+        "apps": {
+            "darktable 5.4.1": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "darktable-darktable 5.4.1": {
+                "version": "20261125",
+                "exec": "darktable",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "visualization"
+        ],
+        "description": "darktable is an open-source photography workflow application and non-destructive RAW developer \u2014 suited for calibrated RAW DSLR clinical photography, dermoscopy macro shots, and reproducible ICC-profiled batch export via `darktable-cli`. ### Included Tools"
+    },
+    "darktable_arm64": {
+        "apps": {
+            "darktable_arm64 5.4.1": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "darktable-darktable_arm64 5.4.1": {
+                "version": "20261125",
+                "exec": "darktable",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "visualization"
+        ],
+        "description": "darktable is an open-source photography workflow application and non-destructive RAW developer \u2014 suited for calibrated RAW DSLR clinical photography, dermoscopy macro shots, and reproducible ICC-profiled batch export via `darktable-cli`. ### Included Tools"
     },
     "datalad": {
         "apps": {
@@ -2446,6 +2636,23 @@
         "citation": "Liu C, Zhuo Z, Qu L, Jin Y, Hua T, Xu J, Tan G, Li Y, Duan Y, Wang T, Zhang Z,\nZhang Y, Chen R, Yu P, Zhang P, Shi Y, Zhang J, Tian D, Li R, Zhang X, Shi F,\nWang Y, Jiang J, Carass A, Liu Y, Ye C. (2024) DeepWMH: a deep learning tool\nfor accurate white matter hyperintensity segmentation without requiring manual\nannotations for training. Science Bulletin 69(7):872-875.\ndoi:10.1016/j.scib.2024.01.034",
         "description": "DeepWMH is an annotation-free white matter hyperintensity (WMH) segmentation\ntool. It segments WMH lesions from a single T2-FLAIR image without requiring\nmanually labelled training data, using multi-atlas registration and a\nnegative log-likelihood formulation to bootstrap an nnU-Net. The container\nbundles the authors' pre-trained model, ROBEX and ANTs."
     },
+    "dentateseg": {
+        "apps": {
+            "dentateseg 0.3.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "machine learning",
+            "quantitative imaging",
+            "structural imaging"
+        ],
+        "citation": "Shiraishi, D. H.*, Saha, S.*, et al., Harding, I. H., Rezende, T. J. R., TRACK-FA Neuroimaging Consortium (*co-first). Automated Deep Learning-based Segmentation of the Dentate Nucleus Using Quantitative Susceptibility Mapping MRI. Radiology: Artificial Intelligence (2025). https://doi.org/10.1148/ryai.240478",
+        "description": "DentateSeg is an automated deep-learning pipeline for segmenting the left and right cerebellar dentate nuclei from Quantitative Susceptibility Mapping (QSM) MRI images. It runs a two-stage workflow combining a MONAI 3D U-Net cerebellar localization model with a 5-fold 3D full-resolution nnU-Net v2 segmentation ensemble, producing labeled NIfTI masks (1 = left dentate nucleus, 2 = right dentate nucleus) along with CSV and Excel volumetric and texture analysis reports. Both CPU and CUDA GPU execution (`--gpu`, with `--nv` under Apptainer/Singularity or `--gpus=all` under Docker) are supported."
+    },
     "dhcpstructuralpipeline": {
         "apps": {
             "dhcpstructuralpipeline 1.1": {
@@ -2461,6 +2668,36 @@
         ],
         "citation": "Makropoulos, A., Robinson, E. C., Schuh, A., Wright, R., Fitzgibbon, S., Bozek, J., ... Rueckert, D. (2018). The developing human connectome project: A minimal processing pipeline for neonatal cortical surface reconstruction. NeuroImage, 173, 88-112. https://doi.org/10.1016/j.neuroimage.2018.01.054",
         "description": "The dHCP (developing Human Connectome Project) structural pipeline performs automated structural analysis of neonatal brain MRI (T1w and T2w), including tissue and structural segmentation, cortical surface extraction, inflation and spherical projection. It is designed for neonatal data with a post-menstrual age of 28-44 weeks."
+    },
+    "dicom-validator": {
+        "apps": {
+            "dicom-validator 0.9.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "optical imaging",
+            "quality control"
+        ],
+        "description": "`dicom-validator` (0.9.0) validates DICOM files against DICOM PS3.3/PS3.4/PS3.6 standard IOD definitions \u2014 including Supplement 221 Dermoscopic Photography (`1.2.840.10008.5.1.4.1.1.77.1.7`) and Supplement 145 VL Whole Slide Microscopy (`1.2.840.10008.5.1.4.1.1.77.1.6`). This container also includes `highdicom` (0.29.0) for DICOM segmentation, structured reporting (SR), and microscopy/clinical annotation workflows (note: `highdicom` does not provide dedicated image constructors for the Dermoscopic Photography or WSI image IODs). ### Included CLI Tools"
+    },
+    "dicom-validator_arm64": {
+        "apps": {
+            "dicom-validator_arm64 0.9.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "optical imaging",
+            "quality control"
+        ],
+        "description": "`dicom-validator` (0.9.0) validates DICOM files against DICOM PS3.3/PS3.4/PS3.6 standard IOD definitions \u2014 including Supplement 221 Dermoscopic Photography (`1.2.840.10008.5.1.4.1.1.77.1.7`) and Supplement 145 VL Whole Slide Microscopy (`1.2.840.10008.5.1.4.1.1.77.1.6`). This container also includes `highdicom` (0.29.0) for DICOM segmentation, structured reporting (SR), and microscopy/clinical annotation workflows (note: `highdicom` does not provide dedicated image constructors for the Dermoscopic Photography or WSI image IODs). ### Included CLI Tools"
     },
     "dicompare": {
         "apps": {
@@ -3839,6 +4076,36 @@
         "citation": "Halchenko, Yaroslav O., Mathias Goncalves, Satrajit Ghosh, Pablo Velasco, Matteo Visconti Di Oleggio Castello, Taylor Salo, John T. Wodder Ii, et al. \\u201CHeuDiConv \\u2014 Flexible DICOM Conversion into Structureddirectory Layouts.\\u201D Journal of Open Source Software 9, no. 99 (July 3, 2024): 5839. https://doi.org/10.21105/joss.05839.",
         "description": "heudiconv is a flexible DICOM converter for organizing brain imaging data into structured directory layouts."
     },
+    "histoqc": {
+        "apps": {
+            "histoqc 2.0.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "optical imaging",
+            "quality control"
+        ],
+        "description": "HistoQC (commit `376f49a53a8d3891b3f2cf2bd16aa62f6c71f5f5`) is an open-source quality control pipeline for digital pathology whole-slide images (WSIs), detecting tissue area, pen markings, out-of-focus blur, air bubbles, and staining outliers. ### Included CLI Tools"
+    },
+    "histoqc_arm64": {
+        "apps": {
+            "histoqc_arm64 2.0.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "optical imaging",
+            "quality control"
+        ],
+        "description": "HistoQC (commit `376f49a53a8d3891b3f2cf2bd16aa62f6c71f5f5`) is an open-source quality control pipeline for digital pathology whole-slide images (WSIs), detecting tissue area, pen markings, out-of-focus blur, air bubbles, and staining outliers. ### Included CLI Tools"
+    },
     "hmri": {
         "apps": {
             "hmriGUI-hmri 0.6.0": {
@@ -3921,6 +4188,36 @@
         "citation": "Mojiri Forooshani P, Biparva M, Ntiri EE, Ramirez J, Boone L, Holmes MF,\nAdamo S, Gao F, Ozzoude M, Scott CJM, Dowlatshahi D, Lawrence-Dewar JM,\nKwan D, Lang AE, Marcotte K, Leonard C, Rochon E, Heyn C, Bartha R,\nStrother S, Tardif JC, Symons S, Masellis M, Swartz RH, Moody A, Black SE,\nGoubran M. (2022) Deep Bayesian networks for uncertainty estimation and\nadversarial resistance of white matter hyperintensity segmentation.\nHuman Brain Mapping 43(7):2089-2108. doi:10.1002/hbm.25784",
         "description": "HyperMapp3r is a CNN-based white matter hyperintensity (WMH) segmentation\ntool from AICONS Lab. It segments WMH from T1-weighted and FLAIR images\nusing a 3D U-Net with Monte-Carlo dropout, designed to be robust in patients\nwith large lesion burden and brain atrophy. Runs on CPU."
     },
+    "hyperspy": {
+        "apps": {
+            "hyperspy 2.5.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "HyperSpy is an open-source Python library for multi-dimensional spectroscopic and hyperspectral data analysis (decomposition, blind source separation, curve fitting, and HDF5/TIFF I/O via RosettaSciIO 0.15.0) \u2014 suited for Raman, reflectance, and fluorescence optical skin imaging. ### Included CLI Tool"
+    },
+    "hyperspy_arm64": {
+        "apps": {
+            "hyperspy_arm64 2.5.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "HyperSpy is an open-source Python library for multi-dimensional spectroscopic and hyperspectral data analysis (decomposition, blind source separation, curve fitting, and HDF5/TIFF I/O via RosettaSciIO 0.15.0) \u2014 suited for Raman, reflectance, and fluorescence optical skin imaging. ### Included CLI Tool"
+    },
     "icy": {
         "apps": {
             "icy 2.5.4.0": {
@@ -3968,9 +4265,67 @@
         "citation": "ilastik: interactive machine learning for (bio)image analysis\nStuart Berg, Dominik Kutra, Thorben Kroeger, Christoph N. Straehle, Bernhard X. Kausler, Carsten Haubold, Martin Schiegg, Janez Ales, Thorsten Beier, Markus Rudy, Kemal Eren, Jaime I Cervantes, Buote Xu, Fynn Beuttenmueller, Adrian Wolny, Chong Zhang, Ullrich Koethe, Fred A. Hamprecht & Anna Kreshuk\nin: Nature Methods, (2019)",
         "description": "ilastik is a simple, user-friendly tool for interactive image classification, segmentation and analysis. It is built as a modular software framework, which currently has workflows for automated (supervised) pixel- and object-level classification, automated and semi-automated object tracking, semi-automated segmentation and object counting without detection."
     },
+    "instanseg": {
+        "apps": {
+            "instanseg 0.1.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning"
+        ],
+        "description": "`InstanSeg` (`instanseg-torch`) is an Apache-2.0 embedding-based nuclei and cell instance segmentation toolkit supporting brightfield H&E dermatopathology and multichannel fluorescence microscopy. This container ships the official open-source CPU PyTorch (`2.15.0+cpu`) build on both `x86_64` and `aarch64` without proprietary CUDA wheels. ### Included CLI Tool"
+    },
+    "instanseg_arm64": {
+        "apps": {
+            "instanseg_arm64 0.1.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning"
+        ],
+        "description": "`InstanSeg` (`instanseg-torch`) is an Apache-2.0 embedding-based nuclei and cell instance segmentation toolkit supporting brightfield H&E dermatopathology and multichannel fluorescence microscopy. This container ships the official open-source CPU PyTorch (`2.15.0+cpu`) build on both `x86_64` and `aarch64` without proprietary CUDA wheels. ### Included CLI Tool"
+    },
     "irkernel": {
         "apps": {},
         "categories": []
+    },
+    "isic-cli": {
+        "apps": {
+            "isic-cli 12.8.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "optical imaging"
+        ],
+        "description": "`isic-cli` is the official International Skin Imaging Collaboration (ISIC) command-line interface for querying, downloading, uploading, and validating metadata for dermoscopy, clinical macro, and 3D total-body photography collections in the ISIC Archive. ### Included CLI Tool"
+    },
+    "isic-cli_arm64": {
+        "apps": {
+            "isic-cli_arm64 12.8.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "optical imaging"
+        ],
+        "description": "`isic-cli` is the official International Skin Imaging Collaboration (ISIC) command-line interface for querying, downloading, uploading, and validating metadata for dermoscopy, clinical macro, and 3D total-body photography collections in the ISIC Archive. ### Included CLI Tool"
     },
     "itksnap": {
         "apps": {
@@ -4285,6 +4640,46 @@
         ],
         "citation": "Radwan AM, Emsell L, Blommaert J, et al. Virtual brain grafting: Enabling whole brain parcellation in the presence of large lesions. NeuroImage. 2021;229:117731. doi:10.1016/j.neuroimage.2021.117731"
     },
+    "labelme": {
+        "apps": {
+            "labelme 7.11.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "LabelMe-labelme 7.11.0": {
+                "version": "20261125",
+                "exec": "labelme",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "optical imaging",
+            "visualization"
+        ],
+        "description": "Labelme is an open-source graphical image annotation tool for polygon, rectangle, circle, line, point, and mask labeling \u2014 well suited for offline dermoscopic lesion delineation, clinical macro photography, and chronic wound boundary annotation. This container ships code only (no pre-downloaded AI/SAM weights) and uses Ubuntu 26.04 system `PySide6` packages. ### Included GUI Tool"
+    },
+    "labelme_arm64": {
+        "apps": {
+            "labelme_arm64 7.11.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "LabelMe-labelme_arm64 7.11.0": {
+                "version": "20261125",
+                "exec": "labelme",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image segmentation",
+            "optical imaging",
+            "visualization"
+        ],
+        "description": "Labelme is an open-source graphical image annotation tool for polygon, rectangle, circle, line, point, and mask labeling \u2014 well suited for offline dermoscopic lesion delineation, clinical macro photography, and chronic wound boundary annotation. This container ships code only (no pre-downloaded AI/SAM weights) and uses Ubuntu 26.04 system `PySide6` packages. ### Included GUI Tool"
+    },
     "lashis": {
         "apps": {
             "lashis 1.0": {
@@ -4340,6 +4735,38 @@
         ],
         "citation": "Huber, L., Poser, B. A., Bandettini, P. A., Arora, K., Wagstyl, K., Cho, S., Goense, J., Nothnagel, N., Morgan, A. T., van den Hurk, J., Mueller A. K., Reynolds, R. C., Glen, D. R., Goebel, R. W., Gulban, O. F. (2021). LayNii: A software suite for layer-fMRI. NeuroImage, 118091. https://doi.org/10.1016/j.neuroimage.2021.118091",
         "description": "LayNii is a standalone software suite for mesoscopic (functional) magnetic resonance imaging (e.g. layer-fMRI). It is a collection of C++ programs that depend only on a C++ compiler. The purpose of this package is to provide layer-analysis software that are not (yet) included in the other major MRI analysis software."
+    },
+    "lazyslide": {
+        "apps": {
+            "lazyslide 0.13.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning",
+            "optical imaging"
+        ],
+        "description": "LazySlide (CPU-only PyTorch build, code-only without baked foundation-model checkpoints) provides whole-slide image (WSI) reading, tissue segmentation, tiling, and SpatialData/WSIData integration for computational dermatopathology. ### Included CLI & Python Environment"
+    },
+    "lazyslide_arm64": {
+        "apps": {
+            "lazyslide_arm64 0.13.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning",
+            "optical imaging"
+        ],
+        "description": "LazySlide (CPU-only PyTorch build, code-only without baked foundation-model checkpoints) provides whole-slide image (WSI) reading, tissue segmentation, tiling, and SpatialData/WSIData integration for computational dermatopathology. ### Included CLI & Python Environment"
     },
     "lcmodel": {
         "apps": {
@@ -4968,6 +5395,46 @@
         ],
         "citation": "DuPre, E. M., Salo, T., Ahmed, Z., Bandettini, P. A., Bottenhorn, K. L., Caballero-Gaudes, C., Dowdle, L. T., Gonzalez-Castillo, J., Heunis, S., Kundu, P., Laird, A. R., Markello, R., Markiewicz, C. J., Moia, S., Staden, I., Teves, J. B., Urunuela, E., Vaziri-Pashkam, M., Whitaker, K., & Handwerker, D. A. (2021). TE-dependent analysis of multi-echo fMRI with tedana. Journal of Open Source Software, 6(66), 3669. https://doi.org/10.21105/joss.03669\n\nKundu, P., Inati, S. J., Evans, J. W., Luh, W. M., & Bandettini, P. A. (2012). Differentiating BOLD and non-BOLD signals in fMRI time series using multi-echo EPI. NeuroImage, 60(3), 1759-1770. https://doi.org/10.1016/j.neuroimage.2011.12.028\n\nLi, Y. O., Adali, T., & Calhoun, V. D. (2007). Estimating the number of independent components for functional magnetic resonance imaging data. Human Brain Mapping, 28(11), 1251-1266. https://doi.org/10.1002/hbm.20359",
         "description": "meica is a Rust port of [tedana](https://tedana.readthedocs.io/en/stable/) multi-echo independent component analysis (ME-ICA) denoising for multi-echo fMRI. It ports tedana's workflow (commit e07066c) and its dimensionality estimate, mapca 0.0.8. It needs neither Python nor Matlab, and its results match tedana's to floating-point rounding with identical component classifications. This container is distinct from the `meica` container, which packages the original ME-ICA v3 (`meica.py`) by Kundu et al. The container provides three programs in /opt/meica-rs/bin: - `meica`: the ME-ICA command line tool (source commit edcb2c5be39a78d8bd4899480317ec2539e140a2) - `niimath` 1.0.20261016: used by `meica --moco` for motion correction - `brainchop-mindgrab`: used by `meica --moco` to mask the BOLD reference. It is the `@brainchop/mindgrab` 0.1.20261008 CPU WebAssembly build, run by Node.js 22.23.4 through the neurodesk/webapps node-drivers command line. A run takes about 40 s on 8 cores and about 2.4 GB of memory."
+    },
+    "meshlab": {
+        "apps": {
+            "meshlab 2025.07.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "MeshLab-meshlab 2025.07.0": {
+                "version": "20261125",
+                "exec": "meshlab",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "shape analysis",
+            "visualization"
+        ],
+        "description": "MeshLab is an open-source system for processing, cleaning, remeshing, inspecting, and measuring 3D triangular meshes \u2014 useful for textured `.obj`/`.ply` exports from 3D total-body photography (3D-TBP) systems and 3D wound or scar surface reconstructions. ### Included GUI Tool"
+    },
+    "meshlab_arm64": {
+        "apps": {
+            "meshlab_arm64 2025.07.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "MeshLab-meshlab_arm64 2025.07.0": {
+                "version": "20261125",
+                "exec": "meshlab",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "shape analysis",
+            "visualization"
+        ],
+        "description": "MeshLab is an open-source system for processing, cleaning, remeshing, inspecting, and measuring 3D triangular meshes \u2014 useful for textured `.obj`/`.ply` exports from 3D total-body photography (3D-TBP) systems and 3D wound or scar surface reconstructions. ### Included GUI Tool"
     },
     "metabody": {
         "apps": {
@@ -6199,6 +6666,38 @@
         "citation": "Gorgolewski K, Burns CD, Madison C, Clark D, Halchenko YO, Waskom ML, Ghosh SS. Nipype: a flexible, lightweight and extensible neuroimaging data processing framework in Python. Front Neuroinform. 2011;5:13. doi:10.3389/fninf.2011.00013\n\nEsteban O, Markiewicz CJ, Burns C, et al. nipy/nipype (Zenodo). 2026. doi:10.5281/zenodo.596855",
         "description": "Python environment with VScode and singularity to run Nipype workflows Setup:"
     },
+    "nnunetv2": {
+        "apps": {
+            "nnunetv2 2.8.1": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning",
+            "optical imaging"
+        ],
+        "description": "nnU-Net v2 (CPU PyTorch 2.15.0 build, code-only \u2014 no model weights baked) is a self-configuring deep-learning segmentation framework for 2D and 3D biomedical images including dermoscopy, OCT, HFUS, and histopathology. ### Included CLI Tools"
+    },
+    "nnunetv2_arm64": {
+        "apps": {
+            "nnunetv2_arm64 2.8.1": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning",
+            "optical imaging"
+        ],
+        "description": "nnU-Net v2 (CPU PyTorch 2.15.0 build, code-only \u2014 no model weights baked) is a self-configuring deep-learning segmentation framework for 2D and 3D biomedical images including dermoscopy, OCT, HFUS, and histopathology. ### Included CLI Tools"
+    },
     "nobrainer": {
         "apps": {
             "nobrainer 1.2.1": {
@@ -6247,6 +6746,26 @@
         "citation": "Potvin O, Dieumegarde L, Duchesne S. NOMIS: Quantifying morphometric deviations\nfrom normality over the lifetime of the adult human brain. bioRxiv\n2021.01.25.428063. https://doi.org/10.1101/2021.01.25.428063",
         "description": "NOMIS (NOrmative Morphometry Image Statistics) computes normative Z-scores for FreeSurfer 6.0 morphometry, adjusted for age, sex, head size and image quality, from models of 6,909 healthy adults aged 18-100."
     },
+    "octproz": {
+        "apps": {
+            "octproz 1.8.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "OCTproZ-octproz 1.8.0": {
+                "version": "20261125",
+                "exec": "OCTproZ",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image reconstruction",
+            "optical imaging",
+            "visualization"
+        ],
+        "description": "OCTproZ is GPU-accelerated open-source software (GPL-3.0-or-later) for raw optical coherence tomography (OCT) interferogram reconstruction and real-time 2D B-scan, en face, and 3D volume visualization. This container builds OCTproZ 1.8.0 (`v1.8.0`) from source with CUDA 12.8 (native kernels for compute capability 5.2 through 12.0 plus PTX for newer GPUs) and bundles the in-repo Virtual OCT System and Demo Extension plugins, color lookup tables, and offline documentation. Requirements: - An NVIDIA GPU with a CUDA 12 capable driver (525 or newer). The driver library (`libcuda.so.1`) comes from the host, so launch with GPU passthrough (for"
+    },
     "omero": {
         "apps": {
             "omero 5.8.6": {
@@ -6266,6 +6785,38 @@
         ],
         "citation": "Allan, C., Burel, J.-M., Moore, J., Blackburn, C., Linkert, M., Loynton, S.,\nMacDonald, D., Moore, W. J., Neves, C., Patterson, A., Porter, M., Tarkowska,\nA., Loranger, B., Avondo, J., Lagerstedt, I., Lianas, L., Leo, S., Hands, K.,\nHay, R. T., ... Swedlow, J. R. (2012). OMERO: flexible, model-driven data\nmanagement for experimental biology. Nature Methods, 9(3), 245-253.\nhttps://doi.org/10.1038/nmeth.1896",
         "description": "OMERO.insight is the official desktop client for the Open Microscopy Environment (OMERO), enabling biologists and imaging facilities to browse, annotate, import, and visualize multi-dimensional microscopy image datasets managed on an OMERO server."
+    },
+    "open3d": {
+        "apps": {
+            "open3d 0.20.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image reconstruction",
+            "shape analysis",
+            "visualization"
+        ],
+        "description": "Open3D is an open-source 3D data processing library (CPU build) for point-cloud and triangle-mesh registration (ICP, FPFH), surface reconstruction, normal estimation, and morphometric measurement in 3D total-body photography (3D-TBP) and wound/scar imaging. ### Included CLI & Python Environment"
+    },
+    "open3d_arm64": {
+        "apps": {
+            "open3d_arm64 0.20.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "body",
+            "image reconstruction",
+            "shape analysis",
+            "visualization"
+        ],
+        "description": "Open3D is an open-source 3D data processing library (CPU build) for point-cloud and triangle-mesh registration (ICP, FPFH), surface reconstruction, normal estimation, and morphometric measurement in 3D total-body photography (3D-TBP) and wound/scar imaging. ### Included CLI & Python Environment"
     },
     "openads": {
         "apps": {
@@ -6440,12 +6991,12 @@
                 "exec": "palmettobug"
             },
             "palmettobug 0.2.11": {
-                "version": "20261024",
+                "version": "20261125",
                 "exec": "",
                 "apptainer_args": []
             },
             "palmettobugGUI-palmettobug 0.2.11": {
-                "version": "20261024",
+                "version": "20261125",
                 "exec": "palmettobug",
                 "apptainer_args": []
             }
@@ -6643,6 +7194,36 @@
         ],
         "citation": "Piffer A, Buchner JA, Gennari AG, et al. Enhancing efficiency in paediatric brain tumour segmentation using a pathologically diverse single-center clinical dataset. arXiv. 2025. doi:10.48550/arXiv.2507.22152",
         "description": "PeTu segments paediatric brain tumours into enhancing tumour (ET), cystic component (CC) and T2-hyperintense (T2H) regions from multi-parametric MRI. Part of the BrainLesion Suite (BLS): https://github.com/BrainLesion ### Input requirements Inputs must already be co-registered and resampled to the BraTS/SRI24 atlas grid: **exactly 240x240x155 at 1 mm**. PeTu asserts this and rejects anything else with \"Invalid shape for input data\". Ordinary preprocessed images, including MNI152 1 mm at 182x218x182, are refused. Use brainles-preprocessing to produce conforming images. Upstream recommends retaining the skull and avoiding defacing to preserve optic-nerve anatomy; skull-stripped inputs are a separate runtime example, not validation of paediatric diagnostic accuracy. ### Example"
+    },
+    "phasorpy": {
+        "apps": {
+            "phasorpy 0.13.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "PhasorPy is an open-source Python library and CLI for phasor-space analysis of fluorescence lifetime imaging microscopy (FLIM) and hyperspectral fluorescence data \u2014 useful for multiphoton and NADH/FAD autofluorescence skin imaging. ### Included CLI Tool"
+    },
+    "phasorpy_arm64": {
+        "apps": {
+            "phasorpy_arm64 0.13.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "PhasorPy is an open-source Python library and CLI for phasor-space analysis of fluorescence lifetime imaging microscopy (FLIM) and hyperspectral fluorescence data \u2014 useful for multiphoton and NADH/FAD autofluorescence skin imaging. ### Included CLI Tool"
     },
     "physio": {
         "apps": {
@@ -7641,6 +8222,16 @@
                 "version": "20261116",
                 "exec": "rstudio",
                 "apptainer_args": []
+            },
+            "rstudio 2026.11.1": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "rstudioGUI-rstudio 2026.11.1": {
+                "version": "20261125",
+                "exec": "rstudio",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -7883,6 +8474,22 @@
         ],
         "description": "This project will develop a comprehensive software that will allow biomedical scientists to precisely locate shape changes in their imaging studies. This software called Shape AnaLysis Toolbox (SALT), will enhance the intuitiveness and ease of use for such studies, as well as allow researchers to find shape changes with higher statistical power. Altogether this constitutes a crucial resource for the imaging field that will enable many and important new findings in biomedical imaging studies."
     },
+    "slideflow": {
+        "apps": {
+            "slideflow 3.0.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "machine learning",
+            "optical imaging",
+            "visualization"
+        ],
+        "description": "Slideflow (Apache-2.0 core only, CPU PyTorch + libvips backend) provides whole-slide image reading, tile extraction, stain normalization, and deep learning workflows for computational dermatopathology. Non-commercial add-ons (`slideflow-noncommercial`, `triangle`) are intentionally excluded. ### Included CLI & Python Environment"
+    },
     "smartscope": {
         "apps": {
             "smartscope 0.10.0": {
@@ -8015,6 +8622,36 @@
         ],
         "citation": "If you\u2019re using the fit_svs function in your research please cite [1], [2], [3].\nThe following methods are used in fit_svs by default:\nrats dynamic frequency and phase correction [4]\nwater reference concentration scaling [5]\nWhen separate coil information is available the GLS method of combination is used [6].\n\nThe following methods are used in fit_svs depending on the input options:\nKlose method for eddy current correction [7]\nHSVD residual water removal [8]\n\nReferences\n[1] M. Wilson, \u201cChemical shift and relaxation regularization improve the accuracy of 1H MR spectroscopy analysis,\u201d Magnetic Resonance in Medicine, vol. 93, no. 6, pp. 2287\u20132296, 2025, doi: 10.1002/mrm.30462.\n[2] M. Wilson, \u201cAdaptive baseline fitting for 1H MR spectroscopy analysis,\u201d Magnetic Resonance in Medicine, vol. 85, no. 1, pp. 13\u201329, Jan. 2021, doi: 10.1002/mrm.28385.\n[3] M. Wilson, \u201cSpant: An R package for magnetic resonance spectroscopy analysis,\u201d Journal of Open Source Software, vol. 6, no. 67, p. 3646, Nov. 2021, doi: 10.21105/joss.03646.\n[4] M. Wilson, \u201cRobust retrospective frequency and phase correction for single-voxel MR spectroscopy,\u201d Magnetic Resonance in Medicine, vol. 81, no. 5, pp. 2878\u20132886, May 2019, doi: 10.1002/mrm.27605.\n[5] C. Gasparovic et al., \u201cUse of tissue water as a concentration reference for proton spectroscopic imaging,\u201d Magnetic Resonance in Medicine, vol. 55, no. 6, pp. 1219\u20131226, Jun. 2006, doi: 10.1002/mrm.20901.\n[6] L. An, J. W. van der Veen, S. Li, D. M. Thomasson, and J. Shen, \u201cCombination of Multichannel Single-Voxel MRS Signals Using Generalized Least Squares,\u201d Journal of magnetic resonance imaging : JMRI, vol. 37, no. 6, pp. 1445\u20131450, Jun. 2013, doi: 10.1002/jmri.23941.\n[7] U. Klose, \u201cIn vivo proton spectroscopy in presence of eddy currents,\u201d Magnetic Resonance in Medicine, vol. 14, no. 1, pp. 26\u201330, Apr. 1990, doi: 10.1002/mrm.1910140104.\n[8] H. Barkhuijsen, R. de Beer, and D. van Ormondt, \u201cImproved algorithm for noniterative time-domain model fitting to exponentially damped magnetic resonance signals,\u201d Journal of Magnetic Resonance (1969), vol. 73, no. 3, pp. 553\u2013557, Jul. 1987, doi: 10.1016/0022-2364(87)90023-0.",
         "description": "spant provides a full suite of tools to build automated analysis pipelines for Magnetic Resonance Spectroscopy (MRS) data."
+    },
+    "spectral": {
+        "apps": {
+            "spectral 0.26.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "Spectral Python (SPy) is a pure-Python module for processing hyperspectral and multispectral image cubes (ENVI I/O, spectral unmixing, PCA, and Spectral Angle Mapper classification) \u2014 suited for VIS-NIR skin chromophore and lesion hyperspectral imaging. ### Included CLI Tool"
+    },
+    "spectral_arm64": {
+        "apps": {
+            "spectral_arm64 0.26.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "Spectral Python (SPy) is a pure-Python module for processing hyperspectral and multispectral image cubes (ENVI I/O, spectral unmixing, PCA, and Spectral Angle Mapper classification) \u2014 suited for VIS-NIR skin chromophore and lesion hyperspectral imaging. ### Included CLI Tool"
     },
     "spinalcordtoolbox": {
         "apps": {
@@ -8159,6 +8796,22 @@
         ],
         "citation": "Tierney, T. M., Alexander, N. A., Labra Avila, N., Balbastre, Y., Barnes, G., Bezsudnova, Y., Brudfors, M., Eckstein, K., Flandin, G., Friston, K., Jafarian, A., Kowalczyk, O. S., Litvak, V., Medrano, J., Mellor, S., O'Neill, G., Parr, T., Razi, A., Timms, R., & Zeidman, P. (2025). SPM 25: open source neuroimaging analysis software. arXiv preprint arXiv:2501.12081. https://arxiv.org/abs/2501.12081",
         "description": "___  ____  __  __\n  / __)(  _ \\(  \\/  )\n  \\__ \\ )___/ )    (   Statistical Parametric Mapping\n  (___/(__)  (_/\\/\\_)  SPM - https://www.fil.ion.ucl.ac.uk/spm/\n\nCopyright (C) 1991,1994-2025 Wellcome Centre for Human Neuroimaging\n\n\n\n\n**The Python interface to SPM**\n\nSPM-Python allows full access to all SPM functions without a commercial license. It supports in-memory transfer of\n- User-defined MATLAB classes\n- Function handles\n- N-dimensional cell arrays\n- N-dimensional structure arrays"
+    },
+    "stardist": {
+        "apps": {
+            "stardist 0.9.2": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning",
+            "optical imaging"
+        ],
+        "description": "StarDist (CPU-only TensorFlow/Keras build, code-only without baked pretrained weights) performs star-convex polygon (2D) and polyhedron (3D) instance segmentation of nuclei and cells in H&E histopathology and fluorescence dermatology microscopy. ### Included CLI & Python Environment"
     },
     "startrack": {
         "apps": {
@@ -8403,6 +9056,36 @@
         "citation": "Langkammer, C; Bredies, K; Poser, BA; Barth, M; Reishofer, G; Fan, AP; Bilgic, B; Fazekas, F; Mainero; C; Ropele, S\nFast Quantitative Susceptibility Mapping using 3D EPI and Total Generalized Variation.\nNeuroimage. 2015 May 1;111:622-30. doi: 10.1016/j.neuroimage.2015.02.041",
         "description": "Quantitative susceptibility mapping allows the determination magnetic susceptibility from MRI phase data. TGV QSM is a python implementation to compute this. This container also includes bet2 for brain extraction and dcm2niix to convert dicom data to NiFTI files."
     },
+    "tiatoolbox": {
+        "apps": {
+            "tiatoolbox 2.1.3": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning"
+        ],
+        "description": "TIAToolbox is an open-source computational pathology toolbox from the Tissue Image Analytics (TIA) Centre for reading whole-slide microscopy images, generating Otsu/morphological tissue masks, performing Macenko/Vahadane/Reinhard H&E stain normalization, and extracting tiles at arbitrary resolutions. This container is **code-only** and ships CPU PyTorch (`2.12.1+cpu`), Ubuntu 26.04 system `OpenCV` and `Shapely`, and OpenSlide (`openslide-bin` 4.0.1.1, `openslide-python` 1.4.3). No pretrained model checkpoints (some of which carry non-commercial upstream"
+    },
+    "tiatoolbox_arm64": {
+        "apps": {
+            "tiatoolbox_arm64 2.1.3": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image segmentation",
+            "machine learning"
+        ],
+        "description": "TIAToolbox is an open-source computational pathology toolbox from the Tissue Image Analytics (TIA) Centre for reading whole-slide microscopy images, generating Otsu/morphological tissue masks, performing Macenko/Vahadane/Reinhard H&E stain normalization, and extracting tiles at arbitrary resolutions. This container is **code-only** and ships CPU PyTorch (`2.12.1+cpu`), Ubuntu 26.04 system `OpenCV` and `Shapely`, and OpenSlide (`openslide-bin` 4.0.1.1, `openslide-python` 1.4.3). No pretrained model checkpoints (some of which carry non-commercial upstream"
+    },
     "tissuumaps": {
         "apps": {
             "tissuumaps 3.2.1.14": {
@@ -8632,6 +9315,21 @@
         ],
         "citation": "Wasserthal, Jakob, Peter Neher, and Klaus H. Maier-Hein. \u201cTractSeg - Fast and Accurate White Matter Tract Segmentation.\u201d NeuroImage 183 (2018): 239\u201353. https://doi.org/10.1016/j.neuroimage.2018.07.070.",
         "description": "Tool for fast and accurate white matter bundle segmentation from Diffusion MRI. It can create bundle segmentations, segmentations of the endregions of bundles and Tract Orientation Maps (TOMs). Moreover, it can do tracking on the TOMs creating bundle-specific tractogram and do Tractometry analysis on those."
+    },
+    "valis": {
+        "apps": {
+            "valis 1.2.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "digital pathology",
+            "image registration",
+            "optical imaging"
+        ],
+        "description": "VALIS (Virtual Alignment of pathoLogy Image Series) performs automated rigid and non-rigid registration of serial H&E, IHC, and multiplex dermatopathology whole-slide images using OpenCV contrib (`xfeatures2d`, `optflow`), `pyvips`, `SimpleITK`, and CPU PyTorch. Proprietary non-commercial Magic Leap SuperPoint/SuperGlue code and weights are intentionally omitted; open-licensed detectors/matchers (`VggFD`, `BriskFD`, `OrbFD`, `KazeFD`, `AkazeFD`, `DaisyFD`, `DiskFD`, `LightGlueMatcher`) are included. ### Included CLI & Python Environment"
     },
     "vertexwiser": {
         "apps": {
@@ -8970,6 +9668,34 @@
             "workflows"
         ],
         "description": "This tool was committed for the workshop."
+    },
+    "wsidicomizer": {
+        "apps": {
+            "wsidicomizer 0.32.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "digital pathology"
+        ],
+        "description": "`wsidicomizer` (IMI Bigpicture) reads proprietary whole-slide microscopy formats (`.svs`, `.ndpi`, `.mrxs`, `.czi`, `.tiff`) and converts them to standard DICOM VL Whole Slide Microscopy Image objects (DICOM Supplement 145). This container bundles OpenSlide 4.x (`openslide-bin` 4.0.1.2, `openslide-python` 1.4.7), `imagecodecs`, OpenJPEG, JPEG-LS (`pyjpegls` 1.5.1), and SIMD pyramid downsampling (`wsidicom-kernels`). ### Included CLI Tool"
+    },
+    "wsidicomizer_arm64": {
+        "apps": {
+            "wsidicomizer_arm64 0.32.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "data organisation",
+            "digital pathology"
+        ],
+        "description": "`wsidicomizer` (IMI Bigpicture) reads proprietary whole-slide microscopy formats (`.svs`, `.ndpi`, `.mrxs`, `.czi`, `.tiff`) and converts them to standard DICOM VL Whole Slide Microscopy Image objects (DICOM Supplement 145). This container bundles OpenSlide 4.x (`openslide-bin` 4.0.1.2, `openslide-python` 1.4.7), `imagecodecs`, OpenJPEG, JPEG-LS (`pyjpegls` 1.5.1), and SIMD pyramid downsampling (`wsidicom-kernels`). ### Included CLI Tool"
     },
     "xcpd": {
         "apps": {
