@@ -5534,12 +5534,35 @@
     "minc": {
         "apps": {
             "minc 1.9.18": {
-                "version": "20230208",
-                "exec": ""
+                "version": "20261127",
+                "exec": "",
+                "apptainer_args": []
             },
             "registerGUI-minc 1.9.18": {
-                "version": "20230208",
-                "exec": "register"
+                "version": "20261127",
+                "exec": "register",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "image registration",
+            "image segmentation",
+            "structural imaging"
+        ],
+        "citation": "Vincent RD, Neelin P, Khalili-Mahani N, et al. MINC 2.0: a flexible format for multi-modal images. Front Neuroinform. 2016;10:35. doi:10.3389/fninf.2016.00035",
+        "description": "This software repository contains open-source tools developed at the McConnell Brain Imaging Centre, Montreal Neurological Institute The main documentation site for this repository is located at wikibooks"
+    },
+    "minc_arm64": {
+        "apps": {
+            "minc_arm64 1.9.18": {
+                "version": "20261127",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "registerGUI-minc_arm64 1.9.18": {
+                "version": "20261127",
+                "exec": "register",
+                "apptainer_args": []
             }
         },
         "categories": [
