@@ -1901,7 +1901,7 @@
                 "exec": ""
             },
             "code 240320": {
-                "version": "20261119",
+                "version": "20261126",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -1914,7 +1914,7 @@
     "code_arm64": {
         "apps": {
             "code_arm64 240320": {
-                "version": "20261119",
+                "version": "20261126",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -2569,6 +2569,25 @@
                 "version": "20260924",
                 "exec": "",
                 "apptainer_args": []
+            },
+            "deeplabcut 3.0.3": {
+                "version": "20261128",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "machine learning"
+        ],
+        "citation": "@article{Mathisetal2018,\n    title = {DeepLabCut: markerless pose estimation of user-defined body parts with deep learning},\n    author = {Alexander Mathis and Pranav Mamidanna and Kevin M. Cury and Taiga Abe  and Venkatesh N. Murthy and Mackenzie W. Mathis and Matthias Bethge},\n    journal = {Nature Neuroscience},\n    year = {2018},\n    url = {https://www.nature.com/articles/s41593-018-0209-y}}\n\n @article{NathMathisetal2019,\n    title = {Using DeepLabCut for 3D markerless pose estimation across species and behaviors},\n    author = {Nath*, Tanmay and Mathis*, Alexander and Chen, An Chi and Patel, Amir and Bethge, Matthias and Mathis, Mackenzie W},\n    journal = {Nature Protocols},\n    year = {2019},\n    url = {https://doi.org/10.1038/s41596-019-0176-0}}\n    \n@InProceedings{Mathis_2021_WACV,\n    author    = {Mathis, Alexander and Biasi, Thomas and Schneider, Steffen and Yuksekgonul, Mert and Rogers, Byron and Bethge, Matthias and Mathis, Mackenzie W.},\n    title     = {Pretraining Boosts Out-of-Domain Robustness for Pose Estimation},\n    booktitle = {Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},\n    month     = {January},\n    year      = {2021},\n    pages     = {1859-1868}}\n    \n@article{Lauer2022MultianimalPE,\n    title={Multi-animal pose estimation, identification and tracking with DeepLabCut},\n    author={Jessy Lauer and Mu Zhou and Shaokai Ye and William Menegas and Steffen Schneider and Tanmay Nath and Mohammed Mostafizur Rahman and     Valentina Di Santo and Daniel Soberanes and Guoping Feng and Venkatesh N. Murthy and George Lauder and Catherine Dulac and M. Mathis and Alexander Mathis},\n    journal={Nature Methods},\n    year={2022},\n    volume={19},\n    pages={496 - 504}}\n\n@article{Ye2024SuperAnimal,\n    title={SuperAnimal pretrained pose estimation models for behavioral analysis},\n    author={Shaokai Ye and Anastasiia Filippova and Jessy Lauer and Steffen Schneider and Maxime Vidal and and Tian Qiu and Alexander Mathis and Mackenzie W. Mathis},\n    journal={Nature Communications},\n    year={2024},\n    volume={15}}",
+        "description": "DeepLabCut is a toolbox for state-of-the-art markerless pose estimation of animals performing various behaviors. As long as you can see (label) what you want to track, you can use this toolbox, as it is animal and object agnostic."
+    },
+    "deeplabcut_arm64": {
+        "apps": {
+            "deeplabcut_arm64 3.0.3": {
+                "version": "20261128",
+                "exec": "",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -2726,6 +2745,11 @@
                 "exec": "",
                 "apptainer_args": []
             },
+            "dicompare 0.15.7": {
+                "version": "20261126",
+                "exec": "",
+                "apptainer_args": []
+            },
             "dicompare 0.5.4": {
                 "version": "20260506",
                 "exec": "",
@@ -2757,6 +2781,11 @@
             },
             "dicompare_arm64 0.15.6": {
                 "version": "20261107",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "dicompare_arm64 0.15.7": {
+                "version": "20261126",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -3593,6 +3622,16 @@
                 "exec": "fsleyes",
                 "apptainer_args": []
             },
+            "fsl 6.0.7.24": {
+                "version": "20261128",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fsleyesGUI-fsl 6.0.7.24": {
+                "version": "20261128",
+                "exec": "fsleyes",
+                "apptainer_args": []
+            },
             "fsl 6.0.7.8": {
                 "version": "20240913",
                 "exec": ""
@@ -3622,6 +3661,16 @@
             },
             "fsleyesGUI-fsl_arm64 6.0.7.23": {
                 "version": "20261013",
+                "exec": "fsleyes",
+                "apptainer_args": []
+            },
+            "fsl_arm64 6.0.7.24": {
+                "version": "20261128",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "fsleyesGUI-fsl_arm64 6.0.7.24": {
+                "version": "20261128",
                 "exec": "fsleyes",
                 "apptainer_args": []
             }
@@ -4194,19 +4243,9 @@
                 "version": "20261125",
                 "exec": "",
                 "apptainer_args": []
-            }
-        },
-        "categories": [
-            "optical imaging",
-            "quantitative imaging",
-            "spectroscopy"
-        ],
-        "description": "HyperSpy is an open-source Python library for multi-dimensional spectroscopic and hyperspectral data analysis (decomposition, blind source separation, curve fitting, and HDF5/TIFF I/O via RosettaSciIO 0.15.0) \u2014 suited for Raman, reflectance, and fluorescence optical skin imaging. ### Included CLI Tool"
-    },
-    "hyperspy_arm64": {
-        "apps": {
-            "hyperspy_arm64 2.5.0": {
-                "version": "20261125",
+            },
+            "hyperspy 2.6.0": {
+                "version": "20261128",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -4216,7 +4255,27 @@
             "quantitative imaging",
             "spectroscopy"
         ],
-        "description": "HyperSpy is an open-source Python library for multi-dimensional spectroscopic and hyperspectral data analysis (decomposition, blind source separation, curve fitting, and HDF5/TIFF I/O via RosettaSciIO 0.15.0) \u2014 suited for Raman, reflectance, and fluorescence optical skin imaging. ### Included CLI Tool"
+        "description": "HyperSpy is an open-source Python library for multi-dimensional spectroscopic and hyperspectral data analysis (decomposition, blind source separation, curve fitting, and HDF5/TIFF I/O via RosettaSciIO 0.16.0) \u2014 suited for Raman, reflectance, and fluorescence optical skin imaging. ### Included CLI Tool"
+    },
+    "hyperspy_arm64": {
+        "apps": {
+            "hyperspy_arm64 2.5.0": {
+                "version": "20261125",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "hyperspy_arm64 2.6.0": {
+                "version": "20261128",
+                "exec": "",
+                "apptainer_args": []
+            }
+        },
+        "categories": [
+            "optical imaging",
+            "quantitative imaging",
+            "spectroscopy"
+        ],
+        "description": "HyperSpy is an open-source Python library for multi-dimensional spectroscopic and hyperspectral data analysis (decomposition, blind source separation, curve fitting, and HDF5/TIFF I/O via RosettaSciIO 0.16.0) \u2014 suited for Raman, reflectance, and fluorescence optical skin imaging. ### Included CLI Tool"
     },
     "icy": {
         "apps": {
@@ -4651,6 +4710,16 @@
                 "version": "20261125",
                 "exec": "labelme",
                 "apptainer_args": []
+            },
+            "labelme 7.11.1": {
+                "version": "20261126",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "LabelMe-labelme 7.11.1": {
+                "version": "20261126",
+                "exec": "labelme",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -4669,6 +4738,16 @@
             },
             "LabelMe-labelme_arm64 7.11.0": {
                 "version": "20261125",
+                "exec": "labelme",
+                "apptainer_args": []
+            },
+            "labelme_arm64 7.11.1": {
+                "version": "20261126",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "LabelMe-labelme_arm64 7.11.1": {
+                "version": "20261126",
                 "exec": "labelme",
                 "apptainer_args": []
             }
@@ -5694,7 +5773,7 @@
                 "apptainer_args": []
             },
             "mne 1.13.2": {
-                "version": "20261121",
+                "version": "20261126",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5708,7 +5787,7 @@
     "mne_arm64": {
         "apps": {
             "mne_arm64 1.13.2": {
-                "version": "20261121",
+                "version": "20261126",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5727,7 +5806,7 @@
                 "apptainer_args": []
             },
             "mneextended 1.2.0": {
-                "version": "20261121",
+                "version": "20261128",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -5742,7 +5821,7 @@
     "mneextended_arm64": {
         "apps": {
             "mneextended_arm64 1.2.0": {
-                "version": "20261121",
+                "version": "20261128",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -6126,7 +6205,7 @@
     "mrtrix3src": {
         "apps": {
             "mrtrix3src latest": {
-                "version": "20261017",
+                "version": "20261127",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -7278,6 +7357,16 @@
                 "version": "20261124",
                 "exec": "plantseg-gui",
                 "apptainer_args": []
+            },
+            "plantseg 2.3.0": {
+                "version": "20261127",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "PlantSeg (PanSeg)-plantseg 2.3.0": {
+                "version": "20261127",
+                "exec": "plantseg-gui",
+                "apptainer_args": []
             }
         },
         "categories": [
@@ -7291,7 +7380,7 @@
     "postgresanalytics": {
         "apps": {
             "postgresanalytics 18.7.0": {
-                "version": "20261123",
+                "version": "20261128",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -7306,7 +7395,7 @@
     "postgresanalytics_arm64": {
         "apps": {
             "postgresanalytics_arm64 18.7.0": {
-                "version": "20261123",
+                "version": "20261128",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -7351,7 +7440,7 @@
                 "apptainer_args": []
             },
             "prostatefiducialseg 8.0.4": {
-                "version": "20261124",
+                "version": "20261127",
                 "exec": "",
                 "apptainer_args": []
             }
@@ -9591,6 +9680,11 @@
             },
             "webknossos 5.0.0": {
                 "version": "20261124",
+                "exec": "",
+                "apptainer_args": []
+            },
+            "webknossos 5.1.0": {
+                "version": "20261127",
                 "exec": "",
                 "apptainer_args": []
             }
