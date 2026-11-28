@@ -38,6 +38,10 @@ DIRECTORY_NAMES = [
     "Statistics",
     "Fetal Imaging",
     "Arterial Spin Labelling",
+    "Digital Pathology",
+    "Molecular Imaging",
+    "Optical Imaging",
+    "Preclinical Imaging",
 ]
 
 

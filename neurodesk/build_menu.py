@@ -536,6 +536,10 @@ def build_menu(installdir, deskenv, sh_prefix):
         write_directory_file("Statistics", directories_path, icon_dir)
         write_directory_file("Fetal Imaging", directories_path, icon_dir)
         write_directory_file("Arterial Spin Labelling", directories_path, icon_dir)
+        write_directory_file("Digital Pathology", directories_path, icon_dir)
+        write_directory_file("Molecular Imaging", directories_path, icon_dir)
+        write_directory_file("Optical Imaging", directories_path, icon_dir)
+        write_directory_file("Preclinical Imaging", directories_path, icon_dir)
 
     appsjson = Path("neurodesk/apps.json").resolve(strict=True)
     (installdir / "icons").mkdir(exist_ok=True)

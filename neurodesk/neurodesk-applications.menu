@@ -266,6 +266,42 @@
 				</And>
 			</Include>
 		</Menu>
+		<Menu>
+			<Name>Digital Pathology</Name>
+			<Directory>neurodesk/digital-pathology.directory</Directory>
+			<Include>
+				<And>
+					<Category>digital-pathology</Category>
+				</And>
+			</Include>
+		</Menu>
+		<Menu>
+			<Name>Molecular Imaging</Name>
+			<Directory>neurodesk/molecular-imaging.directory</Directory>
+			<Include>
+				<And>
+					<Category>molecular-imaging</Category>
+				</And>
+			</Include>
+		</Menu>
+		<Menu>
+			<Name>Optical Imaging</Name>
+			<Directory>neurodesk/optical-imaging.directory</Directory>
+			<Include>
+				<And>
+					<Category>optical-imaging</Category>
+				</And>
+			</Include>
+		</Menu>
+		<Menu>
+			<Name>Preclinical Imaging</Name>
+			<Directory>neurodesk/preclinical-imaging.directory</Directory>
+			<Include>
+				<And>
+					<Category>preclinical-imaging</Category>
+				</And>
+			</Include>
+		</Menu>
 	</Menu> <!-- End Neurodesk -->
 
 </Menu> <!-- End Applications -->
